@@ -1,6 +1,7 @@
 project:
   type: default
   output-dir: _output
+  pre-render: scripts/check_paper.py
   render:
     - paper/index.qmd
 

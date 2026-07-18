@@ -10,9 +10,13 @@ revision.
 ## Build
 
 ```bash
-uv run python scripts/build_tables.py   # regenerate tables from data/
-quarto render paper/index.qmd           # HTML + PDF to _output/
+quarto render   # runs scripts/check_paper.py pre-render, then HTML + PDF to _output/
 ```
+
+The pre-render check regenerates every table from `data/` via
+`scripts/build_tables.py`, verifies `data/SHA256SUMS`, and re-derives
+the load-bearing prose figures; the render fails if any of them
+drifts from the artifacts.
 
 Every numeric table is generated from the artifacts in `data/`
 (SHA-256 sums in `data/SHA256SUMS`), which are produced by the scripts

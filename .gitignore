@@ -4,3 +4,4 @@ _output/
 
 /.quarto/
 **/*.quarto_ipynb
+paper/index_files/

@@ -1,0 +1,42 @@
+{
+ "generated_by": "scripts/simulate_nowcast_rate_impact.py (PolicyEngine US microsimulation, default Populace dataset, spm-calculator 0.4.0)",
+ "threshold_ratio_nowcast_over_current": {
+  "OWNER_WITH_MORTGAGE": 1.0189540220741273,
+  "OWNER_WITHOUT_MORTGAGE": 1.0132176449593837,
+  "RENTER": 1.0116078064507583
+ },
+ "2025": {
+  "all": {
+   "current_cpi_aging_rate": 0.17023514484029875,
+   "nowcast_rate": 0.17416539061300798,
+   "delta_pp": 0.3930245772709229
+  },
+  "children (<18)": {
+   "current_cpi_aging_rate": 0.16172534520118156,
+   "nowcast_rate": 0.16905640948015768,
+   "delta_pp": 0.7331064278976118
+  },
+  "seniors (65+)": {
+   "current_cpi_aging_rate": 0.1737017922650426,
+   "nowcast_rate": 0.1759364571685478,
+   "delta_pp": 0.22346649035052124
+  }
+ },
+ "2026": {
+  "all": {
+   "current_cpi_aging_rate": 0.1666625294169207,
+   "nowcast_rate": 0.17777724358238503,
+   "delta_pp": 1.1114714165464334
+  },
+  "children (<18)": {
+   "current_cpi_aging_rate": 0.16147447623258904,
+   "nowcast_rate": 0.17602136711927588,
+   "delta_pp": 1.454689088668684
+  },
+  "seniors (65+)": {
+   "current_cpi_aging_rate": 0.16673899373591913,
+   "nowcast_rate": 0.1734941714084882,
+   "delta_pp": 0.6755177672569057
+  }
+ }
+}
