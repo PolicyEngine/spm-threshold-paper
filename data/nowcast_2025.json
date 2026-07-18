@@ -1,0 +1,34 @@
+{
+  "generated_by": "scripts/compute_nowcast_2025.py",
+  "label": "PolicyEngine nowcast of 2025 SPM thresholds \u2014 NOT a BLS publication",
+  "method": "50/50 blend of realized FCSUti-composite CPI aging and CE replication growth ratio, applied to the corrected 2024 base. Selected by backtest over 2020-2024 (see docs/bls-2026-correction.md): mean absolute error 1.35%/yr vs 2.23% for All-Items CPI-U aging.",
+  "caveats": [
+    "BLS publishes actual 2025 thresholds ~September 2026; this nowcast is superseded the day they do.",
+    "2025 CPI annual averages are 11-month means (October 2025 release canceled during the federal shutdown).",
+    "All projection rules tested were biased low in 2022-2024 (real FCSUti consumption growth and in-kind benefit changes are not fully captured); the blend's backtest errors ranged -0.6% to -2.4% by year."
+  ],
+  "base_year": 2024,
+  "base_series": "bls-corrected-2026-07-17",
+  "values": {
+    "owner_with_mortgage": 41099.572342177584,
+    "owner_without_mortgage": 34250.695183843076,
+    "renter": 40791.71685501318
+  },
+  "components": {
+    "owner_with_mortgage": {
+      "replication_ratio": 1.060664251905302,
+      "price_ratio": 1.0345960345615974,
+      "blend_ratio": 1.0476301432334498
+    },
+    "owner_without_mortgage": {
+      "replication_ratio": 1.0488686233525495,
+      "price_ratio": 1.0345960345615974,
+      "blend_ratio": 1.0417323289570735
+    },
+    "renter": {
+      "replication_ratio": 1.0455583359188911,
+      "price_ratio": 1.0345960345615974,
+      "blend_ratio": 1.0400771852402442
+    }
+  }
+}

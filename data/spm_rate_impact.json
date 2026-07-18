@@ -1,0 +1,38 @@
+{
+ "2024": {
+  "all": {
+   "published_rate": 0.181327118635311,
+   "corrected_rate": 0.17965683442027183,
+   "delta_pp": -0.1670284215039175
+  },
+  "children (<18)": {
+   "published_rate": 0.16418073748143222,
+   "corrected_rate": 0.1609409281034637,
+   "delta_pp": -0.3239809377968528
+  },
+  "seniors (65+)": {
+   "published_rate": 0.18453320779748889,
+   "corrected_rate": 0.18393118794681904,
+   "delta_pp": -0.06020198506698493
+  },
+  "mean_threshold_change_pct": NaN
+ },
+ "2026": {
+  "all": {
+   "published_rate": 0.16867101999348488,
+   "corrected_rate": 0.1666625294169207,
+   "delta_pp": -0.2008490576564187
+  },
+  "children (<18)": {
+   "published_rate": 0.16373909670066505,
+   "corrected_rate": 0.16147447623258904,
+   "delta_pp": -0.22646204680760174
+  },
+  "seniors (65+)": {
+   "published_rate": 0.16815925462621328,
+   "corrected_rate": 0.16673899373591913,
+   "delta_pp": -0.14202608902941505
+  },
+  "mean_threshold_change_pct": NaN
+ }
+}

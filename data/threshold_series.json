@@ -1,0 +1,614 @@
+{
+  "generated_by": "scripts/build_threshold_series.py",
+  "default_series": "bls-corrected-2026-07-17",
+  "series": {
+    "bls-corrected-2026-07-17": {
+      "label": "BLS SPM thresholds, corrected series published 2026-07-17",
+      "provenance": {
+        "source_url": "https://www.bls.gov/pir/spm/spm_threshold_200524_corrected.xlsx",
+        "landing_url": "https://www.bls.gov/pir/spm/spm_thresholds_2024_correction.htm",
+        "sha256": "e7931a1f2540d52877d6fd14a8ed1e421e977a85c952ae1b6f690a04d904f2cb",
+        "retrieved": "2026-07-17",
+        "published": "2026-07-17",
+        "note": "BLS reissued 2019-2024 thresholds on 2026-07-17 after finding errors in the code that produced them (introduced with the 2021 methodology change) and re-anchored the revised-methodology series at 82% (previously 83%) of the 47th-53rd percentile FCSUti average to minimize the series break. Workbook footnote 1: these are the thresholds Census uses to produce SPM poverty statistics."
+      },
+      "segments": {
+        "published_2005_2019": {
+          "methodology": {
+            "expenditures": "FCSU out-of-pocket",
+            "anchor": "30th-36th percentile range",
+            "price_index": "All-Items CPI-U",
+            "ce_window": "(T-4)Q2 through (T+1)Q1"
+          },
+          "years": {
+            "2005": {
+              "owner_with_mortgage": {
+                "threshold": 21064.41,
+                "standard_error": 200.21,
+                "tenure_share": 0.4830746879032468
+              },
+              "owner_without_mortgage": {
+                "threshold": 17642.67,
+                "standard_error": 229.79,
+                "tenure_share": 0.11774357003236376
+              },
+              "renter": {
+                "threshold": 20640.57,
+                "standard_error": 224.2,
+                "tenure_share": 0.39918174206438956
+              }
+            },
+            "2006": {
+              "owner_with_mortgage": {
+                "threshold": 22009.65,
+                "standard_error": 193.9,
+                "tenure_share": 0.4717893586973309
+              },
+              "owner_without_mortgage": {
+                "threshold": 18300.52,
+                "standard_error": 279.46,
+                "tenure_share": 0.10180511047740068
+              },
+              "renter": {
+                "threshold": 21278.03,
+                "standard_error": 241.42,
+                "tenure_share": 0.42640553082526833
+              }
+            },
+            "2007": {
+              "owner_with_mortgage": {
+                "threshold": 22771.56,
+                "standard_error": 170.98,
+                "tenure_share": 0.49953140277362656
+              },
+              "owner_without_mortgage": {
+                "threshold": 19206.41,
+                "standard_error": 299.44,
+                "tenure_share": 0.08643918946263303
+              },
+              "renter": {
+                "threshold": 22417.62,
+                "standard_error": 248.69,
+                "tenure_share": 0.41402940776374036
+              }
+            },
+            "2008": {
+              "owner_with_mortgage": {
+                "threshold": 24258.63,
+                "standard_error": 258.81,
+                "tenure_share": 0.4934029927372238
+              },
+              "owner_without_mortgage": {
+                "threshold": 20385.96,
+                "standard_error": 340.08,
+                "tenure_share": 0.08177947487936407
+              },
+              "renter": {
+                "threshold": 23472.44,
+                "standard_error": 256.52,
+                "tenure_share": 0.42481753238341197
+              }
+            },
+            "2009": {
+              "owner_with_mortgage": {
+                "threshold": 24450.46,
+                "standard_error": 241.9,
+                "tenure_share": 0.4894298046875392
+              },
+              "owner_without_mortgage": {
+                "threshold": 20298.15,
+                "standard_error": 335.35,
+                "tenure_share": 0.0844121019386131
+              },
+              "renter": {
+                "threshold": 23873.79,
+                "standard_error": 345.13,
+                "tenure_share": 0.42615809337384764
+              }
+            },
+            "2010": {
+              "owner_with_mortgage": {
+                "threshold": 25018.26,
+                "standard_error": 322.71,
+                "tenure_share": 0.48603574620740103
+              },
+              "owner_without_mortgage": {
+                "threshold": 20590.22,
+                "standard_error": 340.71,
+                "tenure_share": 0.09268678585361236
+              },
+              "renter": {
+                "threshold": 24390.5,
+                "standard_error": 378.72,
+                "tenure_share": 0.4212774679389866
+              }
+            },
+            "2011": {
+              "owner_with_mortgage": {
+                "threshold": 25703.41,
+                "standard_error": 346.77,
+                "tenure_share": 0.4594646331143138
+              },
+              "owner_without_mortgage": {
+                "threshold": 21175.19,
+                "standard_error": 297.7,
+                "tenure_share": 0.10971020790849774
+              },
+              "renter": {
+                "threshold": 25221.52,
+                "standard_error": 377.81,
+                "tenure_share": 0.4308251589771885
+              }
+            },
+            "2012": {
+              "owner_with_mortgage": {
+                "threshold": 25784.217451574375,
+                "standard_error": 368.03406075690776,
+                "tenure_share": 0.43861858106361024
+              },
+              "owner_without_mortgage": {
+                "threshold": 21399.50704050622,
+                "standard_error": 233.3094864011297,
+                "tenure_share": 0.11977723975362309
+              },
+              "renter": {
+                "threshold": 25105.072483651067,
+                "standard_error": 397.5786841244934,
+                "tenure_share": 0.4416041791827668
+              }
+            },
+            "2013": {
+              "owner_with_mortgage": {
+                "threshold": 25639.41,
+                "standard_error": 289.07,
+                "tenure_share": 0.43779791220572883
+              },
+              "owner_without_mortgage": {
+                "threshold": 21397.38,
+                "standard_error": 336.89,
+                "tenure_share": 0.11472478747626333
+              },
+              "renter": {
+                "threshold": 25144.31,
+                "standard_error": 399.67,
+                "tenure_share": 0.44747730031800786
+              }
+            },
+            "2014": {
+              "owner_with_mortgage": {
+                "threshold": 25844.455332,
+                "standard_error": 345.32087189,
+                "tenure_share": 0.41543473322060215
+              },
+              "owner_without_mortgage": {
+                "threshold": 21380.306455,
+                "standard_error": 469.53749524,
+                "tenure_share": 0.10822593177342608
+              },
+              "renter": {
+                "threshold": 25459.570533,
+                "standard_error": 363.38157635,
+                "tenure_share": 0.47633933500597175
+              }
+            },
+            "2015": {
+              "owner_with_mortgage": {
+                "threshold": 25929.883367,
+                "standard_error": 296.71212308,
+                "tenure_share": 0.37082807163
+              },
+              "owner_without_mortgage": {
+                "threshold": 21806.488776,
+                "standard_error": 416.76353732,
+                "tenure_share": 0.11913890155
+              },
+              "renter": {
+                "threshold": 25583.069953,
+                "standard_error": 282.38810283,
+                "tenure_share": 0.51003302682
+              }
+            },
+            "2016": {
+              "owner_with_mortgage": {
+                "threshold": 26335.619055,
+                "standard_error": 279.79084394,
+                "tenure_share": 0.381591480350824
+              },
+              "owner_without_mortgage": {
+                "threshold": 22298.214204,
+                "standard_error": 389.79511046,
+                "tenure_share": 0.12915508486509
+              },
+              "renter": {
+                "threshold": 26104.306345,
+                "standard_error": 301.72861368,
+                "tenure_share": 0.489253434784086
+              }
+            },
+            "2017": {
+              "owner_with_mortgage": {
+                "threshold": 27085.067001,
+                "standard_error": 275.70448129,
+                "tenure_share": 0.3819
+              },
+              "owner_without_mortgage": {
+                "threshold": 23260.655432,
+                "standard_error": 471.35166636,
+                "tenure_share": 0.113
+              },
+              "renter": {
+                "threshold": 27004.994983,
+                "standard_error": 262.66939744,
+                "tenure_share": 0.5051
+              }
+            },
+            "2018": {
+              "owner_with_mortgage": {
+                "threshold": 28343.504154,
+                "standard_error": 328.9411322,
+                "tenure_share": 0.393921399550633
+              },
+              "owner_without_mortgage": {
+                "threshold": 24174.464503,
+                "standard_error": 424.31225186,
+                "tenure_share": 0.137251459499648
+              },
+              "renter": {
+                "threshold": 28167.730141,
+                "standard_error": 253.15801801,
+                "tenure_share": 0.468827140949719
+              }
+            },
+            "2019": {
+              "owner_with_mortgage": {
+                "threshold": 29234.3036109672,
+                "standard_error": 322.079425237689,
+                "tenure_share": 0.389991904101128
+              },
+              "owner_without_mortgage": {
+                "threshold": 24979.8892401075,
+                "standard_error": 574.038551830127,
+                "tenure_share": 0.140054321396666
+              },
+              "renter": {
+                "threshold": 28880.5005587631,
+                "standard_error": 299.701341464383,
+                "tenure_share": 0.469953774502206
+              }
+            }
+          }
+        },
+        "revised_2019_2024": {
+          "methodology": {
+            "expenditures": "FCSUti out-of-pocket plus imputed in-kind benefits (broadband, LIHEAP, NSLP, WIC, rental assistance)",
+            "anchor": "82% of mean FCSUti within the 47th-53rd percentile range (83% before the 2026-07-17 correction)",
+            "median_share": 0.82,
+            "price_index": "FCSUti composite CPI-U",
+            "ce_window": "(T-5)Q2 through (T)Q1"
+          },
+          "years": {
+            "2019": {
+              "owner_with_mortgage": {
+                "threshold": 29076.17484,
+                "standard_error": 200.92191565,
+                "tenure_share": 0.47382986709999997
+              },
+              "owner_without_mortgage": {
+                "threshold": 24514.952286,
+                "standard_error": 327.84241002,
+                "tenure_share": 0.092394537673
+              },
+              "renter": {
+                "threshold": 28913.050035,
+                "standard_error": 204.05348421,
+                "tenure_share": 0.43377559523000003
+              }
+            },
+            "2020": {
+              "owner_with_mortgage": {
+                "threshold": 29814.550519,
+                "standard_error": 223.91102114,
+                "tenure_share": 0.46764297895
+              },
+              "owner_without_mortgage": {
+                "threshold": 25249.135101,
+                "standard_error": 333.63841266,
+                "tenure_share": 0.08892117752300001
+              },
+              "renter": {
+                "threshold": 29978.900071,
+                "standard_error": 256.79521267,
+                "tenure_share": 0.44343584352
+              }
+            },
+            "2021": {
+              "owner_with_mortgage": {
+                "threshold": 30983.241762,
+                "standard_error": 285.77603893,
+                "tenure_share": 0.48052332298000006
+              },
+              "owner_without_mortgage": {
+                "threshold": 26055.401211,
+                "standard_error": 259.38711506,
+                "tenure_share": 0.088476821217
+              },
+              "renter": {
+                "threshold": 31216.693518,
+                "standard_error": 241.9712778,
+                "tenure_share": 0.4309998558
+              }
+            },
+            "2022": {
+              "owner_with_mortgage": {
+                "threshold": 33978.493165,
+                "standard_error": 318.83118091,
+                "tenure_share": 0.50317244758
+              },
+              "owner_without_mortgage": {
+                "threshold": 28454.915504,
+                "standard_error": 439.35663798,
+                "tenure_share": 0.08145292033500001
+              },
+              "renter": {
+                "threshold": 34140.062994,
+                "standard_error": 307.91315069,
+                "tenure_share": 0.41537463208
+              }
+            },
+            "2023": {
+              "owner_with_mortgage": {
+                "threshold": 36966.23764,
+                "standard_error": 329.65613888,
+                "tenure_share": 0.52036835447
+              },
+              "owner_without_mortgage": {
+                "threshold": 30587.725238,
+                "standard_error": 516.90311235,
+                "tenure_share": 0.09857058582
+              },
+              "renter": {
+                "threshold": 37230.752855,
+                "standard_error": 345.03707524,
+                "tenure_share": 0.38106105971
+              }
+            },
+            "2024": {
+              "owner_with_mortgage": {
+                "threshold": 39230.994457,
+                "standard_error": 303.49304574,
+                "tenure_share": 0.52737108113
+              },
+              "owner_without_mortgage": {
+                "threshold": 32878.594848,
+                "standard_error": 681.67747304,
+                "tenure_share": 0.10033422292
+              },
+              "renter": {
+                "threshold": 39219.893902,
+                "standard_error": 325.1136139,
+                "tenure_share": 0.37229469594000003
+              }
+            }
+          }
+        }
+      }
+    },
+    "census-published-pre-correction": {
+      "label": "Thresholds as published before the 2026-07-17 correction (Census P60 reports)",
+      "provenance": {
+        "sources": [
+          "P60-275 (The Supplemental Poverty Measure: 2020, Sept 2021): 2019 revised + 2020",
+          "P60-277 (Poverty in the United States: 2021, Sept 2022): 2020 + 2021",
+          "P60-280 (Poverty in the United States: 2022, Sept 2023): 2021 + 2022",
+          "P60-283 (Poverty in the United States: 2023, Sept 2024): 2022 + 2023",
+          "P60-287 (Poverty in the United States: 2024, Sept 2025): 2023 + 2024"
+        ],
+        "note": "Every SPM statistic Census published for 2019-2024 used these thresholds; superseded by the corrected series on 2026-07-17. Census will re-release 2019-2024 SPM estimates before the September 2026 poverty report. P60-280 notes the 2022 thresholds already reflected an earlier round of computer-code corrections to in-kind benefit estimation."
+      },
+      "years": {
+        "2019": {
+          "owner_with_mortgage": {
+            "threshold": 29080,
+            "standard_error": 210
+          },
+          "owner_without_mortgage": {
+            "threshold": 24413,
+            "standard_error": 344
+          },
+          "renter": {
+            "threshold": 29194,
+            "standard_error": 179
+          }
+        },
+        "2020": {
+          "owner_with_mortgage": {
+            "threshold": 29959,
+            "standard_error": 241
+          },
+          "owner_without_mortgage": {
+            "threshold": 25222,
+            "standard_error": 402
+          },
+          "renter": {
+            "threshold": 30150,
+            "standard_error": 255
+          }
+        },
+        "2021": {
+          "owner_with_mortgage": {
+            "threshold": 31107,
+            "standard_error": 280
+          },
+          "owner_without_mortgage": {
+            "threshold": 26279,
+            "standard_error": 284
+          },
+          "renter": {
+            "threshold": 31453,
+            "standard_error": 231
+          }
+        },
+        "2022": {
+          "owner_with_mortgage": {
+            "threshold": 34235,
+            "standard_error": 307
+          },
+          "owner_without_mortgage": {
+            "threshold": 28909,
+            "standard_error": 525
+          },
+          "renter": {
+            "threshold": 34518,
+            "standard_error": 303
+          }
+        },
+        "2023": {
+          "owner_with_mortgage": {
+            "threshold": 36915,
+            "standard_error": 316
+          },
+          "owner_without_mortgage": {
+            "threshold": 30870,
+            "standard_error": 612
+          },
+          "renter": {
+            "threshold": 37482,
+            "standard_error": 415
+          }
+        },
+        "2024": {
+          "owner_with_mortgage": {
+            "threshold": 39068,
+            "standard_error": 320
+          },
+          "owner_without_mortgage": {
+            "threshold": 32586,
+            "standard_error": 638
+          },
+          "renter": {
+            "threshold": 39430,
+            "standard_error": 327
+          }
+        }
+      }
+    },
+    "package-legacy-0.3": {
+      "label": "Values shipped in spm-calculator <= 0.3.1",
+      "provenance": {
+        "note": "Hand-entered values retained verbatim for reproducibility of results produced with spm-calculator <= 0.3.1. 2022 and 2023 match no BLS or Census publication; superseded by the corrected series."
+      },
+      "years": {
+        "2015": {
+          "renter": {
+            "threshold": 25155.0
+          },
+          "owner_with_mortgage": {
+            "threshold": 24859.0
+          },
+          "owner_without_mortgage": {
+            "threshold": 20639.0
+          }
+        },
+        "2016": {
+          "renter": {
+            "threshold": 25558.0
+          },
+          "owner_with_mortgage": {
+            "threshold": 25248.0
+          },
+          "owner_without_mortgage": {
+            "threshold": 20943.0
+          }
+        },
+        "2017": {
+          "renter": {
+            "threshold": 26213.0
+          },
+          "owner_with_mortgage": {
+            "threshold": 25897.0
+          },
+          "owner_without_mortgage": {
+            "threshold": 21527.0
+          }
+        },
+        "2018": {
+          "renter": {
+            "threshold": 26905.0
+          },
+          "owner_with_mortgage": {
+            "threshold": 26565.0
+          },
+          "owner_without_mortgage": {
+            "threshold": 22095.0
+          }
+        },
+        "2019": {
+          "renter": {
+            "threshold": 27515.0
+          },
+          "owner_with_mortgage": {
+            "threshold": 27172.0
+          },
+          "owner_without_mortgage": {
+            "threshold": 22600.0
+          }
+        },
+        "2020": {
+          "renter": {
+            "threshold": 28881.0
+          },
+          "owner_with_mortgage": {
+            "threshold": 28533.0
+          },
+          "owner_without_mortgage": {
+            "threshold": 23948.0
+          }
+        },
+        "2021": {
+          "renter": {
+            "threshold": 31453.0
+          },
+          "owner_with_mortgage": {
+            "threshold": 31089.0
+          },
+          "owner_without_mortgage": {
+            "threshold": 26022.0
+          }
+        },
+        "2022": {
+          "renter": {
+            "threshold": 33402.0
+          },
+          "owner_with_mortgage": {
+            "threshold": 32949.0
+          },
+          "owner_without_mortgage": {
+            "threshold": 27679.0
+          }
+        },
+        "2023": {
+          "renter": {
+            "threshold": 36606.0
+          },
+          "owner_with_mortgage": {
+            "threshold": 36192.0
+          },
+          "owner_without_mortgage": {
+            "threshold": 30347.0
+          }
+        },
+        "2024": {
+          "renter": {
+            "threshold": 39430.0
+          },
+          "owner_with_mortgage": {
+            "threshold": 39068.0
+          },
+          "owner_without_mortgage": {
+            "threshold": 32586.0
+          }
+        }
+      }
+    }
+  }
+}

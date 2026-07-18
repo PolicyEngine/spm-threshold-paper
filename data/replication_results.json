@@ -1,0 +1,1010 @@
+[
+ {
+  "target_year": 2019,
+  "principal": "include",
+  "annualization": "quarter4",
+  "anchor": "82",
+  "calculated": {
+   "renter": 29741.150911838296,
+   "owner_with_mortgage": 29870.906026054006,
+   "owner_without_mortgage": 25703.88885830078
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": 0.02719759374326025,
+   "owner_without_mortgage": 0.05287710884777708,
+   "renter": 0.0187418960004897
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": 0.027332728270731632,
+   "owner_without_mortgage": 0.04849842489719047,
+   "renter": 0.02864107646325298
+  }
+ },
+ {
+  "target_year": 2019,
+  "principal": "include",
+  "annualization": "quarter4",
+  "anchor": "83",
+  "calculated": {
+   "renter": 30103.847874177787,
+   "owner_with_mortgage": 30235.18536783515,
+   "owner_without_mortgage": 26017.350917548352
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": 0.03972439366695846,
+   "owner_without_mortgage": 0.06571707358982315,
+   "renter": 0.031165577659032273
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": 0.039861176176472224,
+   "owner_without_mortgage": 0.06128499105447349,
+   "renter": 0.04118547983475618
+  }
+ },
+ {
+  "target_year": 2019,
+  "principal": "include",
+  "annualization": "pqcq2",
+  "anchor": "82",
+  "calculated": {
+   "renter": 14870.575455919148,
+   "owner_with_mortgage": 14935.453013027003,
+   "owner_without_mortgage": 12851.94442915039
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.4864012031283699,
+   "owner_without_mortgage": -0.47356144557611146,
+   "renter": -0.49062905199975515
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.4863336358646342,
+   "owner_without_mortgage": -0.47575078755140476,
+   "renter": -0.4856794617683735
+  }
+ },
+ {
+  "target_year": 2019,
+  "principal": "include",
+  "annualization": "pqcq2",
+  "anchor": "83",
+  "calculated": {
+   "renter": 15051.923937088894,
+   "owner_with_mortgage": 15117.592683917575,
+   "owner_without_mortgage": 13008.675458774176
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.48013780316652077,
+   "owner_without_mortgage": -0.4671414632050884,
+   "renter": -0.48441721117048386
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.4800694119117639,
+   "owner_without_mortgage": -0.46935750447276325,
+   "renter": -0.4794072600826219
+  }
+ },
+ {
+  "target_year": 2019,
+  "principal": "exclude",
+  "annualization": "quarter4",
+  "anchor": "82",
+  "calculated": {
+   "renter": 28390.889699618136,
+   "owner_with_mortgage": 27523.707230486627,
+   "owner_without_mortgage": 24024.86957725789
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.053517633064421366,
+   "owner_without_mortgage": -0.0158985140188469,
+   "renter": -0.02750943003294737
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.05339311715025352,
+   "owner_without_mortgage": -0.019991175304958086,
+   "renter": -0.01805967667713282
+  }
+ },
+ {
+  "target_year": 2019,
+  "principal": "exclude",
+  "annualization": "quarter4",
+  "anchor": "83",
+  "calculated": {
+   "renter": 28737.1200618086,
+   "owner_with_mortgage": 27859.362196712074,
+   "owner_without_mortgage": 24317.855791614693
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.041975165174963025,
+   "owner_without_mortgage": -0.003897276384930426,
+   "renter": -0.015649788935788167
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.04184913077403707,
+   "owner_without_mortgage": -0.00803984817453085,
+   "renter": -0.006084794685390582
+  }
+ },
+ {
+  "target_year": 2019,
+  "principal": "exclude",
+  "annualization": "pqcq2",
+  "anchor": "82",
+  "calculated": {
+   "renter": 14195.444849809068,
+   "owner_with_mortgage": 13761.853615243313,
+   "owner_without_mortgage": 12012.434788628945
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.5267588165322107,
+   "owner_without_mortgage": -0.5079492570094235,
+   "renter": -0.5137547150164736
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.5266965585751268,
+   "owner_without_mortgage": -0.5099955876524791,
+   "renter": -0.5090298383385664
+  }
+ },
+ {
+  "target_year": 2019,
+  "principal": "exclude",
+  "annualization": "pqcq2",
+  "anchor": "83",
+  "calculated": {
+   "renter": 14368.5600309043,
+   "owner_with_mortgage": 13929.681098356037,
+   "owner_without_mortgage": 12158.927895807346
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.5209875825874815,
+   "owner_without_mortgage": -0.5019486381924652,
+   "renter": -0.507824894467894
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.5209245653870185,
+   "owner_without_mortgage": -0.5040199240872654,
+   "renter": -0.5030423973426953
+  }
+ },
+ {
+  "target_year": 2020,
+  "principal": "include",
+  "annualization": "quarter4",
+  "anchor": "82",
+  "calculated": {
+   "renter": 30463.22993460877,
+   "owner_with_mortgage": 30461.900895142586,
+   "owner_without_mortgage": 26165.492733965842
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": 0.016786304454173617,
+   "owner_without_mortgage": 0.03740753048790113,
+   "renter": 0.010389052557504774
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": 0.021712565337184797,
+   "owner_without_mortgage": 0.03629263455165055,
+   "renter": 0.016155691585138854
+  }
+ },
+ {
+  "target_year": 2020,
+  "principal": "include",
+  "annualization": "quarter4",
+  "anchor": "83",
+  "calculated": {
+   "renter": 30834.732738689367,
+   "owner_with_mortgage": 30833.38749142481,
+   "owner_without_mortgage": 26484.584108770305
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": 0.029186137435321946,
+   "owner_without_mortgage": 0.050058841835314505,
+   "renter": 0.022710870271620776
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": 0.03417247467056517,
+   "owner_without_mortgage": 0.048930349607158474,
+   "renter": 0.028547834165445485
+  }
+ },
+ {
+  "target_year": 2020,
+  "principal": "include",
+  "annualization": "pqcq2",
+  "anchor": "82",
+  "calculated": {
+   "renter": 15231.614967304386,
+   "owner_with_mortgage": 15230.950447571293,
+   "owner_without_mortgage": 13082.746366982921
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.4916068477729132,
+   "owner_without_mortgage": -0.48129623475604943,
+   "renter": -0.4948054737212476
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.4891437173314076,
+   "owner_without_mortgage": -0.4818536827241747,
+   "renter": -0.4919221542074306
+  }
+ },
+ {
+  "target_year": 2020,
+  "principal": "include",
+  "annualization": "pqcq2",
+  "anchor": "83",
+  "calculated": {
+   "renter": 15417.366369344683,
+   "owner_with_mortgage": 15416.693745712406,
+   "owner_without_mortgage": 13242.292054385152
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.485406931282339,
+   "owner_without_mortgage": -0.47497057908234275,
+   "renter": -0.4886445648641896
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.4829137626647174,
+   "owner_without_mortgage": -0.47553482519642076,
+   "renter": -0.48572608291727726
+  }
+ },
+ {
+  "target_year": 2020,
+  "principal": "exclude",
+  "annualization": "quarter4",
+  "anchor": "82",
+  "calculated": {
+   "renter": 29161.22581434148,
+   "owner_with_mortgage": 27954.37347189644,
+   "owner_without_mortgage": 24501.68688517911
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.06691233112265293,
+   "owner_without_mortgage": -0.02855892137106053,
+   "renter": -0.032795163703433494
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.06239158446873516,
+   "owner_without_mortgage": -0.029602923539004178,
+   "renter": -0.027274991901704015
+  }
+ },
+ {
+  "target_year": 2020,
+  "principal": "exclude",
+  "annualization": "quarter4",
+  "anchor": "83",
+  "calculated": {
+   "renter": 29516.850519394426,
+   "owner_with_mortgage": 28295.280465456155,
+   "owner_without_mortgage": 24800.487944754466
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.05553321320951454,
+   "owner_without_mortgage": -0.01671207894875637,
+   "renter": -0.020999982772987535
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.05095733549884163,
+   "owner_without_mortgage": -0.017768812850455395,
+   "renter": -0.01541249180294435
+  }
+ },
+ {
+  "target_year": 2020,
+  "principal": "exclude",
+  "annualization": "pqcq2",
+  "anchor": "82",
+  "calculated": {
+   "renter": 14580.61290717074,
+   "owner_with_mortgage": 13977.18673594822,
+   "owner_without_mortgage": 12250.843442589556
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.5334561655613265,
+   "owner_without_mortgage": -0.5142794606855303,
+   "renter": -0.5163975818517168
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.5311957922343675,
+   "owner_without_mortgage": -0.514801461769502,
+   "renter": -0.5136374959508521
+  }
+ },
+ {
+  "target_year": 2020,
+  "principal": "exclude",
+  "annualization": "pqcq2",
+  "anchor": "83",
+  "calculated": {
+   "renter": 14758.425259697213,
+   "owner_with_mortgage": 14147.640232728078,
+   "owner_without_mortgage": 12400.243972377233
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.5277666066047573,
+   "owner_without_mortgage": -0.5083560394743782,
+   "renter": -0.5104999913864938
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.5254786677494208,
+   "owner_without_mortgage": -0.5088844064252277,
+   "renter": -0.5077062459014722
+  }
+ },
+ {
+  "target_year": 2021,
+  "principal": "include",
+  "annualization": "quarter4",
+  "anchor": "82",
+  "calculated": {
+   "renter": 31290.53927038965,
+   "owner_with_mortgage": 31103.024920789307,
+   "owner_without_mortgage": 26776.671202352434
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.00012778728937834494,
+   "owner_without_mortgage": 0.018937980986811986,
+   "renter": -0.005165190271527398
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": 0.0038660628125819496,
+   "owner_without_mortgage": 0.027682167912575828,
+   "renter": 0.0023655853348807376
+  }
+ },
+ {
+  "target_year": 2021,
+  "principal": "include",
+  "annualization": "quarter4",
+  "anchor": "83",
+  "calculated": {
+   "renter": 31672.131212711476,
+   "owner_with_mortgage": 31482.33010275015,
+   "owner_without_mortgage": 27103.21597311283
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": 0.012065776280263396,
+   "owner_without_mortgage": 0.03136405392567565,
+   "renter": 0.006966941554429562
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": 0.01610833187127203,
+   "owner_without_mortgage": 0.04021487727736339,
+   "renter": 0.014589555887745354
+  }
+ },
+ {
+  "target_year": 2021,
+  "principal": "include",
+  "annualization": "pqcq2",
+  "anchor": "82",
+  "calculated": {
+   "renter": 15645.269635194825,
+   "owner_with_mortgage": 15551.512460394653,
+   "owner_without_mortgage": 13388.335601176217
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.5000638936446892,
+   "owner_without_mortgage": -0.490531009506594,
+   "renter": -0.5025825951357636
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.498066968593709,
+   "owner_without_mortgage": -0.4861589160437121,
+   "renter": -0.49881720733255963
+  }
+ },
+ {
+  "target_year": 2021,
+  "principal": "include",
+  "annualization": "pqcq2",
+  "anchor": "83",
+  "calculated": {
+   "renter": 15836.065606355738,
+   "owner_with_mortgage": 15741.165051375076,
+   "owner_without_mortgage": 13551.607986556415
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.4939671118598683,
+   "owner_without_mortgage": -0.4843179730371622,
+   "renter": -0.4965165292227852
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.491945834064364,
+   "owner_without_mortgage": -0.4798925613613183,
+   "renter": -0.4927052220561273
+  }
+ },
+ {
+  "target_year": 2021,
+  "principal": "exclude",
+  "annualization": "quarter4",
+  "anchor": "82",
+  "calculated": {
+   "renter": 29901.706414663204,
+   "owner_with_mortgage": 28438.041065524336,
+   "owner_without_mortgage": 25615.025203020476
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.08579930351611098,
+   "owner_without_mortgage": -0.02526636466302079,
+   "renter": -0.04932100547918472
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.08214765633715182,
+   "owner_without_mortgage": -0.01690152473236939,
+   "renter": -0.04212448389444434
+  }
+ },
+ {
+  "target_year": 2021,
+  "principal": "exclude",
+  "annualization": "quarter4",
+  "anchor": "83",
+  "calculated": {
+   "renter": 30266.361370939583,
+   "owner_with_mortgage": 28784.846444372197,
+   "owner_without_mortgage": 25927.40355915487
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.07465051453460003,
+   "owner_without_mortgage": -0.013379369110130823,
+   "renter": -0.03772735920454062
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.07095433507297066,
+   "owner_without_mortgage": -0.0049125189364227495,
+   "renter": -0.03044307516144984
+  }
+ },
+ {
+  "target_year": 2021,
+  "principal": "exclude",
+  "annualization": "pqcq2",
+  "anchor": "82",
+  "calculated": {
+   "renter": 14950.853207331602,
+   "owner_with_mortgage": 14219.020532762168,
+   "owner_without_mortgage": 12807.512601510238
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.5428996517580555,
+   "owner_without_mortgage": -0.5126331823315105,
+   "renter": -0.5246605027395923
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.5410738281685759,
+   "owner_without_mortgage": -0.5084507623661847,
+   "renter": -0.5210622419472222
+  }
+ },
+ {
+  "target_year": 2021,
+  "principal": "exclude",
+  "annualization": "pqcq2",
+  "anchor": "83",
+  "calculated": {
+   "renter": 15133.180685469792,
+   "owner_with_mortgage": 14392.423222186098,
+   "owner_without_mortgage": 12963.701779577435
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.5373252572673,
+   "owner_without_mortgage": -0.5066896845550655,
+   "renter": -0.5188636796022703
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.5354771675364853,
+   "owner_without_mortgage": -0.5024562594682114,
+   "renter": -0.515221537580725
+  }
+ },
+ {
+  "target_year": 2022,
+  "principal": "include",
+  "annualization": "quarter4",
+  "anchor": "82",
+  "calculated": {
+   "renter": 33452.49284414707,
+   "owner_with_mortgage": 33257.55485732262,
+   "owner_without_mortgage": 28641.715582513163
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.028551048420545677,
+   "owner_without_mortgage": -0.009245716471923515,
+   "renter": -0.030868160259949318
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.021217489079827456,
+   "owner_without_mortgage": 0.0065647736148399805,
+   "renter": -0.02013968603320293
+  }
+ },
+ {
+  "target_year": 2022,
+  "principal": "include",
+  "annualization": "quarter4",
+  "anchor": "83",
+  "calculated": {
+   "renter": 33860.45007395374,
+   "owner_with_mortgage": 33663.13479460704,
+   "owner_without_mortgage": 28991.004796934056
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.01670410998664995,
+   "owner_without_mortgage": 0.0028366528393946044,
+   "renter": -0.019049479287509663
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.009281116995435212,
+   "owner_without_mortgage": 0.018839953780874774,
+   "renter": -0.008190170009217623
+  }
+ },
+ {
+  "target_year": 2022,
+  "principal": "include",
+  "annualization": "pqcq2",
+  "anchor": "82",
+  "calculated": {
+   "renter": 16726.246422073535,
+   "owner_with_mortgage": 16628.77742866131,
+   "owner_without_mortgage": 14320.857791256582
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.5142755242102728,
+   "owner_without_mortgage": -0.5046228582359618,
+   "renter": -0.5154340801299746
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.5106087445399137,
+   "owner_without_mortgage": -0.49671761319258,
+   "renter": -0.5100698430166015
+  }
+ },
+ {
+  "target_year": 2022,
+  "principal": "include",
+  "annualization": "pqcq2",
+  "anchor": "83",
+  "calculated": {
+   "renter": 16930.22503697687,
+   "owner_with_mortgage": 16831.56739730352,
+   "owner_without_mortgage": 14495.502398467028
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.5083520549933249,
+   "owner_without_mortgage": -0.4985816735803027,
+   "renter": -0.5095247396437548
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.5046405584977176,
+   "owner_without_mortgage": -0.4905800231095626,
+   "renter": -0.5040950850046089
+  }
+ },
+ {
+  "target_year": 2022,
+  "principal": "exclude",
+  "annualization": "quarter4",
+  "anchor": "82",
+  "calculated": {
+   "renter": 31916.387437561494,
+   "owner_with_mortgage": 30269.392683556365,
+   "owner_without_mortgage": 27135.0583367665
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.1158348858315652,
+   "owner_without_mortgage": -0.061362954901017064,
+   "renter": -0.07536973644007494
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.10916024037417416,
+   "owner_without_mortgage": -0.04638415345313418,
+   "renter": -0.06513390314567691
+  }
+ },
+ {
+  "target_year": 2022,
+  "principal": "exclude",
+  "annualization": "quarter4",
+  "anchor": "83",
+  "calculated": {
+   "renter": 32305.611674604927,
+   "owner_with_mortgage": 30638.531618721685,
+   "owner_without_mortgage": 27465.973682336822
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.10505238443926723,
+   "owner_without_mortgage": -0.04991616166810264,
+   "renter": -0.06409375761617342
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.09829634086654226,
+   "owner_without_mortgage": -0.034754691909879676,
+   "renter": -0.05373309708647789
+  }
+ },
+ {
+  "target_year": 2022,
+  "principal": "exclude",
+  "annualization": "pqcq2",
+  "anchor": "82",
+  "calculated": {
+   "renter": 15958.193718780747,
+   "owner_with_mortgage": 15134.696341778183,
+   "owner_without_mortgage": 13567.52916838325
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.5579174429157826,
+   "owner_without_mortgage": -0.5306814774505085,
+   "renter": -0.5376848682200375
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.554580120187087,
+   "owner_without_mortgage": -0.5231920767265671,
+   "renter": -0.5325669515728384
+  }
+ },
+ {
+  "target_year": 2022,
+  "principal": "exclude",
+  "annualization": "pqcq2",
+  "anchor": "83",
+  "calculated": {
+   "renter": 16152.805837302463,
+   "owner_with_mortgage": 15319.265809360842,
+   "owner_without_mortgage": 13732.986841168411
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.5525261922196336,
+   "owner_without_mortgage": -0.5249580808340513,
+   "renter": -0.5320468788080868
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.5491481704332711,
+   "owner_without_mortgage": -0.5173773459549398,
+   "renter": -0.5268665485432389
+  }
+ },
+ {
+  "target_year": 2023,
+  "principal": "include",
+  "annualization": "quarter4",
+  "anchor": "82",
+  "calculated": {
+   "renter": 35701.100870885726,
+   "owner_with_mortgage": 35232.268273674454,
+   "owner_without_mortgage": 29733.723397280497
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.04558395574496943,
+   "owner_without_mortgage": -0.03680844194102695,
+   "renter": -0.04751344989899886
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.046906839241039555,
+   "owner_without_mortgage": -0.027919756506069038,
+   "renter": -0.04108571185953991
+  }
+ },
+ {
+  "target_year": 2023,
+  "principal": "include",
+  "annualization": "quarter4",
+  "anchor": "83",
+  "calculated": {
+   "renter": 36136.48014979897,
+   "owner_with_mortgage": 35661.93008189,
+   "owner_without_mortgage": 30096.329780174165
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.033944735693078654,
+   "owner_without_mortgage": -0.025062203428112606,
+   "renter": -0.03589776026362068
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.03528375191471067,
+   "owner_without_mortgage": -0.016065119390289317,
+   "renter": -0.029391635174900066
+  }
+ },
+ {
+  "target_year": 2023,
+  "principal": "include",
+  "annualization": "pqcq2",
+  "anchor": "82",
+  "calculated": {
+   "renter": 17850.550435442863,
+   "owner_with_mortgage": 17616.134136837227,
+   "owner_without_mortgage": 14866.861698640249
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.5227919778724848,
+   "owner_without_mortgage": -0.5184042209705135,
+   "renter": -0.5237567249494994
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.5234534196205198,
+   "owner_without_mortgage": -0.5139598782530346,
+   "renter": -0.52054285592977
+  }
+ },
+ {
+  "target_year": 2023,
+  "principal": "include",
+  "annualization": "pqcq2",
+  "anchor": "83",
+  "calculated": {
+   "renter": 18068.240074899484,
+   "owner_with_mortgage": 17830.965040945,
+   "owner_without_mortgage": 15048.164890087082
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.5169723678465393,
+   "owner_without_mortgage": -0.5125311017140564,
+   "renter": -0.5179488801318104
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.5176418759573553,
+   "owner_without_mortgage": -0.5080325596951447,
+   "renter": -0.5146958175874501
+  }
+ },
+ {
+  "target_year": 2023,
+  "principal": "exclude",
+  "annualization": "quarter4",
+  "anchor": "82",
+  "calculated": {
+   "renter": 33655.4726329746,
+   "owner_with_mortgage": 31922.974343534097,
+   "owner_without_mortgage": 28726.03794703309
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.13523027648559938,
+   "owner_without_mortgage": -0.06945131366915802,
+   "renter": -0.10208973285911649
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.13642890427693255,
+   "owner_without_mortgage": -0.06086386864277438,
+   "renter": -0.09603029613582603
+  }
+ },
+ {
+  "target_year": 2023,
+  "principal": "exclude",
+  "annualization": "quarter4",
+  "anchor": "83",
+  "calculated": {
+   "renter": 34065.90522605965,
+   "owner_with_mortgage": 32312.27890869915,
+   "owner_without_mortgage": 29076.35548297252
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.12468430424761878,
+   "owner_without_mortgage": -0.05810315895780627,
+   "renter": -0.09113960765008133
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.12589754945104137,
+   "owner_without_mortgage": -0.04941098899207641,
+   "renter": -0.08500627535699479
+  }
+ },
+ {
+  "target_year": 2023,
+  "principal": "exclude",
+  "annualization": "pqcq2",
+  "anchor": "82",
+  "calculated": {
+   "renter": 16827.7363164873,
+   "owner_with_mortgage": 15961.487171767048,
+   "owner_without_mortgage": 14363.018973516546
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.5676151382427996,
+   "owner_without_mortgage": -0.5347256568345791,
+   "renter": -0.5510448664295582
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.5682144521384662,
+   "owner_without_mortgage": -0.5304319343213872,
+   "renter": -0.548015148067913
+  }
+ },
+ {
+  "target_year": 2023,
+  "principal": "exclude",
+  "annualization": "pqcq2",
+  "anchor": "83",
+  "calculated": {
+   "renter": 17032.952613029825,
+   "owner_with_mortgage": 16156.139454349575,
+   "owner_without_mortgage": 14538.17774148626
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.5623421521238094,
+   "owner_without_mortgage": -0.5290515794789031,
+   "renter": -0.5455698038250407
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.5629487747255206,
+   "owner_without_mortgage": -0.5247054944960382,
+   "renter": -0.5425031376784974
+  }
+ },
+ {
+  "target_year": 2024,
+  "principal": "include",
+  "annualization": "quarter4",
+  "anchor": "82",
+  "calculated": {
+   "renter": 37709.70295680673,
+   "owner_with_mortgage": 37664.18314580443,
+   "owner_without_mortgage": 32232.493232858225
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.03593265214998376,
+   "owner_without_mortgage": -0.010848424695936165,
+   "renter": -0.043629141343983546
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.03993809825322947,
+   "owner_without_mortgage": -0.019651132237516467,
+   "renter": -0.03850573764852183
+  }
+ },
+ {
+  "target_year": 2024,
+  "principal": "include",
+  "annualization": "quarter4",
+  "anchor": "83",
+  "calculated": {
+   "renter": 38169.57738310925,
+   "owner_with_mortgage": 38123.50245246058,
+   "owner_without_mortgage": 32625.57241862479
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.0241757332737641,
+   "owner_without_mortgage": 0.0012143993931379438,
+   "renter": -0.03196608209208085
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.02823002628070792,
+   "owner_without_mortgage": -0.007695658240412961,
+   "renter": -0.026780197863747635
+  }
+ },
+ {
+  "target_year": 2024,
+  "principal": "include",
+  "annualization": "pqcq2",
+  "anchor": "82",
+  "calculated": {
+   "renter": 18854.851478403365,
+   "owner_with_mortgage": 18832.091572902216,
+   "owner_without_mortgage": 16116.246616429113
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.5179663260749918,
+   "owner_without_mortgage": -0.5054242123479681,
+   "renter": -0.5218145706719918
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.5199690491266147,
+   "owner_without_mortgage": -0.5098255661187583,
+   "renter": -0.5192528688242609
+  }
+ },
+ {
+  "target_year": 2024,
+  "principal": "include",
+  "annualization": "pqcq2",
+  "anchor": "83",
+  "calculated": {
+   "renter": 19084.788691554626,
+   "owner_with_mortgage": 19061.75122623029,
+   "owner_without_mortgage": 16312.786209312395
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.512087866636882,
+   "owner_without_mortgage": -0.49939280030343103,
+   "renter": -0.5159830410460404
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.514115013140354,
+   "owner_without_mortgage": -0.5038478291202064,
+   "renter": -0.5133900989318738
+  }
+ },
+ {
+  "target_year": 2024,
+  "principal": "exclude",
+  "annualization": "quarter4",
+  "anchor": "82",
+  "calculated": {
+   "renter": 35457.47371541055,
+   "owner_with_mortgage": 34137.62953444079,
+   "owner_without_mortgage": 30871.60589969319
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.12619971499844396,
+   "owner_without_mortgage": -0.052611369922875184,
+   "renter": -0.10074882791248918
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.12983012521239823,
+   "owner_without_mortgage": -0.06104241855788728,
+   "renter": -0.09593142184399395
+  }
+ },
+ {
+  "target_year": 2024,
+  "principal": "exclude",
+  "annualization": "quarter4",
+  "anchor": "83",
+  "calculated": {
+   "renter": 35889.88193145214,
+   "owner_with_mortgage": 34553.94208973885,
+   "owner_without_mortgage": 31248.088898469938
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.11554361396183965,
+   "owner_without_mortgage": -0.041057850043885735,
+   "renter": -0.08978235020410508
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.11921829747108603,
+   "owner_without_mortgage": -0.04959171634517845,
+   "renter": -0.08490619528111609
+  }
+ },
+ {
+  "target_year": 2024,
+  "principal": "exclude",
+  "annualization": "pqcq2",
+  "anchor": "82",
+  "calculated": {
+   "renter": 17728.736857705277,
+   "owner_with_mortgage": 17068.814767220396,
+   "owner_without_mortgage": 15435.802949846595
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.563099857499222,
+   "owner_without_mortgage": -0.5263056849614376,
+   "renter": -0.5503744139562445
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.5649150626061992,
+   "owner_without_mortgage": -0.5305212092789436,
+   "renter": -0.547965710921997
+  }
+ },
+ {
+  "target_year": 2024,
+  "principal": "exclude",
+  "annualization": "pqcq2",
+  "anchor": "83",
+  "calculated": {
+   "renter": 17944.94096572607,
+   "owner_with_mortgage": 17276.971044869424,
+   "owner_without_mortgage": 15624.044449234969
+  },
+  "dev_vs_published": {
+   "owner_with_mortgage": -0.5577718069809199,
+   "owner_without_mortgage": -0.5205289250219429,
+   "renter": -0.5448911751020525
+  },
+  "dev_vs_corrected": {
+   "owner_with_mortgage": -0.559609148735543,
+   "owner_without_mortgage": -0.5247958581725892,
+   "renter": -0.542453097640558
+  }
+ }
+]

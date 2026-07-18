@@ -1,0 +1,6 @@
+_output/
+*.tex
+.quarto/
+
+/.quarto/
+**/*.quarto_ipynb
