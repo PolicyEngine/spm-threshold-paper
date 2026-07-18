@@ -1,6 +1,6 @@
 | Rule | 2020 | 2021 | 2022 | 2023 | 2024 | Mean |
 |---|---:|---:|---:|---:|---:|---:|
 | All-Items CPI-U aging | 1.78% | 0.92% | 1.29% | 3.99% | 3.16% | 2.23% |
-| FCSUti-composite CPI aging | 0.70% | 0.45% | 1.40% | 2.15% | 2.27% | 1.40% |
-| CE replication growth ratio | 0.97% | 1.31% | 2.27% | 2.73% | 0.62% | 1.58% |
-| **50/50 blend (FCSUti CPI + replication)** | 0.84% | 0.79% | 1.84% | 2.44% | 0.83% | **1.35%** |
+| FCSUti-composite CPI aging | 0.90% | 0.43% | 1.41% | 2.52% | 2.59% | 1.57% |
+| CE replication growth ratio | 0.65% | 0.25% | 0.57% | 0.26% | 0.33% | 0.41% |
+| **50/50 blend (FCSUti CPI + replication)** | 0.45% | 0.09% | 0.54% | 1.39% | 1.32% | **0.76%** |

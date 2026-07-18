@@ -5,19 +5,19 @@
   "annualization": "quarter4",
   "anchor": "82",
   "calculated": {
-   "renter": 29741.150911838296,
-   "owner_with_mortgage": 29870.906026054006,
-   "owner_without_mortgage": 25703.88885830078
+   "renter": 28358.020028378145,
+   "owner_with_mortgage": 28383.465560922737,
+   "owner_without_mortgage": 24009.460182929015
   },
   "dev_vs_published": {
-   "owner_with_mortgage": 0.02719759374326025,
-   "owner_without_mortgage": 0.05287710884777708,
-   "renter": 0.0187418960004897
+   "owner_with_mortgage": -0.023952353475834354,
+   "owner_without_mortgage": -0.01652971028021899,
+   "renter": -0.028635335055896882
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": 0.027332728270731632,
-   "owner_without_mortgage": 0.04849842489719047,
-   "renter": 0.02864107646325298
+   "owner_with_mortgage": -0.02382394805675414,
+   "owner_without_mortgage": -0.020619746560129437,
+   "renter": -0.01919652219153556
   }
  },
  {
@@ -26,19 +26,19 @@
   "annualization": "quarter4",
   "anchor": "83",
   "calculated": {
-   "renter": 30103.847874177787,
-   "owner_with_mortgage": 30235.18536783515,
-   "owner_without_mortgage": 26017.350917548352
+   "renter": 28703.849540919342,
+   "owner_with_mortgage": 28729.605384836428,
+   "owner_without_mortgage": 24302.25847784278
   },
   "dev_vs_published": {
-   "owner_with_mortgage": 0.03972439366695846,
-   "owner_without_mortgage": 0.06571707358982315,
-   "renter": 0.031165577659032273
+   "owner_with_mortgage": -0.012049333396271344,
+   "owner_without_mortgage": -0.004536170161685171,
+   "renter": -0.01678942450779808
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": 0.039861176176472224,
-   "owner_without_mortgage": 0.06128499105447349,
-   "renter": 0.04118547983475618
+   "owner_with_mortgage": -0.01191936205744637,
+   "owner_without_mortgage": -0.008676084932814021,
+   "renter": -0.007235504169481155
   }
  },
  {
@@ -47,19 +47,19 @@
   "annualization": "pqcq2",
   "anchor": "82",
   "calculated": {
-   "renter": 14870.575455919148,
-   "owner_with_mortgage": 14935.453013027003,
-   "owner_without_mortgage": 12851.94442915039
+   "renter": 14179.010014189073,
+   "owner_with_mortgage": 14191.732780461369,
+   "owner_without_mortgage": 12004.730091464507
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.4864012031283699,
-   "owner_without_mortgage": -0.47356144557611146,
-   "renter": -0.49062905199975515
+   "owner_with_mortgage": -0.5119761767379172,
+   "owner_without_mortgage": -0.5082648551401094,
+   "renter": -0.5143176675279484
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.4863336358646342,
-   "owner_without_mortgage": -0.47575078755140476,
-   "renter": -0.4856794617683735
+   "owner_with_mortgage": -0.5119119740283771,
+   "owner_without_mortgage": -0.5103098732800647,
+   "renter": -0.5095982610957678
   }
  },
  {
@@ -68,19 +68,19 @@
   "annualization": "pqcq2",
   "anchor": "83",
   "calculated": {
-   "renter": 15051.923937088894,
-   "owner_with_mortgage": 15117.592683917575,
-   "owner_without_mortgage": 13008.675458774176
+   "renter": 14351.924770459671,
+   "owner_with_mortgage": 14364.802692418214,
+   "owner_without_mortgage": 12151.12923892139
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.48013780316652077,
-   "owner_without_mortgage": -0.4671414632050884,
-   "renter": -0.48441721117048386
+   "owner_with_mortgage": -0.5060246666981356,
+   "owner_without_mortgage": -0.5022680850808425,
+   "renter": -0.508394712253899
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.4800694119117639,
-   "owner_without_mortgage": -0.46935750447276325,
-   "renter": -0.4794072600826219
+   "owner_with_mortgage": -0.5059596810287232,
+   "owner_without_mortgage": -0.504338042466407,
+   "renter": -0.5036177520847406
   }
  },
  {
@@ -89,19 +89,19 @@
   "annualization": "quarter4",
   "anchor": "82",
   "calculated": {
-   "renter": 28390.889699618136,
-   "owner_with_mortgage": 27523.707230486627,
-   "owner_without_mortgage": 24024.86957725789
+   "renter": 26981.012117824546,
+   "owner_with_mortgage": 26125.431783832428,
+   "owner_without_mortgage": 23207.469561495447
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.053517633064421366,
-   "owner_without_mortgage": -0.0158985140188469,
-   "renter": -0.02750943003294737
+   "owner_with_mortgage": -0.10160138294936627,
+   "owner_without_mortgage": -0.04938067580815764,
+   "renter": -0.07580283216330252
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.05339311715025352,
-   "owner_without_mortgage": -0.019991175304958086,
-   "renter": -0.01805967667713282
+   "owner_with_mortgage": -0.10148319276537865,
+   "owner_without_mortgage": -0.053334092159389224,
+   "renter": -0.06682234889908434
   }
  },
  {
@@ -110,19 +110,19 @@
   "annualization": "quarter4",
   "anchor": "83",
   "calculated": {
-   "renter": 28737.1200618086,
-   "owner_with_mortgage": 27859.362196712074,
-   "owner_without_mortgage": 24317.855791614693
+   "renter": 27310.048850968746,
+   "owner_with_mortgage": 26444.034610464532,
+   "owner_without_mortgage": 23490.487482977096
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.041975165174963025,
-   "owner_without_mortgage": -0.003897276384930426,
-   "renter": -0.015649788935788167
+   "owner_with_mortgage": -0.09064530225362677,
+   "owner_without_mortgage": -0.037787757220452356,
+   "renter": -0.06453213499456234
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.04184913077403707,
-   "owner_without_mortgage": -0.00803984817453085,
-   "renter": -0.006084794685390582
+   "owner_with_mortgage": -0.09052567072593198,
+   "owner_without_mortgage": -0.04178938596621107,
+   "renter": -0.05544213364175621
   }
  },
  {
@@ -131,19 +131,19 @@
   "annualization": "pqcq2",
   "anchor": "82",
   "calculated": {
-   "renter": 14195.444849809068,
-   "owner_with_mortgage": 13761.853615243313,
-   "owner_without_mortgage": 12012.434788628945
+   "renter": 13490.506058912273,
+   "owner_with_mortgage": 13062.715891916214,
+   "owner_without_mortgage": 11603.734780747724
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.5267588165322107,
-   "owner_without_mortgage": -0.5079492570094235,
-   "renter": -0.5137547150164736
+   "owner_with_mortgage": -0.5508006914746831,
+   "owner_without_mortgage": -0.5246903379040788,
+   "renter": -0.5379014160816513
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.5266965585751268,
-   "owner_without_mortgage": -0.5099955876524791,
-   "renter": -0.5090298383385664
+   "owner_with_mortgage": -0.5507415963826894,
+   "owner_without_mortgage": -0.5266670460796946,
+   "renter": -0.5334111744495422
   }
  },
  {
@@ -152,19 +152,19 @@
   "annualization": "pqcq2",
   "anchor": "83",
   "calculated": {
-   "renter": 14368.5600309043,
-   "owner_with_mortgage": 13929.681098356037,
-   "owner_without_mortgage": 12158.927895807346
+   "renter": 13655.024425484373,
+   "owner_with_mortgage": 13222.017305232266,
+   "owner_without_mortgage": 11745.243741488548
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.5209875825874815,
-   "owner_without_mortgage": -0.5019486381924652,
-   "renter": -0.507824894467894
+   "owner_with_mortgage": -0.5453226511268134,
+   "owner_without_mortgage": -0.5188938786102262,
+   "renter": -0.5322660674972812
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.5209245653870185,
-   "owner_without_mortgage": -0.5040199240872654,
-   "renter": -0.5030423973426953
+   "owner_with_mortgage": -0.545262835362966,
+   "owner_without_mortgage": -0.5208946929831055,
+   "renter": -0.527721066820878
   }
  },
  {
@@ -173,19 +173,19 @@
   "annualization": "quarter4",
   "anchor": "82",
   "calculated": {
-   "renter": 30463.22993460877,
-   "owner_with_mortgage": 30461.900895142586,
-   "owner_without_mortgage": 26165.492733965842
+   "renter": 29272.924744394822,
+   "owner_with_mortgage": 29148.512145232922,
+   "owner_without_mortgage": 25063.032372666927
   },
   "dev_vs_published": {
-   "owner_with_mortgage": 0.016786304454173617,
-   "owner_without_mortgage": 0.03740753048790113,
-   "renter": 0.010389052557504774
+   "owner_with_mortgage": -0.0270532345794946,
+   "owner_without_mortgage": -0.00630273679062221,
+   "renter": -0.029090389903985936
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": 0.021712565337184797,
-   "owner_without_mortgage": 0.03629263455165055,
-   "renter": 0.016155691585138854
+   "owner_with_mortgage": -0.02233937329837088,
+   "owner_without_mortgage": -0.007370657552769111,
+   "renter": -0.023549073679594468
   }
  },
  {
@@ -194,19 +194,19 @@
   "annualization": "quarter4",
   "anchor": "83",
   "calculated": {
-   "renter": 30834.732738689367,
-   "owner_with_mortgage": 30833.38749142481,
-   "owner_without_mortgage": 26484.584108770305
+   "renter": 29629.91163152159,
+   "owner_with_mortgage": 29503.98180554064,
+   "owner_without_mortgage": 25368.67910891896
   },
   "dev_vs_published": {
-   "owner_with_mortgage": 0.029186137435321946,
-   "owner_without_mortgage": 0.050058841835314505,
-   "renter": 0.022710870271620776
+   "owner_with_mortgage": -0.015188030123146956,
+   "owner_without_mortgage": 0.0058155225168092795,
+   "renter": -0.01725002880525406
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": 0.03417247467056517,
-   "owner_without_mortgage": 0.048930349607158474,
-   "renter": 0.028547834165445485
+   "owner_with_mortgage": -0.010416682728838889,
+   "owner_without_mortgage": 0.004734578330733763,
+   "renter": -0.011641135553735804
   }
  },
  {
@@ -215,19 +215,19 @@
   "annualization": "pqcq2",
   "anchor": "82",
   "calculated": {
-   "renter": 15231.614967304386,
-   "owner_with_mortgage": 15230.950447571293,
-   "owner_without_mortgage": 13082.746366982921
+   "renter": 14636.462372197411,
+   "owner_with_mortgage": 14574.256072616461,
+   "owner_without_mortgage": 12531.516186333463
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.4916068477729132,
-   "owner_without_mortgage": -0.48129623475604943,
-   "renter": -0.4948054737212476
+   "owner_with_mortgage": -0.5135266172897472,
+   "owner_without_mortgage": -0.503151368395311,
+   "renter": -0.514545194951993
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.4891437173314076,
-   "owner_without_mortgage": -0.4818536827241747,
-   "renter": -0.4919221542074306
+   "owner_with_mortgage": -0.5111696866491855,
+   "owner_without_mortgage": -0.5036853287763845,
+   "renter": -0.5117745368397972
   }
  },
  {
@@ -236,19 +236,19 @@
   "annualization": "pqcq2",
   "anchor": "83",
   "calculated": {
-   "renter": 15417.366369344683,
-   "owner_with_mortgage": 15416.693745712406,
-   "owner_without_mortgage": 13242.292054385152
+   "renter": 14814.955815760795,
+   "owner_with_mortgage": 14751.99090277032,
+   "owner_without_mortgage": 12684.33955445948
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.485406931282339,
-   "owner_without_mortgage": -0.47497057908234275,
-   "renter": -0.4886445648641896
+   "owner_with_mortgage": -0.5075940150615734,
+   "owner_without_mortgage": -0.49709223874159536,
+   "renter": -0.508625014402627
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.4829137626647174,
-   "owner_without_mortgage": -0.47553482519642076,
-   "renter": -0.48572608291727726
+   "owner_with_mortgage": -0.5052083413644195,
+   "owner_without_mortgage": -0.4976327108346331,
+   "renter": -0.5058205677768679
   }
  },
  {
@@ -257,19 +257,19 @@
   "annualization": "quarter4",
   "anchor": "82",
   "calculated": {
-   "renter": 29161.22581434148,
-   "owner_with_mortgage": 27954.37347189644,
-   "owner_without_mortgage": 24501.68688517911
+   "renter": 27902.679095027266,
+   "owner_with_mortgage": 26762.88634515651,
+   "owner_without_mortgage": 23929.233541816946
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.06691233112265293,
-   "owner_without_mortgage": -0.02855892137106053,
-   "renter": -0.032795163703433494
+   "owner_with_mortgage": -0.10668292182127215,
+   "owner_without_mortgage": -0.05125550940381629,
+   "renter": -0.07453800679843225
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.06239158446873516,
-   "owner_without_mortgage": -0.029602923539004178,
-   "renter": -0.027274991901704015
+   "owner_with_mortgage": -0.10235486098972879,
+   "owner_without_mortgage": -0.05227511967848664,
+   "renter": -0.06925607580850368
   }
  },
  {
@@ -278,19 +278,19 @@
   "annualization": "quarter4",
   "anchor": "83",
   "calculated": {
-   "renter": 29516.850519394426,
-   "owner_with_mortgage": 28295.280465456155,
-   "owner_without_mortgage": 24800.487944754466
+   "renter": 28242.95566935687,
+   "owner_with_mortgage": 27089.26300790232,
+   "owner_without_mortgage": 24221.053463058615
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.05553321320951454,
-   "owner_without_mortgage": -0.01671207894875637,
-   "renter": -0.020999982772987535
+   "owner_with_mortgage": -0.09578881111177551,
+   "owner_without_mortgage": -0.03968545464044826,
+   "renter": -0.06325188493012035
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.05095733549884163,
-   "owner_without_mortgage": -0.017768812850455395,
-   "renter": -0.01541249180294435
+   "owner_with_mortgage": -0.09140796905057924,
+   "owner_without_mortgage": -0.04071749918676093,
+   "renter": -0.05790554014763172
   }
  },
  {
@@ -299,19 +299,19 @@
   "annualization": "pqcq2",
   "anchor": "82",
   "calculated": {
-   "renter": 14580.61290717074,
-   "owner_with_mortgage": 13977.18673594822,
-   "owner_without_mortgage": 12250.843442589556
+   "renter": 13951.339547513633,
+   "owner_with_mortgage": 13381.443172578254,
+   "owner_without_mortgage": 11964.616770908473
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.5334561655613265,
-   "owner_without_mortgage": -0.5142794606855303,
-   "renter": -0.5163975818517168
+   "owner_with_mortgage": -0.5533414609106361,
+   "owner_without_mortgage": -0.5256277547019081,
+   "renter": -0.5372690033992161
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.5311957922343675,
-   "owner_without_mortgage": -0.514801461769502,
-   "renter": -0.5136374959508521
+   "owner_with_mortgage": -0.5511774304948645,
+   "owner_without_mortgage": -0.5261375598392433,
+   "renter": -0.5346280379042518
   }
  },
  {
@@ -320,19 +320,19 @@
   "annualization": "pqcq2",
   "anchor": "83",
   "calculated": {
-   "renter": 14758.425259697213,
-   "owner_with_mortgage": 14147.640232728078,
-   "owner_without_mortgage": 12400.243972377233
+   "renter": 14121.477834678435,
+   "owner_with_mortgage": 13544.63150395116,
+   "owner_without_mortgage": 12110.526731529308
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.5277666066047573,
-   "owner_without_mortgage": -0.5083560394743782,
-   "renter": -0.5104999913864938
+   "owner_with_mortgage": -0.5478944055558878,
+   "owner_without_mortgage": -0.5198427273202242,
+   "renter": -0.5316259424650602
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.5254786677494208,
-   "owner_without_mortgage": -0.5088844064252277,
-   "renter": -0.5077062459014722
+   "owner_with_mortgage": -0.5457039845252896,
+   "owner_without_mortgage": -0.5203587495933805,
+   "renter": -0.5289527700738159
   }
  },
  {
@@ -341,19 +341,19 @@
   "annualization": "quarter4",
   "anchor": "82",
   "calculated": {
-   "renter": 31290.53927038965,
-   "owner_with_mortgage": 31103.024920789307,
-   "owner_without_mortgage": 26776.671202352434
+   "renter": 30621.498793160543,
+   "owner_with_mortgage": 30294.35000470746,
+   "owner_without_mortgage": 25790.146781649022
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.00012778728937834494,
-   "owner_without_mortgage": 0.018937980986811986,
-   "renter": -0.005165190271527398
+   "owner_with_mortgage": -0.02612434485140136,
+   "owner_without_mortgage": -0.018602428492369483,
+   "renter": -0.026436308359757632
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": 0.0038660628125819496,
-   "owner_without_mortgage": 0.027682167912575828,
-   "renter": 0.0023655853348807376
+   "owner_with_mortgage": -0.022234334372894682,
+   "owner_without_mortgage": -0.010180400877457751,
+   "renter": -0.019066552468033127
   }
  },
  {
@@ -362,19 +362,19 @@
   "annualization": "quarter4",
   "anchor": "83",
   "calculated": {
-   "renter": 31672.131212711476,
-   "owner_with_mortgage": 31482.33010275015,
-   "owner_without_mortgage": 27103.21597311283
+   "renter": 30994.931705272258,
+   "owner_with_mortgage": 30663.79329744779,
+   "owner_without_mortgage": 26104.660766791087
   },
   "dev_vs_published": {
-   "owner_with_mortgage": 0.012065776280263396,
-   "owner_without_mortgage": 0.03136405392567565,
-   "renter": 0.006966941554429562
+   "owner_with_mortgage": -0.014247812471540389,
+   "owner_without_mortgage": -0.00663416542520312,
+   "renter": -0.014563580412925381
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": 0.01610833187127203,
-   "owner_without_mortgage": 0.04021487727736339,
-   "renter": 0.014589555887745354
+   "owner_with_mortgage": -0.010310362840856846,
+   "owner_without_mortgage": 0.0018905698435489615,
+   "renter": -0.007103949449350555
   }
  },
  {
@@ -383,19 +383,19 @@
   "annualization": "pqcq2",
   "anchor": "82",
   "calculated": {
-   "renter": 15645.269635194825,
-   "owner_with_mortgage": 15551.512460394653,
-   "owner_without_mortgage": 13388.335601176217
+   "renter": 15310.749396580271,
+   "owner_with_mortgage": 15147.17500235373,
+   "owner_without_mortgage": 12895.073390824511
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.5000638936446892,
-   "owner_without_mortgage": -0.490531009506594,
-   "renter": -0.5025825951357636
+   "owner_with_mortgage": -0.5130621724257007,
+   "owner_without_mortgage": -0.5093012142461848,
+   "renter": -0.5132181541798788
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.498066968593709,
-   "owner_without_mortgage": -0.4861589160437121,
-   "renter": -0.49881720733255963
+   "owner_with_mortgage": -0.5111171671864474,
+   "owner_without_mortgage": -0.5050902004387289,
+   "renter": -0.5095332762340166
   }
  },
  {
@@ -404,19 +404,19 @@
   "annualization": "pqcq2",
   "anchor": "83",
   "calculated": {
-   "renter": 15836.065606355738,
-   "owner_with_mortgage": 15741.165051375076,
-   "owner_without_mortgage": 13551.607986556415
+   "renter": 15497.465852636129,
+   "owner_with_mortgage": 15331.896648723896,
+   "owner_without_mortgage": 13052.330383395543
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.4939671118598683,
-   "owner_without_mortgage": -0.4843179730371622,
-   "renter": -0.4965165292227852
+   "owner_with_mortgage": -0.5071239062357702,
+   "owner_without_mortgage": -0.5033170827126016,
+   "renter": -0.5072817902064627
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.491945834064364,
-   "owner_without_mortgage": -0.4798925613613183,
-   "renter": -0.4927052220561273
+   "owner_with_mortgage": -0.5051551814204285,
+   "owner_without_mortgage": -0.4990547150782255,
+   "renter": -0.5035519747246753
   }
  },
  {
@@ -425,19 +425,19 @@
   "annualization": "quarter4",
   "anchor": "82",
   "calculated": {
-   "renter": 29901.706414663204,
-   "owner_with_mortgage": 28438.041065524336,
-   "owner_without_mortgage": 25615.025203020476
+   "renter": 29054.173788601034,
+   "owner_with_mortgage": 27681.807295438466,
+   "owner_without_mortgage": 25082.179015115067
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.08579930351611098,
-   "owner_without_mortgage": -0.02526636466302079,
-   "renter": -0.04932100547918472
+   "owner_with_mortgage": -0.11011003004344788,
+   "owner_without_mortgage": -0.04554286635278859,
+   "renter": -0.07626700827898658
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.08214765633715182,
-   "owner_without_mortgage": -0.01690152473236939,
-   "renter": -0.04212448389444434
+   "owner_with_mortgage": -0.1065554886709964,
+   "owner_without_mortgage": -0.037352032617101294,
+   "renter": -0.06927446457940922
   }
  },
  {
@@ -446,19 +446,19 @@
   "annualization": "quarter4",
   "anchor": "83",
   "calculated": {
-   "renter": 30266.361370939583,
-   "owner_with_mortgage": 28784.846444372197,
-   "owner_without_mortgage": 25927.40355915487
+   "renter": 29408.492981144947,
+   "owner_with_mortgage": 28019.390311236497,
+   "owner_without_mortgage": 25388.059247006713
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.07465051453460003,
-   "owner_without_mortgage": -0.013379369110130823,
-   "renter": -0.03772735920454062
+   "owner_with_mortgage": -0.09925771333666067,
+   "owner_without_mortgage": -0.03390314521074955,
+   "renter": -0.06500197179458411
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.07095433507297066,
-   "owner_without_mortgage": -0.0049125189364227495,
-   "renter": -0.03044307516144984
+   "owner_with_mortgage": -0.09565982389869154,
+   "owner_without_mortgage": -0.02561242325877333,
+   "renter": -0.057924153171841186
   }
  },
  {
@@ -467,19 +467,19 @@
   "annualization": "pqcq2",
   "anchor": "82",
   "calculated": {
-   "renter": 14950.853207331602,
-   "owner_with_mortgage": 14219.020532762168,
-   "owner_without_mortgage": 12807.512601510238
+   "renter": 14527.086894300517,
+   "owner_with_mortgage": 13840.903647719233,
+   "owner_without_mortgage": 12541.089507557534
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.5428996517580555,
-   "owner_without_mortgage": -0.5126331823315105,
-   "renter": -0.5246605027395923
+   "owner_with_mortgage": -0.5550550150217239,
+   "owner_without_mortgage": -0.5227714331763943,
+   "renter": -0.5381335041394932
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.5410738281685759,
-   "owner_without_mortgage": -0.5084507623661847,
-   "renter": -0.5210622419472222
+   "owner_with_mortgage": -0.5532777443354981,
+   "owner_without_mortgage": -0.5186760163085506,
+   "renter": -0.5346372322897046
   }
  },
  {
@@ -488,19 +488,19 @@
   "annualization": "pqcq2",
   "anchor": "83",
   "calculated": {
-   "renter": 15133.180685469792,
-   "owner_with_mortgage": 14392.423222186098,
-   "owner_without_mortgage": 12963.701779577435
+   "renter": 14704.246490572474,
+   "owner_with_mortgage": 14009.695155618248,
+   "owner_without_mortgage": 12694.029623503357
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.5373252572673,
-   "owner_without_mortgage": -0.5066896845550655,
-   "renter": -0.5188636796022703
+   "owner_with_mortgage": -0.5496288566683303,
+   "owner_without_mortgage": -0.5169515726053748,
+   "renter": -0.532500985897292
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.5354771675364853,
-   "owner_without_mortgage": -0.5024562594682114,
-   "renter": -0.515221537580725
+   "owner_with_mortgage": -0.5478299119493457,
+   "owner_without_mortgage": -0.5128062116293867,
+   "renter": -0.5289620765859206
   }
  },
  {
@@ -509,19 +509,19 @@
   "annualization": "quarter4",
   "anchor": "82",
   "calculated": {
-   "renter": 33452.49284414707,
-   "owner_with_mortgage": 33257.55485732262,
-   "owner_without_mortgage": 28641.715582513163
+   "renter": 33459.36121088154,
+   "owner_with_mortgage": 33265.7198742967,
+   "owner_without_mortgage": 28582.17391376461
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.028551048420545677,
-   "owner_without_mortgage": -0.009245716471923515,
-   "renter": -0.030868160259949318
+   "owner_with_mortgage": -0.02831254931220384,
+   "owner_without_mortgage": -0.011305340421162602,
+   "renter": -0.0306691809814722
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.021217489079827456,
-   "owner_without_mortgage": 0.0065647736148399805,
-   "renter": -0.02013968603320293
+   "owner_with_mortgage": -0.020977189519325146,
+   "owner_without_mortgage": 0.004472282117538473,
+   "renter": -0.01993850401617847
   }
  },
  {
@@ -530,19 +530,19 @@
   "annualization": "quarter4",
   "anchor": "83",
   "calculated": {
-   "renter": 33860.45007395374,
-   "owner_with_mortgage": 33663.13479460704,
-   "owner_without_mortgage": 28991.004796934056
+   "renter": 33867.40220125815,
+   "owner_with_mortgage": 33671.39938495886,
+   "owner_without_mortgage": 28930.737010273933
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.01670410998664995,
-   "owner_without_mortgage": 0.0028366528393946044,
-   "renter": -0.019049479287509663
+   "owner_with_mortgage": -0.016462702352596503,
+   "owner_without_mortgage": 0.000751911524920823,
+   "renter": -0.01884807343246575
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.009281116995435212,
-   "owner_without_mortgage": 0.018839953780874774,
-   "renter": -0.008190170009217623
+   "owner_with_mortgage": -0.009037886952487528,
+   "owner_without_mortgage": 0.01672194409458161,
+   "renter": -0.007986534552961166
   }
  },
  {
@@ -551,19 +551,19 @@
   "annualization": "pqcq2",
   "anchor": "82",
   "calculated": {
-   "renter": 16726.246422073535,
-   "owner_with_mortgage": 16628.77742866131,
-   "owner_without_mortgage": 14320.857791256582
+   "renter": 16729.68060544077,
+   "owner_with_mortgage": 16632.85993714835,
+   "owner_without_mortgage": 14291.086956882305
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.5142755242102728,
-   "owner_without_mortgage": -0.5046228582359618,
-   "renter": -0.5154340801299746
+   "owner_with_mortgage": -0.5141562746561019,
+   "owner_without_mortgage": -0.5056526702105812,
+   "renter": -0.515334590490736
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.5106087445399137,
-   "owner_without_mortgage": -0.49671761319258,
-   "renter": -0.5100698430166015
+   "owner_with_mortgage": -0.5104885947596626,
+   "owner_without_mortgage": -0.49776385894123076,
+   "renter": -0.5099692520080892
   }
  },
  {
@@ -572,19 +572,19 @@
   "annualization": "pqcq2",
   "anchor": "83",
   "calculated": {
-   "renter": 16930.22503697687,
-   "owner_with_mortgage": 16831.56739730352,
-   "owner_without_mortgage": 14495.502398467028
+   "renter": 16933.701100629074,
+   "owner_with_mortgage": 16835.69969247943,
+   "owner_without_mortgage": 14465.368505136967
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.5083520549933249,
-   "owner_without_mortgage": -0.4985816735803027,
-   "renter": -0.5095247396437548
+   "owner_with_mortgage": -0.5082313511762983,
+   "owner_without_mortgage": -0.4996240442375396,
+   "renter": -0.5094240367162328
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.5046405584977176,
-   "owner_without_mortgage": -0.4905800231095626,
-   "renter": -0.5040950850046089
+   "owner_with_mortgage": -0.5045189434762438,
+   "owner_without_mortgage": -0.4916390279527092,
+   "renter": -0.5039932672764806
   }
  },
  {
@@ -593,19 +593,19 @@
   "annualization": "quarter4",
   "anchor": "82",
   "calculated": {
-   "renter": 31916.387437561494,
-   "owner_with_mortgage": 30269.392683556365,
-   "owner_without_mortgage": 27135.0583367665
+   "renter": 31946.185072540753,
+   "owner_with_mortgage": 30328.999625849185,
+   "owner_without_mortgage": 27094.370589063048
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.1158348858315652,
-   "owner_without_mortgage": -0.061362954901017064,
-   "renter": -0.07536973644007494
+   "owner_with_mortgage": -0.11409377462102577,
+   "owner_without_mortgage": -0.06277039714057742,
+   "renter": -0.07450648726633202
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.10916024037417416,
-   "owner_without_mortgage": -0.04638415345313418,
-   "renter": -0.06513390314567691
+   "owner_with_mortgage": -0.1074059853516407,
+   "owner_without_mortgage": -0.04781405570315944,
+   "renter": -0.06426109763900589
   }
  },
  {
@@ -614,19 +614,19 @@
   "annualization": "quarter4",
   "anchor": "83",
   "calculated": {
-   "renter": 32305.611674604927,
-   "owner_with_mortgage": 30638.531618721685,
-   "owner_without_mortgage": 27465.973682336822
+   "renter": 32335.772695376614,
+   "owner_with_mortgage": 30698.865474944905,
+   "owner_without_mortgage": 27424.789742588207
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.10505238443926723,
-   "owner_without_mortgage": -0.04991616166810264,
-   "renter": -0.06409375761617342
+   "owner_with_mortgage": -0.10329004016518462,
+   "owner_without_mortgage": -0.0513407678374137,
+   "renter": -0.06321998101348236
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.09829634086654226,
-   "owner_without_mortgage": -0.034754691909879676,
-   "renter": -0.05373309708647789
+   "owner_with_mortgage": -0.09652069249007544,
+   "owner_without_mortgage": -0.03620203199222238,
+   "renter": -0.05284964761021338
   }
  },
  {
@@ -635,19 +635,19 @@
   "annualization": "pqcq2",
   "anchor": "82",
   "calculated": {
-   "renter": 15958.193718780747,
-   "owner_with_mortgage": 15134.696341778183,
-   "owner_without_mortgage": 13567.52916838325
+   "renter": 15973.092536270377,
+   "owner_with_mortgage": 15164.499812924592,
+   "owner_without_mortgage": 13547.185294531524
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.5579174429157826,
-   "owner_without_mortgage": -0.5306814774505085,
-   "renter": -0.5376848682200375
+   "owner_with_mortgage": -0.5570468873105129,
+   "owner_without_mortgage": -0.5313851985702887,
+   "renter": -0.5372532436331661
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.554580120187087,
-   "owner_without_mortgage": -0.5231920767265671,
-   "renter": -0.5325669515728384
+   "owner_with_mortgage": -0.5537029926758203,
+   "owner_without_mortgage": -0.5239070278515797,
+   "renter": -0.532130548819503
   }
  },
  {
@@ -656,19 +656,19 @@
   "annualization": "pqcq2",
   "anchor": "83",
   "calculated": {
-   "renter": 16152.805837302463,
-   "owner_with_mortgage": 15319.265809360842,
-   "owner_without_mortgage": 13732.986841168411
+   "renter": 16167.886347688307,
+   "owner_with_mortgage": 15349.432737472453,
+   "owner_without_mortgage": 13712.394871294104
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.5525261922196336,
-   "owner_without_mortgage": -0.5249580808340513,
-   "renter": -0.5320468788080868
+   "owner_with_mortgage": -0.5516450200825923,
+   "owner_without_mortgage": -0.5256703839187069,
+   "renter": -0.5316099905067412
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.5491481704332711,
-   "owner_without_mortgage": -0.5173773459549398,
-   "renter": -0.5268665485432389
+   "owner_with_mortgage": -0.5482603462450377,
+   "owner_without_mortgage": -0.5181010159961112,
+   "renter": -0.5264248238051067
   }
  },
  {
@@ -677,19 +677,19 @@
   "annualization": "quarter4",
   "anchor": "82",
   "calculated": {
-   "renter": 35701.100870885726,
-   "owner_with_mortgage": 35232.268273674454,
-   "owner_without_mortgage": 29733.723397280497
+   "renter": 36450.93362500298,
+   "owner_with_mortgage": 36067.79594250496,
+   "owner_without_mortgage": 30618.417127471414
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.04558395574496943,
-   "owner_without_mortgage": -0.03680844194102695,
-   "renter": -0.04751344989899886
+   "owner_with_mortgage": -0.022950130231478738,
+   "owner_without_mortgage": -0.008149752916377873,
+   "renter": -0.02750830732076781
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.046906839241039555,
-   "owner_without_mortgage": -0.027919756506069038,
-   "renter": -0.04108571185953991
+   "owner_with_mortgage": -0.024304385700395503,
+   "owner_without_mortgage": 0.0010034054259544511,
+   "renter": -0.020945567043302193
   }
  },
  {
@@ -698,19 +698,19 @@
   "annualization": "quarter4",
   "anchor": "83",
   "calculated": {
-   "renter": 36136.48014979897,
-   "owner_with_mortgage": 35661.93008189,
-   "owner_without_mortgage": 30096.329780174165
+   "renter": 36895.4572057957,
+   "owner_with_mortgage": 36507.64711253552,
+   "owner_without_mortgage": 30991.812458294236
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.033944735693078654,
-   "owner_without_mortgage": -0.025062203428112606,
-   "renter": -0.03589776026362068
+   "owner_with_mortgage": -0.011034887917228287,
+   "owner_without_mortgage": 0.003945981804154064,
+   "renter": -0.015648652531996765
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.03528375191471067,
-   "owner_without_mortgage": -0.016065119390289317,
-   "renter": -0.029391635174900066
+   "owner_with_mortgage": -0.012405658696741595,
+   "owner_without_mortgage": 0.01321076402871002,
+   "renter": -0.00900587883651327
   }
  },
  {
@@ -719,19 +719,19 @@
   "annualization": "pqcq2",
   "anchor": "82",
   "calculated": {
-   "renter": 17850.550435442863,
-   "owner_with_mortgage": 17616.134136837227,
-   "owner_without_mortgage": 14866.861698640249
+   "renter": 18225.46681250149,
+   "owner_with_mortgage": 18033.89797125248,
+   "owner_without_mortgage": 15309.208563735707
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.5227919778724848,
-   "owner_without_mortgage": -0.5184042209705135,
-   "renter": -0.5237567249494994
+   "owner_with_mortgage": -0.5114750651157394,
+   "owner_without_mortgage": -0.5040748764581889,
+   "renter": -0.5137541536603839
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.5234534196205198,
-   "owner_without_mortgage": -0.5139598782530346,
-   "renter": -0.52054285592977
+   "owner_with_mortgage": -0.5121521928501978,
+   "owner_without_mortgage": -0.4994982972870228,
+   "renter": -0.5104727835216512
   }
  },
  {
@@ -740,19 +740,19 @@
   "annualization": "pqcq2",
   "anchor": "83",
   "calculated": {
-   "renter": 18068.240074899484,
-   "owner_with_mortgage": 17830.965040945,
-   "owner_without_mortgage": 15048.164890087082
+   "renter": 18447.72860289785,
+   "owner_with_mortgage": 18253.82355626776,
+   "owner_without_mortgage": 15495.906229147118
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.5169723678465393,
-   "owner_without_mortgage": -0.5125311017140564,
-   "renter": -0.5179488801318104
+   "owner_with_mortgage": -0.5055174439586141,
+   "owner_without_mortgage": -0.49802700909792297,
+   "renter": -0.5078243262659984
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.5176418759573553,
-   "owner_without_mortgage": -0.5080325596951447,
-   "renter": -0.5146958175874501
+   "owner_with_mortgage": -0.5062028293483708,
+   "owner_without_mortgage": -0.493394617985645,
+   "renter": -0.5045029394182566
   }
  },
  {
@@ -761,19 +761,19 @@
   "annualization": "quarter4",
   "anchor": "82",
   "calculated": {
-   "renter": 33655.4726329746,
-   "owner_with_mortgage": 31922.974343534097,
-   "owner_without_mortgage": 28726.03794703309
+   "renter": 34424.50603867291,
+   "owner_with_mortgage": 32613.581914566246,
+   "owner_without_mortgage": 29495.293577767636
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.13523027648559938,
-   "owner_without_mortgage": -0.06945131366915802,
-   "renter": -0.10208973285911649
+   "owner_with_mortgage": -0.11652222905143583,
+   "owner_without_mortgage": -0.044532116042512615,
+   "renter": -0.08157232701902484
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.13642890427693255,
-   "owner_without_mortgage": -0.06086386864277438,
-   "renter": -0.09603029613582603
+   "owner_with_mortgage": -0.1177467874286422,
+   "owner_without_mortgage": -0.0357147075087233,
+   "renter": -0.07537443111226849
   }
  },
  {
@@ -782,19 +782,19 @@
   "annualization": "quarter4",
   "anchor": "83",
   "calculated": {
-   "renter": 34065.90522605965,
-   "owner_with_mortgage": 32312.27890869915,
-   "owner_without_mortgage": 29076.35548297252
+   "renter": 34844.31708792502,
+   "owner_with_mortgage": 33011.308523280466,
+   "owner_without_mortgage": 29854.992279935534
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.12468430424761878,
-   "owner_without_mortgage": -0.05810315895780627,
-   "renter": -0.09113960765008133
+   "owner_with_mortgage": -0.10574810989352657,
+   "owner_without_mortgage": -0.03288006867717741,
+   "renter": -0.0703719895436472
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.12589754945104137,
-   "owner_without_mortgage": -0.04941098899207641,
-   "renter": -0.08500627535699479
+   "owner_with_mortgage": -0.10698760190947942,
+   "owner_without_mortgage": -0.023955130771024846,
+   "renter": -0.06409850954046692
   }
  },
  {
@@ -803,19 +803,19 @@
   "annualization": "pqcq2",
   "anchor": "82",
   "calculated": {
-   "renter": 16827.7363164873,
-   "owner_with_mortgage": 15961.487171767048,
-   "owner_without_mortgage": 14363.018973516546
+   "renter": 17212.253019336455,
+   "owner_with_mortgage": 16306.790957283123,
+   "owner_without_mortgage": 14747.646788883818
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.5676151382427996,
-   "owner_without_mortgage": -0.5347256568345791,
-   "renter": -0.5510448664295582
+   "owner_with_mortgage": -0.5582611145257179,
+   "owner_without_mortgage": -0.5222660580212564,
+   "renter": -0.5407861635095124
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.5682144521384662,
-   "owner_without_mortgage": -0.5304319343213872,
-   "renter": -0.548015148067913
+   "owner_with_mortgage": -0.5588733937143211,
+   "owner_without_mortgage": -0.5178573537543616,
+   "renter": -0.5376872155561343
   }
  },
  {
@@ -824,19 +824,19 @@
   "annualization": "pqcq2",
   "anchor": "83",
   "calculated": {
-   "renter": 17032.952613029825,
-   "owner_with_mortgage": 16156.139454349575,
-   "owner_without_mortgage": 14538.17774148626
+   "renter": 17422.15854396251,
+   "owner_with_mortgage": 16505.654261640233,
+   "owner_without_mortgage": 14927.496139967767
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.5623421521238094,
-   "owner_without_mortgage": -0.5290515794789031,
-   "renter": -0.5455698038250407
+   "owner_with_mortgage": -0.5528740549467632,
+   "owner_without_mortgage": -0.5164400343385886,
+   "renter": -0.5351859947718236
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.5629487747255206,
-   "owner_without_mortgage": -0.5247054944960382,
-   "renter": -0.5425031376784974
+   "owner_with_mortgage": -0.5534938009547397,
+   "owner_without_mortgage": -0.5119775653855124,
+   "renter": -0.5320492547702335
   }
  },
  {
@@ -845,19 +845,19 @@
   "annualization": "quarter4",
   "anchor": "82",
   "calculated": {
-   "renter": 37709.70295680673,
-   "owner_with_mortgage": 37664.18314580443,
-   "owner_without_mortgage": 32232.493232858225
+   "renter": 38502.20869928683,
+   "owner_with_mortgage": 38062.370366534655,
+   "owner_without_mortgage": 32959.38065659103
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.03593265214998376,
-   "owner_without_mortgage": -0.010848424695936165,
-   "renter": -0.043629141343983546
+   "owner_with_mortgage": -0.025740494355107613,
+   "owner_without_mortgage": 0.011458315122783613,
+   "renter": -0.023530086246846826
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.03993809825322947,
-   "owner_without_mortgage": -0.019651132237516467,
-   "renter": -0.03850573764852183
+   "owner_with_mortgage": -0.029788286191578472,
+   "owner_without_mortgage": 0.00245709431818808,
+   "renter": -0.01829900928611583
   }
  },
  {
@@ -866,19 +866,19 @@
   "annualization": "quarter4",
   "anchor": "83",
   "calculated": {
-   "renter": 38169.57738310925,
-   "owner_with_mortgage": 38123.50245246058,
-   "owner_without_mortgage": 32625.57241862479
+   "renter": 38971.74782976594,
+   "owner_with_mortgage": 38526.54561490702,
+   "owner_without_mortgage": 33361.32432313482
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.0241757332737641,
-   "owner_without_mortgage": 0.0012143993931379438,
-   "renter": -0.03196608209208085
+   "owner_with_mortgage": -0.013859280871633461,
+   "owner_without_mortgage": 0.023793172624280823,
+   "renter": -0.011621916566930235
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.02823002628070792,
-   "owner_without_mortgage": -0.007695658240412961,
-   "renter": -0.026780197863747635
+   "owner_with_mortgage": -0.01795643602318331,
+   "owner_without_mortgage": 0.014682180834263425,
+   "renter": -0.006327045984726887
   }
  },
  {
@@ -887,19 +887,19 @@
   "annualization": "pqcq2",
   "anchor": "82",
   "calculated": {
-   "renter": 18854.851478403365,
-   "owner_with_mortgage": 18832.091572902216,
-   "owner_without_mortgage": 16116.246616429113
+   "renter": 19251.104349643414,
+   "owner_with_mortgage": 19031.185183267327,
+   "owner_without_mortgage": 16479.690328295514
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.5179663260749918,
-   "owner_without_mortgage": -0.5054242123479681,
-   "renter": -0.5218145706719918
+   "owner_with_mortgage": -0.5128702471775538,
+   "owner_without_mortgage": -0.4942708424386082,
+   "renter": -0.5117650431234234
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.5199690491266147,
-   "owner_without_mortgage": -0.5098255661187583,
-   "renter": -0.5192528688242609
+   "owner_with_mortgage": -0.5148941430957892,
+   "owner_without_mortgage": -0.49877145284090596,
+   "renter": -0.5091495046430579
   }
  },
  {
@@ -908,19 +908,19 @@
   "annualization": "pqcq2",
   "anchor": "83",
   "calculated": {
-   "renter": 19084.788691554626,
-   "owner_with_mortgage": 19061.75122623029,
-   "owner_without_mortgage": 16312.786209312395
+   "renter": 19485.87391488297,
+   "owner_with_mortgage": 19263.27280745351,
+   "owner_without_mortgage": 16680.66216156741
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.512087866636882,
-   "owner_without_mortgage": -0.49939280030343103,
-   "renter": -0.5159830410460404
+   "owner_with_mortgage": -0.5069296404358168,
+   "owner_without_mortgage": -0.4881034136878596,
+   "renter": -0.5058109582834651
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.514115013140354,
-   "owner_without_mortgage": -0.5038478291202064,
-   "renter": -0.5133900989318738
+   "owner_with_mortgage": -0.5089782180115916,
+   "owner_without_mortgage": -0.4926589095828683,
+   "renter": -0.5031635229923634
   }
  },
  {
@@ -929,19 +929,19 @@
   "annualization": "quarter4",
   "anchor": "82",
   "calculated": {
-   "renter": 35457.47371541055,
-   "owner_with_mortgage": 34137.62953444079,
-   "owner_without_mortgage": 30871.60589969319
+   "renter": 36057.464708931446,
+   "owner_with_mortgage": 34642.93871998258,
+   "owner_without_mortgage": 31367.565240978853
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.12619971499844396,
-   "owner_without_mortgage": -0.052611369922875184,
-   "renter": -0.10074882791248918
+   "owner_with_mortgage": -0.11326562096901349,
+   "owner_without_mortgage": -0.037391356994449954,
+   "renter": -0.08553221635984165
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.12983012521239823,
-   "owner_without_mortgage": -0.06104241855788728,
-   "renter": -0.09593142184399395
+   "owner_with_mortgage": -0.11694976893961384,
+   "owner_without_mortgage": -0.04595785233544014,
+   "renter": -0.08063329291432098
   }
  },
  {
@@ -950,19 +950,19 @@
   "annualization": "quarter4",
   "anchor": "83",
   "calculated": {
-   "renter": 35889.88193145214,
-   "owner_with_mortgage": 34553.94208973885,
-   "owner_without_mortgage": 31248.088898469938
+   "renter": 36497.18988830866,
+   "owner_with_mortgage": 35065.413582421395,
+   "owner_without_mortgage": 31750.096524405424
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.11554361396183965,
-   "owner_without_mortgage": -0.041057850043885735,
-   "renter": -0.08978235020410508
+   "owner_with_mortgage": -0.10245178707839164,
+   "owner_without_mortgage": -0.02565222720169935,
+   "renter": -0.07438017021788834
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.11921829747108603,
-   "owner_without_mortgage": -0.04959171634517845,
-   "renter": -0.08490619528111609
+   "owner_with_mortgage": -0.10618086368277979,
+   "owner_without_mortgage": -0.03432319199806744,
+   "renter": -0.06942150380351997
   }
  },
  {
@@ -971,19 +971,19 @@
   "annualization": "pqcq2",
   "anchor": "82",
   "calculated": {
-   "renter": 17728.736857705277,
-   "owner_with_mortgage": 17068.814767220396,
-   "owner_without_mortgage": 15435.802949846595
+   "renter": 18028.732354465723,
+   "owner_with_mortgage": 17321.46935999129,
+   "owner_without_mortgage": 15683.782620489426
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.563099857499222,
-   "owner_without_mortgage": -0.5263056849614376,
-   "renter": -0.5503744139562445
+   "owner_with_mortgage": -0.5566328104845067,
+   "owner_without_mortgage": -0.518695678497225,
+   "renter": -0.5427661081799209
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.5649150626061992,
-   "owner_without_mortgage": -0.5305212092789436,
-   "renter": -0.547965710921997
+   "owner_with_mortgage": -0.5584748844698069,
+   "owner_without_mortgage": -0.52297892616772,
+   "renter": -0.5403166464571605
   }
  },
  {
@@ -992,19 +992,19 @@
   "annualization": "pqcq2",
   "anchor": "83",
   "calculated": {
-   "renter": 17944.94096572607,
-   "owner_with_mortgage": 17276.971044869424,
-   "owner_without_mortgage": 15624.044449234969
+   "renter": 18248.59494415433,
+   "owner_with_mortgage": 17532.706791210698,
+   "owner_without_mortgage": 15875.048262202712
   },
   "dev_vs_published": {
-   "owner_with_mortgage": -0.5577718069809199,
-   "owner_without_mortgage": -0.5205289250219429,
-   "renter": -0.5448911751020525
+   "owner_with_mortgage": -0.5512258935391958,
+   "owner_without_mortgage": -0.5128261136008496,
+   "renter": -0.5371900851089442
   },
   "dev_vs_corrected": {
-   "owner_with_mortgage": -0.559609148735543,
-   "owner_without_mortgage": -0.5247958581725892,
-   "renter": -0.542453097640558
+   "owner_with_mortgage": -0.5530904318413898,
+   "owner_without_mortgage": -0.5171615959990337,
+   "renter": -0.53471075190176
   }
  }
 ]

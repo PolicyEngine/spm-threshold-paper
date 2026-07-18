@@ -122,15 +122,25 @@ WEIGHTS = {
 }
 
 
+REBASE_YEAR = 2019
+
+
 def composite(year: int) -> float:
+    """Static-weight composite with each component rebased to
+    REBASE_YEAR = 100 before weighting. Raw CPI levels carry different
+    reference bases; summing them directly weights components by level
+    as well as share — a construction error caught by cross-model
+    review 2026-07-18."""
     avail = {
         c: w
         for c, w in WEIGHTS.items()
         if str(year) in cpi.get(CPI_IDS[c], {})
+        and str(REBASE_YEAR) in cpi.get(CPI_IDS[c], {})
     }
-    return sum(w * cpi[CPI_IDS[c]][str(year)] for c, w in avail.items()) / sum(
-        avail.values()
-    )
+    return sum(
+        w * cpi[CPI_IDS[c]][str(year)] / cpi[CPI_IDS[c]][str(REBASE_YEAR)]
+        for c, w in avail.items()
+    ) / sum(avail.values())
 
 
 replicated_82 = {

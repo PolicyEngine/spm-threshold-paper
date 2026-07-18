@@ -27,20 +27,24 @@ abstract: |
   The paper makes three contributions. It quantifies the correction and
   documents a replication of the BLS threshold methodology from public
   Consumer Expenditure microdata, which reproduces the corrected
-  thresholds within 1 to 4 percent per year and surfaces six pitfalls
-  in the public files that face any CE researcher. It shows that
-  CPI-U threshold indexation, common in microsimulation practice
+  thresholds within 1.5 to 2.1 percent per year and surfaces six
+  pitfalls in the public files that face any CE researcher. It shows
+  that CPI-U threshold indexation, common in microsimulation practice
   including our own, missed actual threshold growth by 2.2 percent per
   year in absolute value over 2020--2024, understating it in four of
   five years, because the SPM is quasi-relative: BLS re-estimates each
   year from consumption data. And it commits to a falsifiable nowcast
-  of the unpublished 2025 thresholds — \$41,099.57 for owners with
-  mortgages, \$34,250.70 for owners without, and \$40,791.72 for
-  renters — built from a backtest-selected blend of consumption growth
-  and composite price aging (mean absolute error 1.35 versus 2.23
-  percent per year for CPI-U aging). BLS publishes the actual 2025
-  thresholds around September 2026; a revision of this paper will
-  report the realized errors, whatever they are.
+  of the unpublished 2025 thresholds — \$41,036.34 for owners with
+  mortgages, \$34,135.99 for owners without, and \$40,755.98 for
+  renters — from a 50/50 blend of consumption growth and composite
+  price aging (backtest mean absolute error 0.76 versus 2.23 percent
+  per year for CPI-U aging; the consumption component alone scores
+  0.41). The nowcast was amended once, before any BLS release, after
+  adversarial cross-model review caught a construction error in the
+  composite index; the original values remain in the repository
+  history. BLS publishes the actual 2025 thresholds around September
+  2026; a revision of this paper will report the realized errors,
+  whatever they are.
 ---
 
 # Introduction
@@ -81,7 +85,8 @@ mechanical artifact-diffing catches it in a week. Because BLS
 re-estimates thresholds each year from a rolling consumption window,
 the series is quasi-relative, and @sec-projection shows what that
 costs the price indexation used in microsimulation practice, ours
-included; a backtest selects a better rule. @sec-nowcast applies that
+included; a backtest scores replacement rules against five years of
+corrected actuals. @sec-nowcast applies that
 rule to data that already exist and commits, before publication, to a
 numeric estimate of the 2025 thresholds that BLS will publish around
 September 2026. @sec-discussion draws the implications for
@@ -227,12 +232,13 @@ four errors in our replication code:
    tenure-specific shelter-utilities average — a different object.
 
 After the fixes, the faithful variant reproduces the corrected
-thresholds within 1.1 to 3.9 percent mean absolute deviation per year
-(1.3 to 4.6 percent against the superseded published series), with no
-imputation of in-kind benefits. For scale, the workbook's published
-sampling standard errors run 0.7 to 2.1 percent of the corresponding
-threshold across 2019--2024, so the replication sits within one to a
-few standard errors of the official values. @tbl-replication reports
+thresholds with mean absolute deviation across the three tenures of
+1.5 to 2.1 percent per year (1.0 to 1.6 percent against the
+superseded published series), with no imputation of in-kind benefits.
+For scale, the workbook's published sampling standard errors run 0.7
+to 2.1 percent of the corresponding threshold across 2019--2024, so
+the replication sits within roughly one to three standard errors of
+the official values. @tbl-replication reports
 signed deviations.
 
 ::: {#tbl-replication}
@@ -243,19 +249,21 @@ Replication deviations from official thresholds (owners with mortgages
 reference series.
 :::
 
-The deviations drift from positive in 2019--2020 to negative by
-2023--2024, consistent with the growing in-kind benefit imputations
-that BLS adds to consumer-unit expenditures and this replication does
-not. Two conclusions follow. The negative one: the BLS correction moved
-thresholds by at most 1.6 percent, inside this replication's noise, and
-neither reference series fits systematically better in the affected
-years — so survey-level replication could not have caught the BLS bug,
-and we do not claim otherwise. What catches that class of error is
-mechanical comparison of published artifacts, which now runs weekly.
-The positive one: at matched anchors, the 83-percent variant fits the
-published series about as well as the 82-percent variant fits the
-corrected one, independently confirming that the re-anchoring preserved
-series continuity as BLS intended.
+The deviations are predominantly negative and roughly stable across
+years: the replication imputes no in-kind benefits and observes no
+internet expenditures, and that shows up as a level deficit — up to
+three percent for owners with mortgages — that persists across
+estimation windows rather than growing or shrinking with any one
+year. Two conclusions follow. The negative one: the BLS correction
+moved thresholds by at most 1.6 percent, inside this replication's
+noise, and neither reference series fits systematically better in the
+affected years — so survey-level replication could not have caught
+the BLS bug, and we do not claim otherwise. What catches that class
+of error is mechanical comparison of published artifacts, which now
+runs weekly. The positive one: a level deficit that is stable across
+adjacent, largely overlapping windows is exactly the error structure
+that cancels when the replication is used in ratio form, which is how
+@sec-projection and @sec-nowcast use it.
 
 ## Pitfalls in the public CE files {#sec-pitfalls}
 
@@ -325,33 +333,56 @@ misses are mostly on one side: it understated actual threshold growth
 in four of five years — most sharply in 2023, when the CE window's
 shelter costs compounded faster than the all-items index — and
 overstated it only in 2021, for a signed mean error of −1.9 percent
-per year. The composite price index closes most of the gap — the
-FCSUti basket is nearly half shelter — but stays biased low in
-2022--2024. The replication growth ratio, the only rule that tracks
-consumption rather than prices, has the lowest error in 2024 (0.62
-percent) and its highest in 2023. Blending it equally with the
-composite index gives the lowest mean error, 1.35 percent; its worst
-year (2.44 percent) trails only the composite index's (2.27 percent).
-We fix the blend weights at one half each rather than fitting them:
-with five backtest years, fitted weights would mostly fit noise, and
-the equal blend's rationale is structural — the two components fail
-for different reasons.
+per year. The composite price index removes about thirty percent of
+that error — the FCSUti basket is nearly half shelter — but runs low
+in all five years. The replication growth ratio, the only rule that
+tracks consumption rather than prices, posts the lowest mean error,
+0.41 percent, and is nearly unbiased, with a signed mean of +0.1
+percent per year. The 50/50 blend inherits half of the composite's
+downward bias and scores 0.76 percent. We fix the blend weights at
+one half each rather than fitting them: with five backtest years,
+fitted weights would mostly fit noise, and the equal blend's
+rationale is structural — the two components fail for different
+reasons.
 
-Two caveats on reading the table. First, rule selection here is
-in-sample: the blend is preferred because of its performance on the
-same five years that score it, and the out-of-sample test is exactly
-the 2025 commitment in @sec-nowcast. Second, the two price rules use
+@tbl-backtest is itself an amended result, and the amendment bears on
+how the blend row should be read. As first released, the composite
+index behind the second and fourth rows averaged CPI component series
+at their raw published levels; the components carry different index
+reference bases, so this weighted them by base level as well as by
+budget share — shelter received an effective weight near 55 percent
+rather than the stated 47. Adversarial cross-model review caught the
+error the day after the 2025 nowcast was first committed. Repairing
+it left the CPI-U row unchanged, moved the composite rule from 1.40
+to 1.57 percent, and — because the replication deflates CE
+expenditures with the same composite — improved the replication ratio
+from 1.58 to 0.41 percent and the blend from 1.35 to 0.76. The
+ranking inverted: the blend had ranked first under the erroneous
+construction, which is why it is the committed rule; the repaired
+table puts the replication ratio first. We retain the blend as the
+primary estimate rather than switching to the new winner, because
+re-selecting a rule after a second look at five noisy backtest years
+would be selection on noise, and the blend's structural rationale is
+unchanged. The September evaluation scores every rule in
+@tbl-backtest against the realized 2025 thresholds, so the choice
+costs nothing in falsifiability; the pre-repair table remains in the
+repository history.
+
+Two caveats on reading the table. First, the two price rules use
 realized index values — information unavailable when a true forecast
 is made; a 2022 projection built from consensus 2021 inflation
 forecasts would have erred by several points. The replication ratio
 uses CE microdata that BLS publishes well before the corresponding
 thresholds, so in the nowcasting position the data it needs genuinely
-exist. The rules also share a residual: every rule is biased low in
-2022--2024, reflecting real consumption growth beyond what a
-five-year averaging window passes through and in-kind benefit
-expansions that neither prices nor our unimputed replication capture.
-With five backtest years we leave that bias unmodeled rather than fit
-a constant to it.
+exist; that it also scores best in backtest counts in its favor, but
+five backtest years cannot settle rankings this close. Second, the
+price rules share a residual: both run low in nearly every year,
+reflecting real consumption growth beyond what a five-year averaging
+window passes through and in-kind benefit expansions that prices do
+not capture. The replication ratio, which tracks consumption, shows
+no such bias — its annual signed errors range from +0.5 to −0.3
+percent. With five backtest years we leave the price rules' bias
+unmodeled rather than fit a constant to it.
 
 # A pre-committed 2025 nowcast {#sec-nowcast}
 
@@ -375,15 +406,24 @@ These are model estimates, not BLS publications.
 :::
 
 The consumption signal moves the estimate materially: replicated
-thresholds grew 4.6 to 6.1 percent by tenure against 3.5 percent
+thresholds grew 4.4 to 6.0 percent by tenure against 3.2 percent
 composite price growth, so the blend projects 2025 threshold growth of
-4.0 to 4.8 percent, against 2.6 percent realized All-Items CPI-U
+3.8 to 4.6 percent, against 2.6 percent realized All-Items CPI-U
 growth over the same period. Applied in the PolicyEngine US
 microsimulation model, replacing CPI-U-aged 2025 thresholds with the
 nowcast raises projected 2025 SPM poverty by 0.4 percentage points
 (simulation output pinned in the repository); we treat that as a
 sensitivity, not a headline, since modeled baseline levels carry their
 own calibration error.
+
+These are amended values. The nowcast as first committed was built on
+the erroneous composite index described in @sec-projection; repairing
+the index moved each tenure's estimate by 0.1 to 0.3 percent — owners
+with mortgages from \$41,099.57 to \$41,036.34, owners without from
+\$34,250.70 to \$34,135.99, renters from \$40,791.72 to \$40,755.98.
+The amendment predates any BLS publication of 2025 thresholds, the
+original values remain in the repository history, and the September
+evaluation will report realized errors for both sets.
 
 Evaluation is committed here, in advance. When BLS publishes the
 actual 2025 thresholds, expected around September 2026, a revision of
@@ -392,10 +432,11 @@ mean absolute error of this nowcast, alongside the same errors for
 All-Items CPI-U aging and each component rule, all computed from the
 corrected 2024 base as committed in the repository — regardless of any
 subsequent BLS revision to 2024. The packaged estimate is fixed with
-its method, components, and hash; the backtest's error range for the
-blend, −0.6 to −2.4 percent per year, is our stated expectation of its
-accuracy. If the nowcast misses by more than the rules it beat in
-backtest, that result publishes too.
+its method, components, and hash. The blend's annual signed errors in
+backtest, averaged across tenures, ranged from −0.1 to −1.4 percent;
+that range is our stated expectation of the nowcast's accuracy. If the
+nowcast misses by more than the rules scored alongside it, that result
+publishes too.
 
 # Discussion {#sec-discussion}
 
@@ -418,7 +459,12 @@ re-anchoring behave as documented; catch transcription-scale errors
 instantly; and measure the consumption growth that price indexation
 misses — the use this paper puts it to, where a level bias that
 cancels in ratios stops being a disqualification. The nowcast is the
-constructive payoff of infrastructure built for verification.
+constructive payoff of infrastructure built for verification. The
+verification infrastructure itself needed verifying: the composite
+index at the heart of the backtest carried a construction error until
+adversarial review by a model from a different family caught it. The
+checking layer is code too, with the same failure modes as what it
+checks.
 
 The projection result has the most direct consequence for
 microsimulation practice. Aging SPM thresholds by projected CPI-U, as
@@ -429,7 +475,8 @@ eligibility and poverty transitions near program cliffs are plausible
 but outside this paper's scope. The blend rule is implementable from
 public data with a published, tested codebase, and it degrades
 gracefully: past the CE data horizon it reduces to composite-price
-aging, which alone removed a third of CPI-U aging's error in backtest.
+aging, which alone removed about thirty percent of CPI-U aging's
+error in backtest.
 
 The pattern generalizes past poverty measurement. Statistical agencies
 publish reference series; models embed them; both sides revise. Every
@@ -459,7 +506,11 @@ the poverty-sensitivity simulation output, with SHA-256 sums. Each
 table is generated from the artifacts by script, and a pre-render
 check regenerates the tables, verifies the artifact hashes, and
 re-derives the load-bearing prose figures — the paper does not build
-if any of them drifts from the data.
+if any of them drifts from the data. The history additionally
+documents one amendment: the composite-index construction error
+caught in cross-model review on July 18, 2026, before any BLS 2025
+publication, with every downstream artifact, table, and pinned prose
+figure regenerated in the same change.
 
 # References {.unnumbered}
 

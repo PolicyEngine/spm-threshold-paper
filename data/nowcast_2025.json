@@ -10,25 +10,25 @@
   "base_year": 2024,
   "base_series": "bls-corrected-2026-07-17",
   "values": {
-    "owner_with_mortgage": 41099.572342177584,
-    "owner_without_mortgage": 34250.695183843076,
-    "renter": 40791.71685501318
+    "owner_with_mortgage": 41036.33884031702,
+    "owner_without_mortgage": 34135.98684075608,
+    "renter": 40755.97769114958
   },
   "components": {
     "owner_with_mortgage": {
-      "replication_ratio": 1.060664251905302,
-      "price_ratio": 1.0345960345615974,
-      "blend_ratio": 1.0476301432334498
+      "replication_ratio": 1.0598909421226619,
+      "price_ratio": 1.0321456941291063,
+      "blend_ratio": 1.046018318125884
     },
     "owner_without_mortgage": {
-      "replication_ratio": 1.0488686233525495,
-      "price_ratio": 1.0345960345615974,
-      "blend_ratio": 1.0417323289570735
+      "replication_ratio": 1.044341272456241,
+      "price_ratio": 1.0321456941291063,
+      "blend_ratio": 1.0382434832926737
     },
     "renter": {
-      "replication_ratio": 1.0455583359188911,
-      "price_ratio": 1.0345960345615974,
-      "blend_ratio": 1.0400771852402442
+      "replication_ratio": 1.046186174538761,
+      "price_ratio": 1.0321456941291063,
+      "blend_ratio": 1.0391659343339337
     }
   }
 }
