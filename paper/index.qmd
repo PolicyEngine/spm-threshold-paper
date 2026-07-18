@@ -420,9 +420,7 @@ official workbook and its SHA-256; the replication, benchmark,
 backtest, and nowcast scripts; and the weekly drift-check workflow.
 The paper repository pins the exact artifacts behind every table, and
 each table in this document is generated from them by script — the
-prose cannot drift from the data without the build failing. The
-analysis was produced with Claude (Fable 5, Anthropic); every number
-derives from the cited artifacts.
+prose cannot drift from the data without the build failing.
 
 # References {.unnumbered}
 
