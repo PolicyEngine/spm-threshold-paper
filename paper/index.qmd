@@ -318,7 +318,9 @@ produces sub-annual SPM estimates, declines to project thresholds at
 all: it carries the latest published ASEC thresholds into subsequent
 months, on the stated grounds that projecting new ones "requires more
 timely consumption data" — so its 2020--2021 estimates ran on 2019
-thresholds [@parolin2022]. Han, Meyer, and Sullivan's real-time
+thresholds [@parolin2022]; a 2024 revision updated the framework's
+base data and income imputation without changing how thresholds are
+handled [@curran2024]. Han, Meyer, and Sullivan's real-time
 series prices official-measure thresholds forward with monthly CPI,
 which is exact for that measure because official thresholds are
 CPI-indexed by construction [@han2020] — precisely what the SPM's are
@@ -328,10 +330,16 @@ indexation conceals: thresholds re-estimated from consumption rose
 published) against 2.9 percent for the official measure's CPI-U
 update, and price-updating the SPM thresholds instead would have put
 2024 SPM poverty half a percentage point below the published rate
-[@creamer2025]. We are not aware of prior work that
-projects the SPM threshold itself by re-estimating it from the
-consumption microdata — the path Columbia's caveat names — or that
-commits to numeric threshold values ahead of publication.
+[@creamer2025]. A related tradition price-indexes deliberately:
+anchored-SPM series hold a reference-year threshold and move it by
+CPI precisely to separate policy effects from drift in living
+standards, in historical work [@wimer2016] and in the National
+Academies' child-poverty simulations [@nasem2019] — a design choice
+about what to measure, not an estimate of what BLS will publish. We
+are not aware of prior work that projects the SPM threshold itself by
+re-estimating it from the consumption microdata — the path Columbia's
+caveat names — or that commits to numeric threshold values ahead of
+publication.
 
 Because the thresholds are re-estimated from consumption data each
 year, price indexation is mismatched in principle, and @tbl-backtest
