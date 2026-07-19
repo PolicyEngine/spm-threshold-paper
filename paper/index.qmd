@@ -135,7 +135,10 @@ panel that proposed this architecture intended exactly that
 The 2026 reissue is its second code-correction episode: the 2022
 thresholds already carried "corrections in the computer code used to
 model" in-kind benefits, disclosed in a footnote of the 2022 poverty
-report [@p60-280]. Census has separately explored simplifying the
+report [@p60-280]; a BLS decomposition attributes 2.5 to 2.9
+percentage points of that year's unusually large threshold increase
+to the code improvement and data updating combined, against 7.2
+points from inflation [@schild2023]. Census has separately explored simplifying the
 design, estimating that a decennially-anchored variant would have put
 2024 SPM poverty at 11.3 percent rather than the published 12.9
 [@sehsd2026]. Third, everything BLS consumes is public — the CE
@@ -323,8 +326,8 @@ base data and income imputation without changing how thresholds are
 handled [@curran2024]. Han, Meyer, and Sullivan's real-time
 series prices official-measure thresholds forward with monthly CPI,
 which is exact for that measure because official thresholds are
-CPI-indexed by construction [@han2020] — precisely what the SPM's are
-not. Census's own analysis of the 2024 estimates quantifies what
+CPI-indexed by construction [@han2020; @fisher1992] — precisely what
+the SPM's are not. Census's own analysis of the 2024 estimates quantifies what
 indexation conceals: thresholds re-estimated from consumption rose
 5.2 to 5.8 percent that year (on the pre-correction vintage then
 published) against 2.9 percent for the official measure's CPI-U
@@ -417,9 +420,11 @@ unmodeled rather than fit a constant to it.
 
 # A pre-committed 2025 nowcast {#sec-nowcast}
 
-The 2025 thresholds are a nowcasting target, not a forecasting one:
-their entire CE window (2020Q2 through 2025Q1) and eleven of twelve
-months of 2025 CPI are published. We apply the blend rule to the
+The 2025 thresholds are a nowcasting target, not a forecasting one —
+estimation of a present quantity from data already in hand, in the
+macroeconomic sense of the term [@giannone2008]: their entire CE
+window (2020Q2 through 2025Q1) and eleven of twelve months of 2025
+CPI are published. We apply the blend rule to the
 corrected 2024 base. The replication component computes thresholds for
 2024 and 2025 with identical code over their respective windows and
 takes the ratio, per tenure — level biases that persist across
@@ -456,11 +461,13 @@ The amendment predates any BLS publication of 2025 thresholds, the
 original values remain in the repository history, and the September
 evaluation will report realized errors for both sets.
 
-Evaluation is committed here, in advance. When BLS publishes the
-actual 2025 thresholds, expected around September 2026, a revision of
-this paper will report the signed percent error per tenure and the
-mean absolute error of this nowcast, alongside the same errors for
-All-Items CPI-U aging and each component rule, all computed from the
+Evaluation is committed here, in advance — the commitment device of
+preregistration [@nosek2018], applied to a numeric estimate rather
+than a hypothesis test. When BLS publishes the actual 2025
+thresholds, expected around September 2026, a revision of this paper
+will report the signed percent error per tenure and the mean absolute
+error of this nowcast, alongside the same errors for All-Items CPI-U
+aging and each component rule, all computed from the
 corrected 2024 base as committed in the repository — regardless of any
 subsequent BLS revision to 2024. The packaged estimate is fixed with
 its method, components, and hash. The blend's annual signed errors in
@@ -509,10 +516,15 @@ gracefully: past the CE data horizon it reduces to composite-price
 aging, which alone removed about thirty percent of CPI-U aging's
 error in backtest.
 
-The pattern generalizes past poverty measurement. Statistical agencies
-publish reference series; models embed them; both sides revise. Every
-embedded copy is a place where the numbers can silently diverge from
-the source. The remedy — bundle the source artifact, generate the
+The pattern generalizes past poverty measurement. Statistical
+agencies publish reference series; models embed them; both sides
+revise — the macroeconomic real-time-data literature documents how
+consequential vintage differences are for downstream conclusions
+[@croushore2001]. Every embedded copy is a place where the numbers
+can silently diverge from the source, and the failure mode is not
+unique to official statistics: a spreadsheet error in a widely cited
+debt-and-growth analysis likewise survived until outside replication
+[@herndon2014]. The remedy — bundle the source artifact, generate the
 values from it, diff it on a schedule — required one scheduled job and
 a parsing script in our case; we do not measure its cost against
 manual auditing across settings. We found errors on both sides of that
