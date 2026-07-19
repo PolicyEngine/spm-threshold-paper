@@ -310,6 +310,29 @@ for years BLS has not published. A common approach, and ours until
 this work, ages the latest published threshold by projected growth in
 the Consumer Price Index for All Urban Consumers (CPI-U).
 
+That practice has company, and no apparent exception. When Urban
+Institute researchers projected 2021 poverty during the pandemic,
+they took the 2019 BLS thresholds and adjusted them for projected
+inflation [@wheaton2021]. Columbia's monthly poverty framework, which
+produces sub-annual SPM estimates, declines to project thresholds at
+all: it carries the latest published ASEC thresholds into subsequent
+months, on the stated grounds that projecting new ones "requires more
+timely consumption data" — so its 2020--2021 estimates ran on 2019
+thresholds [@parolin2022]. Han, Meyer, and Sullivan's real-time
+series prices official-measure thresholds forward with monthly CPI,
+which is exact for that measure because official thresholds are
+CPI-indexed by construction [@han2020] — precisely what the SPM's are
+not. Census's own analysis of the 2024 estimates quantifies what
+indexation conceals: thresholds re-estimated from consumption rose
+5.2 to 5.8 percent that year (on the pre-correction vintage then
+published) against 2.9 percent for the official measure's CPI-U
+update, and price-updating the SPM thresholds instead would have put
+2024 SPM poverty half a percentage point below the published rate
+[@creamer2025]. We are not aware of prior work that
+projects the SPM threshold itself by re-estimating it from the
+consumption microdata — the path Columbia's caveat names — or that
+commits to numeric threshold values ahead of publication.
+
 Because the thresholds are re-estimated from consumption data each
 year, price indexation is mismatched in principle, and @tbl-backtest
 measures the cost in practice. For each year 2020 through 2024 we
