@@ -154,11 +154,21 @@ states that these are the values Census uses to produce SPM statistics
 as the years the code errors affected; the workbook nonetheless
 reissues all six years 2019--2024, and every year's values changed.
 This paper treats the full reissued range as revised.] The
-pre-correction values do not remain on the BLS site; we transcribed
-them from the five annual P60 reports that published them — each year
-from 2020 on cross-verified against the two consecutive reports that
-print it, and 2019 from its single source, the 2020 report [@p60-275;
-@p60-277; @p60-280; @p60-283; @p60-287]. @tbl-correction compares the
+pre-correction values were removed from the per-year BLS threshold
+pages at the correction, so we transcribed them from the five annual
+P60 reports that published them — each year from 2020 on
+cross-verified against the two consecutive reports that print it, and
+2019 from its single source, the 2020 report [@p60-275; @p60-277;
+@p60-280; @p60-283; @p60-287].^[The removal has since become
+inconsistent: as of August 6, 2026, the BLS page for the 2024
+thresholds again serves the pre-correction values — \$39,430 for
+renters, \$39,068 for owners with mortgages, \$32,586 for owners
+without — with no correction notice, while the 2023 page remains
+empty and the corrected workbook carries different 2024 values. A
+reader who lands on the per-year page today receives superseded
+numbers, 0.4 to 0.9 percent from the corrected ones: the
+vintage-consistency problem this paper describes, on the producer's
+own site.] @tbl-correction compares the
 two series for two-adult, two-child units.
 
 ::: {#tbl-correction}
