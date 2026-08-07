@@ -586,9 +586,10 @@ prose figures — the paper does not build if any of them drifts from
 the data; continuous integration runs the same check on every push.
 The nowcast's in-advance commitment is externally timestamped, all
 before any BLS 2025 publication: the artifact checksum file is
-stamped via OpenTimestamps, the original and amended nowcasts are
-tagged releases in the repository history, and the published page is
-archived in the Internet Archive. The history documents one
+stamped via OpenTimestamps (proof committed alongside it), and the
+original and amended nowcasts are tagged releases in the repository
+history; Internet Archive captures of the published page have been
+requested. The history documents one
 amendment: the composite-index construction error caught in
 cross-model review on July 18, 2026, with every downstream artifact,
 table, and pinned prose figure regenerated in the same change.
