@@ -47,6 +47,19 @@ for line in (REPO / "data" / "SHA256SUMS").read_text().splitlines():
     actual = hashlib.sha256((REPO / name).read_bytes()).hexdigest()
     check(f"artifact hash mismatch: {name}", actual == digest)
 
+# The bundled BLS workbook is the exact file BLS published 2026-07-17
+# (verified against the live site 2026-08-06).
+BLS_WORKBOOK_SHA256 = (
+    "e7931a1f2540d52877d6fd14a8ed1e421e977a85c952ae1b6f690a04d904f2cb"
+)
+check(
+    "bundled BLS workbook hash",
+    hashlib.sha256(
+        (REPO / "data" / "spm_threshold_200524_corrected.xlsx").read_bytes()
+    ).hexdigest()
+    == BLS_WORKBOOK_SHA256,
+)
+
 # (c) Load-bearing prose numbers match artifacts.
 TENURES = ("owner_with_mortgage", "owner_without_mortgage", "renter")
 
@@ -77,6 +90,21 @@ check(
     "0.1 to 0.3 percent" in QMD
     and 0.0005 <= min(shifts)
     and max(shifts) < 0.0035,
+)
+
+# Provenance strings inside the nowcast artifact carry the repaired
+# backtest numbers, not the pre-repair ones (a stale 1.35% survived
+# there once — caught in colleague review, 2026-08-07).
+_nowcast_meta = json.loads(
+    (REPO / "data" / "nowcast_2025.json").read_text()
+)
+_prov = _nowcast_meta["method"] + " ".join(_nowcast_meta["caveats"])
+check(
+    "nowcast provenance strings repaired",
+    "0.76" in _nowcast_meta["method"]
+    and "0.41" in _nowcast_meta["method"]
+    and "1.35" not in _prov
+    and "biased low in 2022" not in _prov,
 )
 
 rate = json.loads((REPO / "data" / "nowcast_rate_impact.json").read_text())

@@ -181,11 +181,15 @@ units, nominal dollars of the threshold year.
 
 Every change is within ±1.6 percent, with mixed signs: renter
 thresholds fall in five of six years, owner thresholds move both ways.
-2022 sees the largest downward revision across all tenures. Census will
-quantify the effect on poverty rates in a working paper before the
-September 2026 annual report; because the changes are small relative to
-year-over-year threshold growth, no published year-to-year comparison
-of SPM rates appears at risk of reversing sign.
+2022 sees the largest downward revision across all tenures. Census
+will quantify the effect on poverty rates in a working paper before
+the September 2026 annual report. Most published year-to-year rate
+comparisons have room to absorb a revision of this size — our
+microsimulation puts the level effect near 0.2 percentage points —
+but not all: the 2024 SPM rate printed at 12.9 percent, statistically
+unchanged from 2023 [@p60-287], and a flat comparison can change
+direction under even a small revision. We leave the rate arithmetic
+to the Census working paper.
 
 Our own software did worse. The spm-calculator package, which supplies
 threshold parameters to the PolicyEngine US microsimulation model,
@@ -372,8 +376,10 @@ values.
 :::
 
 The direction of the error is the clearest result. All-Items CPI-U
-aging misses by 2.23 percent per year in absolute value, and the
-misses are mostly on one side: it understated actual threshold growth
+aging misses by 2.23 percent per year in absolute value — projection
+error against the realized thresholds, not the much smaller pure
+price-index gap between the FCSUti basket and the all-items index —
+and the misses are mostly on one side: it understated actual threshold growth
 in four of five years — most sharply in 2023, when the CE window's
 shelter costs compounded faster than the all-items index — and
 overstated it only in 2021, for a signed mean error of −1.9 percent
@@ -410,7 +416,12 @@ would be selection on noise, and the blend's structural rationale is
 unchanged. The September evaluation scores every rule in
 @tbl-backtest against the realized 2025 thresholds, so the choice
 costs nothing in falsifiability; the pre-repair table remains in the
-repository history.
+repository history. The repair then demonstrated the paper's thesis
+once more: colleague review caught the pre-repair numbers surviving
+in the packaged nowcast's own method and caveat strings after every
+table and prose figure had been regenerated — a stale value
+persisting in exactly the provenance field meant to prevent
+staleness. Those strings are now pinned by the pre-render check too.
 
 Two caveats on reading the table. First, the two price rules use
 realized index values — information unavailable when a true forecast
@@ -460,7 +471,12 @@ microsimulation model, replacing CPI-U-aged 2025 thresholds with the
 nowcast raises projected 2025 SPM poverty by 0.4 percentage points
 (simulation output pinned in the repository); we treat that as a
 sensitivity, not a headline, since modeled baseline levels carry their
-own calibration error.
+own calibration error. To be explicit about adoption: the companion
+policyengine-us change takes up only the corrected historical series,
+and that model still ages thresholds past 2024 by projected CPI-U —
+so its current-law poverty projections carry the understatement
+quantified in @sec-projection until the nowcast is wired into its
+forecast path, at the measured 2025 cost of those 0.4 points.
 
 These are amended values. The nowcast as first committed was built on
 the erroneous composite index described in @sec-projection; repairing
@@ -545,25 +561,37 @@ ordinary and rarely checked.
 # Reproducibility
 
 Everything in this paper regenerates from public data. The
-spm-calculator repository (PolicyEngine/spm-calculator, version 0.4.0)
-contains the corrected and pre-correction threshold series with the
-official workbook and its SHA-256; the replication, benchmark,
-backtest, and nowcast scripts; and the weekly drift-check workflow.
-Regenerating those artifacts from scratch requires the public CE
-PUMD year bundles (roughly 700 MB, cached locally by the scripts) and
-the BLS public data API; bls.gov's bot filtering requires a
+spm-calculator implementation lives on PolicyEngine/spm-calculator
+pull request #32 (branch `max/bls-2026-threshold-correction`; this
+revision pins commit `d2746cf`), to be released as version 0.4.0 on
+merge. It contains the corrected and pre-correction threshold series
+with the official workbook and its SHA-256; the replication,
+benchmark, backtest, and nowcast scripts; and the weekly drift-check
+workflow — which, as a scheduled job, does not run until the branch
+merges; its workbook comparison was last run manually on August 6,
+2026, and matched all twenty packaged years within half a cent.
+Regenerating the artifacts from scratch requires the public CE PUMD
+year bundles (roughly 700 MB, cached locally by the scripts) and the
+BLS public data API; bls.gov's bot filtering requires a
 browser-impersonating TLS client, which the scripts document.
 
 The paper repository pins the exact artifacts behind every table and
-the poverty-sensitivity simulation output, with SHA-256 sums. Each
-table is generated from the artifacts by script, and a pre-render
-check regenerates the tables, verifies the artifact hashes, and
-re-derives the load-bearing prose figures — the paper does not build
-if any of them drifts from the data. The history additionally
-documents one amendment: the composite-index construction error
-caught in cross-model review on July 18, 2026, before any BLS 2025
-publication, with every downstream artifact, table, and pinned prose
-figure regenerated in the same change.
+the poverty-sensitivity simulation output, with SHA-256 sums, and
+bundles the corrected BLS workbook itself (hash matching the file
+bls.gov served on August 6, 2026), so the correction table is
+checkable without fighting the bot filtering. Each table is generated
+from the artifacts by script, and a pre-render check regenerates the
+tables, verifies the artifact hashes, and re-derives the load-bearing
+prose figures — the paper does not build if any of them drifts from
+the data; continuous integration runs the same check on every push.
+The nowcast's in-advance commitment is externally timestamped, all
+before any BLS 2025 publication: the artifact checksum file is
+stamped via OpenTimestamps, the original and amended nowcasts are
+tagged releases in the repository history, and the published page is
+archived in the Internet Archive. The history documents one
+amendment: the composite-index construction error caught in
+cross-model review on July 18, 2026, with every downstream artifact,
+table, and pinned prose figure regenerated in the same change.
 
 # References {.unnumbered}
 

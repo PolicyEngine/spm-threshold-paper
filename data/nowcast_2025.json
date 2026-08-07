@@ -1,11 +1,11 @@
 {
   "generated_by": "scripts/compute_nowcast_2025.py",
   "label": "PolicyEngine nowcast of 2025 SPM thresholds \u2014 NOT a BLS publication",
-  "method": "50/50 blend of realized FCSUti-composite CPI aging and CE replication growth ratio, applied to the corrected 2024 base. Selected by backtest over 2020-2024 (see docs/bls-2026-correction.md): mean absolute error 1.35%/yr vs 2.23% for All-Items CPI-U aging.",
+  "method": "50/50 blend of realized FCSUti-composite CPI aging and CE replication growth ratio, applied to the corrected 2024 base. Committed via the 2020-2024 backtest (see docs/bls-2026-correction.md): mean absolute error 0.76%/yr vs 2.23% for All-Items CPI-U aging after the 2026-07-18 composite repair, which ranks the replication ratio alone first (0.41%); the blend remains the committed primary.",
   "caveats": [
     "BLS publishes actual 2025 thresholds ~September 2026; this nowcast is superseded the day they do.",
     "2025 CPI annual averages are 11-month means (October 2025 release canceled during the federal shutdown).",
-    "All projection rules tested were biased low in 2022-2024 (real FCSUti consumption growth and in-kind benefit changes are not fully captured); the blend's backtest errors ranged -0.6% to -2.4% by year."
+    "Both price rules ran low in nearly every backtest year (real FCSUti consumption growth and in-kind benefit changes are not fully captured by prices); the replication ratio is near-unbiased (+0.1%/yr signed mean), and the blend's annual signed errors ranged -0.1% to -1.4%."
   ],
   "base_year": 2024,
   "base_series": "bls-corrected-2026-07-17",
