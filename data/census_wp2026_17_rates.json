@@ -1,0 +1,29 @@
+{
+  "source": "Creamer, John. 2026. \"Revising Supplemental Poverty Measure Estimates from 2019 to 2024.\" SEHSD Working Paper 2026-17, U.S. Census Bureau, August 19, 2026. https://www.census.gov/library/working-papers/2026/demo/sehsd-wp2026-17.html (PDF: https://www2.census.gov/library/working-papers/2026/demo/sehsd-wp2026-17.pdf)",
+  "retrieved": "2026-09-04",
+  "note": "Transcribed from Table 4 (all people) and Table 3 (tenure rows, 2023 to 2024, corrected series). 'Revised' = the series as originally published under the 2021 methodology; 'corrected' = re-estimated with the corrected thresholds. Percent of people; margins of error are 90-percent, +/- percentage points. Asterisk = statistically significant difference at the 90-percent level; Z = rounds to zero.",
+  "all_people": {
+    "2019": {"revised": 11.8, "corrected": 11.7, "difference": -0.1, "significant": true},
+    "2020": {"revised": 9.2, "corrected": 9.1, "difference": -0.1, "significant": true},
+    "2021": {"revised": 7.8, "corrected": 7.7, "difference": -0.1, "significant": true},
+    "2022": {"revised": 12.4, "corrected": 12.1, "difference": -0.3, "significant": true},
+    "2023": {"revised": 12.9, "corrected": 12.7, "difference": -0.1, "significant": true},
+    "2024": {"revised": 12.9, "corrected": 13.0, "difference": 0.0, "significant": true, "difference_note": "printed as Z* (rounds to zero, significant)"}
+  },
+  "under_18": {
+    "2019": {"revised": 12.6, "corrected": 12.4},
+    "2020": {"revised": 9.7, "corrected": 9.6},
+    "2021": {"revised": 5.2, "corrected": 5.1},
+    "2022": {"revised": 12.4, "corrected": 12.0},
+    "2023": {"revised": 13.7, "corrected": 13.5},
+    "2024": {"revised": 13.4, "corrected": 13.4}
+  },
+  "corrected_series_2023_to_2024": {
+    "all_people": {"2023": 12.7, "2024": 13.0, "change": 0.2, "significant": false, "note": "'not statistically different'; printed change 0.2 from unrounded values"},
+    "owner_with_mortgage": {"2023": 5.7, "2024": 6.1, "change": 0.4},
+    "owner_without_mortgage_or_rent_free": {"2023": 11.3, "2024": 11.9, "change": 0.6},
+    "renter": {"2023": 23.6, "2024": 23.1, "change": -0.5},
+    "age_65_plus": {"2023": 14.0, "2024": 15.1, "change": 1.2, "significant": true}
+  },
+  "headline_quote": "corrected methodology yields overall SPM poverty rates which are lower than estimates published in Shrider and Bijou (2025) for 2019 to 2023 by 0.1 to 0.3 percentage points and marginally higher (12.9% to 13.0%) in 2024"
+}

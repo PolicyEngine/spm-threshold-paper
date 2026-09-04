@@ -33,11 +33,12 @@ def check(label: str, ok: bool) -> None:
 before = {
     p: p.read_text() for p in sorted((REPO / "paper" / "tables").glob("*.md"))
 }
-subprocess.run(
-    [sys.executable, str(REPO / "scripts" / "build_tables.py")],
-    check=True,
-    capture_output=True,
-)
+for script in ("build_tables.py", "evaluate_nowcast_2025.py"):
+    subprocess.run(
+        [sys.executable, str(REPO / "scripts" / script)],
+        check=True,
+        capture_output=True,
+    )
 for path, old in before.items():
     check(f"table drifted: {path.name}", path.read_text() == old)
 
@@ -289,6 +290,58 @@ realized_2025 = cpi["CUUR0000SA0"]["2025"] / cpi["CUUR0000SA0"]["2024"] - 1
 check(
     "realized CPI-U 2025 growth 2.6",
     "2.6 percent" in QMD and abs(realized_2025 - 0.026) < 0.002,
+)
+
+# (d) The September evaluation: every figure quoted from it re-derives
+# from data/evaluation_2025.json (written by evaluate_nowcast_2025.py
+# from the pinned artifacts + BLS's published 2025 values).
+ev = json.loads((REPO / "data" / "evaluation_2025.json").read_text())
+R = ev["rules"]
+amended = R["Amended nowcast (50/50 blend, committed)"]
+original = R["Original nowcast (pre-repair blend)"]
+repl = R["CE replication growth ratio alone"]
+comp = R["FCSUti-composite CPI aging alone"]
+cpiu = R["All-Items CPI-U aging (status quo)"]
+for label, value, literal in [
+    ("evaluation amended MAE 1.17", amended["mae"], "1.17"),
+    ("evaluation original MAE 0.98", original["mae"], "0.98"),
+    ("evaluation replication MAE 0.75", repl["mae"], "0.75"),
+    ("evaluation composite MAE 2.02", comp["mae"], "2.02"),
+    ("evaluation CPI-U MAE 2.58", cpiu["mae"], "2.58"),
+]:
+    check(label, literal in QMD and f"{value:.2%}".rstrip("%") == literal)
+check(
+    "evaluation renter miss -2.27",
+    "2.27" in QMD and abs(amended["errors"]["renter"] - (-0.0227)) < 0.0001,
+)
+signed_mean = sum(amended["errors"].values()) / 3
+check(
+    "evaluation signed mean -1.17 inside stated range",
+    "−1.17" in QMD and -0.014 <= signed_mean <= -0.001,
+)
+actual = json.loads((REPO / "data" / "bls_2025_thresholds.json").read_text())
+for literal, value in [
+    ("41,323", actual["values"]["owner_with_mortgage"]),
+    ("34,326", actual["values"]["owner_without_mortgage"]),
+    ("41,701", actual["values"]["renter"]),
+]:
+    check(f"BLS 2025 literal {literal}", literal in QMD and f"{value:,}" == literal)
+check(
+    "BLS-stated 2025 growth 4.40-6.33",
+    "4.40 to 6.33" in QMD
+    and min(actual["bls_stated_growth_pct_2025_over_2024"].values()) == 4.402
+    and max(actual["bls_stated_growth_pct_2025_over_2024"].values()) == 6.325,
+)
+gaps = ev["composite_vs_bls_fcsuti_gap_pp"]
+check(
+    "composite within 0.7pp of BLS FCSUti",
+    "0.7 percentage point" in QMD and max(abs(g) for g in gaps.values()) < 0.7,
+)
+census = json.loads((REPO / "data" / "census_wp2026_17_rates.json").read_text())
+c23 = census["corrected_series_2023_to_2024"]["all_people"]
+check(
+    "Census corrected 2023->2024 = 12.7 -> 13.0",
+    "12.7" in QMD and "13.0" in QMD and c23["2023"] == 12.7 and c23["2024"] == 13.0,
 )
 
 if failures:

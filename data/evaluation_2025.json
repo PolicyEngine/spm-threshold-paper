@@ -1,0 +1,88 @@
+{
+ "actual_2025": {
+  "owner_with_mortgage": 41323,
+  "owner_without_mortgage": 34326,
+  "renter": 41701
+ },
+ "corrected_2024_base": {
+  "owner_with_mortgage": 39230.994457,
+  "owner_without_mortgage": 32878.594848,
+  "renter": 39219.893902
+ },
+ "cpi_u_ratio_pinned": 1.0263126854942315,
+ "rules": {
+  "Amended nowcast (50/50 blend, committed)": {
+   "mae": 0.011711497719319675,
+   "errors": {
+    "owner_with_mortgage": -0.006937084908718694,
+    "owner_without_mortgage": -0.0055355462111496,
+    "renter": -0.02266186203809073
+   },
+   "values": {
+    "owner_with_mortgage": 41036.33884031702,
+    "owner_without_mortgage": 34135.98684075608,
+    "renter": 40755.97769114958
+   }
+  },
+  "Original nowcast (pre-repair blend)": {
+   "mae": 0.009801833535956614,
+   "errors": {
+    "owner_with_mortgage": -0.0054068595654337415,
+    "owner_without_mortgage": -0.002193812741272616,
+    "renter": -0.02180482830116348
+   },
+   "values": {
+    "owner_with_mortgage": 41099.572342177584,
+    "owner_without_mortgage": 34250.695183843076,
+    "renter": 40791.71685501318
+   }
+  },
+  "CE replication growth ratio alone": {
+   "mae": 0.0075325524985206576,
+   "errors": {
+    "owner_with_mortgage": 0.0062332278740329095,
+    "owner_without_mortgage": 0.0003051209034998781,
+    "renter": -0.016059308718029186
+   },
+   "values": {
+    "owner_with_mortgage": 41580.57567543866,
+    "owner_without_mortgage": 34336.473580133534,
+    "renter": 41031.310767149465
+   }
+  },
+  "FCSUti-composite CPI aging alone": {
+   "mae": 0.02024934212514044,
+   "errors": {
+    "owner_with_mortgage": -0.020107397691469853,
+    "owner_without_mortgage": -0.01137621332579919,
+    "renter": -0.029264415358152274
+   },
+   "values": {
+    "owner_with_mortgage": 40492.10200519539,
+    "owner_without_mortgage": 33935.50010137862,
+    "renter": 40480.64461514969
+   }
+  },
+  "All-Items CPI-U aging (status quo)": {
+   "mae": 0.02578624847461697,
+   "errors": {
+    "owner_with_mortgage": -0.02564510621753069,
+    "owner_without_mortgage": -0.016963264763512065,
+    "renter": -0.03475037444280815
+   },
+   "values": {
+    "owner_with_mortgage": 40263.26727577298,
+    "owner_without_mortgage": 33743.718973727686,
+    "renter": 40251.87463536046
+   }
+  }
+ },
+ "composite_vs_bls_fcsuti_gap_pp": {
+  "2020": -0.23837588468315607,
+  "2021": 0.3503990201698066,
+  "2022": 0.6627784307196025,
+  "2023": -0.4572813482465854,
+  "2024": -0.42003871332198894,
+  "2025": -0.16485359563639967
+ }
+}

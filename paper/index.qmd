@@ -1,12 +1,12 @@
 ---
 title: "Nowcasting Supplemental Poverty Measure thresholds"
-subtitle: "A pre-committed 2025 estimate from public microdata"
+subtitle: "A pre-committed 2025 estimate from public microdata, and its evaluation"
 author:
   - name: Max Ghenis
     affiliations:
       - name: PolicyEngine
     email: max@policyengine.org
-date: 2026-07-18
+date: 2026-09-04
 bibliography: ../bibliography/references.bib
 format:
   html:
@@ -42,9 +42,12 @@ abstract: |
   0.41). The nowcast was amended once, before any BLS release, after
   adversarial cross-model review caught a construction error in the
   composite index; the original values remain in the repository
-  history. BLS publishes the actual 2025 thresholds around September
-  2026; a revision of this paper will report the realized errors,
-  whatever they are.
+  history. BLS published the 2025 thresholds on August 24, 2026 —
+  \$41,323, \$34,326, and \$41,701. The committed nowcast's mean
+  absolute error was 1.17 percent against 2.58 for CPI-U aging, with
+  the miss concentrated in renters; the consumption component alone
+  scored 0.75, in the order the backtest predicted. This revision
+  reports that evaluation in full.
 ---
 
 # Introduction
@@ -88,9 +91,10 @@ costs the price indexation used in microsimulation practice, ours
 included; a backtest scores replacement rules against five years of
 corrected actuals. @sec-nowcast applies that
 rule to data that already exist and commits, before publication, to a
-numeric estimate of the 2025 thresholds that BLS will publish around
-September 2026. @sec-discussion draws the implications for
-poverty measurement infrastructure.
+numeric estimate of the 2025 thresholds. BLS published those
+thresholds on August 24, 2026, and @sec-evaluation scores the
+commitment and every alternative rule against them. @sec-discussion
+draws the implications for poverty measurement infrastructure.
 
 # How the thresholds are produced {#sec-production}
 
@@ -182,14 +186,21 @@ units, nominal dollars of the threshold year.
 Every change is within ±1.6 percent, with mixed signs: renter
 thresholds fall in five of six years, owner thresholds move both ways.
 2022 sees the largest downward revision across all tenures. Census
-will quantify the effect on poverty rates in a working paper before
-the September 2026 annual report. Most published year-to-year rate
-comparisons have room to absorb a revision of this size — our
-microsimulation puts the level effect near 0.2 percentage points —
-but not all: the 2024 SPM rate printed at 12.9 percent, statistically
-unchanged from 2023 [@p60-287], and a flat comparison can change
-direction under even a small revision. We leave the rate arithmetic
-to the Census working paper.
+has since quantified the effect on poverty rates
+[@creamer2026revising]: the corrected series runs 0.1 to 0.3
+percentage points below the originally published rates for 2019
+through 2023 and marginally above for 2024 (12.9 to 13.0 percent),
+with no year-to-year trend materially altered. Our microsimulation
+had put the level effect near 0.2 percentage points — the right
+magnitude but, for 2024, the wrong sign: it lowered the modeled rate
+where Census's re-estimate raised it. A revision with mixed signs
+across tenures (owner thresholds up, renter thresholds down in 2024)
+resolves through the tenure mix of households near the line, and the
+model's mix evidently differs from the survey's. The one comparison
+we had flagged as fragile did move: the 2024 rate had printed as
+statistically unchanged from 2023 at 12.9 percent [@p60-287]; under
+the corrected series it rises from 12.7 to 13.0, still not a
+statistically significant change.
 
 Our own software did worse. The spm-calculator package, which supplies
 threshold parameters to the PolicyEngine US microsimulation model,
@@ -315,13 +326,18 @@ these files. None is documented in one place elsewhere.
 6. **October 2025 CPI does not exist.** The scheduled release covering
    October 2025 was not published during the federal government
    shutdown, and the month is absent from the CPI series; 2025 annual
-   averages must be computed over eleven months.
+   averages must be computed over eleven months. The API still
+   returns a placeholder for October 2025 as of September 2026, yet
+   BLS's own 2025 threshold page reports 2.70 percent CPI-U growth
+   for the year against the 2.63 percent the eleven-month annual
+   average implies; the treatment is undocumented.
 
 # Projecting thresholds past the published years {#sec-projection}
 
 BLS publishes thresholds with roughly a fourteen-month lag: the 2024
-thresholds arrived in September 2025 [@p60-287], and 2025 thresholds
-are expected in September 2026. Any analysis of current-law poverty —
+thresholds arrived in September 2025 [@p60-287], and the 2025
+thresholds followed on August 24, 2026 [@bls2025thresholds]. Any
+analysis of current-law poverty —
 which for microsimulation models is most analyses — needs thresholds
 for years BLS has not published. A common approach, and ours until
 this work, ages the latest published threshold by projected growth in
@@ -452,7 +468,14 @@ takes the ratio, per tenure — level biases that persist across
 adjacent, 80-percent-overlapping windows cancel, and the anchor share
 cancels exactly. The price component is the FCSUti-composite ratio of
 2025 to 2024 annual averages, with 2025 averaged over its eleven
-published months. @tbl-nowcast states the estimate.
+published months.^[The nowcast's composite ratio chain-links at the
+base year: each component's 2025-to-2024 ratio, weighted by budget
+share. The backtest composite in @tbl-backtest holds a fixed 2019
+base instead. The two definitions differ by at most 0.06 percentage
+points in any year's growth and by 0.006 points of mean absolute
+error in the backtest; we note the inconsistency rather than re-run
+the committed table under a new definition.] @tbl-nowcast states the
+estimate.
 
 ::: {#tbl-nowcast}
 {{< include tables/nowcast.md >}}
@@ -500,7 +523,98 @@ its method, components, and hash. The blend's annual signed errors in
 backtest, averaged across tenures, ranged from −0.1 to −1.4 percent;
 that range is our stated expectation of the nowcast's accuracy. If the
 nowcast misses by more than the rules scored alongside it, that result
-publishes too.
+publishes too. The evaluation follows in @sec-evaluation.
+
+# Evaluation against the published 2025 thresholds {#sec-evaluation}
+
+BLS published the 2025 thresholds on August 24, 2026, in late August
+rather than the September this paper anticipated [@bls2025thresholds]:
+\$41,323 for owners with mortgages, \$34,326 for owners without, and
+\$41,701 for renters — growth of 4.40 to 6.33 percent over the
+corrected 2024 base, by BLS's own statement. The page publishes whole
+dollars; no full-precision workbook had appeared by September 4, and
+the half-dollar rounding bound is immaterial at this scale.
+@tbl-evaluation scores the committed nowcast, its superseded
+original, and every rule from @tbl-backtest against those values, all
+from the corrected 2024 base as committed.
+
+::: {#tbl-evaluation}
+{{< include tables/evaluation.md >}}
+
+Signed percent error of each 2025 projection against BLS's published
+thresholds, and mean absolute error across tenures. All rules project
+from the corrected 2024 base; the CPI-U rule uses the pinned
+eleven-month 2025 annual average.
+:::
+
+::: {#tbl-evaluation-levels}
+{{< include tables/evaluation_levels.md >}}
+
+Published 2025 thresholds and the committed nowcast in dollars, with
+BLS's stated growth against the nowcast's.
+:::
+
+Four results. First, the committed nowcast missed by 0.69, 0.55, and
+2.27 percent by tenure, a mean absolute error of 1.17 percent; its
+signed mean of −1.17 percent falls inside the −0.1 to −1.4 range
+stated in advance as our expectation, though the renter miss alone
+falls outside it. Second, the status-quo rule did what the backtest
+said it would: All-Items CPI-U aging understated every tenure, by
+1.70 to 3.48 percent, for a mean absolute error of 2.58 — the fourth
+consecutive year it ran low. The blend more than halved that error.
+Third, the ranking the repaired backtest produced held out of sample:
+the replication growth ratio alone was the most accurate rule at 0.75
+percent and the only one with errors on both sides of zero, the
+composite index alone sat between it and CPI-U at 2.02, and the blend
+landed between its two components. Fourth, the superseded original
+nowcast, built on the erroneous composite, scored 0.98 percent —
+better than the amended 1.17 — because its higher price ratio
+happened to offset more of the common shortfall. One year cannot
+distinguish that from luck, and we do not try; both vintages are
+reported because both were committed.
+
+The miss is a renter story. BLS's renter threshold grew 6.33 percent,
+against 5.33 and 4.40 for the two owner groups; every rule, the
+replication ratio included, missed renters by the most, and the
+nowcast captured 3.92 of those 6.33 points. The replication's own
+renter growth of 4.62 percent understated the published figure by
+more than its two owner-group errors combined, so whatever moved
+renter thresholds in 2025 is something the unimputed replication does
+not observe. The in-kind imputations, which include rental
+assistance, are the obvious candidate; this paper's data cannot
+attribute it, and we leave the diagnosis to a replication that
+imputes them.
+
+The composite index can now be checked against BLS's own. The
+threshold page also publishes year-over-year growth in BLS's FCSUti
+deflator, which BLS releases only alongside each year's thresholds —
+useless for nowcasting, ideal for validation. @tbl-composite-validation
+compares them: the static-weight composite tracks BLS's index within
+0.7 percentage point in every year from 2020 through 2025, with a
+mean absolute gap of 0.4 point and no consistent sign, so the
+construction repaired in @sec-projection is sound after the repair.
+The same page reports 2025 All-Items CPI-U growth of 2.70 percent
+against the 2.63 percent implied by the CPI program's eleven-month
+annual average; BLS does not state how it treated the missing October
+index, and we do not guess.
+
+::: {#tbl-composite-validation}
+{{< include tables/composite_validation.md >}}
+
+Year-over-year growth in BLS's published FCSUti deflator against the
+paper's static-weight composite, with the two CPI-U annual-average
+figures alongside.
+:::
+
+What the result licenses. The pre-commitment did its job: the numbers
+scored above are the ones fixed in the repository and its timestamps
+before BLS published, and the amended nowcast beat the rule it
+replaced by more than half. It does not license re-selecting the rule
+for 2026 after the fact. The replication ratio has now led on both
+looks — the repaired backtest and the realized year — and if the
+packaged method changes for 2026, the change will be committed and
+timestamped before the 2026 CE window closes, in the same way, with
+this year's evaluation as its stated basis.
 
 # Discussion {#sec-discussion}
 
@@ -533,8 +647,9 @@ checks.
 The projection result has the most direct consequence for
 microsimulation practice. Aging SPM thresholds by projected CPI-U, as
 our own model did, understated threshold growth by an average of 1.9
-percent per year over 2020--2024, which flows directly into
-understated current-law poverty projections. Effects on modeled
+percent per year over 2020--2024 and by 2.6 percent in 2025 out of
+sample, which flows directly into understated current-law poverty
+projections. Effects on modeled
 eligibility and poverty transitions near program cliffs are plausible
 but outside this paper's scope. The blend rule is implementable from
 public data with a published, tested codebase, and it degrades
@@ -585,14 +700,26 @@ tables, verifies the artifact hashes, and re-derives the load-bearing
 prose figures — the paper does not build if any of them drifts from
 the data; continuous integration runs the same check on every push.
 The nowcast's in-advance commitment is externally timestamped, all
-before any BLS 2025 publication: the artifact checksum file is
-stamped via OpenTimestamps (proof committed alongside it), the
-original and amended nowcasts are tagged releases in the repository
-history, and the Internet Archive holds a capture of the published
-page from August 7, 2026. The history documents one
+before BLS's August 24 publication: the artifact checksum file as it
+stood on August 7, 2026 (`data/SHA256SUMS.precommit`) is stamped via
+OpenTimestamps, and that proof (`SHA256SUMS.precommit.ots`) has
+since completed to a Bitcoin attestation — block 961505, mined
+August 7, 2026 at 23:18 UTC, with two further calendars confirming
+in blocks 961512 and 962551 — so the committed values are anchored
+in a public ledger seventeen days before BLS published; the original
+and amended nowcasts are tagged releases in the repository history;
+and the Internet Archive holds a capture of the published page from
+August 7, 2026. The post-evaluation checksum file carries its own,
+separate stamp. The history documents one
 amendment: the composite-index construction error caught in
 cross-model review on July 18, 2026, with every downstream artifact,
-table, and pinned prose figure regenerated in the same change.
+table, and pinned prose figure regenerated in the same change. The
+evaluation in @sec-evaluation adds three pinned artifacts — BLS's
+published 2025 values with their retrieval date, Census's revised
+rate series, and the evaluation output — and one script,
+`evaluate_nowcast_2025.py`, which the pre-render check now runs
+alongside the table generator, so the evaluation tables and every
+figure quoted from them are re-derived on each build.
 
 # References {.unnumbered}
 

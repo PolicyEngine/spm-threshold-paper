@@ -1,0 +1,39 @@
+{
+  "source": "U.S. Bureau of Labor Statistics, Division of Price and Index Number Research, \"2025 Research Supplemental Poverty Measure Thresholds\", https://www.bls.gov/pir/spm/spm_thresholds_2025.htm",
+  "retrieved": "2026-09-04",
+  "page_last_modified": "August 24, 2026",
+  "precision": "Page publishes whole dollars; no full-precision workbook for 2025 located as of retrieval. Rounding bound +/- $0.50 = +/- 0.0012 percent.",
+  "units": "Two-adult, two-child consumer units, nominal 2025 dollars",
+  "values": {
+    "owner_with_mortgage": 41323,
+    "owner_without_mortgage": 34326,
+    "renter": 41701
+  },
+  "bls_stated_growth_pct_2025_over_2024": {
+    "owner_with_mortgage": 5.332,
+    "owner_without_mortgage": 4.402,
+    "renter": 6.325
+  },
+  "bls_chart3_yoy_growth_pct_corrected_series": {
+    "2020": {"owner_with_mortgage": 2.539, "owner_without_mortgage": 2.995, "renter": 3.686},
+    "2021": {"owner_with_mortgage": 3.920, "owner_without_mortgage": 3.193, "renter": 4.129},
+    "2022": {"owner_with_mortgage": 9.667, "owner_without_mortgage": 9.209, "renter": 9.365},
+    "2023": {"owner_with_mortgage": 8.793, "owner_without_mortgage": 7.495, "renter": 9.053},
+    "2024": {"owner_with_mortgage": 6.127, "owner_without_mortgage": 7.490, "renter": 5.343},
+    "2025": {"owner_with_mortgage": 5.332, "owner_without_mortgage": 4.402, "renter": 6.325}
+  },
+  "bls_chart4_annual_average_inflation_pct": {
+    "note": "Year-over-year percent change in annual averages as published on the same BLS page (Chart 4). FCSUti is BLS's own composite price index used to deflate the CE window; it is published only alongside the thresholds, so it is available for backtesting our composite but not for nowcasting.",
+    "2020": {"cpi_u": 1.233, "c_cpi_u": 1.074, "fcsuti": 2.387},
+    "2021": {"cpi_u": 4.698, "c_cpi_u": 4.469, "fcsuti": 3.170},
+    "2022": {"cpi_u": 8.003, "c_cpi_u": 7.678, "fcsuti": 7.206},
+    "2023": {"cpi_u": 4.116, "c_cpi_u": 3.874, "fcsuti": 6.172},
+    "2024": {"cpi_u": 2.950, "c_cpi_u": 2.599, "fcsuti": 3.976},
+    "2025": {"cpi_u": 2.699, "c_cpi_u": null, "fcsuti": 3.441}
+  },
+  "corrected_2024_shown_on_page": {
+    "owner_with_mortgage": 39231,
+    "owner_without_mortgage": 32879,
+    "renter": 39220
+  }
+}
