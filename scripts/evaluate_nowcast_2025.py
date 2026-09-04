@@ -47,15 +47,19 @@ assert corrected_2024 is not None
 
 # The original (pre-repair) nowcast, from the tagged release rather
 # than a hand-copied number.
-original = json.loads(
-    subprocess.run(
-        ["git", "show", "v1.0-original-nowcast:data/nowcast_2025.json"],
-        cwd=REPO,
-        check=True,
-        capture_output=True,
-        text=True,
-    ).stdout
+_orig = subprocess.run(
+    ["git", "show", "v1.0-original-nowcast:data/nowcast_2025.json"],
+    cwd=REPO,
+    capture_output=True,
+    text=True,
 )
+if _orig.returncode != 0:
+    raise SystemExit(
+        "cannot read data/nowcast_2025.json at tag v1.0-original-nowcast "
+        "(shallow or tagless checkout? run `git fetch --tags --unshallow`): "
+        + _orig.stderr.strip()
+    )
+original = json.loads(_orig.stdout)
 
 cpi_u_ratio = cpi["CUUR0000SA0"]["2025"] / cpi["CUUR0000SA0"]["2024"]
 
