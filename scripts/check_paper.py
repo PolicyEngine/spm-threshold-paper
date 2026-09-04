@@ -60,6 +60,18 @@ check(
     ).hexdigest()
     == BLS_WORKBOOK_SHA256,
 )
+# The current-thresholds workbook as BLS served it on 2026-09-04, which
+# carries 2025 at full precision (its sheet is still titled 2005-2024).
+BLS_CURRENT_WORKBOOK_SHA256 = (
+    "95f39fb5479ee5c196de627e06e10efd59af5148cf1c8466924e3fb2e5e2bd3b"
+)
+check(
+    "bundled current BLS workbook hash",
+    hashlib.sha256(
+        (REPO / "data" / "spm_thresholds_current_2026-09-04.xlsx").read_bytes()
+    ).hexdigest()
+    == BLS_CURRENT_WORKBOOK_SHA256,
+)
 
 # (c) Load-bearing prose numbers match artifacts.
 TENURES = ("owner_with_mortgage", "owner_without_mortgage", "renter")
@@ -325,7 +337,23 @@ for literal, value in [
     ("34,326", actual["values"]["owner_without_mortgage"]),
     ("41,701", actual["values"]["renter"]),
 ]:
-    check(f"BLS 2025 literal {literal}", literal in QMD and f"{value:,}" == literal)
+    check(
+        f"BLS 2025 literal {literal}",
+        literal in QMD and f"{round(value):,}" == literal,
+    )
+# Misses in units of BLS's published standard errors.
+se = actual["standard_errors"]
+miss_se = {
+    t: (amended["values"][t] - actual["values"][t]) / se[t]
+    for t in TENURES
+}
+check(
+    "owner misses within one SE; renter about 2.4 SE",
+    "2.4 standard errors" in QMD
+    and abs(miss_se["owner_with_mortgage"]) < 1
+    and abs(miss_se["owner_without_mortgage"]) < 1
+    and abs(abs(miss_se["renter"]) - 2.4) < 0.05,
+)
 check(
     "BLS-stated 2025 growth 4.40-6.33",
     "4.40 to 6.33" in QMD

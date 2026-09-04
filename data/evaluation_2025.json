@@ -1,8 +1,8 @@
 {
  "actual_2025": {
-  "owner_with_mortgage": 41323,
-  "owner_without_mortgage": 34326,
-  "renter": 41701
+  "owner_with_mortgage": 41322.707394,
+  "owner_without_mortgage": 34325.99772,
+  "renter": 41700.555713
  },
  "corrected_2024_base": {
   "owner_with_mortgage": 39230.994457,
@@ -12,11 +12,11 @@
  "cpi_u_ratio_pinned": 1.0263126854942315,
  "rules": {
   "Amended nowcast (50/50 blend, committed)": {
-   "mae": 0.011711497719319675,
+   "mae": 0.011705660816454744,
    "errors": {
-    "owner_with_mortgage": -0.006937084908718694,
-    "owner_without_mortgage": -0.0055355462111496,
-    "renter": -0.02266186203809073
+    "owner_with_mortgage": -0.006930053032405126,
+    "owner_without_mortgage": -0.005535480156872774,
+    "renter": -0.02265144926008633
    },
    "values": {
     "owner_with_mortgage": 41036.33884031702,
@@ -25,11 +25,11 @@
    }
   },
   "Original nowcast (pre-repair blend)": {
-   "mae": 0.009801833535956614,
+   "mae": 0.009795989903586691,
    "errors": {
-    "owner_with_mortgage": -0.0054068595654337415,
-    "owner_without_mortgage": -0.002193812741272616,
-    "renter": -0.02180482830116348
+    "owner_with_mortgage": -0.005399816853597805,
+    "owner_without_mortgage": -0.002193746465031343,
+    "renter": -0.021794406392130927
    },
    "values": {
     "owner_with_mortgage": 41099.572342177584,
@@ -38,11 +38,11 @@
    }
   },
   "CE replication growth ratio alone": {
-   "mae": 0.0075325524985206576,
+   "mae": 0.007531455316659959,
    "errors": {
-    "owner_with_mortgage": 0.0062332278740329095,
-    "owner_without_mortgage": 0.0003051209034998781,
-    "renter": -0.016059308718029186
+    "owner_with_mortgage": 0.0062403530093022574,
+    "owner_without_mortgage": 0.00030518734572515527,
+    "renter": -0.016048825594952465
    },
    "values": {
     "owner_with_mortgage": 41580.57567543866,
@@ -51,11 +51,11 @@
    }
   },
   "FCSUti-composite CPI aging alone": {
-   "mae": 0.02024934212514044,
+   "mae": 0.020243559886267765,
    "errors": {
-    "owner_with_mortgage": -0.020107397691469853,
-    "owner_without_mortgage": -0.01137621332579919,
-    "renter": -0.029264415358152274
+    "owner_with_mortgage": -0.020100459074112176,
+    "owner_without_mortgage": -0.011376147659470925,
+    "renter": -0.029254072925220198
    },
    "values": {
     "owner_with_mortgage": 40492.10200519539,
@@ -64,11 +64,11 @@
    }
   },
   "All-Items CPI-U aging (status quo)": {
-   "mae": 0.02578624847461697,
+   "mae": 0.025780498913155443,
    "errors": {
-    "owner_with_mortgage": -0.02564510621753069,
-    "owner_without_mortgage": -0.016963264763512065,
-    "renter": -0.03475037444280815
+    "owner_with_mortgage": -0.025638206812674702,
+    "owner_without_mortgage": -0.016963199468286727,
+    "renter": -0.0347400904585049
    },
    "values": {
     "owner_with_mortgage": 40263.26727577298,

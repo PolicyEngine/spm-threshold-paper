@@ -262,7 +262,18 @@ four errors in our replication code:
 After the fixes, the faithful variant reproduces the corrected
 thresholds with mean absolute deviation across the three tenures of
 1.5 to 2.1 percent per year (1.0 to 1.6 percent against the
-superseded published series), with no imputation of in-kind benefits.
+superseded published series), with no imputation of in-kind
+benefits.^[Three further approximations remain and are documented in
+the implementation: each collection quarter is deflated with annual
+rather than quarterly price indexes, so the terminal first quarter is
+not given BLS's special treatment; the tenure codes for owners with
+unreported mortgage status and for rent-free units are folded into
+neighboring groups; and the 80-percent grocery allocation is applied
+to the combined grocery summary rather than to the single item code
+the errata names. A cross-model code review on September 4, 2026
+surfaced all three; each moves replicated levels by a fraction of a
+percent, and none enters the ratios the nowcast uses at a scale the
+evaluation could detect.]
 For scale, the workbook's published sampling standard errors run 0.7
 to 2.1 percent of the corresponding threshold across 2019--2024, so
 the replication sits within roughly one to three standard errors of
@@ -532,8 +543,9 @@ rather than the September this paper anticipated [@bls2025thresholds]:
 \$41,323 for owners with mortgages, \$34,326 for owners without, and
 \$41,701 for renters — growth of 4.40 to 6.33 percent over the
 corrected 2024 base, by BLS's own statement. The page publishes whole
-dollars; no full-precision workbook had appeared by September 4, and
-the half-dollar rounding bound is immaterial at this scale.
+dollars; the current-thresholds workbook linked from the BLS SPM
+home page carries the same values at full precision, with standard
+errors of \$327, \$560, and \$393, and is bundled with this revision.
 @tbl-evaluation scores the committed nowcast, its superseded
 original, and every rule from @tbl-backtest against those values, all
 from the corrected 2024 base as committed.
@@ -558,7 +570,9 @@ Four results. First, the committed nowcast missed by 0.69, 0.55, and
 2.27 percent by tenure, a mean absolute error of 1.17 percent; its
 signed mean of −1.17 percent falls inside the −0.1 to −1.4 range
 stated in advance as our expectation, though the renter miss alone
-falls outside it. Second, the status-quo rule did what the backtest
+falls outside it. Scaled by BLS's own sampling uncertainty, the two
+owner misses sit within one standard error of the published
+thresholds; the renter miss is about 2.4 standard errors. Second, the status-quo rule did what the backtest
 said it would: All-Items CPI-U aging understated every tenure, by
 1.70 to 3.48 percent, for a mean absolute error of 2.58 — the fourth
 consecutive year it ran low. The blend more than halved that error.
@@ -688,7 +702,19 @@ merges; its workbook comparison was last run manually on August 6,
 Regenerating the artifacts from scratch requires the public CE PUMD
 year bundles (roughly 700 MB, cached locally by the scripts) and the
 BLS public data API; bls.gov's bot filtering requires a
-browser-impersonating TLS client, which the scripts document.
+browser-impersonating TLS client, which the scripts document. One
+reproducibility defect is disclosed rather than hidden: at the
+pinned commit, the nowcast and backtest scripts read a six-series
+CPI cache (`CUUR0000SAF`, `SAA`, `SAH1`, `SAH2`, `SEED`, and
+`SA0`) that is pinned in this repository but was untracked in the
+implementation repository, whose own default store carried a
+seventh, mis-mapped series (`SEEE`, information-technology hardware
+and services, labeled as internet) and therefore returned a
+different 2025 price ratio (1.0297 rather than the committed 1.0322).
+The same September 4 review caught it; the branch is being
+reconciled to the six-series definition the evaluation scored, and
+the choice of series for 2026 is an open, public issue on the
+implementation repository.
 
 The paper repository pins the exact artifacts behind every table and
 the poverty-sensitivity simulation output, with SHA-256 sums, and
@@ -714,9 +740,11 @@ separate stamp. The history documents one
 amendment: the composite-index construction error caught in
 cross-model review on July 18, 2026, with every downstream artifact,
 table, and pinned prose figure regenerated in the same change. The
-evaluation in @sec-evaluation adds three pinned artifacts — BLS's
-published 2025 values with their retrieval date, Census's revised
-rate series, and the evaluation output — and one script,
+evaluation in @sec-evaluation adds four pinned artifacts — BLS's
+current-thresholds workbook as served on September 4, 2026 (hash
+pinned), the 2025 values and standard errors read from it with their
+retrieval date, Census's revised rate series, and the evaluation
+output — and one script,
 `evaluate_nowcast_2025.py`, which the pre-render check now runs
 alongside the table generator, so the evaluation tables and every
 figure quoted from them are re-derived on each build.
