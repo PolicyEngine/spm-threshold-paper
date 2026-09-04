@@ -10,15 +10,45 @@ One simulation per year: net income is scenario-invariant, so the
 nowcast counterfactual rescales each unit's threshold exactly.
 """
 
+import argparse
 import gc
+import importlib.metadata
 import json
+import subprocess
+from pathlib import Path
 
 import numpy as np
 
 from policyengine_us import CountryTaxBenefitSystem, Microsimulation
 from spm_calculator import nowcast_with_metadata
 
-OUT = "/private/tmp/claude-501/-Users-maxghenis/df49f127-9b39-49ca-a681-58a1a922dc27/scratchpad/nowcast_rate_impact.json"
+REPO = Path(__file__).resolve().parent.parent
+DEFAULT_OUT = REPO / "data" / "nowcast_rate_impact.json"
+
+
+def _version(dist: str) -> str:
+    try:
+        return importlib.metadata.version(dist)
+    except importlib.metadata.PackageNotFoundError:
+        return "unknown"
+
+
+def _spm_calculator_commit() -> str:
+    """Commit of an editable spm-calculator install, if it is a git tree."""
+    try:
+        import spm_calculator
+
+        root = Path(spm_calculator.__file__).resolve().parent.parent
+        return subprocess.check_output(
+            ["git", "-C", str(root), "rev-parse", "HEAD"], text=True
+        ).strip()
+    except Exception:  # noqa: BLE001
+        return "unknown"
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--output", type=Path, default=DEFAULT_OUT)
+OUT = parser.parse_args().output
 
 doc = nowcast_with_metadata(2025)
 blend = {t.upper(): c["blend_ratio"] for t, c in doc["components"].items()}
@@ -29,7 +59,16 @@ RATIO = {t: b / cpi_factor for t, b in blend.items()}
 print(f"PE CPI-U factor 2025/2024: {cpi_factor:.5f}")
 print("nowcast/current threshold ratios:", {k: round(v, 5) for k, v in RATIO.items()})
 
-results = {"threshold_ratio_nowcast_over_current": RATIO}
+results = {
+    "generated_by": (
+        "scripts/simulate_nowcast_rate_impact.py (PolicyEngine US "
+        f"microsimulation, policyengine-us {_version('policyengine-us')}, "
+        f"spm-calculator {_version('spm-calculator')} at commit "
+        f"{_spm_calculator_commit()}, default dataset of that "
+        "policyengine-us release)"
+    ),
+    "threshold_ratio_nowcast_over_current": RATIO,
+}
 for year in (2025, 2026):
     sim = Microsimulation()
     net = sim.calculate("spm_unit_net_income", year)

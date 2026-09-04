@@ -13,20 +13,48 @@ revision.
 quarto render   # runs scripts/check_paper.py pre-render, then HTML + PDF to _output/
 ```
 
-The pre-render check regenerates every table from `data/` via
-`scripts/build_tables.py`, verifies `data/SHA256SUMS`, and re-derives
-the load-bearing prose figures; the render fails if any of them
-drifts from the artifacts.
+The pre-render check (`scripts/check_paper.py`) regenerates every
+table from `data/`, enforces allowlists of generated tables, QMD
+includes, and checksummed artifacts, verifies `data/SHA256SUMS`, and
+re-derives the registered prose figures at numeric-token boundaries;
+the render fails if any registered figure, table, or artifact drifts.
+Figures quoted from external publications are bound to citations,
+not artifacts. `data/PROVENANCE.md` names the generator, inputs, and
+source of every artifact.
 
-Every numeric table is generated from the artifacts in `data/`
-(SHA-256 sums in `data/SHA256SUMS`), which are produced by the scripts
-in [PolicyEngine/spm-calculator](https://github.com/PolicyEngine/spm-calculator)
-(v0.4.0, PR #32). The prose cannot drift from the data without the
-build failing.
+## Clean-room build
+
+Tested on 2026-09-04 with Python 3.14.6, Quarto 1.9.36, and TeX Live
+2026 (LuaHBTeX). The check and the table generators use only the
+Python standard library and need a writable checkout.
+
+```bash
+git clone https://github.com/PolicyEngine/spm-threshold-paper.git
+cd spm-threshold-paper
+git checkout <full commit SHA of the revision you are checking>
+python3 scripts/check_paper.py      # guard only; no Quarto needed
+quarto render --to html             # HTML; add --to pdf for the PDF (needs TeX)
+```
+
+Rendered output lands in `_output/paper/`. The published site is a
+static deploy of that directory.
+
+## Pre-commitment evidence
+
+- `data/SHA256SUMS.precommit` — the artifact manifest as of 2026-08-07,
+  before BLS published the 2025 thresholds; `SHA256SUMS.precommit.ots`
+  is its completed OpenTimestamps proof (Bitcoin block 961505, mined
+  2026-08-07 23:18 UTC). Verify with
+  `ots verify -f data/SHA256SUMS.precommit data/SHA256SUMS.precommit.ots`.
+- `data/COMMITMENT-MANIFEST.txt` — both nowcast vintages (tags
+  `v1.0-original-nowcast`, `v1.1-amended-nowcast`), their commits and
+  artifact hashes; stamped as `COMMITMENT-MANIFEST.txt.ots`.
+- Internet Archive capture of the page, 2026-08-07:
+  <https://web.archive.org/web/20260807211521/https://spm-threshold-paper.vercel.app/>
 
 ## Companion code
 
-- spm-calculator 0.4.0: corrected/published/legacy threshold series
+- spm-calculator PR #32 (0.4.0 on merge): corrected/published/legacy threshold series
   with provenance, CE replication, benchmark, backtest, nowcast, and
   the weekly BLS drift-watch workflow.
 - policyengine-us #9081: adopts the corrected series in the US

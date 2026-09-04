@@ -1,5 +1,5 @@
 {
- "generated_by": "scripts/simulate_nowcast_rate_impact.py (PolicyEngine US microsimulation, default Populace dataset, spm-calculator 0.4.0)",
+ "generated_by": "scripts/simulate_nowcast_rate_impact.py (PolicyEngine US microsimulation, default Populace dataset as of 2026-07-18, spm-calculator editable install from PR #32 branch \u2014 version 0.4.0 unreleased at the time; produced by the script's earlier version, which wrote to a scratch path)",
  "threshold_ratio_nowcast_over_current": {
   "OWNER_WITH_MORTGAGE": 1.017386316441713,
   "OWNER_WITHOUT_MORTGAGE": 1.0098242972735643,

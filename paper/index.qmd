@@ -68,7 +68,7 @@ We maintain open-source software that carries these thresholds into
 policy microsimulation, so we audited it against the correction. The
 audit found a larger problem on our side: threshold values transcribed
 by hand into our own package matched no BLS or Census publication for
-four of the six affected years, with errors up to 7.4 percent. The two
+five of the six affected years, with errors up to 7.4 percent. The two
 failure modes are the same failure mode. Reference data that people
 transcribe, in agencies or in open-source projects, drifts silently
 unless something mechanical checks it against the source.
@@ -184,7 +184,7 @@ units, nominal dollars of the threshold year.
 :::
 
 Every change is within ±1.6 percent, with mixed signs: renter
-thresholds fall in five of six years, owner thresholds move both ways.
+thresholds fall in all six years, owner thresholds move both ways.
 2022 sees the largest downward revision across all tenures. Census
 has since quantified the effect on poverty rates
 [@creamer2026revising]: the corrected series runs 0.1 to 0.3
@@ -505,12 +505,17 @@ microsimulation model, replacing CPI-U-aged 2025 thresholds with the
 nowcast raises projected 2025 SPM poverty by 0.4 percentage points
 (simulation output pinned in the repository); we treat that as a
 sensitivity, not a headline, since modeled baseline levels carry their
-own calibration error. To be explicit about adoption: the companion
-policyengine-us change takes up only the corrected historical series,
-and that model still ages thresholds past 2024 by projected CPI-U —
-so its current-law poverty projections carry the understatement
-quantified in @sec-projection until the nowcast is wired into its
-forecast path, at the measured 2025 cost of those 0.4 points.
+own calibration error. To be explicit about adoption: at the pinned
+implementation commit, the companion policyengine-us change takes up
+only the corrected historical series and still ages thresholds past
+2024 by projected CPI-U — so its current-law poverty projections
+carried the understatement quantified in @sec-projection, at the
+measured 2025 cost of those 0.4 points, for as long as 2025 was
+unpublished. With the 2025 thresholds now published, the
+implementation branch carries them as the latest published year and
+CPI-U aging begins at 2026; whether the nowcast method enters that
+model's forecast path for 2026 is the open decision @sec-evaluation
+ends on.
 
 These are amended values. The nowcast as first committed was built on
 the erroneous composite index described in @sec-projection; repairing
@@ -692,8 +697,8 @@ ordinary and rarely checked.
 Everything in this paper regenerates from public data. The
 spm-calculator implementation lives on PolicyEngine/spm-calculator
 pull request #32 (branch `max/bls-2026-threshold-correction`; this
-revision pins commit `d2746cf`), to be released as version 0.4.0 on
-merge. It contains the corrected and pre-correction threshold series
+revision pins commit `d2746cfacce072f599ffb1788eb195777c6ca9ca`), to
+be released as version 0.4.0 on merge. It contains the corrected and pre-correction threshold series
 with the official workbook and its SHA-256; the replication,
 benchmark, backtest, and nowcast scripts; and the weekly drift-check
 workflow — which, as a scheduled job, does not run until the branch
@@ -706,8 +711,9 @@ browser-impersonating TLS client, which the scripts document. One
 reproducibility defect is disclosed rather than hidden: at the
 pinned commit, the nowcast and backtest scripts read a six-series
 CPI cache (`CUUR0000SAF`, `SAA`, `SAH1`, `SAH2`, `SEED`, and
-`SA0`) that is pinned in this repository but was untracked in the
-implementation repository, whose own default store carried a
+`SA0`) and a replication-results file that are pinned in this
+repository but were untracked in the implementation repository,
+whose own default store carried a
 seventh, mis-mapped series (`SEEE`, information-technology hardware
 and services, labeled as internet) and therefore returned a
 different 2025 price ratio (1.0297 rather than the committed 1.0322).
@@ -722,21 +728,42 @@ bundles the corrected BLS workbook itself (hash matching the file
 bls.gov served on August 6, 2026), so the correction table is
 checkable without fighting the bot filtering. Each table is generated
 from the artifacts by script, and a pre-render check regenerates the
-tables, verifies the artifact hashes, and re-derives the load-bearing
-prose figures — the paper does not build if any of them drifts from
-the data; continuous integration runs the same check on every push.
-The nowcast's in-advance commitment is externally timestamped, all
-before BLS's August 24 publication: the artifact checksum file as it
-stood on August 7, 2026 (`data/SHA256SUMS.precommit`) is stamped via
-OpenTimestamps, and that proof (`SHA256SUMS.precommit.ots`) has
-since completed to a Bitcoin attestation — block 961505, mined
-August 7, 2026 at 23:18 UTC, with two further calendars confirming
-in blocks 961512 and 962551 — so the committed values are anchored
-in a public ledger seventeen days before BLS published; the original
-and amended nowcasts are tagged releases in the repository history;
-and the Internet Archive holds a capture of the published page from
-August 7, 2026. The post-evaluation checksum file carries its own,
-separate stamp. The history documents one
+tables, verifies the artifact hashes, and re-derives the registered
+prose figures; continuous integration runs the same check on every
+push to master and every pull request. Its scope is stated exactly:
+it enforces an allowlist of generated tables and of the tables the
+source includes, requires the checksum manifest to cover every
+artifact present, and matches each registered figure at numeric-token
+boundaries — the three tenure amounts as ordered triples in the
+sentences that state them — so the build fails if any registered
+figure, table, or artifact drifts. Figures quoted from external
+publications are bound to their citations, not to artifacts, and
+dates and ordinals are not registered; an earlier version of the
+check matched bare substrings, and a September 4, 2026 audit showed
+it passing under edits the current version rejects. On its first
+run, the strengthened check found two miscounts that had survived
+every prior review — the package's values were wrong in five of six
+years, not four, and renter thresholds fell in all six years, not
+five — which is the argument for registering counts as well as
+values. A provenance file in `data/` names the generator, inputs,
+and source of every artifact.
+
+The nowcast's in-advance commitment is externally timestamped before
+BLS's August 24 publication. The artifact checksum file as it stood
+on August 7, 2026 (`data/SHA256SUMS.precommit`) is stamped via
+OpenTimestamps, and that proof (`SHA256SUMS.precommit.ots`, committed
+in completed form) is a Bitcoin attestation — block 961505, mined
+August 7, 2026 at 23:18 UTC, with further calendars confirming in
+blocks 961512 and 962551 — so the amended values are anchored in a
+public ledger seventeen days before BLS published. The original
+values predate the stamp and are anchored differently: the Internet
+Archive's capture of the published page from August 7, 2026
+(`web.archive.org/web/20260807211521/https://spm-threshold-paper.vercel.app/`)
+quotes both sets in the amendment sentence, and both nowcasts are
+tagged releases whose creation dates GitHub records. A manifest
+listing both tags, their commits, and both artifact hashes is
+committed alongside and stamped separately, as is the
+post-evaluation checksum file. The history documents one
 amendment: the composite-index construction error caught in
 cross-model review on July 18, 2026, with every downstream artifact,
 table, and pinned prose figure regenerated in the same change. The
