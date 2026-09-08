@@ -1,10 +1,16 @@
-# Nowcasting Supplemental Poverty Measure thresholds
+# Calculating and projecting Supplemental Poverty Measure thresholds
 
-Working paper on the July 2026 BLS threshold correction, public CE
-replication, threshold projection, and the completed evaluation of the
-2025 forecast. The September 8 revision preserves that forecast and its
-evaluation, and adds a separately identified current-method experiment
-and portable threshold release.
+Working paper on national SPM threshold estimation from public Consumer
+Expenditure Survey microdata, family and geographic adjustments, and
+projection from consumption and price growth. The manuscript presents
+current-method replication and sample sensitivities, retrospective
+comparisons, and a separately preserved pre-committed 2025 validation.
+
+The current six-year results use revised inputs and overlapping CE
+windows. They are separate from the single prospective validation year.
+Method limitations and the forecast amendment history are reported in
+the manuscript. The repository preserves source artifacts, method
+versions, and forecast commitment evidence.
 
 ## Build and verify
 
@@ -20,7 +26,8 @@ The guard and table generators use the Python standard library. Quarto
 Clone with full tag history and check out the exact revision to reproduce
 it. The guard first checks artifact hashes and frozen Git identities,
 then generates tables and evaluation JSON in temporary storage and
-compares every output byte with the checkout. It never repairs or
+compares every output byte with the checkout, including archived tables
+that the manuscript no longer includes. It never repairs or
 restores source artifacts. The regression tests verify that failed checks
 leave source bytes unchanged.
 

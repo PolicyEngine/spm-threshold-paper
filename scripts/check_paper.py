@@ -59,6 +59,8 @@ EXPECTED_TABLES = {
     "current_sensitivity.md",
     "current_projection.md",
 }
+ARCHIVED_TABLES = {"correction.md", "package_errors.md"}
+ARTICLE_TABLES = EXPECTED_TABLES - ARCHIVED_TABLES
 GENERATORS = ("build_tables.py", "evaluate_nowcast_2025.py", "build_current_tables.py")
 
 failures: list[str] = []
@@ -265,12 +267,12 @@ with tempfile.TemporaryDirectory(prefix="spm-paper-check-") as tmp:
 # (b) Every QMD include names an expected table.
 includes = set(re.findall(r"\{\{<\s*include\s+tables/([^\s>]+)\s*>\}\}", QMD))
 check(
-    f"qmd includes outside allowlist: {includes - EXPECTED_TABLES}",
-    includes <= EXPECTED_TABLES,
+    f"qmd includes outside allowlist: {includes - ARTICLE_TABLES}",
+    includes <= ARTICLE_TABLES,
 )
 check(
-    f"expected tables never included: {EXPECTED_TABLES - includes}",
-    EXPECTED_TABLES <= includes,
+    f"article tables never included: {ARTICLE_TABLES - includes}",
+    ARTICLE_TABLES <= includes,
 )
 
 # (d) Load-bearing prose figures re-derive from the artifacts.
@@ -278,9 +280,9 @@ nowcast = json.loads((DATA / "nowcast_2025.json").read_text())
 AMENDED = {t: f"{nowcast['values'][t]:,.2f}" for t in TENURES}
 for t, literal in AMENDED.items():
     check(f"nowcast literal {literal}", has_number(literal, min_count=2))
-# Ordered tenure triples: abstract, amendment sentence, table caption order.
+# Ordered tenure triples: committed estimate and amendment chronology.
 check(
-    "abstract states the amended triple in tenure order",
+    "committed estimate states the amended triple in tenure order",
     has_ordered(
         [
             AMENDED["owner_with_mortgage"],
@@ -474,65 +476,8 @@ check(
     and abs(min(annual_signed["blend"]) - (-0.014)) < 0.001,
 )
 
-# Effective shelter weight under the pre-repair raw-level construction.
-raw_2024 = {c: cpi[CPI_IDS[c]]["2024"] for c in WEIGHTS}
-eff_shelter = (
-    WEIGHTS["shelter"]
-    * raw_2024["shelter"]
-    / sum(WEIGHTS[c] * raw_2024[c] for c in WEIGHTS)
-)
-stated_shelter = WEIGHTS["shelter"] / sum(WEIGHTS.values())
-check(
-    "effective shelter weight ~55 vs stated 47",
-    "near 55 percent" in QMD
-    and "stated 47" in QMD
-    and abs(eff_shelter - 0.55) < 0.02
-    and abs(stated_shelter - 0.47) < 0.005,
-)
-
-# Correction and package-error magnitudes.
-corr_changes = [
-    corrected[y][t] / published[y][t] - 1 for y in range(2019, 2025) for t in TENURES
-]
-check(
-    "correction within ±1.6 percent",
-    has_number("1.6 percent") and max(abs(c) for c in corr_changes) < 0.016,
-)
-renter_falls = sum(
-    1 for y in range(2019, 2025) if corrected[y]["renter"] < published[y]["renter"]
-)
-FALL_WORDS = {
-    4: "fall in four of six years",
-    5: "fall in five of six years",
-    6: "fall in all six years",
-}
-check(
-    f"renter thresholds {FALL_WORDS.get(renter_falls)} (computed {renter_falls})",
-    FALL_WORDS.get(renter_falls, "") in QMD,
-)
-check(
-    "reproducibility note cites the two miscounts the check found",
-    "five of six\nyears, not four" in QMD or "five of six years, not four" in QMD,
-)
-pkg_err = {
-    y: max(abs(legacy[y][t] / published[y][t] - 1) for t in TENURES)
-    for y in range(2019, 2025)
-}
-check(
-    "package errors reach 7.4 percent",
-    has_number("7.4 percent") and abs(max(pkg_err.values()) - 0.074) < 0.001,
-)
-wrong_years = sum(1 for y, e in pkg_err.items() if e > 0.001)
-WORDS = {
-    3: "three of the six",
-    4: "four of the six",
-    5: "five of the six",
-    6: "all six",
-}
-check(
-    f"package wrong in {WORDS.get(wrong_years)} years (computed {wrong_years}; per-year max errors {{y: round(e, 4) for y, e in pkg_err.items()}})",
-    WORDS.get(wrong_years, "") in QMD,
-)
+# Archived correction and package tables remain byte-checked above.
+# Their former audit claims are intentionally absent from this methods paper.
 se = flat_measure("bls-corrected-2026-07-17", "standard_error")
 se_ratio = [
     se[y][t] / corrected[y][t] for y in range(2019, 2025) for t in TENURES if se[y][t]
@@ -603,6 +548,10 @@ check(
     has_number("2.63") and abs(realized_2025 - 0.0263) < 0.0005,
 )
 
+# Current retrospective results in the abstract are a separate experiment.
+for rule, value in current_ce["projection_evaluation"]["summary_2020_2025"].items():
+    check(f"current projection prose {rule}", has_number(f"{value:.2f}"))
+
 # (e) The September evaluation, re-derived from data/evaluation_2025.json.
 ev = json.loads((DATA / "evaluation_2025.json").read_text())
 R = ev["rules"]
@@ -632,12 +581,11 @@ check(
     "−1.17" in QMD and -0.014 <= ev_signed <= -0.001,
 )
 cpiu_errs = [abs(v) for v in cpiu["errors"].values()]
+cpiu_error_range = f"{min(cpiu_errs):.2%} to {max(cpiu_errs):.2%}".replace("%", "")
 check(
-    "CPI-U 2025 understated every tenure by 1.70 to 3.48",
-    has_number("1.70 to 3.48")
-    and all(v < 0 for v in cpiu["errors"].values())
-    and abs(min(cpiu_errs) - 0.0170) < 0.0001
-    and abs(max(cpiu_errs) - 0.0348) < 0.0001,
+    f"CPI-U 2025 understated every tenure by {cpiu_error_range} percent",
+    has_number(f"{cpiu_error_range} percent")
+    and all(v < 0 for v in cpiu["errors"].values()),
 )
 check(
     "replication only rule with errors both sides of zero",
@@ -719,22 +667,6 @@ bls_cpiu_2025 = actual["bls_chart4_annual_average_inflation_pct"]["2025"]["cpi_u
 check(
     "BLS page 2025 CPI-U growth 2.70 quoted",
     has_number("2.70 percent") and abs(bls_cpiu_2025 - 2.70) < 0.005,
-)
-census = json.loads((DATA / "census_wp2026_17_rates.json").read_text())
-c23 = census["corrected_series_2023_to_2024"]["all_people"]
-check(
-    "Census corrected 2023->2024 = 12.7 -> 13.0",
-    has_ordered(["12.7", "13.0"], window=10)
-    and c23["2023"] == 12.7
-    and c23["2024"] == 13.0,
-)
-diffs = [v["difference"] for y, v in census["all_people"].items() if y != "2024"]
-check(
-    "Census 2019-2023 corrected 0.1 to 0.3 below",
-    has_number("0.1 to 0.3")
-    and abs(max(diffs)) == 0.1
-    and abs(min(diffs)) == 0.3
-    and all(d < 0 for d in diffs),
 )
 
 if failures:

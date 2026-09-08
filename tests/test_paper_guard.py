@@ -135,6 +135,32 @@ class PaperGuardTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("generated tables present == expected", result.stdout)
 
+    def test_archived_table_still_checked_when_not_in_article(self):
+        qmd = (self.repo / "paper/index.qmd").read_text()
+        self.assertNotIn("include tables/package_errors.md", qmd)
+        (self.repo / "paper/tables/package_errors.md").write_text("changed archive\n")
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(
+            "generated output drifted: paper/tables/package_errors.md", result.stdout
+        )
+
+    def test_current_projection_headline_drift_is_detected(self):
+        path = self.repo / "paper/index.qmd"
+        path.write_text(path.read_text().replace("0.51", "9.51"))
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("current projection prose replication_ratio", result.stdout)
+
+    def test_evaluation_range_rounds_from_saved_errors(self):
+        path = self.repo / "paper/index.qmd"
+        path.write_text(path.read_text().replace("1.70 to 3.47", "1.70 to 3.48"))
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(
+            "CPI-U 2025 understated every tenure by 1.70 to 3.47 percent", result.stdout
+        )
+
     def test_generator_failure_leaves_source_files_unchanged(self):
         (self.repo / "scripts/evaluate_nowcast_2025.py").write_text(
             "raise RuntimeError('fixture failure')\n"
