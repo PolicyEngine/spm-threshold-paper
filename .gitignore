@@ -5,3 +5,7 @@ _output/
 /.quarto/
 **/*.quarto_ipynb
 paper/index_files/
+
+# Local Python execution artifacts
+__pycache__/
+*.py[cod]
