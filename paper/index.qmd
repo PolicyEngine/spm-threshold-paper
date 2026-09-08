@@ -840,7 +840,7 @@ six-series definition as an explicitly archived commitment. Current-method
 inputs and code are recorded separately in `data/current/`; they do not
 replace this frozen evaluation. The current experiment and shared release
 pin spm-calculator version 0.5.0, development commit
-`9e6ae4798458771231613b994df2345dd1685214`.
+`0d7fa0d77b0a88064ab7b9fe70557309b5f7901f`.
 The release content digest and exact executed CE source hashes are in
 `data/current/provenance.json`. These are committed development inputs,
 not evidence of a published package or completed model migration.

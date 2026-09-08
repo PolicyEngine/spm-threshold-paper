@@ -45,7 +45,7 @@ It does not contact OpenTimestamps calendars or verify Bitcoin attestations.
 |---|---|
 | `spm-release.json` | Exact portable `spm-2026-09-08.json` from the spm-calculator 0.5.0 rebuild. Revised national 2005–2025 published thresholds, source fingerprints, separately dated 2024 housing shares, and pinned geographic rent indices. The release's conservative available-on date is September 8, not a reconstructed historical publication calendar. |
 | `ce_replication_2019_2025.json` | `scripts/replicate_current_ce.py` in the rebuild. Seven overlapping CE windows, explicit minor-only and tenure approximations, raw source bundle hashes, CPI cache hash, exact executed source hashes, and six-year retrospective projections. No prospective validation or new commitment. |
-| `provenance.json` | Paper linkage to the release content digest and CE artifact/source hashes. Pins spm-calculator 0.5.0 development commit `9e6ae4798458771231613b994df2345dd1685214`. The retained `ce_starting_git_head` identifies the checkout's starting commit before the rebuild was committed. The `ce_code_sha256` map identifies the executed code, whose bytes match the pinned development commit. |
+| `provenance.json` | Paper linkage to the release content digest and CE artifact/source hashes. Pins spm-calculator 0.5.0 development commit `0d7fa0d77b0a88064ab7b9fe70557309b5f7901f`. The retained `ce_starting_git_head` identifies the starting commit for this replay, before its source and artifact update was committed. The `ce_code_sha256` map identifies the executed code, whose bytes match the pinned development commit. |
 
 `build_current_tables.py` reads only these inputs. It cross-checks the
 published comparison series against the shared release, re-derives

@@ -5,7 +5,7 @@
     "spm_calculator/ce_threshold.py": "2a43c93460d03f54ef7e589dfc7411069ceabf91ed8e234ceeb004da1ed3ad84",
     "spm_calculator/equivalence_scale.py": "95c797adca4811b0a2c4202e8471f6cd46fcd259bf46b34da74588ab08b41326",
     "spm_calculator/fcsuti_cpi.py": "cf8fbe9103846d83a280bcd4f13b9ddd91e8baa94e2668b9ef288c7cc980a5fc",
-    "spm_calculator/forecast.py": "28092513cea2b5451da56532cb628273b8d1fafae64b6ab41eb605cacbe5fb0e",
+    "spm_calculator/forecast.py": "367c124844976e557484c6591c49c7ebca8c87a27828b29999b64f02989da597",
     "spm_calculator/projection.py": "a7b0c6935f3cdf857e6cffc941cbe4fef9607c460a20e0ba8da72a19c6a60340"
   },
   "cpi_input": {
@@ -27,7 +27,7 @@
   "frozen_commitments_modified": false,
   "generated_by": "scripts/replicate_current_ce.py",
   "generated_on": "2026-09-08",
-  "git_head": "816a7084990e2bbb7dff801fd9b9cd5cdd1bb995",
+  "git_head": "dc88395ea8292dbbacbb9880d5aea19228ee13d8",
   "limitations": [
     "Youth sensitivity compares explicit assumptions; it does not identify the correct BLS classification",
     "Tenure sensitivity changes assignment/exclusion policy; official BLS handling remains unverified",

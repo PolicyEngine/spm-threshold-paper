@@ -44,5 +44,5 @@ describes both collections and the original implementation pin.
 The current spm-calculator rebuild provides a portable release, standalone
 unit calculations, CE research replication, projections, and explicit
 PolicyEngine, Microcosm, and real native Axiom adapters. This paper pins version 0.5.0 at development commit
-`9e6ae4798458771231613b994df2345dd1685214`; it does not claim that a model
+`0d7fa0d77b0a88064ab7b9fe70557309b5f7901f`; it does not claim that a model
 migration or public deployment has occurred. The paper consumes the same release bytes as those adapters.
