@@ -28,3 +28,30 @@ Generated tables (`paper/tables/*.md`) are written only by
 `scripts/build_tables.py` and `scripts/evaluate_nowcast_2025.py`, both run
 by `scripts/check_paper.py`, which also enforces the table allowlist, the
 QMD include allowlist, and full `SHA256SUMS` coverage of `data/`.
+
+
+## September 8, 2026 amendment and current inputs
+
+The original `SHA256SUMS`, `SHA256SUMS.precommit`, and
+`COMMITMENT-MANIFEST.txt` and all three `.ots` proofs remain byte-identical.
+`COMMITMENT-AMENDMENT-2026-09-08.txt` corrects the two tag-artifact hashes
+without claiming coverage by the old proof. `verify_commitments.py` checks
+those original bytes, tag objects, peeled commits, and exact forecast bytes.
+It does not contact OpenTimestamps calendars or verify Bitcoin attestations.
+
+`data/current/SHA256SUMS` separately covers these new inputs:
+
+| Artifact | Source and scope |
+|---|---|
+| `spm-release.json` | Exact portable `spm-2026-09-08.json` from the spm-calculator 0.5.0 rebuild. Revised national 2005–2025 published thresholds, source fingerprints, separately dated 2024 housing shares, and pinned geographic rent indices. The release's conservative available-on date is September 8, not a reconstructed historical publication calendar. |
+| `ce_replication_2019_2025.json` | `scripts/replicate_current_ce.py` in the rebuild. Seven overlapping CE windows, explicit minor-only and tenure approximations, raw source bundle hashes, CPI cache hash, exact executed source hashes, and six-year retrospective projections. No prospective validation or new commitment. |
+| `provenance.json` | Paper linkage to the release content digest and CE artifact/source hashes. Pins spm-calculator 0.5.0 development commit `9e6ae4798458771231613b994df2345dd1685214`. The retained `ce_starting_git_head` identifies the checkout's starting commit before the rebuild was committed. The `ce_code_sha256` map identifies the executed code, whose bytes match the pinned development commit. |
+
+`build_current_tables.py` reads only these inputs. It cross-checks the
+published comparison series against the shared release, re-derives
+replication and sensitivity percentages and projection errors, and
+produces the four `current_*.md` tables. The pre-render guard checks both
+manifests before parsing inputs, generates all tables and evaluation JSON
+in scratch space, and compares bytes without mutating source files. These
+checks establish reproducibility of the recorded calculations, not exact
+parity with the BLS production procedure or historical information sets.

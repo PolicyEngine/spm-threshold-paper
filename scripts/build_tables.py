@@ -10,12 +10,16 @@ data/SHA256SUMS). Rerun after any artifact update:
 
 from __future__ import annotations
 
+import argparse
 import json
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 DATA = REPO / "data"
-OUT = REPO / "paper" / "tables"
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("--output-root", type=Path, default=REPO)
+args = parser.parse_args()
+OUT = args.output_root / "paper" / "tables"
 
 TENURES = ("owner_with_mortgage", "owner_without_mortgage", "renter")
 TENURE_LABELS = {
@@ -71,7 +75,7 @@ write("correction.md", lines)
 
 # Table 2: what spm-calculator <=0.3.1 shipped vs published.
 lines = [
-    "| Year | Tenure | Package $\\leq$0.3.1 | Published | Error |",
+    "| Year | Tenure | Package $\\leq 0.3.1$ | Published | Error |",
     "|---|---|---:|---:|---:|",
 ]
 for year in range(2019, 2025):
@@ -162,9 +166,9 @@ errors_by_rule: dict[str, list[float]] = {r: [] for r in RULES}
 year_rows = []
 for year in range(2020, 2025):
     base, actual = corrected[year - 1], corrected[year]
-    f_cpi = cpi[CPI_IDS["all_items"]][str(year)] / cpi[CPI_IDS["all_items"]][
-        str(year - 1)
-    ]
+    f_cpi = (
+        cpi[CPI_IDS["all_items"]][str(year)] / cpi[CPI_IDS["all_items"]][str(year - 1)]
+    )
     f_fcs = composite(year) / composite(year - 1)
     per_rule = {}
     for rule in RULES:
@@ -184,9 +188,7 @@ for year in range(2020, 2025):
     year_rows.append((year, per_rule))
 
 lines = [
-    "| Rule | "
-    + " | ".join(str(y) for y, _ in year_rows)
-    + " | Mean |",
+    "| Rule | " + " | ".join(str(y) for y, _ in year_rows) + " | Mean |",
     "|---|" + "---:|" * (len(year_rows) + 1),
 ]
 for rule in RULES:
@@ -201,8 +203,7 @@ write("backtest.md", lines)
 
 # Table 5: the pre-registered 2025 nowcast.
 lines = [
-    "| Tenure | Replication ratio | FCSUti CPI ratio | Blend "
-    "| Nowcast 2025 |",
+    "| Tenure | Replication ratio | FCSUti CPI ratio | Blend " "| Nowcast 2025 |",
     "|---|---:|---:|---:|---:|",
 ]
 for t in TENURES:

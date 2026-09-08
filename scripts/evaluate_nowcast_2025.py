@@ -17,13 +17,18 @@ thresholds (Chart 4 on the same page).
 
 from __future__ import annotations
 
+import argparse
 import json
 import subprocess
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 DATA = REPO / "data"
-OUT = REPO / "paper" / "tables"
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("--output-root", type=Path, default=REPO)
+args = parser.parse_args()
+OUT = args.output_root / "paper" / "tables"
+OUTPUT_DATA = args.output_root / "data"
 
 TENURES = ("owner_with_mortgage", "owner_without_mortgage", "renter")
 LABELS = {
@@ -40,9 +45,7 @@ series_doc = json.loads((DATA / "threshold_series.json").read_text())
 corrected_2024 = None
 for seg in series_doc["series"]["bls-corrected-2026-07-17"]["segments"].values():
     if "2024" in seg["years"]:
-        corrected_2024 = {
-            t: m["threshold"] for t, m in seg["years"]["2024"].items()
-        }
+        corrected_2024 = {t: m["threshold"] for t, m in seg["years"]["2024"].items()}
 assert corrected_2024 is not None
 
 # The original (pre-repair) nowcast, from the tagged release rather
@@ -71,8 +74,7 @@ rules = {
         for t in TENURES
     },
     "FCSUti-composite CPI aging alone": {
-        t: corrected_2024[t] * nowcast["components"][t]["price_ratio"]
-        for t in TENURES
+        t: corrected_2024[t] * nowcast["components"][t]["price_ratio"] for t in TENURES
     },
     "All-Items CPI-U aging (status quo)": {
         t: corrected_2024[t] * cpi_u_ratio for t in TENURES
@@ -177,8 +179,12 @@ summary = {
     },
     "composite_vs_bls_fcsuti_gap_pp": dict(zip(range(2020, 2026), gaps)),
 }
-(DATA / "evaluation_2025.json").write_text(json.dumps(summary, indent=1) + "\n")
+OUTPUT_DATA.mkdir(parents=True, exist_ok=True)
+(OUTPUT_DATA / "evaluation_2025.json").write_text(json.dumps(summary, indent=1) + "\n")
 print("wrote data/evaluation_2025.json")
 for k, v in results.items():
-    print(f"{k:45s} MAE {v['mae']:.2%}  " + "  ".join(f"{v['errors'][t]:+.2%}" for t in TENURES))
+    print(
+        f"{k:45s} MAE {v['mae']:.2%}  "
+        + "  ".join(f"{v['errors'][t]:+.2%}" for t in TENURES)
+    )
 print("composite gap vs BLS FCSUti (pp):", [f"{g:+.2f}" for g in gaps])

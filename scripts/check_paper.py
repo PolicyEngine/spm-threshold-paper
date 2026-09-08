@@ -30,11 +30,13 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-import shutil
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
+
+sys.dont_write_bytecode = True
+from verify_commitments import verify_commitments
 
 REPO = Path(__file__).resolve().parent.parent
 DATA = REPO / "data"
@@ -52,8 +54,12 @@ EXPECTED_TABLES = {
     "evaluation.md",
     "evaluation_levels.md",
     "composite_validation.md",
+    "current_release.md",
+    "current_replication.md",
+    "current_sensitivity.md",
+    "current_projection.md",
 }
-GENERATORS = ("build_tables.py", "evaluate_nowcast_2025.py")
+GENERATORS = ("build_tables.py", "evaluate_nowcast_2025.py", "build_current_tables.py")
 
 failures: list[str] = []
 
@@ -72,52 +78,27 @@ def has_number(literal: str, text: str = QMD, min_count: int = 1) -> bool:
 
 def has_ordered(literals: list[str], window: int = 400) -> bool:
     """The literals appear in this order within one window of text."""
-    pattern = r"[\s\S]{0,%d}" % window
+    pattern = rf"[\s\S]{{0,{window}}}"
     body = pattern.join(re.escape(x) for x in literals)
     return re.search(body, QMD) is not None
 
 
-# (a) Tables regenerate identically, and the set is exactly as expected.
-present_before = {p.name for p in TABLES.glob("*.md")}
-check(
-    f"generated tables present == expected (missing {EXPECTED_TABLES - present_before}, extra {present_before - EXPECTED_TABLES})",
-    present_before == EXPECTED_TABLES,
-)
-before = {p.name: p.read_text() for p in TABLES.glob("*.md")}
-with tempfile.TemporaryDirectory() as tmp:
-    backup = Path(tmp) / "tables"
-    shutil.copytree(TABLES, backup)
-    for script in GENERATORS:
-        proc = subprocess.run(
-            [sys.executable, str(REPO / "scripts" / script)],
-            capture_output=True,
-            text=True,
-        )
-        if proc.returncode != 0:
-            failures.append(f"{script} failed:\n{proc.stderr[-2000:]}")
-    after = {p.name: p.read_text() for p in TABLES.glob("*.md")}
-    for name in EXPECTED_TABLES:
-        check(f"table drifted: {name}", before.get(name) == after.get(name))
-    if any(before.get(n) != after.get(n) for n in EXPECTED_TABLES):
-        # Report without leaving the checkout mutated.
-        shutil.rmtree(TABLES)
-        shutil.copytree(backup, TABLES)
-
-# (b) Every QMD include names an expected table.
-includes = set(re.findall(r"\{\{<\s*include\s+tables/([^\s>]+)\s*>\}\}", QMD))
-check(
-    f"qmd includes outside allowlist: {includes - EXPECTED_TABLES}",
-    includes <= EXPECTED_TABLES,
-)
-check(
-    f"expected tables never included: {EXPECTED_TABLES - includes}",
-    EXPECTED_TABLES <= includes,
-)
-
 # (c) SHA256SUMS lists exactly the artifacts present, and every hash holds.
+# This must happen before any artifact is parsed or generator is invoked.
 listed: dict[str, str] = {}
-for line in (DATA / "SHA256SUMS").read_text().splitlines():
-    digest, name = line.split()
+for number, line in enumerate((DATA / "SHA256SUMS").read_text().splitlines(), 1):
+    fields = line.split()
+    if len(fields) != 2:
+        failures.append(f"malformed checksum manifest line {number}")
+        continue
+    digest, name = fields
+    if not re.fullmatch(r"[0-9a-f]{64}", digest) or not re.fullmatch(
+        r"data/[^/]+\.(?:json|xlsx)", name
+    ):
+        failures.append(f"invalid checksum manifest line {number}")
+        continue
+    if name in listed:
+        failures.append(f"duplicate checksum manifest entry: {name}")
     listed[name] = digest
 present_artifacts = {
     f"data/{p.name}" for p in DATA.iterdir() if p.suffix in (".json", ".xlsx")
@@ -134,9 +115,7 @@ for name, digest in listed.items():
     )
 
 # Bundled BLS workbooks are the exact files BLS served on the stated dates.
-BLS_WORKBOOK_SHA256 = (
-    "e7931a1f2540d52877d6fd14a8ed1e421e977a85c952ae1b6f690a04d904f2cb"
-)
+BLS_WORKBOOK_SHA256 = "e7931a1f2540d52877d6fd14a8ed1e421e977a85c952ae1b6f690a04d904f2cb"
 BLS_CURRENT_WORKBOOK_SHA256 = (
     "95f39fb5479ee5c196de627e06e10efd59af5148cf1c8466924e3fb2e5e2bd3b"
 )
@@ -146,8 +125,153 @@ for fname, expected in (
 ):
     check(
         f"bundled BLS workbook hash: {fname}",
-        hashlib.sha256((DATA / fname).read_bytes()).hexdigest() == expected,
+        (DATA / fname).is_file()
+        and hashlib.sha256((DATA / fname).read_bytes()).hexdigest() == expected,
     )
+
+failures.extend(verify_commitments(REPO))
+
+# The current experiment has a separate manifest, never the old timestamp.
+current_names = {"spm-release.json", "ce_replication_2019_2025.json", "provenance.json"}
+current_listed = {}
+for number, line in enumerate(
+    (DATA / "current" / "SHA256SUMS").read_text().splitlines(), 1
+):
+    fields = line.split()
+    if (
+        len(fields) != 2
+        or not re.fullmatch(r"[0-9a-f]{64}", fields[0])
+        or fields[1] not in {f"data/current/{name}" for name in current_names}
+    ):
+        failures.append(f"invalid current checksum manifest line {number}")
+        continue
+    digest, name = fields
+    if name in current_listed:
+        failures.append(f"duplicate current checksum entry: {name}")
+    current_listed[name] = digest
+current_present = {str(p.relative_to(REPO)) for p in (DATA / "current").glob("*.json")}
+check(
+    "current checksum coverage",
+    set(current_listed)
+    == current_present
+    == {f"data/current/{name}" for name in current_names},
+)
+for name, digest in current_listed.items():
+    path = REPO / name
+    check(
+        f"current artifact hash mismatch: {name}",
+        path.is_file() and hashlib.sha256(path.read_bytes()).hexdigest() == digest,
+    )
+if failures:
+    print("PAPER INPUT CHECK FAILED (generators were not run):")
+    for failure in failures:
+        print(f"  - {failure}")
+    sys.exit(1)
+
+# All input byte checks have passed; it is now safe to parse current inputs.
+release = json.loads((DATA / "current" / "spm-release.json").read_text())
+content = {key: value for key, value in release.items() if key != "content_sha256"}
+content_digest = hashlib.sha256(
+    json.dumps(
+        content,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+        allow_nan=False,
+    ).encode()
+).hexdigest()
+current_ce = json.loads(
+    (DATA / "current" / "ce_replication_2019_2025.json").read_text()
+)
+current_provenance = json.loads((DATA / "current" / "provenance.json").read_text())
+check(
+    "release canonical content hash",
+    release["content_sha256"]
+    == content_digest
+    == current_provenance["release_content_sha256"],
+)
+check(
+    "current CE provenance hash",
+    current_provenance["ce_artifact_sha256"]
+    == current_listed["data/current/ce_replication_2019_2025.json"],
+)
+check(
+    "current CE executed source fingerprints",
+    current_provenance["ce_code_sha256"] == current_ce["code_sha256"],
+)
+check(
+    "current inputs are outside frozen commitment",
+    current_provenance["covered_by_original_timestamp"] is False
+    and current_provenance["frozen_commitments_modified"] is False
+    and current_ce["frozen_commitments_modified"] is False,
+)
+max_tenure_sensitivity = max(
+    abs(value)
+    for row in current_ce["results"].values()
+    for value in row["sensitivity_change_percent_from_exclusion"][
+        "include_5_6_as_renter_sensitivity"
+    ].values()
+)
+check(
+    "current tenure-sensitivity prose",
+    has_number(f"{max_tenure_sensitivity:.2f} percent"),
+)
+if failures:
+    print("PAPER INPUT CHECK FAILED (generators were not run):")
+    for failure in failures:
+        print(f"  - {failure}")
+    sys.exit(1)
+
+# (a) Generate only in scratch; never repair or restore source files.
+present_before = {p.name for p in TABLES.glob("*.md")}
+check(
+    f"generated tables present == expected (missing {EXPECTED_TABLES - present_before}, extra {present_before - EXPECTED_TABLES})",
+    present_before == EXPECTED_TABLES,
+)
+expected_outputs = {f"paper/tables/{name}" for name in EXPECTED_TABLES} | {
+    "data/evaluation_2025.json"
+}
+with tempfile.TemporaryDirectory(prefix="spm-paper-check-") as tmp:
+    scratch = Path(tmp)
+    for script in GENERATORS:
+        proc = subprocess.run(
+            [
+                sys.executable,
+                str(REPO / "scripts" / script),
+                "--output-root",
+                str(scratch),
+            ],
+            capture_output=True,
+            check=False,
+            text=True,
+            cwd=REPO,
+        )
+        if proc.returncode != 0:
+            failures.append(f"{script} failed:\n{proc.stderr[-2000:]}")
+    generated = {str(p.relative_to(scratch)) for p in scratch.rglob("*") if p.is_file()}
+    check(
+        f"generator output coverage: missing {expected_outputs - generated}, extra {generated - expected_outputs}",
+        generated == expected_outputs,
+    )
+    for name in sorted(expected_outputs):
+        original, regenerated = REPO / name, scratch / name
+        check(
+            f"generated output drifted: {name}",
+            original.is_file()
+            and regenerated.is_file()
+            and original.read_bytes() == regenerated.read_bytes(),
+        )
+
+# (b) Every QMD include names an expected table.
+includes = set(re.findall(r"\{\{<\s*include\s+tables/([^\s>]+)\s*>\}\}", QMD))
+check(
+    f"qmd includes outside allowlist: {includes - EXPECTED_TABLES}",
+    includes <= EXPECTED_TABLES,
+)
+check(
+    f"expected tables never included: {EXPECTED_TABLES - includes}",
+    EXPECTED_TABLES <= includes,
+)
 
 # (d) Load-bearing prose figures re-derive from the artifacts.
 nowcast = json.loads((DATA / "nowcast_2025.json").read_text())
@@ -158,7 +282,14 @@ for t, literal in AMENDED.items():
 check(
     "abstract states the amended triple in tenure order",
     has_ordered(
-        [AMENDED["owner_with_mortgage"], "owners with", AMENDED["owner_without_mortgage"], "owners without", AMENDED["renter"], "renters"],
+        [
+            AMENDED["owner_with_mortgage"],
+            "owners with",
+            AMENDED["owner_without_mortgage"],
+            "owners without",
+            AMENDED["renter"],
+            "renters",
+        ],
         window=120,
     ),
 )
@@ -173,9 +304,14 @@ for t in TENURES:
 check(
     "amendment sentence pairs original -> amended per tenure, in order",
     has_ordered(
-        [ORIG_LIT["owner_with_mortgage"], AMENDED["owner_with_mortgage"],
-         ORIG_LIT["owner_without_mortgage"], AMENDED["owner_without_mortgage"],
-         ORIG_LIT["renter"], AMENDED["renter"]],
+        [
+            ORIG_LIT["owner_with_mortgage"],
+            AMENDED["owner_with_mortgage"],
+            ORIG_LIT["owner_without_mortgage"],
+            AMENDED["owner_without_mortgage"],
+            ORIG_LIT["renter"],
+            AMENDED["renter"],
+        ],
         window=60,
     ),
 )
@@ -309,13 +445,22 @@ check(
     has_number("1.9 percent") and abs(signed_mean - (-0.019)) < 0.002,
 )
 cpiu_low_years = sum(1 for m in annual_signed["cpi_u"] if m < 0)
-check("CPI-U understated four of five years", "four of five" in QMD and cpiu_low_years == 4)
+check(
+    "CPI-U understated four of five years",
+    "four of five" in QMD and cpiu_low_years == 4,
+)
 check(
     "composite removes ~thirty percent of CPI-U error",
-    "thirty percent" in QMD and abs((1 - mae("fcsuti_cpi") / mae("cpi_u")) - 0.30) < 0.02,
+    "thirty percent" in QMD
+    and abs((1 - mae("fcsuti_cpi") / mae("cpi_u")) - 0.30) < 0.02,
 )
-rep_signed = sum(signed_by_rule["replication_ratio"]) / len(signed_by_rule["replication_ratio"])
-check("replication signed mean +0.1", has_number("+0.1") and abs(rep_signed - 0.001) < 0.001)
+rep_signed = sum(signed_by_rule["replication_ratio"]) / len(
+    signed_by_rule["replication_ratio"]
+)
+check(
+    "replication signed mean +0.1",
+    has_number("+0.1") and abs(rep_signed - 0.001) < 0.001,
+)
 check(
     "replication annual signed range +0.5 to −0.3",
     "+0.5 to −0.3" in QMD
@@ -331,8 +476,10 @@ check(
 
 # Effective shelter weight under the pre-repair raw-level construction.
 raw_2024 = {c: cpi[CPI_IDS[c]]["2024"] for c in WEIGHTS}
-eff_shelter = WEIGHTS["shelter"] * raw_2024["shelter"] / sum(
-    WEIGHTS[c] * raw_2024[c] for c in WEIGHTS
+eff_shelter = (
+    WEIGHTS["shelter"]
+    * raw_2024["shelter"]
+    / sum(WEIGHTS[c] * raw_2024[c] for c in WEIGHTS)
 )
 stated_shelter = WEIGHTS["shelter"] / sum(WEIGHTS.values())
 check(
@@ -347,9 +494,18 @@ check(
 corr_changes = [
     corrected[y][t] / published[y][t] - 1 for y in range(2019, 2025) for t in TENURES
 ]
-check("correction within ±1.6 percent", has_number("1.6 percent") and max(abs(c) for c in corr_changes) < 0.016)
-renter_falls = sum(1 for y in range(2019, 2025) if corrected[y]["renter"] < published[y]["renter"])
-FALL_WORDS = {4: "fall in four of six years", 5: "fall in five of six years", 6: "fall in all six years"}
+check(
+    "correction within ±1.6 percent",
+    has_number("1.6 percent") and max(abs(c) for c in corr_changes) < 0.016,
+)
+renter_falls = sum(
+    1 for y in range(2019, 2025) if corrected[y]["renter"] < published[y]["renter"]
+)
+FALL_WORDS = {
+    4: "fall in four of six years",
+    5: "fall in five of six years",
+    6: "fall in all six years",
+}
 check(
     f"renter thresholds {FALL_WORDS.get(renter_falls)} (computed {renter_falls})",
     FALL_WORDS.get(renter_falls, "") in QMD,
@@ -359,20 +515,34 @@ check(
     "five of six\nyears, not four" in QMD or "five of six years, not four" in QMD,
 )
 pkg_err = {
-    y: max(abs(legacy[y][t] / published[y][t] - 1) for t in TENURES) for y in range(2019, 2025)
+    y: max(abs(legacy[y][t] / published[y][t] - 1) for t in TENURES)
+    for y in range(2019, 2025)
 }
-check("package errors reach 7.4 percent", has_number("7.4 percent") and abs(max(pkg_err.values()) - 0.074) < 0.001)
-wrong_years = sum(1 for y, e in pkg_err.items() if e > 0.001)
-WORDS = {3: "three of the six", 4: "four of the six", 5: "five of the six", 6: "all six"}
 check(
-    f"package wrong in {WORDS.get(wrong_years)} years (computed {wrong_years}; per-year max errors {dict((y, round(e, 4)) for y, e in pkg_err.items())})",
+    "package errors reach 7.4 percent",
+    has_number("7.4 percent") and abs(max(pkg_err.values()) - 0.074) < 0.001,
+)
+wrong_years = sum(1 for y, e in pkg_err.items() if e > 0.001)
+WORDS = {
+    3: "three of the six",
+    4: "four of the six",
+    5: "five of the six",
+    6: "all six",
+}
+check(
+    f"package wrong in {WORDS.get(wrong_years)} years (computed {wrong_years}; per-year max errors {{y: round(e, 4) for y, e in pkg_err.items()}})",
     WORDS.get(wrong_years, "") in QMD,
 )
 se = flat_measure("bls-corrected-2026-07-17", "standard_error")
-se_ratio = [se[y][t] / corrected[y][t] for y in range(2019, 2025) for t in TENURES if se[y][t]]
+se_ratio = [
+    se[y][t] / corrected[y][t] for y in range(2019, 2025) for t in TENURES if se[y][t]
+]
 check(
     "SE range 0.7 to 2.1 percent",
-    has_number("0.7") and has_number("2.1") and abs(min(se_ratio) - 0.007) < 0.001 and abs(max(se_ratio) - 0.021) < 0.001,
+    has_number("0.7")
+    and has_number("2.1")
+    and abs(min(se_ratio) - 0.007) < 0.001
+    and abs(max(se_ratio) - 0.021) < 0.001,
 )
 
 # Replication level fidelity ranges.
@@ -393,11 +563,15 @@ for year in range(2019, 2025):
         out.append(sum(abs(v) for v in row[key].values()) / 3)
 check(
     "replication fidelity 1.5 to 2.1 vs corrected",
-    has_number("1.5 to 2.1") and abs(min(mad_corrected) - 0.015) < 0.001 and abs(max(mad_corrected) - 0.021) < 0.001,
+    has_number("1.5 to 2.1")
+    and abs(min(mad_corrected) - 0.015) < 0.001
+    and abs(max(mad_corrected) - 0.021) < 0.001,
 )
 check(
     "replication fidelity 1.0 to 1.6 vs published",
-    has_number("1.0 to 1.6") and abs(min(mad_published) - 0.010) < 0.001 and abs(max(mad_published) - 0.016) < 0.001,
+    has_number("1.0 to 1.6")
+    and abs(min(mad_published) - 0.010) < 0.001
+    and abs(max(mad_published) - 0.016) < 0.001,
 )
 
 # Nowcast growth ranges.
@@ -406,16 +580,28 @@ blend_growth = [nowcast["components"][t]["blend_ratio"] - 1 for t in TENURES]
 price_growth = nowcast["components"]["renter"]["price_ratio"] - 1
 check(
     "replication growth 4.4 to 6.0",
-    has_number("4.4 to 6.0") and abs(min(rep_growth) - 0.044) < 0.001 and abs(max(rep_growth) - 0.060) < 0.001,
+    has_number("4.4 to 6.0")
+    and abs(min(rep_growth) - 0.044) < 0.001
+    and abs(max(rep_growth) - 0.060) < 0.001,
 )
-check("price growth 3.2", has_number("3.2 percent") and abs(price_growth - 0.032) < 0.001)
+check(
+    "price growth 3.2", has_number("3.2 percent") and abs(price_growth - 0.032) < 0.001
+)
 check(
     "blend growth 3.8 to 4.6",
-    has_number("3.8 to 4.6") and abs(min(blend_growth) - 0.038) < 0.001 and abs(max(blend_growth) - 0.046) < 0.001,
+    has_number("3.8 to 4.6")
+    and abs(min(blend_growth) - 0.038) < 0.001
+    and abs(max(blend_growth) - 0.046) < 0.001,
 )
 realized_2025 = cpi["CUUR0000SA0"]["2025"] / cpi["CUUR0000SA0"]["2024"] - 1
-check("realized CPI-U 2025 growth 2.6", has_number("2.6 percent") and abs(realized_2025 - 0.026) < 0.002)
-check("eleven-month CPI-U growth 2.63 quoted", has_number("2.63") and abs(realized_2025 - 0.0263) < 0.0005)
+check(
+    "realized CPI-U 2025 growth 2.6",
+    has_number("2.6 percent") and abs(realized_2025 - 0.026) < 0.002,
+)
+check(
+    "eleven-month CPI-U growth 2.63 quoted",
+    has_number("2.63") and abs(realized_2025 - 0.0263) < 0.0005,
+)
 
 # (e) The September evaluation, re-derived from data/evaluation_2025.json.
 ev = json.loads((DATA / "evaluation_2025.json").read_text())
@@ -441,17 +627,26 @@ check(
     and abs(amended["errors"]["renter"] - (-0.0227)) < 0.0001,
 )
 ev_signed = sum(amended["errors"].values()) / 3
-check("evaluation signed mean −1.17 inside stated range", "−1.17" in QMD and -0.014 <= ev_signed <= -0.001)
+check(
+    "evaluation signed mean −1.17 inside stated range",
+    "−1.17" in QMD and -0.014 <= ev_signed <= -0.001,
+)
 cpiu_errs = [abs(v) for v in cpiu["errors"].values()]
 check(
     "CPI-U 2025 understated every tenure by 1.70 to 3.48",
-    has_number("1.70 to 3.48") and all(v < 0 for v in cpiu["errors"].values())
-    and abs(min(cpiu_errs) - 0.0170) < 0.0001 and abs(max(cpiu_errs) - 0.0348) < 0.0001,
+    has_number("1.70 to 3.48")
+    and all(v < 0 for v in cpiu["errors"].values())
+    and abs(min(cpiu_errs) - 0.0170) < 0.0001
+    and abs(max(cpiu_errs) - 0.0348) < 0.0001,
 )
 check(
     "replication only rule with errors both sides of zero",
     max(repl["errors"].values()) > 0 > min(repl["errors"].values())
-    and all(max(R[k]["errors"].values()) < 0 for k in R if not k.startswith("CE replication")),
+    and all(
+        max(R[k]["errors"].values()) < 0
+        for k in R
+        if not k.startswith("CE replication")
+    ),
 )
 actual = json.loads((DATA / "bls_2025_thresholds.json").read_text())
 for literal, value in [
@@ -459,23 +654,40 @@ for literal, value in [
     ("34,326", actual["values"]["owner_without_mortgage"]),
     ("41,701", actual["values"]["renter"]),
 ]:
-    check(f"BLS 2025 literal {literal}", has_number(literal) and f"{round(value):,}" == literal)
+    check(
+        f"BLS 2025 literal {literal}",
+        has_number(literal) and f"{round(value):,}" == literal,
+    )
 check(
     "BLS 2025 triple in tenure order",
-    has_ordered(["41,323", "owners with", "34,326", "owners without", "41,701", "renters"], window=80),
+    has_ordered(
+        ["41,323", "owners with", "34,326", "owners without", "41,701", "renters"],
+        window=80,
+    ),
 )
 g = actual["bls_stated_growth_pct_2025_over_2024"]
 check(
     "BLS-stated 2025 growth 4.40-6.33 and per-tenure 5.33/4.40/6.33",
-    has_number("4.40 to 6.33") and has_number("6.33") and has_number("5.33") and has_number("4.40")
-    and abs(min(g.values()) - 4.402) < 0.001 and abs(max(g.values()) - 6.325) < 0.001
+    has_number("4.40 to 6.33")
+    and has_number("6.33")
+    and has_number("5.33")
+    and has_number("4.40")
+    and abs(min(g.values()) - 4.402) < 0.001
+    and abs(max(g.values()) - 6.325) < 0.001
     and abs(g["owner_with_mortgage"] - 5.332) < 0.001,
 )
-now_growth_renter = (nowcast["values"]["renter"] / ev["corrected_2024_base"]["renter"] - 1) * 100
-check("nowcast renter growth 3.92", has_number("3.92") and abs(now_growth_renter - 3.92) < 0.005)
+now_growth_renter = (
+    nowcast["values"]["renter"] / ev["corrected_2024_base"]["renter"] - 1
+) * 100
+check(
+    "nowcast renter growth 3.92",
+    has_number("3.92") and abs(now_growth_renter - 3.92) < 0.005,
+)
 check(
     "replication renter growth 4.62",
-    has_number("4.62") and abs((nowcast["components"]["renter"]["replication_ratio"] - 1) * 100 - 4.62) < 0.005,
+    has_number("4.62")
+    and abs((nowcast["components"]["renter"]["replication_ratio"] - 1) * 100 - 4.62)
+    < 0.005,
 )
 se25 = actual["standard_errors"]
 miss_se = {t: (amended["values"][t] - actual["values"][t]) / se25[t] for t in TENURES}
@@ -486,26 +698,43 @@ check(
     and abs(miss_se["owner_without_mortgage"]) < 1
     and abs(abs(miss_se["renter"]) - 2.4) < 0.05,
 )
-for literal, key in (("327", "owner_with_mortgage"), ("560", "owner_without_mortgage"), ("393", "renter")):
-    check(f"2025 SE literal {literal}", has_number(literal) and f"{round(se25[key])}" == literal)
+for literal, key in (
+    ("327", "owner_with_mortgage"),
+    ("560", "owner_without_mortgage"),
+    ("393", "renter"),
+):
+    check(
+        f"2025 SE literal {literal}",
+        has_number(literal) and f"{round(se25[key])}" == literal,
+    )
 gaps = ev["composite_vs_bls_fcsuti_gap_pp"]
 check(
     "composite within 0.7pp of BLS FCSUti, mean gap 0.4",
-    "0.7 percentage point" in QMD and max(abs(v) for v in gaps.values()) < 0.7
-    and "0.4 point" in QMD and abs(sum(abs(v) for v in gaps.values()) / len(gaps) - 0.4) < 0.05,
+    "0.7 percentage point" in QMD
+    and max(abs(v) for v in gaps.values()) < 0.7
+    and "0.4 point" in QMD
+    and abs(sum(abs(v) for v in gaps.values()) / len(gaps) - 0.4) < 0.05,
 )
 bls_cpiu_2025 = actual["bls_chart4_annual_average_inflation_pct"]["2025"]["cpi_u"]
-check("BLS page 2025 CPI-U growth 2.70 quoted", has_number("2.70 percent") and abs(bls_cpiu_2025 - 2.70) < 0.005)
+check(
+    "BLS page 2025 CPI-U growth 2.70 quoted",
+    has_number("2.70 percent") and abs(bls_cpiu_2025 - 2.70) < 0.005,
+)
 census = json.loads((DATA / "census_wp2026_17_rates.json").read_text())
 c23 = census["corrected_series_2023_to_2024"]["all_people"]
 check(
     "Census corrected 2023->2024 = 12.7 -> 13.0",
-    has_ordered(["12.7", "13.0"], window=10) and c23["2023"] == 12.7 and c23["2024"] == 13.0,
+    has_ordered(["12.7", "13.0"], window=10)
+    and c23["2023"] == 12.7
+    and c23["2024"] == 13.0,
 )
 diffs = [v["difference"] for y, v in census["all_people"].items() if y != "2024"]
 check(
     "Census 2019-2023 corrected 0.1 to 0.3 below",
-    has_number("0.1 to 0.3") and abs(max(diffs)) == 0.1 and abs(min(diffs)) == 0.3 and all(d < 0 for d in diffs),
+    has_number("0.1 to 0.3")
+    and abs(max(diffs)) == 0.1
+    and abs(min(diffs)) == 0.3
+    and all(d < 0 for d in diffs),
 )
 
 if failures:
@@ -514,5 +743,5 @@ if failures:
         print(f"  - {f}")
     sys.exit(1)
 print(
-    f"paper drift check passed ({len(EXPECTED_TABLES)} tables, {len(listed)} artifacts, prose pins OK)"
+    f"paper drift check passed ({len(EXPECTED_TABLES)} tables, {len(listed)} frozen + {len(current_listed)} current artifacts, prose pins OK)"
 )

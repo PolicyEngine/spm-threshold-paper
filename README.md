@@ -1,61 +1,48 @@
 # Nowcasting Supplemental Poverty Measure thresholds
 
-Working paper. Quantifies the July 17, 2026 BLS threshold correction,
-documents a replication of the BLS threshold methodology from public CE
-microdata, backtests threshold-projection rules, and commits to a
-pre-registered nowcast of the unpublished 2025 thresholds — graded
-against BLS's actual publication (~September 2026) in a planned
-revision.
+Working paper on the July 2026 BLS threshold correction, public CE
+replication, threshold projection, and the completed evaluation of the
+2025 forecast. The September 8 revision preserves that forecast and its
+evaluation, and adds a separately identified current-method experiment
+and portable threshold release.
 
-## Build
-
-```bash
-quarto render   # runs scripts/check_paper.py pre-render, then HTML + PDF to _output/
-```
-
-The pre-render check (`scripts/check_paper.py`) regenerates every
-table from `data/`, enforces allowlists of generated tables, QMD
-includes, and checksummed artifacts, verifies `data/SHA256SUMS`, and
-re-derives the registered prose figures at numeric-token boundaries;
-the render fails if any registered figure, table, or artifact drifts.
-Figures quoted from external publications are bound to citations,
-not artifacts. `data/PROVENANCE.md` names the generator, inputs, and
-source of every artifact.
-
-## Clean-room build
-
-Tested on 2026-09-04 with Python 3.14.6, Quarto 1.9.36, and TeX Live
-2026 (LuaHBTeX). The check and the table generators use only the
-Python standard library and need a writable checkout.
+## Build and verify
 
 ```bash
-git clone https://github.com/PolicyEngine/spm-threshold-paper.git
-cd spm-threshold-paper
-git checkout <full commit SHA of the revision you are checking>
-python3 scripts/check_paper.py      # guard only; no Quarto needed
-quarto render --to html             # HTML; add --to pdf for the PDF (needs TeX)
+python3 -B scripts/check_paper.py
+python3 -B -m unittest discover -s tests -v
+quarto render --to html
+quarto render --to pdf
 ```
 
-Rendered output lands in `_output/paper/`. The published site is a
-static deploy of that directory.
+The guard and table generators use the Python standard library. Quarto
+1.9.36 and TeX Live 2026 render the HTML and PDF to `_output/paper/`.
+Clone with full tag history and check out the exact revision to reproduce
+it. The guard first checks artifact hashes and frozen Git identities,
+then generates tables and evaluation JSON in temporary storage and
+compares every output byte with the checkout. It never repairs or
+restores source artifacts. The regression tests verify that failed checks
+leave source bytes unchanged.
 
-## Pre-commitment evidence
+## Preserved forecast evidence
 
-- `data/SHA256SUMS.precommit` — the artifact manifest as of 2026-08-07,
-  before BLS published the 2025 thresholds; `SHA256SUMS.precommit.ots`
-  is its completed OpenTimestamps proof (Bitcoin block 961505, mined
-  2026-08-07 23:18 UTC). Verify with
-  `ots verify -f data/SHA256SUMS.precommit data/SHA256SUMS.precommit.ots`.
-- `data/COMMITMENT-MANIFEST.txt` — both nowcast vintages (tags
-  `v1.0-original-nowcast`, `v1.1-amended-nowcast`), their commits and
-  artifact hashes; stamped as `COMMITMENT-MANIFEST.txt.ots`.
-- Internet Archive capture of the page, 2026-08-07:
-  <https://web.archive.org/web/20260807211521/https://spm-threshold-paper.vercel.app/>
+The tags `v1.0-original-nowcast` and `v1.1-amended-nowcast`, forecast
+bytes, and all original OpenTimestamps manifest/proof pairs are preserved.
+Two hashes in `data/COMMITMENT-MANIFEST.txt` were incorrect; the dated
+`data/COMMITMENT-AMENDMENT-2026-09-08.txt` records the exact tag hashes and
+the original manifest digest. The original proof does not cover that
+amendment. This revision verifies retained proof bytes and Git identities;
+it does not independently reverify blockchain attestations.
 
-## Companion code
+`data/SHA256SUMS` continues to cover only the frozen artifacts. New inputs
+have their own `data/current/SHA256SUMS`; they do not replace the frozen
+forecast or become a new prospective commitment. `data/PROVENANCE.md`
+describes both collections and the original implementation pin.
 
-- spm-calculator PR #32 (0.4.0 on merge): corrected/published/legacy threshold series
-  with provenance, CE replication, benchmark, backtest, nowcast, and
-  the weekly BLS drift-watch workflow.
-- policyengine-us #9081: adopts the corrected series in the US
-  microsimulation model.
+## Companion implementation
+
+The current spm-calculator rebuild provides a portable release, standalone
+unit calculations, CE research replication, projections, and explicit
+PolicyEngine, Microcosm, and real native Axiom adapters. This paper pins version 0.5.0 at development commit
+`9e6ae4798458771231613b994df2345dd1685214`; it does not claim that a model
+migration or public deployment has occurred. The paper consumes the same release bytes as those adapters.

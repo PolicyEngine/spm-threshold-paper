@@ -1,4 +1,4 @@
-| Year | Tenure | Package $\leq$0.3.1 | Published | Error |
+| Year | Tenure | Package $\leq 0.3.1$ | Published | Error |
 |---|---|---:|---:|---:|
 | 2019 | Owners with mortgages | 27,172 | 29,080 | -6.6% |
 | 2019 | Owners without mortgages | 22,600 | 24,413 | -7.4% |

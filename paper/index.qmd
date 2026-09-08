@@ -6,7 +6,7 @@ author:
     affiliations:
       - name: PolicyEngine
     email: max@policyengine.org
-date: 2026-09-04
+date: 2026-09-08
 bibliography: ../bibliography/references.bib
 format:
   html:
@@ -22,10 +22,11 @@ abstract: |
   Supplemental Poverty Measure thresholds after finding errors in the code
   that produced them. The correction moved every published threshold by
   less than 1.6 percent. Auditing our own software against it found
-  hand-entered threshold values off by up to 7.4 percent — and both errors
-  had survived for years because no one was diffing published artifacts.
+  hand-entered threshold values off by up to 7.4 percent. Comparing
+  downstream copies with published sources detects transcription errors
+  and later revisions, but cannot identify errors in the source calculation.
   The paper makes three contributions. It quantifies the correction and
-  documents a replication of the BLS threshold methodology from public
+  documents a historical replication of the BLS threshold methodology from public
   Consumer Expenditure microdata, which reproduces the corrected
   thresholds within 1.5 to 2.1 percent per year and surfaces six
   pitfalls in the public files that face any CE researcher. It shows
@@ -33,8 +34,8 @@ abstract: |
   including our own, missed actual threshold growth by 2.2 percent per
   year in absolute value over 2020--2024, understating it in four of
   five years, because the SPM is quasi-relative: BLS re-estimates each
-  year from consumption data. And it commits to a falsifiable nowcast
-  of the unpublished 2025 thresholds — \$41,036.34 for owners with
+  year from consumption data. It evaluates a pre-committed nowcast
+  of the then-unpublished 2025 thresholds — \$41,036.34 for owners with
   mortgages, \$34,135.99 for owners without, and \$40,755.98 for
   renters — from a 50/50 blend of consumption growth and composite
   price aging (backtest mean absolute error 0.76 versus 2.23 percent
@@ -47,7 +48,9 @@ abstract: |
   absolute error was 1.17 percent against 2.58 for CPI-U aging, with
   the miss concentrated in renters; the consumption component alone
   scored 0.75, in the order the backtest predicted. This revision
-  reports that evaluation in full.
+  reports that evaluation in full and separately records a current-method
+  retrospective experiment, measured sample-treatment sensitivities, and
+  a shared threshold release for standalone and model integration.
 ---
 
 # Introduction
@@ -69,9 +72,9 @@ policy microsimulation, so we audited it against the correction. The
 audit found a larger problem on our side: threshold values transcribed
 by hand into our own package matched no BLS or Census publication for
 five of the six affected years, with errors up to 7.4 percent. The two
-failure modes are the same failure mode. Reference data that people
-transcribe, in agencies or in open-source projects, drifts silently
-unless something mechanical checks it against the source.
+failures require different checks. Comparing an embedded reference table
+with its published source detects transcription errors and stale copies.
+It cannot discover an error already present in the agency's calculation.
 
 That observation sets the paper's agenda. @sec-production describes how
 BLS produces the thresholds and their revision history, which now
@@ -83,14 +86,15 @@ methodology from public Consumer Expenditure microdata: its measured
 fidelity, the bugs the exercise found in our replication code, six
 pitfalls in the public CE files that face any researcher who uses
 them, and a negative result — replication at survey level cannot
-detect a sub-2-percent error in the official pipeline, though
-mechanical artifact-diffing catches it in a week. Because BLS
+resolve a sub-2-percent error in the official pipeline. Mechanical
+artifact comparisons can detect a revised publication once it appears.
+Because BLS
 re-estimates thresholds each year from a rolling consumption window,
 the series is quasi-relative, and @sec-projection shows what that
 costs the price indexation used in microsimulation practice, ours
 included; a backtest scores replacement rules against five years of
 corrected actuals. @sec-nowcast applies that
-rule to data that already exist and commits, before publication, to a
+rule to data available before publication and records the original
 numeric estimate of the 2025 thresholds. BLS published those
 thresholds on August 24, 2026, and @sec-evaluation scores the
 commitment and every alternative rule against them. @sec-discussion
@@ -259,7 +263,7 @@ four errors in our replication code:
    band, applies the 1.2 other-necessities multiplier, and swaps a
    tenure-specific shelter-utilities average — a different object.
 
-After the fixes, the faithful variant reproduces the corrected
+After the fixes, the frozen historical variant reproduces the corrected
 thresholds with mean absolute deviation across the three tenures of
 1.5 to 2.1 percent per year (1.0 to 1.6 percent against the
 superseded published series), with no imputation of in-kind
@@ -271,9 +275,10 @@ unreported mortgage status and for rent-free units are folded into
 neighboring groups; and the 80-percent grocery allocation is applied
 to the combined grocery summary rather than to the single item code
 the errata names. A cross-model code review on September 4, 2026
-surfaced all three; each moves replicated levels by a fraction of a
-percent, and none enters the ratios the nowcast uses at a scale the
-evaluation could detect.]
+surfaced these differences. The frozen experiment did not measure their
+separate effects on levels or growth ratios. The current-method
+experiment below measures selected sample-policy sensitivities; other
+approximation effects remain unmeasured.]
 For scale, the workbook's published sampling standard errors run 0.7
 to 2.1 percent of the corresponding threshold across 2019--2024, so
 the replication sits within roughly one to three standard errors of
@@ -289,20 +294,21 @@ reference series.
 :::
 
 The deviations are predominantly negative and roughly stable across
-years: the replication imputes no in-kind benefits and observes no
-internet expenditures, and that shows up as a level deficit — up to
-three percent for owners with mortgages — that persists across
+years. The replication imputes no in-kind benefits and observes no
+internet expenditures, but the contribution of each omission has not
+been isolated. The observed level deficit — up to
+three percent for owners with mortgages — persists across
 estimation windows rather than growing or shrinking with any one
 year. Two conclusions follow. The negative one: the BLS correction
 moved thresholds by at most 1.6 percent, inside this replication's
 noise, and neither reference series fits systematically better in the
 affected years — so survey-level replication could not have caught
-the BLS bug, and we do not claim otherwise. What catches that class
-of error is mechanical comparison of published artifacts, which now
-runs weekly. The positive one: a level deficit that is stable across
-adjacent, largely overlapping windows is exactly the error structure
-that cancels when the replication is used in ratio form, which is how
-@sec-projection and @sec-nowcast use it.
+the BLS bug, and we do not claim otherwise. Comparing published artifacts
+can detect a later correction and stale downstream copies; independent
+validation of the agency calculation is a separate task. The positive
+one is conditional: a stable proportional replication bias cancels in a
+growth ratio, while a persistent additive deficit need not. Sections
+@sec-projection and @sec-nowcast test the resulting ratios empirically.
 
 ## Pitfalls in the public CE files {#sec-pitfalls}
 
@@ -392,7 +398,10 @@ stand at the prior year's corrected threshold and project one year
 ahead under four rules: All-Items CPI-U aging; aging by a composite of
 the CPI components matching the FCSUti basket; scaling by the growth
 of our replicated thresholds; and a 50/50 blend of the last two. All
-rules are scored against the corrected actuals.
+rules are scored against the corrected actuals. This is a retrospective
+experiment using the 2026-corrected threshold vintage and one repaired
+implementation, not forecasts reconstructed from the data and code
+available at each historical prediction date.
 
 ::: {#tbl-backtest}
 {{< include tables/backtest.md >}}
@@ -457,7 +466,9 @@ forecasts would have erred by several points. The replication ratio
 uses CE microdata that BLS publishes well before the corresponding
 thresholds, so in the nowcasting position the data it needs genuinely
 exist; that it also scores best in backtest counts in its favor, but
-five backtest years cannot settle rankings this close. Second, the
+five backtest years cannot settle rankings this close. Adjacent CE
+windows overlap by 80 percent and tenure estimates share a sample;
+these are not fifteen independent forecast trials. Second, the
 price rules share a residual: both run low in nearly every year,
 reflecting real consumption growth beyond what a five-year averaging
 window passes through and in-kind benefit expansions that prices do
@@ -468,16 +479,17 @@ unmodeled rather than fit a constant to it.
 
 # A pre-committed 2025 nowcast {#sec-nowcast}
 
-The 2025 thresholds are a nowcasting target, not a forecasting one —
+At the commitment date, the 2025 thresholds were a nowcasting target —
 estimation of a present quantity from data already in hand, in the
 macroeconomic sense of the term [@giannone2008]: their entire CE
 window (2020Q2 through 2025Q1) and eleven of twelve months of 2025
-CPI are published. We apply the blend rule to the
+CPI were published. We applied the blend rule to the
 corrected 2024 base. The replication component computes thresholds for
 2024 and 2025 with identical code over their respective windows and
-takes the ratio, per tenure — level biases that persist across
-adjacent, 80-percent-overlapping windows cancel, and the anchor share
-cancels exactly. The price component is the FCSUti-composite ratio of
+takes the ratio, per tenure. Stable proportional replication biases
+would cancel across adjacent, 80-percent-overlapping windows; additive
+or changing errors would not. The anchor share cancels exactly.
+The price component is the FCSUti-composite ratio of
 2025 to 2024 annual averages, with 2025 averaged over its eleven
 published months.^[The nowcast's composite ratio chain-links at the
 base year: each component's 2025-to-2024 ratio, weighted by budget
@@ -523,23 +535,22 @@ the index moved each tenure's estimate by 0.1 to 0.3 percent — owners
 with mortgages from \$41,099.57 to \$41,036.34, owners without from
 \$34,250.70 to \$34,135.99, renters from \$40,791.72 to \$40,755.98.
 The amendment predates any BLS publication of 2025 thresholds, the
-original values remain in the repository history, and the September
-evaluation will report realized errors for both sets.
+original values remain in the repository history, and the completed
+evaluation reports realized errors for both sets.
 
-Evaluation is committed here, in advance — the commitment device of
-preregistration [@nosek2018], applied to a numeric estimate rather
-than a hypothesis test. When BLS publishes the actual 2025
-thresholds, expected around September 2026, a revision of this paper
-will report the signed percent error per tenure and the mean absolute
-error of this nowcast, alongside the same errors for All-Items CPI-U
-aging and each component rule, all computed from the
+The original paper committed in advance to an evaluation — the device
+of preregistration [@nosek2018], applied to a numeric estimate rather
+than a hypothesis test. It anticipated publication around September
+2026 and promised signed percent errors per tenure and mean absolute
+errors for the nowcast, All-Items CPI-U aging and each component rule,
+all computed from the
 corrected 2024 base as committed in the repository — regardless of any
 subsequent BLS revision to 2024. The packaged estimate is fixed with
 its method, components, and hash. The blend's annual signed errors in
 backtest, averaged across tenures, ranged from −0.1 to −1.4 percent;
-that range is our stated expectation of the nowcast's accuracy. If the
-nowcast misses by more than the rules scored alongside it, that result
-publishes too. The evaluation follows in @sec-evaluation.
+that range was the stated expectation of the nowcast's accuracy.
+The commitment included publishing worse performance than competing
+rules. The completed evaluation follows in @sec-evaluation.
 
 # Evaluation against the published 2025 thresholds {#sec-evaluation}
 
@@ -630,23 +641,128 @@ scored above are the ones fixed in the repository and its timestamps
 before BLS published, and the amended nowcast beat the rule it
 replaced by more than half. It does not license re-selecting the rule
 for 2026 after the fact. The replication ratio has now led on both
-looks — the repaired backtest and the realized year — and if the
-packaged method changes for 2026, the change will be committed and
-timestamped before the 2026 CE window closes, in the same way, with
-this year's evaluation as its stated basis.
+looks — the repaired backtest and the realized year. The previously
+discussed 2026 CE collection window already closed in 2026Q1. This
+revision makes no new forecast commitment or scheduled cutoff. Any
+future commitment would need an actual timestamp and a recorded
+available-input cutoff before outcome publication; it could not claim
+to precede that completed collection window.
+
+# Current-method research and a shared release {#sec-current}
+
+The September 8 rebuild separates a release of reference thresholds from
+the research that estimates or projects them. The paper, standalone
+calculator, and integration adapters consume the same portable JSON
+release, with a content digest, target year, information date, source
+fingerprints, methodology identifier, and published or estimated status.
+The release records corrected national thresholds through published 2025.
+Its conservative September 8 availability date describes this snapshot;
+it does not reconstruct what was available to forecasters in earlier years.
+
+::: {#tbl-current-release}
+{{< include tables/current_release.md >}}
+
+Reference-family values from the shared release. The 2025 national bases
+are published values; the displayed housing shares come from the 2024
+Census metro snapshot and are carried into 2025 as an approximation.
+:::
+
+Unit-level application combines the selected national base with the
+SPM equivalence factor and a geographic adjustment to its housing
+portion. The current release pins geographic rent indices and identifies
+the source vintage separately from the target year. It does not claim
+that carried housing shares or aggregate geographic averages exactly
+reproduce revised official thresholds for every local area.
+
+This boundary lets PolicyEngine or a future Axiom implementation supply
+resources and already classified SPM-unit membership, while Microcosm
+supplies entity links and explicit weights. The reference threshold does
+not change when the sample is reweighted. The implemented Axiom bridge
+executes national-base selection, multiplication, and the strict
+resources-below-threshold judgment in the native runtime. Its equivalence
+factor remains an explicitly supplied SPM calculation because the pinned
+RuleSpec runtime lacks fractional powers. This is a partial bridge;
+it does not migrate CE estimation, SPM membership, or resource accounting
+into Axiom. A host migration can change those inputs and therefore poverty
+results even when the shared threshold release stays fixed.
+
+## CE replication and measured sensitivities
+
+The current CE experiment reconstructs seven target years from their
+public five-year windows. It normalizes each consumer unit to the
+reference family before selecting the weighted expenditure band and
+estimating tenure-specific housing means. @tbl-current-replication
+compares this explicitly approximate implementation with the corrected
+published series. These results are separate from the historical
+implementation and frozen evaluation above.
+
+::: {#tbl-current-replication}
+{{< include tables/current_replication.md >}}
+
+Signed current replication deviations from published thresholds, by
+reference-family tenure. Negative values indicate a lower replication.
+:::
+
+Independent minors can form CE consumer units, so a minor-only record
+does not by itself establish the SPM adult/child classification needed
+for exact equivalence scaling. The default exact path rejects these
+unresolved records. For the experiment, an explicit research option
+excludes them; a sensitivity imposes an adult while retaining the reported
+child count, which is nonofficial and not a resolution of membership.
+The baseline excludes tenure codes 5 and 6 and assigns code 3 to owners
+with a mortgage. The recorded windows contain no code-3 observations,
+so assigning those records to owners without a mortgage has zero measured
+effect here; it provides no evidence about other samples.
+
+::: {#tbl-current-sensitivity}
+{{< include tables/current_sensitivity.md >}}
+
+Unresolved-youth interviews and their weighted share of child-containing
+CE interviews, with maximum absolute threshold changes across tenures
+under separate youth-recode and tenure-5/6 sensitivities. These
+overlapping windows reuse observations.
+:::
+
+The tenure sensitivity reaches 1.74 percent, so the sample-treatment
+approximations cannot collectively be described as negligible. Annual
+rather than quarterly CPI adjustment, the allocation of the redesigned
+food summary, omitted home internet and in-kind imputations, and exact
+BLS percentile-code parity remain unmeasured sources of discrepancy.
+Sampling and imputation uncertainty has not been estimated. The table
+measures selected implementation choices, not a confidence interval or
+an exhaustive error bound.
+
+## Retrospective projection under the current method
+
+The same current replication supplies adjacent-year growth ratios for
+six one-year projections in @tbl-current-projection. The price comparator
+rebases static component weights to each prior year, while the frozen
+backtest used a fixed 2019 price base. These are different method
+versions. All current inputs are conservatively dated to this replay;
+no historical information-set eligibility is inferred. Adjacent windows
+overlap by four of five years, and tenure estimates share observations.
+The resulting year-tenure errors are dependent retrospective evidence.
+The blend gives equal weight to replication growth and composite-price
+growth. These figures do not replace the frozen backtest or the single
+prospective 2025 evaluation and do not establish a new forecast commitment.
+
+::: {#tbl-current-projection}
+{{< include tables/current_projection.md >}}
+
+Current-method retrospective mean absolute percentage errors across
+three tenures, 2020–2025. The mean row weights the six years equally.
+:::
 
 # Discussion {#sec-discussion}
 
-The 2026 correction cost the SPM six years of restated statistics, and
-the error is less notable for how it arose than for taking five years
-to surface. The threshold pipeline's inputs are public, its
-methodology is documented, and its outputs are three numbers a year.
-Nothing checked them. Our package's larger errors have the same
-anatomy: values a person typed, tests that enshrined the typing, and
-no process comparing the artifact to its source. Both failures were
-detectable by a scheduled diff against the published artifact, which
-has no false-negative mode for this error class short of the source
-itself being wrong.
+The 2026 correction restated six years of SPM statistics. Its delayed
+discovery illustrates the difficulty of validating the source
+calculation itself. Our package's larger transcription errors illustrate
+a separate, directly testable problem: tests had preserved values a
+person typed without comparing them with their sources. Scheduled
+comparisons can identify disagreement and later source revisions.
+They cannot establish the correctness of an agency calculation that
+supplied the same erroneous values to every downstream copy.
 
 Replication plays a narrower role than adjudication. At its measured
 fidelity, an independent implementation cannot resolve sub-2-percent
@@ -654,8 +770,8 @@ errors in the official series, and claiming otherwise would overreach.
 What it can do is structural: confirm the formula, the window, and the
 re-anchoring behave as documented; catch transcription-scale errors
 instantly; and measure the consumption growth that price indexation
-misses — the use this paper puts it to, where a level bias that
-cancels in ratios stops being a disqualification. The nowcast is the
+misses — the use this paper tests, conditional on sufficient stability
+of proportional replication errors. The nowcast is the
 constructive payoff of infrastructure built for verification. The
 verification infrastructure itself needed verifying: the composite
 index at the heart of the backtest carried a construction error until
@@ -694,7 +810,9 @@ ordinary and rarely checked.
 
 # Reproducibility
 
-Everything in this paper regenerates from public data. The
+The historical tables regenerate from the frozen public-data artifacts
+included here; the poverty-sensitivity artifact also requires its
+original population dataset to reproduce. The historical
 spm-calculator implementation lives on PolicyEngine/spm-calculator
 pull request #32 (branch `max/bls-2026-threshold-correction`; this
 revision pins commit `d2746cfacce072f599ffb1788eb195777c6ca9ca`), to
@@ -717,18 +835,24 @@ whose own default store carried a
 seventh, mis-mapped series (`SEEE`, information-technology hardware
 and services, labeled as internet) and therefore returned a
 different 2025 price ratio (1.0297 rather than the committed 1.0322).
-The same September 4 review caught it; the branch is being
-reconciled to the six-series definition the evaluation scored, and
-the choice of series for 2026 is an open, public issue on the
-implementation repository.
+The same September 4 review caught it; the rebuild now preserves the
+six-series definition as an explicitly archived commitment. Current-method
+inputs and code are recorded separately in `data/current/`; they do not
+replace this frozen evaluation. The current experiment and shared release
+pin spm-calculator version 0.5.0, development commit
+`9e6ae4798458771231613b994df2345dd1685214`.
+The release content digest and exact executed CE source hashes are in
+`data/current/provenance.json`. These are committed development inputs,
+not evidence of a published package or completed model migration.
 
 The paper repository pins the exact artifacts behind every table and
 the poverty-sensitivity simulation output, with SHA-256 sums, and
 bundles the corrected BLS workbook itself (hash matching the file
 bls.gov served on August 6, 2026), so the correction table is
 checkable without fighting the bot filtering. Each table is generated
-from the artifacts by script, and a pre-render check regenerates the
-tables, verifies the artifact hashes, and re-derives the registered
+from the artifacts by script. A pre-render check first verifies the
+original artifact hashes and commitment identities, then regenerates
+tables and evaluation JSON in scratch space and re-derives the registered
 prose figures; continuous integration runs the same check on every
 push to master and every pull request. Its scope is stated exactly:
 it enforces an allowlist of generated tables and of the tables the
@@ -736,7 +860,8 @@ source includes, requires the checksum manifest to cover every
 artifact present, and matches each registered figure at numeric-token
 boundaries — the three tenure amounts as ordered triples in the
 sentences that state them — so the build fails if any registered
-figure, table, or artifact drifts. Figures quoted from external
+figure, table, or artifact drifts. It compares generated bytes without
+repairing or restoring source files. Figures quoted from external
 publications are bound to their citations, not to artifacts, and
 dates and ordinals are not registered; an earlier version of the
 check matched bare substrings, and a September 4, 2026 audit showed
@@ -763,7 +888,14 @@ quotes both sets in the amendment sentence, and both nowcasts are
 tagged releases whose creation dates GitHub records. A manifest
 listing both tags, their commits, and both artifact hashes is
 committed alongside and stamped separately, as is the
-post-evaluation checksum file. The history documents one
+post-evaluation checksum file. Two artifact hashes in that secondary
+manifest were transcribed incorrectly. The explicitly dated
+`COMMITMENT-AMENDMENT-2026-09-08.txt` supplies the correct hashes and
+records the original manifest's digest. The original manifest, tags,
+forecast bytes and every existing proof remain unchanged. The old proof
+does not cover the amendment. This revision checks the retained proof
+bytes and Git identities; it does not independently reverify the
+blockchain attestations. The forecast history documents one
 amendment: the composite-index construction error caught in
 cross-model review on July 18, 2026, with every downstream artifact,
 table, and pinned prose figure regenerated in the same change. The
