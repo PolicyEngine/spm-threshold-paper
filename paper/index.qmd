@@ -561,8 +561,25 @@ $T-5$ through $T-1$. Public-use geography requires fractional allocation
 from Public Use Microdata Areas to SPM estimation areas. The projection
 uses the declared February 2013 metropolitan delineation and records
 the crosswalk and source vintages. These allocations, public-data
-topcoding, and the selected rental sample limit exact reproduction of
+topcoding, and the public rental sample limit exact reproduction of
 the Census calculation [@acs2024pumd].
+
+The rental sample contains occupied, cash-rented two-bedroom housing
+units with complete kitchen and plumbing facilities, positive gross
+rent, and positive housing weights. This follows the housing-unit
+definition used for the SPM geographic adjustment [@spmtechnical].
+For each complete five-year PUMS product, we retain its housing weights
+(`WGTP`) and identify survey-year cohorts from the record identifiers;
+we do not combine overlapping products as independent observations.
+Monthly gross rent is `GRNTP` multiplied once by `ADJHSG` divided by
+$10^6$, placing the product's observations on a common dollar basis
+[@acs2024accuracy]. Area estimation multiplies housing weights by the
+PUMA-to-area allocation fractions. After sorting adjusted rents, the
+median is the first observed value whose cumulative weight reaches
+50 percent. This is a discrete weighted median without interpolation,
+an additional approximation in the public-data reconstruction. Future
+donor copies retain the original product weights; no annual reweighting
+or population-growth adjustment is imposed.
 
 Observed ACS cohorts are used through 2024. Each later cohort copies
 the 2024 donor records, scales nominal rents, and converts them to a
