@@ -10,8 +10,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The evaluation reads the original nowcast from the
+          # v1.0-original-nowcast tag; a shallow, tagless checkout
+          # cannot resolve it.
+          fetch-depth: 0
+          fetch-tags: true
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: Paper drift check
         run: python scripts/check_paper.py
+      - name: Guard mutation tests
+        run: python -m unittest discover -s tests -v

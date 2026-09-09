@@ -1,33 +1,64 @@
-# Nowcasting Supplemental Poverty Measure thresholds
+# Calculating and projecting Supplemental Poverty Measure thresholds
 
-Working paper. Quantifies the July 17, 2026 BLS threshold correction,
-documents a replication of the BLS threshold methodology from public CE
-microdata, backtests threshold-projection rules, and commits to a
-pre-registered nowcast of the unpublished 2025 thresholds — graded
-against BLS's actual publication (~September 2026) in a planned
-revision.
+Working paper on national SPM threshold estimation from public Consumer
+Expenditure Survey microdata, family and geographic adjustments, and
+projection from consumption and price growth. The manuscript presents
+current-method replication and sample sensitivities, retrospective
+comparisons, and a separately preserved pre-committed 2025 validation.
+It also constructs conditional forecasts through 2035 by advancing the
+CE and ACS windows with explicit price, real-spending, and rent assumptions.
 
-## Build
+The current six-year results use revised inputs and overlapping CE
+windows. They are separate from the single prospective validation year.
+Method limitations and the forecast amendment history are reported in
+the manuscript. The repository preserves source artifacts, method
+versions, and forecast commitment evidence.
+
+## Build and verify
 
 ```bash
-quarto render   # runs scripts/check_paper.py pre-render, then HTML + PDF to _output/
+python3 -B scripts/check_paper.py
+python3 -B -m unittest discover -s tests -v
+quarto render --to html
+quarto render --to pdf
 ```
 
-The pre-render check regenerates every table from `data/` via
-`scripts/build_tables.py`, verifies `data/SHA256SUMS`, and re-derives
-the load-bearing prose figures; the render fails if any of them
-drifts from the artifacts.
+The guard and table generators use the Python standard library. Quarto
+1.9.36 and TeX Live 2026 render the HTML and PDF to `_output/paper/`.
+Clone with full tag history and check out the exact revision to reproduce
+it. The guard first checks artifact hashes and frozen Git identities,
+then generates tables and evaluation JSON in temporary storage and
+compares every output byte with the checkout, including archived tables
+that the manuscript no longer includes. It never repairs or
+restores source artifacts. The regression tests verify that failed checks
+leave source bytes unchanged.
 
-Every numeric table is generated from the artifacts in `data/`
-(SHA-256 sums in `data/SHA256SUMS`), which are produced by the scripts
-in [PolicyEngine/spm-calculator](https://github.com/PolicyEngine/spm-calculator)
-(v0.4.0, PR #32). The prose cannot drift from the data without the
-build failing.
+## Preserved forecast evidence
 
-## Companion code
+The tags `v1.0-original-nowcast` and `v1.1-amended-nowcast`, forecast
+bytes, and all original OpenTimestamps manifest/proof pairs are preserved.
+Two hashes in `data/COMMITMENT-MANIFEST.txt` were incorrect; the dated
+`data/COMMITMENT-AMENDMENT-2026-09-08.txt` records the exact tag hashes and
+the original manifest digest. The original proof does not cover that
+amendment. This revision verifies retained proof bytes and Git identities;
+it does not independently reverify blockchain attestations.
 
-- spm-calculator 0.4.0: corrected/published/legacy threshold series
-  with provenance, CE replication, benchmark, backtest, nowcast, and
-  the weekly BLS drift-watch workflow.
-- policyengine-us #9081: adopts the corrected series in the US
-  microsimulation model.
+`data/SHA256SUMS` continues to cover only the frozen artifacts. New inputs
+have their own `data/current/SHA256SUMS`; they do not replace the frozen
+forecast or become a new prospective commitment. `data/PROVENANCE.md`
+describes both collections and the original implementation pin.
+
+## Companion implementation
+
+The companion spm-calculator provides a portable artifact, standalone
+unit calculations, CE research replication, rolling projections, and
+PolicyEngine, Microcosm, and native Axiom adapters. The rolling projection
+pins the 1.0.0 release candidate at commit
+`78bae15f76152c6076dd909a09f6b63dc2ec8c34`, with content digest
+`3d86d5c4c0423480e6b69b75d222ffa4a7a2639e4094df5ba2504af01be17173`.
+The paper consumes the same projection bytes as the calculator.
+
+The 2019–2025 retrospective experiment retains its separate development
+version 0.5.0 pin at `0d7fa0d77b0a88064ab7b9fe70557309b5f7901f`.
+These source identities document reproducibility; they do not certify
+publication, deployment, or a population-model migration.

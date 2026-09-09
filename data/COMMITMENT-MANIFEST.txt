@@ -1,0 +1,19 @@
+# Commitment manifest — 2025 SPM threshold nowcast, both vintages
+# Written 2026-09-04 after BLS's 2025 publication; stamped separately from the pre-publication proof.
+# Pre-publication anchors: SHA256SUMS.precommit.ots (Bitcoin block 961505, 2026-08-07 23:18 UTC) covers the amended manifest;
+# the Internet Archive capture https://web.archive.org/web/20260807211521/https://spm-threshold-paper.vercel.app/ shows both sets;
+# GitHub release timestamps for both tags date 2026-08-07.
+
+tag v1.0-original-nowcast
+  tag_object 12b7042a960412477af53c62ebd961ded1a2625e
+  commit a8b7c51869e64e36517d4eca8d5dbd6e2e0cde5b
+  nowcast_2025.json sha256 85049a018bbf319d900320fceed6b740f83ab52efbf11a795250066f69c8bfd8
+  values 41099.57 / 34250.70 / 40791.72
+
+tag v1.1-amended-nowcast
+  tag_object 3759670e314b762fa24348a3c9a16526cdc74b47
+  commit d72e1dc083ad1abc95b1c88fd1b782944454074b
+  nowcast_2025.json sha256 ec0cd0f8b629fe79d9db24e0f8fcd0bac4f172817f940376d8f1c80fbb823028
+  values 41036.34 / 34135.99 / 40755.98
+
+evaluation: PR #1 (branch v2-evaluation) of PolicyEngine/spm-threshold-paper; this manifest is stamped as COMMITMENT-MANIFEST.txt.ots
