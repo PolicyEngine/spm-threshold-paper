@@ -54,8 +54,8 @@ The companion spm-calculator provides a portable artifact, standalone
 unit calculations, CE research replication, rolling projections, and
 PolicyEngine, Microcosm, and native Axiom adapters. The rolling projection
 pins the 1.0.0 release candidate at commit
-`c89d20f08f8d9d0896c88944fdb685ea01cecbb1`, with content digest
-`b9dbf5ae49697e3bf3abee2fa22b7429703412cb1e58478938a682a0dfddc821`.
+`78bae15f76152c6076dd909a09f6b63dc2ec8c34`, with content digest
+`3d86d5c4c0423480e6b69b75d222ffa4a7a2639e4094df5ba2504af01be17173`.
 The paper consumes the same projection bytes as the calculator.
 
 The 2019–2025 retrospective experiment retains its separate development

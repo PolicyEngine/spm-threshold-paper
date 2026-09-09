@@ -65,7 +65,7 @@ checksum manifest, any earlier experiment, or any timestamp proof.
 
 | Artifact | Source and scope |
 |---|---|
-| `rolling_forecast_2026_09_09.json` | Exact 26,606,301-byte calculator artifact from commit `c89d20f08f8d9d0896c88944fdb685ea01cecbb1`, development candidate 1.0.0. File SHA-256 `76ab8435f087f167ad01b8495ebd016415ba8086f32bfbd3dab961dcc8976c0a`; canonical content SHA-256 `b9dbf5ae49697e3bf3abee2fa22b7429703412cb1e58478938a682a0dfddc821`. Years 2022–2035, published 2025 national bases and housing shares, conditional CE-trend and zero-real projections, year-specific geographic assignments and rent diagnostics. |
+| `rolling_forecast_2026_09_09.json` | Exact 26,607,056-byte calculator artifact from commit `78bae15f76152c6076dd909a09f6b63dc2ec8c34`, development candidate 1.0.0. File SHA-256 `cc06784feb81f8c7935d4494cea0a9821a79af868ac50383da8be37c6dc14b99`; canonical content SHA-256 `3d86d5c4c0423480e6b69b75d222ffa4a7a2639e4094df5ba2504af01be17173`. Years 2022–2035, published 2025 national bases and housing shares, conditional CE-trend and zero-real projections, year-specific geographic assignments and rent diagnostics. |
 | `rolling_provenance.json` | Source commit/path, exact artifact seals, all source/code/component fingerprints and the information date. Explicitly outside the original timestamp commitment. |
 
 `scripts/import_rolling_forecast.py` obtains the exact bytes from the
@@ -92,3 +92,9 @@ repository revision `284a95665f9f2f74ed1f482feb629b43fce323da`, SHA-256
 Uniform component-price and rent growth and the fitted real-spending
 scenario are calculator assumptions. Publication of these inputs does
 not make the future SPM thresholds official forecasts.
+
+The September 9 AST portability adaptation changes source/provenance identities
+while preserving every scientific scenario value. The calculator retains the
+original reparse receipts and records the equivalent-code operation explicitly
+in `acs_code_identity_adaptation.json`; it does not claim a new raw-data reparse.
+The original paper experiment and its timestamped inputs remain unchanged.
