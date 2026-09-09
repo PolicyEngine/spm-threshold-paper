@@ -46,7 +46,12 @@ from collections import Counter
 from pathlib import Path
 
 sys.dont_write_bytecode = True
-from rolling_inputs import ROLLING_FILES, load_rolling_forecast
+from rolling_inputs import (
+    CALCULATOR_COMMIT,
+    CONTENT_SHA256,
+    ROLLING_FILES,
+    load_rolling_forecast,
+)
 from verify_commitments import verify_commitments
 
 REPO = Path(__file__).resolve().parent.parent
@@ -759,6 +764,22 @@ ROLLING_CE = section(
 )
 ROLLING_ACS = section("## Projecting local relative housing costs", None, ROLLING)
 
+REPRODUCIBILITY = section(
+    "# Appendix B: reproducibility {.unnumbered}", "# References {.unnumbered}"
+)
+check(
+    "rolling reproducibility identity matches the sealed calculator commit and content",
+    has_ordered(
+        [
+            "projection uses the separate 1.0.0 release candidate at commit",
+            f"`{CALCULATOR_COMMIT}`",
+            "candidate's content digest is",
+            CONTENT_SHA256,
+        ],
+        text=REPRODUCIBILITY,
+    ),
+)
+
 fit = rolling_forecast["assumptions"]["real_growth_fit"]
 SENSITIVITIES = fit["sensitivities"]
 TEN_BLOCK = SENSITIVITIES["latest_ten_blocks"]
@@ -950,7 +971,9 @@ check(
 )
 
 thin_counts = {
-    sum(bool(area.get("thin_support")) for area in record["median_diagnostics"].values())
+    sum(
+        bool(area.get("thin_support")) for area in record["median_diagnostics"].values()
+    )
     for scenario in rolling_forecast["scenarios"].values()
     for record in scenario["years"].values()
     if record["acs_window"]["projected_years"] > 0

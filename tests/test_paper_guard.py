@@ -310,7 +310,8 @@ class PaperGuardTests(unittest.TestCase):
         ).hexdigest()
         guard_path.write_text(
             guard_path.read_text().replace(
-                original_manifest_hash, hashlib.sha256(manifest.read_bytes()).hexdigest()
+                original_manifest_hash,
+                hashlib.sha256(manifest.read_bytes()).hexdigest(),
             )
         )
         result = self.run_guard()
@@ -388,7 +389,11 @@ class PaperGuardTests(unittest.TestCase):
         artifact["scenarios"]["ce_trend"]["years"]["2026"]["thresholds"]["renter"] += 1
         artifact["content_sha256"] = hashlib.sha256(
             json.dumps(
-                {key: value for key, value in artifact.items() if key != "content_sha256"},
+                {
+                    key: value
+                    for key, value in artifact.items()
+                    if key != "content_sha256"
+                },
                 sort_keys=True,
                 separators=(",", ":"),
                 ensure_ascii=False,
@@ -419,7 +424,10 @@ class PaperGuardTests(unittest.TestCase):
         table.write_text(table.read_text() + "unreviewed forecast row\n")
         result = self.run_guard()
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("generated output drifted: paper/tables/rolling_projection.md", result.stdout)
+        self.assertIn(
+            "generated output drifted: paper/tables/rolling_projection.md",
+            result.stdout,
+        )
 
     def test_rolling_validation_missing_is_detected_without_repair(self):
         (self.repo / "paper/tables/rolling_validation.md").unlink()
@@ -514,7 +522,9 @@ class PaperGuardTests(unittest.TestCase):
             prose = prose.replace(host, f"{host}\n{decoy}\n")
         path.write_text(prose)
 
-    def assert_article_mutation_fails(self, label, edits, expected, host=None, decoy=None):
+    def assert_article_mutation_fails(
+        self, label, edits, expected, host=None, decoy=None
+    ):
         self.install_article()
         self.edit_article(edits, host, decoy)
         result = self.run_guard()
@@ -525,6 +535,35 @@ class PaperGuardTests(unittest.TestCase):
         for label, edits, _, _, expected in ROLLING_PROSE_MUTATIONS:
             with self.subTest(figure=label):
                 self.assert_article_mutation_fails(label, edits, expected)
+
+    def test_reproducibility_identity_matches_the_sealed_forecast(self):
+        provenance = json.loads(
+            (self.repo / "data/current/rolling_provenance.json").read_text()
+        )
+        appendix = (
+            (self.repo / "paper/index.qmd")
+            .read_text()
+            .split("# Appendix B: reproducibility {.unnumbered}", 1)[1]
+            .split("# References {.unnumbered}", 1)[0]
+        )
+        for key in ("calculator_commit", "content_sha256"):
+            with self.subTest(identity=key):
+                self.assertIn(provenance[key], appendix)
+
+    def test_reproducibility_identity_cannot_be_borrowed_from_another_section(self):
+        provenance = json.loads(
+            (self.repo / "data/current/rolling_provenance.json").read_text()
+        )
+        for key in ("calculator_commit", "content_sha256"):
+            with self.subTest(identity=key):
+                identity = provenance[key]
+                self.assert_article_mutation_fails(
+                    key,
+                    ((identity, "0" * len(identity)),),
+                    "rolling reproducibility identity",
+                    DISCUSSION_HEADING,
+                    f"The recorded {key} is `{identity}`.",
+                )
 
     def test_rolling_pins_reject_a_figure_borrowed_from_another_section(self):
         """The same numeral stated correctly elsewhere must not rescue a
@@ -585,7 +624,9 @@ class PaperGuardTests(unittest.TestCase):
         path.write_text(json.dumps(artifact))
         provenance_path = self.repo / "data/current/rolling_provenance.json"
         provenance = json.loads(provenance_path.read_text())
-        source = source.replace(provenance["content_sha256"], artifact["content_sha256"])
+        source = source.replace(
+            provenance["content_sha256"], artifact["content_sha256"]
+        )
         source = source.replace(
             provenance["artifact_sha256"], hashlib.sha256(path.read_bytes()).hexdigest()
         )
@@ -607,7 +648,9 @@ class PaperGuardTests(unittest.TestCase):
         fit["log_slope"] = fit["annual_log_slope"] = applied_log_rate * 2
         fit["shrunk_annual_rate"] = fit["annual_rate"] = math.exp(applied_log_rate) - 1
         fit["unshrunk_annual_rate"] = math.exp(applied_log_rate * 2) - 1
-        artifact["scenarios"]["ce_trend"]["real_growth_rate"] = fit["shrunk_annual_rate"]
+        artifact["scenarios"]["ce_trend"]["real_growth_rate"] = fit[
+            "shrunk_annual_rate"
+        ]
         self.reseal_rolling_artifact(artifact)
         result = self.run_guard()
         self.assertNotEqual(result.returncode, 0)

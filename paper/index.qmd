@@ -20,6 +20,7 @@ format:
     include-in-header:
       text: |
         \usepackage{needspace}
+        \fvset{fontsize=\small}
 abstract: |
   Supplemental Poverty Measure (SPM) thresholds reflect spending on basic
   needs as well as prices. BLS re-estimates them from a rolling five-year
@@ -743,8 +744,13 @@ source hashes, methodology choices, and sample diagnostics. The
 pin, spm-calculator development version 0.5.0 at commit
 `0d7fa0d77b0a88064ab7b9fe70557309b5f7901f`. The conditional rolling
 projection uses the separate 1.0.0 release candidate at commit
-`c89d20f08f8d9d0896c88944fdb685ea01cecbb1`. The candidate's content
-digest is `b9dbf5ae49697e3bf3abee2fa22b7429703412cb1e58478938a682a0dfddc821`.
+`78bae15f76152c6076dd909a09f6b63dc2ec8c34`. The candidate's content
+digest is:
+
+```{.text .small}
+3d86d5c4c0423480e6b69b75d222ffa4a7a2639e4094df5ba2504af01be17173
+```
+
 Exact source and release identities are recorded alongside the inputs;
 `data/PROVENANCE.md` describes the separate collections. The frozen
 poverty sensitivity additionally requires its original model and
