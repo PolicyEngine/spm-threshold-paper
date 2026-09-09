@@ -11,6 +11,12 @@ import unittest
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
+ROLLING_NAME = "rolling_forecast_2026_09_09.json"
+
+
+def excluded_diagnostic(path):
+    """Do not read or copy private worker diagnostics into test fixtures."""
+    return str(path).endswith((".err", ".lane.log"))
 
 
 class PaperGuardTests(unittest.TestCase):
@@ -39,10 +45,20 @@ class PaperGuardTests(unittest.TestCase):
             .split("\0")
         )
         for name in names:
-            if name and (REPO / name).is_file():
+            if name and not excluded_diagnostic(name) and (REPO / name).is_file():
                 destination = self.repo / name
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(REPO / name, destination)
+        # The article owner integrates these two includes concurrently. Supply
+        # only that declared integration in the private fixture; the actual
+        # checkout still requires an independent check_paper.py run.
+        article = self.repo / "paper/index.qmd"
+        prose = article.read_text()
+        for name in ("rolling_projection.md", "rolling_validation.md"):
+            directive = "{{< include tables/" + name + " >}}"
+            if directive not in prose:
+                prose += "\n" + directive + "\n"
+        article.write_text(prose)
 
     def tearDown(self):
         self.temp.cleanup()
@@ -51,7 +67,11 @@ class PaperGuardTests(unittest.TestCase):
         return {
             str(p.relative_to(self.repo)): hashlib.sha256(p.read_bytes()).hexdigest()
             for p in self.repo.rglob("*")
-            if p.is_file() and ".git" not in p.relative_to(self.repo).parts
+            if (
+                not excluded_diagnostic(p)
+                and ".git" not in p.relative_to(self.repo).parts
+                and p.is_file()
+            )
         }
 
     def run_guard(self):
@@ -67,7 +87,7 @@ class PaperGuardTests(unittest.TestCase):
         self.assertEqual(before, self.snapshot(), "Guard changed checkout bytes")
         return result
 
-    def test_clean_guard_leaves_sources_unchanged(self):
+    def test_integrated_fixture_guard_leaves_sources_unchanged(self):
         result = self.run_guard()
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
@@ -110,9 +130,131 @@ class PaperGuardTests(unittest.TestCase):
             for line in lines
         ]
         manifest.write_text("\n".join(lines) + "\n")
+        # Bypass only the independent frozen-manifest byte pin in this private
+        # fixture so this attack reaches the release's inner content seal.
+        guard_path = self.repo / "scripts/check_paper.py"
+        original_manifest_hash = hashlib.sha256(
+            (REPO / "data/current/SHA256SUMS").read_bytes()
+        ).hexdigest()
+        guard_path.write_text(
+            guard_path.read_text().replace(
+                original_manifest_hash, hashlib.sha256(manifest.read_bytes()).hexdigest()
+            )
+        )
         result = self.run_guard()
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("release canonical content hash", result.stdout)
+
+    def test_retrospective_manifest_history_cannot_be_amended(self):
+        manifest = self.repo / "data/current/SHA256SUMS"
+        manifest.write_text(manifest.read_text() + "\n")
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("retrospective checksum manifest history changed", result.stdout)
+        self.assertIn("generators were not run", result.stdout)
+
+    def test_new_rolling_tables_must_both_be_included_in_article(self):
+        path = self.repo / "paper/index.qmd"
+        prose = path.read_text()
+        for name in ("rolling_projection.md", "rolling_validation.md"):
+            prose = prose.replace("{{< include tables/" + name + " >}}", "")
+        path.write_text(prose)
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("article tables never included", result.stdout)
+        self.assertIn("rolling_projection.md", result.stdout)
+        self.assertIn("rolling_validation.md", result.stdout)
+
+    def refresh_rolling_manifest(self):
+        manifest = self.repo / "data/current/ROLLING_SHA256SUMS"
+        lines = []
+        for line in manifest.read_text().splitlines():
+            _, name = line.split()
+            digest = hashlib.sha256((self.repo / name).read_bytes()).hexdigest()
+            lines.append(f"{digest}  {name}")
+        manifest.write_text("\n".join(lines) + "\n")
+
+    def test_rolling_corruption_fails_before_generators_without_repair(self):
+        (self.repo / "data/current" / ROLLING_NAME).write_text("invalid JSON\n")
+        (self.repo / "scripts/build_current_tables.py").write_text(
+            "from pathlib import Path\nPath('GENERATOR_RAN').write_text('wrong')\n"
+        )
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("rolling artifact hash mismatch", result.stdout)
+        self.assertIn("generators were not run", result.stdout)
+        self.assertFalse((self.repo / "GENERATOR_RAN").exists())
+
+    def test_rolling_provenance_mismatches_fail_after_manifest_refresh(self):
+        path = self.repo / "data/current/rolling_provenance.json"
+        original = json.loads(path.read_text())
+        cases = (
+            ("content_sha256", "rolling canonical content hash"),
+            ("source_sha256", "rolling source fingerprints"),
+            ("code_sha256", "rolling executed code fingerprints"),
+            ("calculator_commit", "rolling calculator commit"),
+        )
+        for field, label in cases:
+            with self.subTest(field=field):
+                provenance = json.loads(json.dumps(original))
+                if isinstance(provenance[field], dict):
+                    provenance[field][next(iter(provenance[field]))] = "0" * 64
+                else:
+                    provenance[field] = "0" * len(provenance[field])
+                path.write_text(json.dumps(provenance))
+                self.refresh_rolling_manifest()
+                result = self.run_guard()
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(label, result.stdout)
+                self.assertIn("generators were not run", result.stdout)
+        path.write_text(json.dumps(original))
+        self.refresh_rolling_manifest()
+
+    def test_self_consistently_resealed_rolling_amount_cannot_replace_release(self):
+        path = self.repo / "data/current" / ROLLING_NAME
+        artifact = json.loads(path.read_text())
+        artifact["scenarios"]["ce_trend"]["years"]["2026"]["thresholds"]["renter"] += 1
+        artifact["content_sha256"] = hashlib.sha256(
+            json.dumps(
+                {key: value for key, value in artifact.items() if key != "content_sha256"},
+                sort_keys=True,
+                separators=(",", ":"),
+                ensure_ascii=False,
+                allow_nan=False,
+            ).encode()
+        ).hexdigest()
+        path.write_text(json.dumps(artifact))
+        provenance_path = self.repo / "data/current/rolling_provenance.json"
+        provenance = json.loads(provenance_path.read_text())
+        provenance["content_sha256"] = artifact["content_sha256"]
+        provenance["artifact_sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+        provenance_path.write_text(json.dumps(provenance))
+        self.refresh_rolling_manifest()
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("rolling artifact hash mismatch", result.stdout)
+        self.assertIn("generators were not run", result.stdout)
+
+    def test_rolling_manifest_must_cover_exact_additional_artifacts(self):
+        (self.repo / "data/current/ROLLING_SHA256SUMS").write_text("")
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("rolling", result.stdout)
+        self.assertIn("generators were not run", result.stdout)
+
+    def test_rolling_projection_drift_is_detected_without_repair(self):
+        table = self.repo / "paper/tables/rolling_projection.md"
+        table.write_text(table.read_text() + "unreviewed forecast row\n")
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("generated output drifted: paper/tables/rolling_projection.md", result.stdout)
+
+    def test_rolling_validation_missing_is_detected_without_repair(self):
+        (self.repo / "paper/tables/rolling_validation.md").unlink()
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("generated tables present == expected", result.stdout)
+        self.assertIn("rolling_validation.md", result.stdout)
 
     def test_regenerated_evaluation_json_drift_is_detected(self):
         path = self.repo / "scripts/evaluate_nowcast_2025.py"

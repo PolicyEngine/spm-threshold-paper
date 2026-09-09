@@ -1,12 +1,12 @@
 ---
 title: "Calculating and projecting Supplemental Poverty Measure thresholds"
-subtitle: "Public consumption data, projection comparisons, and a pre-committed 2025 validation"
+subtitle: "Public consumption data, rolling forecasts, and a pre-committed 2025 validation"
 author:
   - name: Max Ghenis
     affiliations:
       - name: PolicyEngine
     email: max@policyengine.org
-date: 2026-09-08
+date: 2026-09-09
 bibliography: ../bibliography/references.bib
 format:
   html:
@@ -37,6 +37,10 @@ abstract: |
   supplies one external validation year: the blend's mean absolute error
   was 1.17 percent against 2.58 percent for CPI-U adjustment and 0.75
   percent for consumption growth alone. The largest miss was for renters.
+  For years beyond available microdata, a separate conditional projection
+  advances both expenditure and rent windows through 2035, with explicit
+  assumptions about prices and real spending. Its prospective accuracy
+  has not been established.
   Sample-treatment sensitivities and unreplicated imputations limit
   claims about level accuracy and future performance. The results support
   evaluating consumption growth when projecting quasi-relative poverty
@@ -85,6 +89,12 @@ replication and 2020–2025 retrospective projections. A separately frozen
 used before the 2025 outcome was published. The completed 2025 evaluation
 provides one external validation year; the current retrospective results
 do not add further prospective observations.
+
+The final methodological extension addresses years beyond available
+microdata. It advances the CE and American Community Survey (ACS) windows
+under declared price, real-expenditure, and rent assumptions. This
+distinguishes an observed expenditure nowcast from a conditional forecast
+whose future survey records must themselves be projected.
 
 # Calculating the thresholds {#sec-production}
 
@@ -157,16 +167,20 @@ national thresholds does not itself resolve those classifications.
 ::: {#tbl-current-release}
 {{< include tables/current_release.md >}}
 
-Published 2025 reference-family thresholds and the housing shares used
-by the companion calculator. Those shares come from the 2024 Census
-metro snapshot and are carried into 2025 as an approximation.
+Published 2025 reference-family thresholds and shelter-utilities shares.
+The shares sum the shelter and utilities components in the BLS shares
+workbook and exclude telephone and internet.
 :::
 
-The national bases in @tbl-current-release are published estimates.
-The carried housing shares and aggregate geographic indices are separate
-approximations; their use does not establish exact reproduction of revised
-official thresholds for every local area. The remainder of the paper
-examines national reference thresholds and their growth.
+Both components in @tbl-current-release use published 2025 values
+[@bls2025thresholds; @blsspmshares]. The geographic index is separately
+dated and estimated. Published national inputs therefore do not make a
+local threshold fully official when its geographic component is modeled.
+Local estimation areas comprise metropolitan statistical areas and
+Census's residual metropolitan and nonmetropolitan groups. Counties
+identify the applicable area; county-specific thresholds are not
+independently estimated. The annual geographic projection is described
+in @sec-rolling.
 
 # Replication from public consumption data {#sec-replication}
 
@@ -472,6 +486,138 @@ the missing October index. We retain the recorded calculation rather
 than substituting a different annual average in the completed forecast
 evaluation.
 
+# Conditional forecasts beyond available microdata {#sec-rolling}
+
+## Projecting expenditure records and rolling windows
+
+The preceding comparisons observe the CE collection window for each
+target year. A future projection instead supplies the unobserved quarters
+and then re-estimates the threshold from the resulting twenty-quarter
+window. The September 2026 snapshot uses observed CE records through
+2025Q1. For each later quarter it reuses the latest observed quarter of
+the same season, preserving survey weights, composition, and record
+identities. Monetary spending is multiplied by the cumulative price
+change and an assumed real-expenditure growth factor. Historical quarters
+leave the window as projected quarters enter; this is not a direct
+inflation adjustment of the final threshold.
+
+Let $r$ be an annual log growth rate for real expenditures. A donor
+record from year $d$ projected to year $t$ receives the multiplier
+$(P_t/P_d)\exp[r(t-d)]$. We report two scenarios: zero real growth and a
+CE trend. To estimate the latter, we construct five nonoverlapping
+annual collection blocks ending in 2021–2025, express them in common
+origin-year prices with fixed origin-window component weights, and
+compute each block's survey-weighted mean in the 47th–53rd percentile
+FCSUti band. An ordinary least-squares regression of log means on year
+provides a slope. The applied slope is half that estimate; the 0.5
+shrinkage was declared independently of the reported forecast scores.
+
+The applied annual real-growth rate is 0.914 percent. Using ten annual
+blocks gives 0.817 percent; excluding the two blocks ending in 2021 and
+2022 from the five-block fit leaves three blocks and gives −0.135 percent.
+These alternatives demonstrate sensitivity to the fitting window. They
+are not confidence intervals: repeated interviews, survey design,
+serial dependence, and future structural changes are not captured by
+ordinary regression uncertainty. The zero-real scenario supplies a
+separate comparison rather than a lower statistical bound.
+
+The nominal path uses annual CPI-U growth from CBO's February 2026
+economic projections, rebased to the observed 2025 annual index
+[@cbodata2026]. Applying that same growth rate to each expenditure price
+component and to rents is an assumption of this projection, not a CBO
+forecast for each component. Real growth and prices both affect projected
+spending; setting real growth to zero still allows changes from replacing
+older observations in the rolling window.
+
+For origin $O=2025$, the national projection is
+
+$$
+\widehat B_{T,h}=B_{O,h}^{\mathrm{published}}
+\frac{\widetilde B_{T,h}}{\widetilde B_{O,h}},\qquad
+\widehat a_{T,h}=a_{O,h}^{\mathrm{published}}
+\frac{\widetilde a_{T,h}}{\widetilde a_{O,h}}.
+$$
+
+Thus both the national base and housing share start from published
+2025 values, with subsequent changes estimated from the projected
+microdata. The percentile band is selected again for every target
+window. Changes in band membership can make the tenure-specific
+threshold under the positive-real-growth scenario slightly lower than
+under zero real growth in a particular year; the scenarios do not
+preserve a fixed ranking of selected observations.
+
+::: {#tbl-rolling-projection}
+{{< include tables/rolling_projection.md >}}
+
+Conditional national reference thresholds under the CE-trend and
+zero-real-growth scenarios. The 2025 bases are published; later values
+are modeled. These scenarios do not constitute prediction intervals.
+:::
+
+## Projecting local relative housing costs
+
+The geographic window for threshold year $T$ comprises ACS years
+$T-5$ through $T-1$. Public-use geography requires fractional allocation
+from Public Use Microdata Areas to SPM estimation areas. The projection
+uses the declared February 2013 metropolitan delineation and records
+the crosswalk and source vintages. These allocations, public-data
+topcoding, and the selected rental sample limit exact reproduction of
+the Census calculation [@acs2024pumd].
+
+Observed ACS cohorts are used through 2024. Each later cohort copies
+the 2024 donor records, scales nominal rents, and converts them to a
+common price basis. Local and national weighted rent medians are
+recomputed from each complete five-cohort window. Equal nationwide
+rent growth therefore does not imply constant local relative costs:
+the mix changes as older observed cohorts leave the window. Once all
+five cohorts use the same donor distribution, the relative indices
+stabilize under this assumption. In this snapshot that occurs in 2029.
+The whole-threshold factor can continue changing as the housing share
+changes.
+
+The public-data products used for the 2024 anchor and subsequent
+windows differ. To avoid treating a product change as rent growth, we
+bridge them over the common 2020–2023 years. If $m^{v}_{W,j}$ is area
+$j$'s local-to-national rent-median ratio for window $W$ in product $v$,
+then, for an area with a published 2024 anchor,
+
+$$
+\widehat g_{T,j}=g^{\mathrm{published}}_{2024,j}
+\frac{m^{\mathrm{old}}_{2020:2023,j}}{m^{\mathrm{old}}_{2019:2023,j}}
+\frac{m^{\mathrm{new}}_{T-5:T-1,j}}{m^{\mathrm{new}}_{2020:2023,j}}.
+$$
+
+Unpublished residual groups retain explicitly modeled, unanchored
+indices. The menu contains 342 published and seven modeled areas in
+2022, and 341 published and eight modeled areas from 2023. Annual
+comparisons distinguish published-index revisions and assignment
+changes from projected rent growth. In particular, the Massachusetts
+nonmetropolitan published index changes between 2022 and 2023, and
+Sumter County moves from a published residual group to an unanchored
+modeled group; neither discontinuity is smoothed into a rent forecast.
+
+```{=latex}
+\Needspace{24\baselineskip}
+```
+
+::: {#tbl-rolling-validation}
+{{< include tables/rolling_validation.md >}}
+
+Retrospective geographic comparison and late-horizon donor support.
+Repeated copies of the same donor are counted once when measuring
+independent support. These diagnostics do not measure prospective
+national-threshold accuracy.
+:::
+
+The 2023-origin, 2024-target geographic comparison covers 341 areas with
+published anchors.
+It is retrospective and does not validate the unanchored residual
+groups or future rent assumptions. Support narrows as observed cohorts
+leave: 31 areas carry thin-donor warnings in projected years. Preserving
+record identity avoids mistaking five projected copies for five
+independent samples. No estimate is silently replaced by a national
+factor or a carried prior-year value when support is thin.
+
 # Discussion {#sec-discussion}
 
 The results distinguish two tasks: estimating a threshold level and
@@ -504,11 +650,12 @@ weight.
 The information horizon also matters. When the complete CE window is
 available but BLS thresholds are not, consumption replication can supply
 a nowcast. Beyond the available CE window, it requires assumptions about
-future consumption as well as prices; this paper does not evaluate that
-longer-horizon problem. Method changes, benefit imputations, and changes
-in sample composition can also alter growth relationships. The sample
-sensitivities here identify specific uncertainties but do not provide
-forecast intervals.
+future consumption as well as prices. The conditional extension here
+specifies those assumptions and advances both survey windows, but its
+longer-horizon accuracy has not been prospectively validated. Method
+changes, benefit imputations, and changes in sample composition can
+also alter growth relationships. The sample and trend sensitivities
+identify specific uncertainties but do not provide forecast intervals.
 
 Threshold choice affects modeled poverty through the distribution of
 resources near the line, not through threshold growth alone. In a frozen
@@ -571,21 +718,29 @@ available-input cutoff before the outcome is published.
 
 The repository preserves the inputs and generated tables for the frozen
 experiments, together with a separate current-method artifact containing
-source hashes, methodology choices, and sample diagnostics. The current
-experiment and shared threshold release pin spm-calculator version 0.5.0,
-commit `0d7fa0d77b0a88064ab7b9fe70557309b5f7901f`. Exact source and release
-identities are recorded in `data/current/provenance.json`; the historical
-implementation pin and its archived inputs are recorded in
-`data/PROVENANCE.md`. The frozen poverty sensitivity additionally requires
-its original model and population dataset to reproduce.
+source hashes, methodology choices, and sample diagnostics. The
+2019–2025 retrospective experiment retains its original implementation
+pin, spm-calculator development version 0.5.0 at commit
+`0d7fa0d77b0a88064ab7b9fe70557309b5f7901f`. The conditional rolling
+projection uses the separate 1.0.0 release candidate at commit
+`c89d20f08f8d9d0896c88944fdb685ea01cecbb1`. The candidate's content
+digest is `b9dbf5ae49697e3bf3abee2fa22b7429703412cb1e58478938a682a0dfddc821`.
+Exact source and release identities are recorded alongside the inputs;
+`data/PROVENANCE.md` describes the separate collections. The frozen
+poverty sensitivity additionally requires its original model and
+population dataset to reproduce.
 
-The paper and standalone calculator consume the same versioned threshold
-release. Its reference thresholds can also be used by PolicyEngine,
-Microcosm, and Axiom adapters. These consumers retain responsibility for
-SPM-unit membership, resources, and weights; integration details do not
-change the national estimation problem studied here. The release's
-availability date identifies this research snapshot; it does not
-reconstruct historical information sets.
+The rolling projection is a portable artifact shared by the paper and
+standalone calculator, with year-specific national bases, housing shares,
+geographic indices, assignments, and source fingerprints. PolicyEngine,
+Microcosm, and native Axiom adapters consume these quantities through
+explicit contracts. Population sources supply native SPM membership
+and composition roles; tax-benefit models retain responsibility for
+resources, and the population system retains its weights. A change of
+rules engine does not require a second expenditure forecast. Runtime
+parity and release integration are separate checks from the statistical
+validity of the projection. The snapshot date does not reconstruct
+historical information sets or certify a public deployment.
 
 Tables regenerate from the recorded artifacts. The build checks their
 hashes before generating outputs in temporary storage and comparing the

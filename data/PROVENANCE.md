@@ -47,7 +47,8 @@ It does not contact OpenTimestamps calendars or verify Bitcoin attestations.
 | `ce_replication_2019_2025.json` | `scripts/replicate_current_ce.py` in the rebuild. Seven overlapping CE windows, explicit minor-only and tenure approximations, raw source bundle hashes, CPI cache hash, exact executed source hashes, and six-year retrospective projections. No prospective validation or new commitment. |
 | `provenance.json` | Paper linkage to the release content digest and CE artifact/source hashes. Pins spm-calculator 0.5.0 development commit `0d7fa0d77b0a88064ab7b9fe70557309b5f7901f`. The retained `ce_starting_git_head` identifies the starting commit for this replay, before its source and artifact update was committed. The `ce_code_sha256` map identifies the executed code, whose bytes match the pinned development commit. |
 
-`build_current_tables.py` reads only these inputs. It cross-checks the
+For the retrospective experiment, `build_current_tables.py` reads these
+preserved inputs. It cross-checks the
 published comparison series against the shared release, re-derives
 replication and sensitivity percentages and projection errors, and
 produces the four `current_*.md` tables. The pre-render guard checks both
@@ -55,3 +56,39 @@ manifests before parsing inputs, generates all tables and evaluation JSON
 in scratch space, and compares bytes without mutating source files. These
 checks establish reproducibility of the recorded calculations, not exact
 parity with the BLS production procedure or historical information sets.
+
+## September 9, 2026 rolling projection
+
+The separate `data/current/ROLLING_SHA256SUMS` covers the exact canonical
+rolling forecast and its linkage receipt. It does not change either old
+checksum manifest, any earlier experiment, or any timestamp proof.
+
+| Artifact | Source and scope |
+|---|---|
+| `rolling_forecast_2026_09_09.json` | Exact 26,606,301-byte calculator artifact from commit `c89d20f08f8d9d0896c88944fdb685ea01cecbb1`, development candidate 1.0.0. File SHA-256 `76ab8435f087f167ad01b8495ebd016415ba8086f32bfbd3dab961dcc8976c0a`; canonical content SHA-256 `b9dbf5ae49697e3bf3abee2fa22b7429703412cb1e58478938a682a0dfddc821`. Years 2022–2035, published 2025 national bases and housing shares, conditional CE-trend and zero-real projections, year-specific geographic assignments and rent diagnostics. |
+| `rolling_provenance.json` | Source commit/path, exact artifact seals, all source/code/component fingerprints and the information date. Explicitly outside the original timestamp commitment. |
+
+`scripts/import_rolling_forecast.py` obtains the exact bytes from the
+pinned local Git commit. `scripts/rolling_inputs.py` checks the manifest,
+externally pinned artifact identity and the complete linkage receipt
+before generating tables. The guard independently pins the old current
+manifest as well, so replacing its artifacts and recomputing its manifest
+cannot silently rewrite the retrospective experiment.
+
+`current_release.md` now reads the rolling artifact's published 2025
+national thresholds and published BLS housing shares. The old
+`spm-release.json` remains solely as a source for the recorded 2019–2025
+retrospective experiment. `rolling_projection.md` presents both scenarios
+for 2025, 2026, 2030 and 2035. `rolling_validation.md` reports the actual
+2023-origin/2024-target retrospective geographic comparison and distinct
+late-horizon support diagnostics. The generator derives these values
+from the sealed artifact; no new prospective validation is claimed.
+
+The BLS shares workbook is pinned at SHA-256
+`6709dec0e39c8c7b881320161a4373035befc586ecefecd8d78d8431d89b4577`.
+The CBO price source is the February 2026 calendar-year CSV at official
+repository revision `284a95665f9f2f74ed1f482feb629b43fce323da`, SHA-256
+`6b54df40058d206247e78fadfe5ebd11e02ae29efd2f0e1a4a86b6767c9ca559`.
+Uniform component-price and rent growth and the fitted real-spending
+scenario are calculator assumptions. Publication of these inputs does
+not make the future SPM thresholds official forecasts.

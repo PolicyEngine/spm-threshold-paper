@@ -5,6 +5,8 @@ Expenditure Survey microdata, family and geographic adjustments, and
 projection from consumption and price growth. The manuscript presents
 current-method replication and sample sensitivities, retrospective
 comparisons, and a separately preserved pre-committed 2025 validation.
+It also constructs conditional forecasts through 2035 by advancing the
+CE and ACS windows with explicit price, real-spending, and rent assumptions.
 
 The current six-year results use revised inputs and overlapping CE
 windows. They are separate from the single prospective validation year.
@@ -48,8 +50,15 @@ describes both collections and the original implementation pin.
 
 ## Companion implementation
 
-The current spm-calculator rebuild provides a portable release, standalone
-unit calculations, CE research replication, projections, and explicit
-PolicyEngine, Microcosm, and real native Axiom adapters. This paper pins version 0.5.0 at development commit
-`0d7fa0d77b0a88064ab7b9fe70557309b5f7901f`; it does not claim that a model
-migration or public deployment has occurred. The paper consumes the same release bytes as those adapters.
+The companion spm-calculator provides a portable artifact, standalone
+unit calculations, CE research replication, rolling projections, and
+PolicyEngine, Microcosm, and native Axiom adapters. The rolling projection
+pins the 1.0.0 release candidate at commit
+`c89d20f08f8d9d0896c88944fdb685ea01cecbb1`, with content digest
+`b9dbf5ae49697e3bf3abee2fa22b7429703412cb1e58478938a682a0dfddc821`.
+The paper consumes the same projection bytes as the calculator.
+
+The 2019–2025 retrospective experiment retains its separate development
+version 0.5.0 pin at `0d7fa0d77b0a88064ab7b9fe70557309b5f7901f`.
+These source identities document reproducibility; they do not certify
+publication, deployment, or a population-model migration.

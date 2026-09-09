@@ -36,6 +36,7 @@ import tempfile
 from pathlib import Path
 
 sys.dont_write_bytecode = True
+from rolling_inputs import ROLLING_FILES, load_rolling_forecast
 from verify_commitments import verify_commitments
 
 REPO = Path(__file__).resolve().parent.parent
@@ -58,6 +59,8 @@ EXPECTED_TABLES = {
     "current_replication.md",
     "current_sensitivity.md",
     "current_projection.md",
+    "rolling_projection.md",
+    "rolling_validation.md",
 }
 ARCHIVED_TABLES = {"correction.md", "package_errors.md"}
 ARTICLE_TABLES = EXPECTED_TABLES - ARCHIVED_TABLES
@@ -134,6 +137,14 @@ for fname, expected in (
 failures.extend(verify_commitments(REPO))
 
 # The current experiment has a separate manifest, never the old timestamp.
+CURRENT_RETROSPECTIVE_MANIFEST_SHA256 = (
+    "9bbba66e0a96fbb8b0524fa57a8e532c6401323db782042fc794e339824822cb"
+)
+check(
+    "retrospective checksum manifest history changed",
+    hashlib.sha256((DATA / "current" / "SHA256SUMS").read_bytes()).hexdigest()
+    == CURRENT_RETROSPECTIVE_MANIFEST_SHA256,
+)
 current_names = {"spm-release.json", "ce_replication_2019_2025.json", "provenance.json"}
 current_listed = {}
 for number, line in enumerate(
@@ -152,10 +163,11 @@ for number, line in enumerate(
         failures.append(f"duplicate current checksum entry: {name}")
     current_listed[name] = digest
 current_present = {str(p.relative_to(REPO)) for p in (DATA / "current").glob("*.json")}
+rolling_paths = {f"data/current/{name}" for name in ROLLING_FILES}
 check(
     "current checksum coverage",
     set(current_listed)
-    == current_present
+    == current_present - rolling_paths
     == {f"data/current/{name}" for name in current_names},
 )
 for name, digest in current_listed.items():
@@ -164,6 +176,10 @@ for name, digest in current_listed.items():
         f"current artifact hash mismatch: {name}",
         path.is_file() and hashlib.sha256(path.read_bytes()).hexdigest() == digest,
     )
+try:
+    rolling_forecast = load_rolling_forecast(DATA / "current")
+except (OSError, KeyError, TypeError, ValueError) as error:
+    failures.append(f"rolling input validation: {error}")
 if failures:
     print("PAPER INPUT CHECK FAILED (generators were not run):")
     for failure in failures:
@@ -675,5 +691,5 @@ if failures:
         print(f"  - {f}")
     sys.exit(1)
 print(
-    f"paper drift check passed ({len(EXPECTED_TABLES)} tables, {len(listed)} frozen + {len(current_listed)} current artifacts, prose pins OK)"
+    f"paper drift check passed ({len(EXPECTED_TABLES)} tables, {len(listed)} frozen + {len(current_listed)} retrospective + {len(ROLLING_FILES)} rolling artifacts, prose pins OK)"
 )
