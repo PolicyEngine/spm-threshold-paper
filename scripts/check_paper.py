@@ -12,9 +12,17 @@ push to master and every pull request. It fails when:
     ``data/`` or any listed hash mismatches (an emptied manifest fails);
 (d) a figure quoted in the prose no longer matches the artifact it
     derives from. Literals are matched at numeric-token boundaries
-    (so ``41,036.34`` does not match ``141,036.34``), and the three
-    tenure amounts are matched as ordered triples in the sentences
-    that state them, so a swap between tenures fails.
+    (so ``41,036.34`` does not match ``141,036.34``), spelled-out
+    counts at word boundaries (so ``seven`` does not match inside
+    ``sevens``), and the three tenure amounts are matched as ordered
+    triples in the sentences that state them, so a swap between
+    tenures fails. Figures that belong to one section — the
+    conditional-forecast rates, the relative-index stabilization
+    year, the area menus, the retrospective validation area count
+    and the thin-donor support count — are pinned inside a
+    whitespace-normalized slice of that section, so the same numeral
+    occurring elsewhere in the paper cannot satisfy them and line
+    rewrapping cannot split a multi-word literal.
 
 Scope, stated honestly: the guard covers artifact hashes, generated
 tables, and the figures registered below. Numbers quoted from
@@ -29,10 +37,12 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import re
 import subprocess
 import sys
 import tempfile
+from collections import Counter
 from pathlib import Path
 
 sys.dont_write_bytecode = True
@@ -74,18 +84,67 @@ def check(label: str, ok: bool) -> None:
         failures.append(label)
 
 
+def bounded(literal: str) -> str:
+    """A literal that cannot match inside a longer token: numeric-token
+    boundaries for figures, word boundaries for spelled-out counts."""
+    pattern = re.escape(literal)
+    if any(character.isdigit() for character in literal):
+        return r"(?<![\d.,])" + pattern + r"(?![\d]|[.,]\d)"
+    return r"\b" + pattern + r"\b"
+
+
 def has_number(literal: str, text: str = QMD, min_count: int = 1) -> bool:
     """Literal present at numeric-token boundaries: no digit, comma-digit,
     or dot-digit continuation on either side."""
-    pattern = r"(?<![\d.,])" + re.escape(literal) + r"(?![\d]|[.,]\d)"
-    return len(re.findall(pattern, text)) >= min_count
+    return len(re.findall(bounded(literal), text)) >= min_count
 
 
-def has_ordered(literals: list[str], window: int = 400) -> bool:
-    """The literals appear in this order within one window of text."""
-    pattern = rf"[\s\S]{{0,{window}}}"
-    body = pattern.join(re.escape(x) for x in literals)
-    return re.search(body, QMD) is not None
+def has_ordered(literals: list[str], window: int = 400, text: str = QMD) -> bool:
+    """The literals appear in this order, each at a token boundary, within
+    one window of text."""
+    joiner = rf"[\s\S]{{0,{window}}}"
+    return re.search(joiner.join(bounded(x) for x in literals), text) is not None
+
+
+def section(start: str, end: str | None = None, text: str = QMD) -> str:
+    """Whitespace-normalized prose between two headings that must each occur
+    exactly once. A pin evaluated inside this slice cannot be satisfied by
+    the same numeral elsewhere in the paper, and rewrapped lines cannot
+    split a multi-word literal. A missing, duplicated or reordered heading
+    yields an empty slice, so every pin inside it fails rather than
+    silently widening to the whole document."""
+    if text.count(start) != 1 or (end is not None and text.count(end) != 1):
+        failures.append(f"paper section heading not unique: {start!r}")
+        return ""
+    first = text.index(start) + len(start)
+    last = len(text) if end is None else text.index(end)
+    if last <= first:
+        failures.append(f"paper sections out of order: {start!r} before {end!r}")
+        return ""
+    return " ".join(text[first:last].split())
+
+
+COUNT_WORDS = (
+    "zero",
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "ten",
+)
+
+
+def count_word(value: int) -> str:
+    """Small count as the paper spells it. A count outside that range yields
+    a literal no prose can contain, so the pin fails instead of raising."""
+    if 0 <= value < len(COUNT_WORDS):
+        return COUNT_WORDS[value]
+    return f"<unspelled count {value}>"
 
 
 # (c) SHA256SUMS lists exactly the artifacts present, and every hash holds.
@@ -683,6 +742,232 @@ bls_cpiu_2025 = actual["bls_chart4_annual_average_inflation_pct"]["2025"]["cpi_u
 check(
     "BLS page 2025 CPI-U growth 2.70 quoted",
     has_number("2.70 percent") and abs(bls_cpiu_2025 - 2.70) < 0.005,
+)
+
+# (f) The conditional-forecast section, pinned inside its own two
+# subsections so an occurrence of the same numeral anywhere else in the
+# paper — a table column width, "seven target years", a hex digest — can
+# never satisfy one of these figures.
+ROLLING = section(
+    "# Conditional forecasts beyond available microdata {#sec-rolling}",
+    "# Discussion {#sec-discussion}",
+)
+ROLLING_CE = section(
+    "## Projecting expenditure records and rolling windows",
+    "## Projecting local relative housing costs",
+    ROLLING,
+)
+ROLLING_ACS = section("## Projecting local relative housing costs", None, ROLLING)
+
+fit = rolling_forecast["assumptions"]["real_growth_fit"]
+SENSITIVITIES = fit["sensitivities"]
+TEN_BLOCK = SENSITIVITIES["latest_ten_blocks"]
+PANDEMIC_EXCLUDED = SENSITIVITIES["pandemic_excluded"]
+
+
+def rate_literal(entry: dict, field: str = "shrunk_annual_rate") -> str:
+    """Percent to three decimals, carrying the paper's typographic minus."""
+    return f"{entry[field] * 100:.3f}".replace("-", "−")
+
+
+def block_end_years(entry: dict) -> list[int]:
+    return [block["end_year"] for block in entry["annual_blocks"]]
+
+
+# The quoted rates are compounded equivalents exp(r) - 1 of the applied
+# log rate r, which is itself the declared half-shrinkage of the OLS slope.
+check(
+    "quoted real-growth rates are exp(r) - 1 of the half-shrunk log slope",
+    fit["shrinkage"] == 0.5
+    and math.isclose(
+        fit["applied_log_rate"], fit["log_slope"] * fit["shrinkage"], rel_tol=1e-12
+    )
+    and all(
+        math.isclose(
+            math.exp(entry["applied_log_rate"]) - 1,
+            entry["shrunk_annual_rate"],
+            rel_tol=1e-12,
+        )
+        for entry in (fit, TEN_BLOCK, PANDEMIC_EXCLUDED)
+    ),
+)
+check(
+    "CE-trend scenario applies the fitted rate and zero-real applies none",
+    rolling_forecast["default_scenario"] == "ce_trend"
+    and math.isclose(
+        rolling_forecast["scenarios"]["ce_trend"]["real_growth_rate"],
+        fit["shrunk_annual_rate"],
+        rel_tol=1e-12,
+    )
+    and rolling_forecast["scenarios"]["zero_real"]["real_growth_rate"] == 0,
+)
+applied_rate = rate_literal(fit)
+applied_log_rate = rate_literal(fit, "applied_log_rate")
+check(
+    f"rolling applied real-growth rate {applied_rate} stated as the compounded"
+    f" equivalent of the applied log rate {applied_log_rate}",
+    has_ordered(
+        [
+            "compounded annual equivalents",
+            f"{applied_rate} percent",
+            "applied log rate",
+            f"{applied_log_rate} percent",
+        ],
+        window=140,
+        text=ROLLING_CE,
+    ),
+)
+fit_years = block_end_years(fit)
+fit_window = f"{fit_years[0]}–{fit_years[-1]}" if len(fit_years) > 1 else "(no blocks)"
+check(
+    f"rolling fit uses {len(fit_years)} blocks ending {fit_window}",
+    len(fit_years) > 1
+    and fit_years == sorted(fit_years)
+    and has_ordered(
+        [f"{count_word(len(fit_years))} nonoverlapping", fit_window],
+        window=60,
+        text=ROLLING_CE,
+    ),
+)
+check(
+    f"rolling applied slope is the declared {fit['shrinkage']} shrinkage",
+    has_ordered(
+        ["half that estimate", str(fit["shrinkage"]), "shrinkage"],
+        window=20,
+        text=ROLLING_CE,
+    ),
+)
+excluded_years = sorted(set(fit_years) - set(block_end_years(PANDEMIC_EXCLUDED)))
+check(
+    "rolling real-growth sensitivities in stated order with their block counts",
+    len(excluded_years) == 2
+    and has_ordered(
+        [
+            f"{applied_rate} percent",
+            f"{count_word(len(block_end_years(TEN_BLOCK)))} annual",
+            f"{rate_literal(TEN_BLOCK)} percent",
+            f"{excluded_years[0]} and {excluded_years[1]}",
+            f"{count_word(len(block_end_years(PANDEMIC_EXCLUDED)))} blocks",
+            f"{rate_literal(PANDEMIC_EXCLUDED)} percent",
+        ],
+        window=140,
+        text=ROLLING_CE,
+    ),
+)
+
+# Geography: the published/modeled area menu, the retrospective validation
+# area count, the stabilization year and the thin-donor support count.
+menu_counts: dict[int, set[tuple[int, int]]] = {}
+for scenario in rolling_forecast["scenarios"].values():
+    for year, record in scenario["years"].items():
+        statuses = Counter(
+            area.get("anchor_status") for area in record["geography_by_area"].values()
+        )
+        menu_counts.setdefault(int(year), set()).add(
+            (statuses["published_anchor"], statuses["modeled_unanchored"])
+        )
+menu_years = sorted(menu_counts)
+opening_year = menu_years[0]
+settled_year = menu_years[1] if len(menu_years) > 1 else opening_year
+menu = {year: min(pairs) for year, pairs in menu_counts.items()}
+check(
+    f"area menus agree across scenarios and settle after {opening_year}",
+    len(menu_years) > 1
+    and all(len(pairs) == 1 for pairs in menu_counts.values())
+    and sum(menu[opening_year]) == sum(menu[settled_year])
+    and menu[opening_year] != menu[settled_year]
+    and all(menu[year] == menu[settled_year] for year in menu_years[1:]),
+)
+check(
+    f"rolling area menu prose states {menu[opening_year]} in {opening_year}"
+    f" and {menu[settled_year]} from {settled_year}",
+    has_ordered(
+        [
+            str(menu[opening_year][0]),
+            "published",
+            count_word(menu[opening_year][1]),
+            "modeled",
+            str(opening_year),
+            str(menu[settled_year][0]),
+            "published",
+            count_word(menu[settled_year][1]),
+            "modeled",
+            str(settled_year),
+        ],
+        window=40,
+        text=ROLLING_ACS,
+    ),
+)
+
+acs_validation = rolling_forecast["validation"]["acs"]
+check(
+    f"rolling geographic validation covers {acs_validation['area_count']} anchored areas",
+    acs_validation["status"] == "complete"
+    and acs_validation["unvalidated"] is False
+    and acs_validation["area_count"] == menu[settled_year][0]
+    and has_ordered(
+        [
+            f"{acs_validation['origin_spm_year']}-origin",
+            f"{acs_validation['target_spm_year']}-target",
+            str(acs_validation["area_count"]),
+            "areas",
+        ],
+        window=60,
+        text=ROLLING_ACS,
+    ),
+)
+
+projected_years = rolling_forecast["scenarios"][rolling_forecast["default_scenario"]][
+    "years"
+]
+horizon = sorted(map(int, projected_years))
+first_constant_index_year = next(
+    (
+        year
+        for year in horizon[:-1]
+        if all(
+            projected_years[str(after)]["rent_indices"]
+            == projected_years[str(year)]["rent_indices"]
+            for after in horizon
+            if after > year
+        )
+    ),
+    None,
+)
+stabilization = rolling_forecast["assumptions"]["acs"]["relative_index_stabilization"]
+check(
+    f"relative rent indices first constant in {first_constant_index_year}",
+    first_constant_index_year is not None
+    and first_constant_index_year > horizon[0]
+    and first_constant_index_year == stabilization["first_constant_index_year"]
+    and projected_years[str(first_constant_index_year - 1)]["rent_indices"]
+    != projected_years[str(first_constant_index_year)]["rent_indices"]
+    and has_ordered(
+        ["relative indices", "stabilize", str(first_constant_index_year)],
+        window=80,
+        text=ROLLING_ACS,
+    ),
+)
+
+thin_counts = {
+    sum(bool(area.get("thin_support")) for area in record["median_diagnostics"].values())
+    for scenario in rolling_forecast["scenarios"].values()
+    for record in scenario["years"].values()
+    if record["acs_window"]["projected_years"] > 0
+}
+check(
+    f"thin-donor support is one constant count across projected windows: {sorted(thin_counts)}",
+    len(thin_counts) == 1,
+)
+thin_areas = min(thin_counts, default=-1)
+check(
+    f"rolling thin-donor warnings cover {thin_areas} areas in projected years",
+    thin_areas >= 0
+    and has_ordered(
+        [str(thin_areas), "areas", "thin-donor", "projected"],
+        window=30,
+        text=ROLLING_ACS,
+    ),
 )
 
 if failures:

@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import math
 import os
 import shutil
 import subprocess
@@ -12,6 +13,173 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 ROLLING_NAME = "rolling_forecast_2026_09_09.json"
+DISCUSSION_HEADING = "# Discussion {#sec-discussion}\n"
+ROLLING_CE_HEADING = "## Projecting expenditure records and rolling windows\n"
+ROLLING_ACS_HEADING = "## Projecting local relative housing costs\n"
+
+# Each case drifts one sealed rolling figure in its own subsection. The
+# third element is the same figure restated correctly somewhere else in the
+# paper, so a pin that searched the whole document would still pass.
+ROLLING_PROSE_MUTATIONS = (
+    (
+        "applied compounded rate",
+        (("real-growth rate is 0.914 percent", "real-growth rate is 0.924 percent"),),
+        DISCUSSION_HEADING,
+        "We report rates as compounded annual equivalents, $\\exp(r)-1$, not as "
+        "the log rate $r$ that enters the multiplier. The applied annual "
+        "real-growth rate is 0.914 percent, from an applied log rate of "
+        "0.910 percent.",
+        "rolling applied real-growth rate",
+    ),
+    (
+        "applied log rate",
+        ((" of 0.910\npercent", " of 0.911\npercent"),),
+        ROLLING_ACS_HEADING,
+        "The applied annual real-growth rate is 0.914 percent, from an applied "
+        "log rate of 0.910 percent.",
+        "rolling applied real-growth rate",
+    ),
+    (
+        "dropped log-rate clause",
+        ((", from an applied log rate of 0.910\npercent", ""),),
+        DISCUSSION_HEADING,
+        "The applied annual real-growth rate is 0.914 percent, from an applied "
+        "log rate of 0.910 percent.",
+        "rolling applied real-growth rate",
+    ),
+    (
+        "dropped compounding convention",
+        (("compounded annual equivalents", "annual equivalents"),),
+        DISCUSSION_HEADING,
+        "We report rates as compounded annual equivalents.",
+        "rolling applied real-growth rate",
+    ),
+    (
+        "swapped sensitivities",
+        (
+            ("0.817 percent", "PLACEHOLDER"),
+            ("−0.135 percent", "0.817 percent"),
+            ("PLACEHOLDER", "−0.135 percent"),
+        ),
+        DISCUSSION_HEADING,
+        "Using ten annual blocks gives 0.817 percent; excluding the two blocks "
+        "ending in 2021 and 2022 from the five-block fit leaves three blocks "
+        "and gives −0.135 percent.",
+        "rolling real-growth sensitivities",
+    ),
+    (
+        "ten-block sensitivity count",
+        (("Using ten annual", "Using nine annual"),),
+        DISCUSSION_HEADING,
+        "Using ten annual blocks gives 0.817 percent.",
+        "rolling real-growth sensitivities",
+    ),
+    (
+        "pandemic-excluded block count",
+        (("leaves three\nblocks", "leaves four\nblocks"),),
+        DISCUSSION_HEADING,
+        "The five-block fit leaves three blocks and gives −0.135 percent.",
+        "rolling real-growth sensitivities",
+    ),
+    (
+        "excluded block years",
+        (("in 2021 and 2022 from", "in 2020 and 2022 from"),),
+        DISCUSSION_HEADING,
+        "Excluding the two blocks ending in 2021 and 2022 from the five-block fit.",
+        "rolling real-growth sensitivities",
+    ),
+    (
+        "fitted block count",
+        (("five nonoverlapping", "six nonoverlapping"),),
+        DISCUSSION_HEADING,
+        "We construct five nonoverlapping annual collection blocks ending in "
+        "2021–2025.",
+        "rolling fit uses 5 blocks",
+    ),
+    (
+        "fitted block window",
+        (("ending in 2021–2025", "ending in 2020–2025"),),
+        DISCUSSION_HEADING,
+        "We construct five nonoverlapping annual collection blocks ending in "
+        "2021–2025.",
+        "rolling fit uses 5 blocks",
+    ),
+    (
+        "declared shrinkage",
+        (("the 0.5\nshrinkage", "the 0.6\nshrinkage"),),
+        DISCUSSION_HEADING,
+        "The applied slope is half that estimate; the 0.5 shrinkage was "
+        "declared in advance.",
+        "rolling applied slope is the declared 0.5",
+    ),
+    (
+        "swapped area menus",
+        (
+            ("342 published and seven modeled areas in\n2022", "PLACEHOLDER"),
+            (
+                "341 published and eight modeled areas from 2023",
+                "342 published and seven modeled areas in\n2022",
+            ),
+            ("PLACEHOLDER", "341 published and eight modeled areas from 2023"),
+        ),
+        DISCUSSION_HEADING,
+        "The menu contains 342 published and seven modeled areas in 2022, and "
+        "341 published and eight modeled areas from 2023.",
+        "rolling area menu prose",
+    ),
+    (
+        "published area menu",
+        (("342 published", "343 published"),),
+        DISCUSSION_HEADING,
+        "The menu contains 342 published and seven modeled areas in 2022.",
+        "rolling area menu prose",
+    ),
+    (
+        "modeled area menu",
+        (("and seven modeled", "and eight modeled"),),
+        ROLLING_CE_HEADING,
+        "The menu contains 342 published and seven modeled areas in 2022, and "
+        "341 published and eight modeled areas from 2023.",
+        "rolling area menu prose",
+    ),
+    (
+        "area menu year",
+        (("modeled areas from 2023", "modeled areas from 2024"),),
+        DISCUSSION_HEADING,
+        "The menu holds 341 published and eight modeled areas from 2023.",
+        "rolling area menu prose",
+    ),
+    (
+        "validation area count",
+        (("covers 341 areas", "covers 340 areas"),),
+        DISCUSSION_HEADING,
+        "The 2023-origin, 2024-target geographic comparison covers 341 areas "
+        "with published anchors.",
+        "rolling geographic validation covers 341",
+    ),
+    (
+        "validation horizon",
+        (("The 2023-origin, 2024-target", "The 2022-origin, 2024-target"),),
+        DISCUSSION_HEADING,
+        "The 2023-origin, 2024-target geographic comparison covers 341 areas.",
+        "rolling geographic validation covers 341",
+    ),
+    (
+        "stabilization year",
+        (("occurs in 2029", "occurs in 2030"),),
+        ROLLING_CE_HEADING,
+        "The relative indices stabilize under this assumption. In this "
+        "snapshot that occurs in 2029.",
+        "relative rent indices first constant in 2029",
+    ),
+    (
+        "thin-donor support count",
+        (("31 areas carry thin-donor", "13 areas carry thin-donor"),),
+        DISCUSSION_HEADING,
+        "Support narrows: 31 areas carry thin-donor warnings in projected years.",
+        "rolling thin-donor warnings cover 31",
+    ),
+)
 
 
 def excluded_diagnostic(path):
@@ -49,11 +217,15 @@ class PaperGuardTests(unittest.TestCase):
                 destination = self.repo / name
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(REPO / name, destination)
+        self.install_article()
+
+    def install_article(self):
         # The article owner integrates these two includes concurrently. Supply
         # only that declared integration in the private fixture; the actual
-        # checkout still requires an independent check_paper.py run.
+        # checkout still requires an independent check_paper.py run. Restoring
+        # from the checkout also resets the fixture between mutation subtests.
         article = self.repo / "paper/index.qmd"
-        prose = article.read_text()
+        prose = (REPO / "paper/index.qmd").read_text()
         for name in ("rolling_projection.md", "rolling_validation.md"):
             directive = "{{< include tables/" + name + " >}}"
             if directive not in prose:
@@ -328,6 +500,146 @@ class PaperGuardTests(unittest.TestCase):
         result = self.run_guard()
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("preserved commitment/proof bytes changed", result.stdout)
+
+    def edit_article(self, edits, host=None, decoy=None):
+        """Apply exact single-occurrence prose edits, optionally restating the
+        original figure under another heading."""
+        path = self.repo / "paper/index.qmd"
+        prose = path.read_text()
+        for old, new in edits:
+            self.assertEqual(prose.count(old), 1, f"ambiguous fixture edit: {old!r}")
+            prose = prose.replace(old, new)
+        if host is not None:
+            self.assertEqual(prose.count(host), 1, f"ambiguous fixture host: {host!r}")
+            prose = prose.replace(host, f"{host}\n{decoy}\n")
+        path.write_text(prose)
+
+    def assert_article_mutation_fails(self, label, edits, expected, host=None, decoy=None):
+        self.install_article()
+        self.edit_article(edits, host, decoy)
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0, label)
+        self.assertIn(expected, result.stdout)
+
+    def test_rolling_prose_figures_drift_from_the_sealed_forecast(self):
+        for label, edits, _, _, expected in ROLLING_PROSE_MUTATIONS:
+            with self.subTest(figure=label):
+                self.assert_article_mutation_fails(label, edits, expected)
+
+    def test_rolling_pins_reject_a_figure_borrowed_from_another_section(self):
+        """The same numeral stated correctly elsewhere must not rescue a
+        drifted figure: 31 already appears in a tbl-colwidths attribute and
+        seven in "seven target years", so an unscoped pin would pass."""
+        for label, edits, host, decoy, expected in ROLLING_PROSE_MUTATIONS:
+            with self.subTest(figure=label):
+                self.assert_article_mutation_fails(label, edits, expected, host, decoy)
+
+    def test_rolling_section_headings_must_be_present_and_unique(self):
+        cases = (
+            (
+                "removed anchor",
+                "# Conditional forecasts beyond available microdata {#sec-rolling}",
+                "# Conditional forecasts beyond available microdata",
+            ),
+            (
+                "duplicated subsection",
+                "## Projecting local relative housing costs",
+                "## Projecting local relative housing costs\n\n"
+                "## Projecting local relative housing costs",
+            ),
+        )
+        for label, old, new in cases:
+            with self.subTest(heading=label):
+                self.assert_article_mutation_fails(
+                    label, [(old, new)], "paper section heading not unique"
+                )
+
+    def reseal_rolling_artifact(self, artifact):
+        """Reseal a mutated forecast end to end — content digest, assumption
+        digest, provenance, manifest and the calculator byte pins — so the pin
+        under test is the only thing left that can fail."""
+
+        def canonical(value):
+            return hashlib.sha256(
+                json.dumps(
+                    value,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                    ensure_ascii=False,
+                    allow_nan=False,
+                ).encode()
+            ).hexdigest()
+
+        path = self.repo / "data/current" / ROLLING_NAME
+        inputs = self.repo / "scripts/rolling_inputs.py"
+        source = inputs.read_text()
+        for old in (
+            json.loads(path.read_text())["content_sha256"],
+            hashlib.sha256(path.read_bytes()).hexdigest(),
+        ):
+            self.assertIn(old, source)
+        artifact["assumption_sha256"] = canonical(artifact["assumptions"])
+        artifact["content_sha256"] = canonical(
+            {k: v for k, v in artifact.items() if k != "content_sha256"}
+        )
+        path.write_text(json.dumps(artifact))
+        provenance_path = self.repo / "data/current/rolling_provenance.json"
+        provenance = json.loads(provenance_path.read_text())
+        source = source.replace(provenance["content_sha256"], artifact["content_sha256"])
+        source = source.replace(
+            provenance["artifact_sha256"], hashlib.sha256(path.read_bytes()).hexdigest()
+        )
+        provenance["content_sha256"] = artifact["content_sha256"]
+        provenance["assumption_sha256"] = artifact["assumption_sha256"]
+        provenance["artifact_sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+        provenance_path.write_text(json.dumps(provenance))
+        inputs.write_text(source)
+        self.refresh_rolling_manifest()
+
+    def test_rolling_rate_pins_follow_the_artifact_not_a_fixed_literal(self):
+        """Reseal the forecast at a different real-growth rate and leave the
+        prose untouched: a hardcoded 0.914 would still pass."""
+        path = self.repo / "data/current" / ROLLING_NAME
+        artifact = json.loads(path.read_text())
+        applied_log_rate = math.log(1.00924)
+        fit = artifact["assumptions"]["real_growth_fit"]
+        fit["applied_log_rate"] = applied_log_rate
+        fit["log_slope"] = fit["annual_log_slope"] = applied_log_rate * 2
+        fit["shrunk_annual_rate"] = fit["annual_rate"] = math.exp(applied_log_rate) - 1
+        fit["unshrunk_annual_rate"] = math.exp(applied_log_rate * 2) - 1
+        artifact["scenarios"]["ce_trend"]["real_growth_rate"] = fit["shrunk_annual_rate"]
+        self.reseal_rolling_artifact(artifact)
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("rolling applied real-growth rate 0.924", result.stdout)
+
+    def test_rolling_geography_pins_follow_the_artifact_not_a_fixed_literal(self):
+        """Reseal one area out of the published menu: the menu, validation and
+        thin-support pins must all move with the forecast, not with the prose."""
+        path = self.repo / "data/current" / ROLLING_NAME
+        artifact = json.loads(path.read_text())
+        for scenario in artifact["scenarios"].values():
+            for record in scenario["years"].values():
+                anchored = next(
+                    key
+                    for key, area in record["geography_by_area"].items()
+                    if area["anchor_status"] == "published_anchor"
+                )
+                record["geography_by_area"][anchored]["anchor_status"] = (
+                    "modeled_unanchored"
+                )
+                for diagnostic in record["median_diagnostics"].values():
+                    diagnostic["thin_support"] = False
+        artifact["validation"]["acs"]["area_count"] -= 1
+        self.reseal_rolling_artifact(artifact)
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        for expected in (
+            "rolling area menu prose",
+            "rolling geographic validation covers 340",
+            "rolling thin-donor warnings cover 0",
+        ):
+            self.assertIn(expected, result.stdout)
 
 
 if __name__ == "__main__":

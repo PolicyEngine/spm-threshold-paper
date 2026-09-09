@@ -512,14 +512,17 @@ FCSUti band. An ordinary least-squares regression of log means on year
 provides a slope. The applied slope is half that estimate; the 0.5
 shrinkage was declared independently of the reported forecast scores.
 
-The applied annual real-growth rate is 0.914 percent. Using ten annual
-blocks gives 0.817 percent; excluding the two blocks ending in 2021 and
-2022 from the five-block fit leaves three blocks and gives −0.135 percent.
-These alternatives demonstrate sensitivity to the fitting window. They
-are not confidence intervals: repeated interviews, survey design,
-serial dependence, and future structural changes are not captured by
-ordinary regression uncertainty. The zero-real scenario supplies a
-separate comparison rather than a lower statistical bound.
+We report rates as compounded annual equivalents, $\exp(r)-1$, not as
+the log rate $r$ that enters the multiplier. The applied annual
+real-growth rate is 0.914 percent, from an applied log rate of 0.910
+percent. Using ten annual blocks gives 0.817 percent; excluding the two
+blocks ending in 2021 and 2022 from the five-block fit leaves three
+blocks and gives −0.135 percent. These alternatives demonstrate
+sensitivity to the fitting window. They are not confidence intervals:
+repeated interviews, survey design, serial dependence, and future
+structural changes are not captured by ordinary regression uncertainty.
+The zero-real scenario supplies a separate comparison rather than a
+lower statistical bound.
 
 The nominal path uses annual CPI-U growth from CBO's February 2026
 economic projections, rebased to the observed 2025 annual index
