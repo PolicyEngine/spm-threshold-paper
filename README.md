@@ -38,10 +38,10 @@ restores source artifacts. The regression tests verify that failed checks
 leave source bytes unchanged.
 
 This is an artifact-level verification: it re-derives tables from the
-preserved experimental outputs. Re-running the underlying CE and ACS
-estimation requires the calculator revision above, the source acquisition
-and build scripts in that revision, and the inputs identified by the
-separate provenance receipts. The historical population sensitivity lacks
+preserved experimental outputs. The [experiment replay guide](docs/reproducing-experiments.md)
+gives executable commands, source links, and input prerequisites separately
+for the 0.5.0 retrospective CE experiment and the 1.0.0 rolling CE/ACS
+projection. The historical population sensitivity lacks
 immutable model and dataset identities, so exact replay of that result
 has not been established. No published package or deployed application is
 required to render the paper.
