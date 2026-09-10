@@ -6,7 +6,8 @@ author:
     affiliations:
       - name: PolicyEngine
     email: max@policyengine.org
-date: 2026-09-09
+date: 2026-09-10
+date-format: long
 bibliography: ../bibliography/references.bib
 format:
   html:
@@ -15,6 +16,9 @@ format:
   pdf:
     documentclass: article
     classoption: 11pt
+    geometry:
+      - margin=1in
+    thanks: "PolicyEngine. Correspondence: max@policyengine.org."
     number-sections: true
     keep-tex: true
     include-in-header:
@@ -149,7 +153,25 @@ National estimation and unit-level application are distinct operations.
 If $q(A,C)$ is the equivalence scale for an already classified unit with
 $A$ adults and $C$ children, normalized to one for two adults and two
 children, the unit receives the corresponding fraction of its tenure's
-reference threshold. Geographic adjustment applies to the housing
+reference threshold. For integer counts $A\geq1$ and $C\geq0$, write
+$q(A,C)=e(A,C)/3^{0.7}$, where
+
+$$
+e(A,C)=
+\begin{cases}
+1, & A=1,\ C=0,\\
+1.41, & A=2,\ C=0,\\
+(1+0.8+0.5(C-1))^{0.7}, & A=1,\ C\geq1,\\
+(A+0.5C)^{0.7}, & \text{otherwise}.
+\end{cases}
+$$
+
+The two-adult, no-child case uses Census's stated constant 1.41
+[@spmtechnical]. The counts describe SPM composition roles; assigning
+those roles requires the resource-unit definition, not age counts alone.
+For example, one adult with two children has
+$q(1,2)=2.3^{0.7}/3^{0.7}$, while $q(2,2)=1$.
+Geographic adjustment applies to the housing
 portion. Writing that portion as share $a_{T,h}$ and the local relative
 housing-cost index as $g$, the calculation is
 
@@ -178,7 +200,8 @@ Both components in @tbl-current-release use published 2025 values
 dated and estimated. Published national inputs therefore do not make a
 local threshold fully official when its geographic component is modeled.
 Local estimation areas comprise metropolitan statistical areas and
-Census's residual metropolitan and nonmetropolitan groups. Counties
+Census's residual metropolitan and nonmetropolitan groups
+[@spmtechnical]. Counties
 identify the applicable area; county-specific thresholds are not
 independently estimated. The annual geographic projection is described
 in @sec-rolling.
@@ -385,7 +408,9 @@ quantity whose underlying period had occurred but whose official value
 was unpublished [@giannone2008]. The relevant CE collection window,
 2020Q2 through 2025Q1, and eleven months of 2025 CPI observations were
 available. October 2025 CPI was not published; the recorded price inputs
-use the eleven available months.
+use the eleven available months. BLS documents this annual-average
+treatment for CPI series without a published October observation
+[@blscpi2025shutdown].
 
 The committed blend projected \$41,036.34 for owners with mortgages,
 \$34,135.99 for owners without mortgages, and \$40,755.98 for renters.
@@ -482,8 +507,9 @@ fixed-2019-base composite, with the CPI-U figures alongside.
 
 For 2025, the BLS threshold page reports CPI-U growth of 2.70 percent,
 compared with 2.63 percent implied by the eleven-month annual average in
-the pinned CPI observations. The page does not explain its treatment of
-the missing October index. We retain the recorded calculation rather
+the pinned CPI observations. The threshold page does not reconcile this
+difference with the CPI program's documented eleven-month averaging
+rule [@blscpi2025shutdown]. We retain the recorded calculation rather
 than substituting a different annual average in the completed forecast
 evaluation.
 
@@ -494,13 +520,23 @@ evaluation.
 The preceding comparisons observe the CE collection window for each
 target year. A future projection instead supplies the unobserved quarters
 and then re-estimates the threshold from the resulting twenty-quarter
-window. The September 2026 snapshot uses observed CE records through
-2025Q1. For each later quarter it reuses the latest observed quarter of
+window. The September 9, 2026 information snapshot uses observed CE
+records through 2025Q1. At that cutoff, BLS scheduled the next annual CE
+microdata release for October 29, 2026 [@blsce2025shutdown]. For each
+later quarter the projection reuses the latest observed quarter of
 the same season, preserving survey weights, composition, and record
 identities. Monetary spending is multiplied by the cumulative price
 change and an assumed real-expenditure growth factor. Historical quarters
 leave the window as projected quarters enter; this is not a direct
 inflation adjustment of the final threshold.
+
+The prospective evaluation will also need to account for the interruption
+of CE collection in October and November 2025. BLS describes adjustments
+for its annual expenditure estimates and states that those adjustments
+will not be applied directly to the public-use files
+[@blsce2025shutdown]. This projection uses seasonal donor records; it
+does not estimate the effect of that missing-data treatment on future
+published SPM thresholds.
 
 Let $r$ be an annual log growth rate for real expenditures. A donor
 record from year $d$ projected to year $t$ receives the multiplier
@@ -687,7 +723,9 @@ parameters, rather than the realized annual-average CPI-U rule evaluated
 above. The recorded sensitivity depends on its original population and
 model vintage; it is not a result from the current model or a general
 conversion between threshold errors and
-poverty-rate errors.
+poverty-rate errors. Its saved receipt lacks immutable model and dataset
+identities, so an exact independent replay of this historical sensitivity
+has not been established.
 
 # Appendix A: method versions and forecast commitment {.unnumbered}
 
@@ -722,7 +760,8 @@ The original and amended values, corrected 2024 base, and evaluation
 rules remain fixed in the repository. This use of preregistration
 [@nosek2018] separates the recorded forecast from later method development.
 
-The August 7, 2026 archived page and retained OpenTimestamps evidence
+The [August 7, 2026 archived page](https://web.archive.org/web/20260807211521/https://spm-threshold-paper.vercel.app/)
+and retained OpenTimestamps evidence
 precede the August 24 publication. The original forecast tags, manifests,
 and proof files remain unchanged. A dated September 8 amendment corrects
 two artifact hashes in a secondary manifest without claiming that its
@@ -737,7 +776,16 @@ available-input cutoff before the outcome is published.
 
 # Appendix B: reproducibility {.unnumbered}
 
-The repository preserves the inputs and generated tables for the frozen
+The [paper repository](https://github.com/PolicyEngine/spm-threshold-paper)
+provides the manuscript, table generators, verification tests, and
+recorded inputs. Its [source-data provenance](https://github.com/PolicyEngine/spm-threshold-paper/blob/cc858aa610cc414215fe3e1fc4038b5248810743/data/PROVENANCE.md)
+describes the preserved experimental collections. The
+companion calculator source [@spmcalculator2026] contains the
+expenditure and geographic estimators, source acquisition
+scripts, and standalone implementation at the rolling projection's
+exact revision.
+
+The paper repository preserves the inputs and generated tables for the frozen
 experiments, together with a separate current-method artifact containing
 source hashes, methodology choices, and sample diagnostics. The
 2019–2025 retrospective experiment retains its original implementation
@@ -756,11 +804,23 @@ Exact source and release identities are recorded alongside the inputs;
 poverty sensitivity additionally requires its original model and
 population dataset to reproduce.
 
+To verify the reported tables, clone the paper repository with its full
+tag history and check out the manuscript revision being evaluated. Run
+`python3 -B scripts/check_paper.py` and
+`python3 -B -m unittest discover -s tests -v`. Quarto 1.9.36 and TeX Live
+2026 render this revision with `quarto render --to html` and
+`quarto render --to pdf`. These commands regenerate the tables from
+the preserved artifacts; regenerating the underlying CE and ACS
+estimates additionally requires the pinned calculator and its source
+files. The repository README gives the build commands and separates
+this verification from raw-data replication.
+
 The rolling projection is a portable artifact shared by the paper and
 standalone calculator, with year-specific national bases, housing shares,
-geographic indices, assignments, and source fingerprints. PolicyEngine,
-Microcosm, and native Axiom adapters consume these quantities through
-explicit contracts. Population sources supply native SPM membership
+geographic indices, assignments, and source fingerprints. The pinned
+calculator includes PolicyEngine, Microcosm, and native Axiom adapters
+that consume these quantities through explicit contracts. Population
+sources supply native SPM membership
 and composition roles; tax-benefit models retain responsibility for
 resources, and the population system retains its weights. A change of
 rules engine does not require a second expenditure forecast. Runtime
@@ -777,5 +837,15 @@ limitations described above constrain their interpretation.
 
 # References {.unnumbered}
 
+```{=latex}
+\begingroup
+\small
+\interlinepenalty=10000
+```
+
 ::: {#refs}
 :::
+
+```{=latex}
+\endgroup
+```

@@ -1,5 +1,9 @@
 # Calculating and projecting Supplemental Poverty Measure thresholds
 
+[Manuscript source](paper/index.qmd) ·
+[Data provenance](data/PROVENANCE.md) ·
+[Pinned companion calculator](https://github.com/PolicyEngine/spm-calculator/tree/78bae15f76152c6076dd909a09f6b63dc2ec8c34)
+
 Working paper on national SPM threshold estimation from public Consumer
 Expenditure Survey microdata, family and geographic adjustments, and
 projection from consumption and price growth. The manuscript presents
@@ -32,6 +36,15 @@ compares every output byte with the checkout, including archived tables
 that the manuscript no longer includes. It never repairs or
 restores source artifacts. The regression tests verify that failed checks
 leave source bytes unchanged.
+
+This is an artifact-level verification: it re-derives tables from the
+preserved experimental outputs. Re-running the underlying CE and ACS
+estimation requires the calculator revision above, the source acquisition
+and build scripts in that revision, and the inputs identified by the
+separate provenance receipts. The historical population sensitivity lacks
+immutable model and dataset identities, so exact replay of that result
+has not been established. No published package or deployed application is
+required to render the paper.
 
 ## Preserved forecast evidence
 
