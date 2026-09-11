@@ -61,6 +61,16 @@ have their own `data/current/SHA256SUMS`; they do not replace the frozen
 forecast or become a new prospective commitment. `data/PROVENANCE.md`
 describes both collections and the original implementation pin.
 
+## Pre-committed 2025 poverty-rate prediction
+
+`data/predictions/2025-spm-poverty-rates-2026-09-11.json` records, before the
+Census Bureau's 2026-09-15 release, PolicyEngine's prediction for the 2025 SPM
+poverty rate: the Census 2024 rate plus the modeled 2024-to-2025 change under
+the rolling CE and ACS threshold method (13.2 percent overall on the corrected
+2024 series; 14.3 for children; 14.6 for people 65 and over). Its SHA-256 is in
+`data/predictions/SHA256SUMS` and the OpenTimestamps proof is beside it. The
+file is never edited; any revision is a dated amendment file.
+
 ## Companion implementation
 
 The companion spm-calculator provides a portable artifact, standalone
