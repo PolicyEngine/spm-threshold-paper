@@ -1,0 +1,47 @@
+{
+  "format": "spm/poverty-rate-prediction/v1",
+  "written": "2026-09-11",
+  "resolves": "Census Bureau P60 report on 2025 income and poverty, scheduled 2026-09-15 10:00 ET",
+  "quantity": "Supplemental Poverty Measure poverty rate, calendar year 2025, percent of people",
+  "method": "Census-published 2024 SPM rate plus PolicyEngine's modeled 2024-to-2025 change. PolicyEngine's simulated levels are held out from calibration and are not comparable to Census levels by construction; only the modeled change is used.",
+  "anchor": {
+    "series": "corrected",
+    "source": "Census SEHSD working paper 2026-17 (2026-08-19), which restates 2019-2024 SPM rates on the corrected BLS thresholds; original P60-287 values listed for reference",
+    "census_2024_corrected": {"all": 13.0, "under_18": 13.4, "age_65_plus": 15.1},
+    "census_2024_original": {"all": 12.9, "under_18": 13.4, "age_65_plus": 15.0}
+  },
+  "model": {
+    "name": "PolicyEngine US canonical SPM runtime (rolling CE and ACS threshold projection, spm-calculator 1.0.0)",
+    "runtime": {
+      "policyengine-us": "2.0.0 candidate, wheel sha256 05c729ae04eefc7b295af9855972e5d001f71632f02590d8846c48e6d190a27d",
+      "spm-calculator": "1.0.0, wheel sha256 c49c41da5fd482e563eaea956e205a3ba6841cadd4dd32bef4c0c3dbce17ffba (published PyPI wheel e354937a5e1a4045d4966ed594a528d8b02866fabaac9bb5672017004b627305 has byte-identical contents)",
+      "policyengine-core": "3.30.1",
+      "policyengine": "5.3.0",
+      "dataset": "Microcosm Build P 2024 population with native SPM roles, H5 sha256 6496cc4393d4d3c6574f76eca231de5898c803b9067645591fd5c4d3e65aee84",
+      "scenario": "ce_trend",
+      "forecast_content_sha256": "3d86d5c4c0423480e6b69b75d222ffa4a7a2639e4094df5ba2504af01be17173"
+    },
+    "receipt": "spm-rebuild-20260908/rollout/final-country-population/FINAL-REPORT.md and final-acceptance/FINAL-ACCEPTANCE-HANDOFF.md (private working directory; hashes in FINAL-INTEGRITY.json)",
+    "simulated_rates_percent": {
+      "2024": {"all": 13.01814420, "under_18": 15.71012089, "age_65_plus": 11.42390615},
+      "2025": {"all": 13.23536160, "under_18": 16.56675940, "age_65_plus": 10.90224481}
+    },
+    "modeled_change_2024_to_2025_pp": {"all": 0.21721740, "under_18": 0.85663851, "age_65_plus": -0.52166134}
+  },
+  "prediction_2025_percent": {
+    "corrected_anchor": {"all": 13.2, "under_18": 14.3, "age_65_plus": 14.6},
+    "original_anchor": {"all": 13.1, "under_18": 14.3, "age_65_plus": 14.5}
+  },
+  "for_comparison_legacy_production_model": {
+    "name": "policyengine-us 1.764.6 with spm-calculator 0.3.1 (CPI-aged 2025 thresholds), the production model until this rollout",
+    "source": "api.policyengine.org economy baseline, pulled 2026-09-08",
+    "simulated_rates_percent": {"2024": {"all": 13.60, "under_18": 16.97, "age_65_plus": 11.55}, "2025": {"all": 13.07, "under_18": 16.73, "age_65_plus": 10.31}},
+    "modeled_change_2024_to_2025_pp": {"all": -0.53, "under_18": -0.24, "age_65_plus": -1.24},
+    "prediction_2025_percent_corrected_anchor": {"all": 12.5, "under_18": 13.2, "age_65_plus": 13.9}
+  },
+  "caveats": [
+    "Runs are development runs on policyengine-core 3.30.1; a rerun on the shipping runtime (core 3.32.5, freshly built dataset) is in progress. If it moves any modeled change by 0.05 pp or more, a dated amendment file will be added; this file will not be edited.",
+    "The 18-to-64 group is omitted because its Census 2024 rate was not verified at writing time.",
+    "Rounding follows Census practice (one decimal)."
+  ]
+}
