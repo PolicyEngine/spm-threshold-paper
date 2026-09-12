@@ -840,9 +840,9 @@ to SPM units by member share, and applies each unit's cap after allocation,
 following Census's subsidy proration [@spmtechnical, p. 14]. It treats
 interview-time public or reduced-rent housing status as full-year
 assistance to a program family represented by the householder's SPM unit,
-because the survey does not identify that family. It allocates the tenant
-contributions of units with positive modeled awards, before allocation,
-by the same shares; Census
+because the survey does not identify that family. For units whose modeled
+award is positive before allocation, it allocates their tenant
+contributions by the same member shares; Census
 does not document this split, so it is a declared consistency assumption
 rather than verified production parity. Program eligibility and awards
 do not depend on the cap. These choices concern resource valuation and
