@@ -6,7 +6,7 @@ author:
     affiliations:
       - name: PolicyEngine
     email: max@policyengine.org
-date: 2026-09-10
+date: 2026-09-12
 date-format: long
 bibliography: ../bibliography/references.bib
 format:
@@ -820,13 +820,29 @@ standalone calculator, with year-specific national bases, housing shares,
 geographic indices, assignments, and source fingerprints. The pinned
 calculator includes PolicyEngine, Microcosm, and native Axiom adapters
 that consume these quantities through explicit contracts. Population
-sources supply native SPM membership
-and composition roles; tax-benefit models retain responsibility for
-resources, and the population system retains its weights. A change of
+sources supply native SPM membership and composition roles;
+tax-benefit models retain responsibility for resources, including
+ordinary income, program awards, and the housing-assistance cap, and the
+population system retains its weights. A change of
 rules engine does not require a second expenditure forecast. Runtime
 parity and release integration are separate checks from the statistical
 validity of the projection. The snapshot date does not reconstruct
 historical information sets or certify a public deployment.
+
+In population applications, the threshold's housing portion limits the
+housing subsidy counted as an SPM resource. The accompanying resource
+specification sums modeled awards within a household, allocates the total
+to SPM units by member share, and applies each unit's cap after allocation,
+following Census's subsidy proration [@spmtechnical, p. 14]. It treats
+interview-time public or reduced-rent housing status as full-year
+assistance to a program family represented by the householder's SPM unit,
+because the survey does not identify that family. It allocates the tenant
+contributions of units with positive awards by the same shares; Census
+does not document this split, so it is a declared consistency assumption
+rather than verified production parity. Program eligibility and awards
+do not depend on the cap. These choices concern resource valuation and
+do not change the threshold estimates reported here. They do not revise
+the separately preserved historical poverty sensitivity.
 
 Tables regenerate from the recorded artifacts. The build checks their
 hashes before generating outputs in temporary storage and comparing the
