@@ -829,6 +829,10 @@ parity and release integration are separate checks from the statistical
 validity of the projection. The snapshot date does not reconstruct
 historical information sets or certify a public deployment.
 
+The resource conventions below are specified separately in the
+[PolicyEngine-US resource contract](https://github.com/PolicyEngine/policyengine-us/blob/7b2ef566aee52db17fe1d8ab5d0a744669802506/docs/spm.md).
+That contract is outside the calculator artifacts pinned above and does
+not reproduce or revise the preserved historical poverty sensitivity.
 In population applications, the threshold's housing portion limits the
 housing subsidy counted as an SPM resource. The accompanying resource
 specification sums modeled awards within a household, allocates the total
@@ -837,7 +841,8 @@ following Census's subsidy proration [@spmtechnical, p. 14]. It treats
 interview-time public or reduced-rent housing status as full-year
 assistance to a program family represented by the householder's SPM unit,
 because the survey does not identify that family. It allocates the tenant
-contributions of units with positive awards by the same shares; Census
+contributions of units with positive modeled awards, before allocation,
+by the same shares; Census
 does not document this split, so it is a declared consistency assumption
 rather than verified production parity. Program eligibility and awards
 do not depend on the cap. These choices concern resource valuation and
