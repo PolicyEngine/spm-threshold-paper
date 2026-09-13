@@ -626,6 +626,15 @@ projected years. Preserving record identity avoids mistaking five
 projected copies for five independent samples. We retain each area’s calculated factor when support is thin and flag
 its donor count.
 
+We collapse repeated copies to their original donor identities before
+calculating support. For allocation-expected support, we sum each
+donor's geographic allocation fraction once. For donor-collapsed Kish
+support, we calculate $(\sum_i w_i)^2/\sum_i w_i^2$ from each original
+donor's total allocated weight $w_i$. We flag thin support when any of
+the unique-donor count, allocation-expected count, or Kish count falls
+below 30. These counts describe donor coverage and unequal weights;
+they do not estimate survey-design uncertainty.
+
 # Discussion {#sec-discussion}
 
 We approximate published threshold levels from public CE data. Sample
@@ -677,7 +686,8 @@ estimation; they do not quantify the uncertainty of the replication.
 
 Benchmark replication deviations by tenure, with the anchor share
 matched to each reference vintage. The benchmark uses the 2025 nowcast
-implementation.
+implementation. Within each cell, values follow the order: owners with
+mortgages, owners without mortgages, and renters.
 :::
 
 # Appendix B: reproducibility {.unnumbered}
@@ -716,7 +726,7 @@ identify each experiment’s inputs and evidence.
 To verify the reported tables, clone the paper repository with its full
 tag history and check out the manuscript revision being evaluated. Run
 `python3 -B scripts/check_paper.py` and `python3 -B -m unittest discover
--s tests -v`. Quarto 1.9.36 and TeX Live 2026 render this revision with
+-s tests -v`. Quarto 1.9.36 and TeX Live 2026 render HTML and PDF with
 `quarto render --to html` and `quarto render --to pdf`. These commands
 regenerate the tables from the recorded artifacts; regenerating the
 underlying CE and ACS estimates additionally requires the pinned
@@ -730,8 +740,8 @@ indices, assignments, and source fingerprints. It includes adapters for
 PolicyEngine's tax-benefit model, Microcosm's population-data tools, and
 Axiom's rules engine. The PolicyEngine and Microcosm adapters apply the same forecast to supplied SPM membership,
 composition, and geography. The Axiom adapter exports forecast inputs
-to RuleSpec and invokes the Axiom core runtime to calculate
-thresholds. Population models supply resources and weights separately.
+to RuleSpec, Axiom's policy specification format, and invokes the Axiom
+core runtime to calculate thresholds. Population models supply resources and weights separately.
 Researchers can reuse the expenditure forecast across engines; each
 adopting model requires its own runtime and release verification.
 
