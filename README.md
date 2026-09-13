@@ -54,8 +54,10 @@ version 0.5.0 at commit
 ## Separate 2025 poverty-rate prediction
 
 The [September 11 prediction](data/predictions/2025-spm-poverty-rates-2026-09-11.json)
-records 13.2 percent overall, 14.3 percent for children, and 14.6 percent
-for people 65 and over. It adds the modeled 2024-to-2025 change to Census's
+predicts a 2025 SPM poverty rate of 13.2 percent overall, 14.3 percent
+for children, and 14.6 percent for people 65 and over. The registration
+precedes the Census release scheduled for September 15, 2026. It adds
+the modeled 2024-to-2025 change to Census's
 2024 rate. These development estimates remain provisional pending a
 comparison on the qualified model and population release. The threshold-method
 results do not depend on them. The prediction's checksum and timestamp proof

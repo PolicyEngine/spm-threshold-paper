@@ -53,9 +53,8 @@ abstract: |
 
 The Bureau of Labor Statistics (BLS) estimates national Supplemental
 Poverty Measure (SPM) thresholds from Consumer Expenditure (CE)
-Interview Survey spending. It includes food, clothing, shelter,
-utilities, telephone, and internet, and varies the thresholds by
-housing tenure. The U.S. Census Bureau adjusts them for family
+Interview Survey spending on food, clothing, shelter, utilities,
+telephone, and internet. BLS varies the thresholds by housing tenure. The U.S. Census Bureau adjusts them for family
 composition and local housing costs [@itwg2010; @garner2021]. By
 updating basic-needs standards with consumption, the agencies follow
 the National Academy of Sciences proposal [@citro1995].
@@ -133,7 +132,7 @@ of 0.82, compared with 0.83 in the preceding series [@bls2026corrected].
 We benchmark against the corrected BLS 2005–2024 workbook issued in July
 2026 and the published 2025 values. In particular, the 2019–2024
 comparisons use this July 2026 vintage. The historical comparisons
-therefore use information unavailable at the forecast dates
+therefore use information unavailable in the target years
 [@croushore2001].
 
 ## Applying a threshold to an SPM unit
@@ -371,6 +370,11 @@ and before BLS published the outcome, producing a nowcast
 eleven months of 2025 CPI observations. BLS did not publish October
 2025 CPI. We average the other eleven months following BLS's
 documented treatment [@blscpi2025shutdown].
+
+We amended the forecast on July 18, 2026 to correct the price
+composite. The [August 7
+registration](https://github.com/PolicyEngine/spm-threshold-paper/blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0/docs/forecast-record.md)
+records both forecasts before BLS’s August 24 publication.
 
 We committed to an equal blend that projected \$41,036.34 for owners with mortgages,
 \$34,135.99 for owners without mortgages, and \$40,755.98 for renters.
@@ -702,6 +706,9 @@ describes the experimental collections. The companion calculator source
 source acquisition scripts, and standalone implementation at the rolling
 projection's exact revision.
 
+The five-year benchmark and 2025 nowcast use recorded outputs from
+spm-calculator at commit `d2746cfacce072f599ffb1788eb195777c6ca9ca`.
+
 The paper repository preserves the inputs and generated tables for the
 five-year benchmark and 2025 nowcast, together with a separate six-year
 replication artifact containing source hashes, methodology choices, and
@@ -718,9 +725,9 @@ digest is:
 
 The input manifests record exact source and release identities. The
 [data
-provenance](https://github.com/PolicyEngine/spm-threshold-paper/blob/master/data/PROVENANCE.md)
+provenance](https://github.com/PolicyEngine/spm-threshold-paper/blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0/data/PROVENANCE.md)
 and [forecast
-registration](https://github.com/PolicyEngine/spm-threshold-paper/blob/master/docs/forecast-record.md)
+registration](https://github.com/PolicyEngine/spm-threshold-paper/blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0/docs/forecast-record.md)
 identify each experiment’s inputs and evidence.
 
 To verify the reported tables, clone the paper repository with its full
@@ -731,7 +738,7 @@ tag history and check out the manuscript revision being evaluated. Run
 regenerate the tables from the recorded artifacts; regenerating the
 underlying CE and ACS estimates additionally requires the pinned
 calculator and its source files. The [experiment replay
-guide](https://github.com/PolicyEngine/spm-threshold-paper/blob/master/docs/reproducing-experiments.md)
+guide](https://github.com/PolicyEngine/spm-threshold-paper/blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0/docs/reproducing-experiments.md)
 provides commands and source-file requirements for raw-data replication.
 
 The standalone calculator provides a portable projection artifact
@@ -754,7 +761,8 @@ from units with positive awards and allocates those payments by the
 same shares. It caps each unit's SPM housing resource at the housing
 portion of its threshold less allocated tenant payments, with a
 minimum of zero. The model calculates eligibility and program awards
-for the U.S. Department of Housing and Urban Development (HUD) separately.
+under U.S. Department of Housing and Urban Development (HUD) programs
+separately.
 
 Under that resource specification, population-data producers use the
 householder's SPM unit to represent an assisted family and treat
@@ -767,7 +775,7 @@ the threshold estimates.
 
 The build verifies artifact hashes, regenerates tables in temporary
 storage, and compares the outputs with the saved tables and evaluation
-JSON. It also checks the supporting forecast record and its tables.
+JSON. It also checks the forecast record and archived evaluation tables.
 
 
 # References {.unnumbered}

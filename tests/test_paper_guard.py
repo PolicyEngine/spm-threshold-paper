@@ -463,6 +463,24 @@ class PaperGuardTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("forecast registration record exists", result.stdout)
 
+    def test_nowcast_registration_link_is_required_at_the_forecast(self):
+        path = self.repo / "paper/index.qmd"
+        qmd = path.read_text()
+        url = (
+            "https://github.com/PolicyEngine/spm-threshold-paper/blob/"
+            "20bfbe1abcb83b4f9f60fbe54789144321ff62b0/docs/forecast-record.md"
+        )
+        self.assertEqual(qmd.count(url), 2)
+        # The Appendix B link stays: it cannot substitute for evidence
+        # beside the pre-commitment claim in the nowcast section.
+        path.write_text(qmd.replace(url, "#sec-nowcast", 1))
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(
+            "nowcast section links to the fixed forecast registration record",
+            result.stdout,
+        )
+
     def test_forecast_record_mutation_is_detected(self):
         path = self.repo / "docs/forecast-record.md"
         path.write_text(path.read_text().replace("$41,099.57", "$41,099.58"))

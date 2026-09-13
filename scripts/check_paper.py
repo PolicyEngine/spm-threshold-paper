@@ -368,6 +368,16 @@ nowcast = json.loads((DATA / "nowcast_2025.json").read_text())
 AMENDED = {t: f"{nowcast['values'][t]:,.2f}" for t in TENURES}
 check("forecast registration record exists", FORECAST_RECORD.is_file())
 record = FORECAST_RECORD.read_text() if FORECAST_RECORD.is_file() else ""
+FORECAST_RECORD_URL = (
+    "https://github.com/PolicyEngine/spm-threshold-paper/blob/"
+    "20bfbe1abcb83b4f9f60fbe54789144321ff62b0/docs/forecast-record.md"
+)
+check(
+    "nowcast section links to the fixed forecast registration record",
+    FORECAST_RECORD_URL in QMD.split("# Pre-committed 2025 validation", 1)[-1].split(
+        "## Evaluation against published thresholds", 1
+    )[0],
+)
 for t, literal in AMENDED.items():
     check(f"nowcast literal {literal}", has_number(literal))
 # The committed estimate remains in the manuscript, in tenure order.
