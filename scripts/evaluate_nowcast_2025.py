@@ -100,6 +100,29 @@ OUT.mkdir(parents=True, exist_ok=True)
 (OUT / "evaluation.md").write_text("\n".join(lines) + "\n")
 print("wrote paper/tables/evaluation.md")
 
+# Main article table: the committed blend and the three comparison rules.
+# Keep the complete five-rule output above as the historical evaluation
+# archive, including the original blend row.
+main_lines = [
+    lines[0],
+    lines[1],
+]
+for name, values in rules.items():
+    if name.startswith("Original"):
+        continue
+    errs = results[name]["errors"]
+    mae = results[name]["mae"]
+    cells = " | ".join(f"{errs[t]:+.2%}" for t in TENURES)
+    if name.startswith("Amended"):
+        label = "**Committed equal blend**"
+        mae_txt = f"**{mae:.2%}**"
+    else:
+        label = name
+        mae_txt = f"{mae:.2%}"
+    main_lines.append(f"| {label} | {cells} | {mae_txt} |")
+(OUT / "evaluation_main.md").write_text("\n".join(main_lines) + "\n")
+print("wrote paper/tables/evaluation_main.md")
+
 # Actual vs nowcast levels, for the reader who wants dollars.
 lines = [
     "| Tenure | BLS 2025 threshold | Amended nowcast | Error "
