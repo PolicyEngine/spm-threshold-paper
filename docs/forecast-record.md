@@ -5,8 +5,9 @@
 The 2025 commitment used a price calculation that combined CPI components
 with different index bases. We corrected the calculation before BLS published the outcome, and the
 equal blend remained the primary forecast.
-The correction changed the retrospective ranking, placing the consumption
-growth rule first. The evaluation retained every component rule.
+We amended the forecast on July 18, 2026. The correction changed the
+retrospective ranking, placing the consumption growth rule first. The
+evaluation retained every component rule.
 
 The correction moved estimates by 0.1 to 0.3 percent. In tenure order, the
 original and amended forecasts were:
@@ -23,8 +24,9 @@ values and evaluation rules before the outcome ([Nosek et al., 2018](https://doi
 
 The [August 7, 2026 archived page](https://web.archive.org/web/20260807211521/https://spm-threshold-paper.vercel.app/)
 and retained OpenTimestamps evidence precede the August 24 publication.
-The repository preserves the original forecast tags, manifests, and proof
-files. A September 8 amendment corrects two hashes in a secondary manifest;
+The archive shows both forecast sets. The repository preserves them at
+tags `v1.0-original-nowcast` and `v1.1-amended-nowcast`, with their
+manifests and proof files. Both GitHub releases date to August 7, 2026. A September 8 amendment corrects two hashes in a secondary manifest;
 the original timestamp does not cover that amendment. The verification
 script checks retained bytes and Git identities without independently
 reverifying blockchain attestations.
