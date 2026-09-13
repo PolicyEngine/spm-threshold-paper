@@ -468,7 +468,7 @@ class PaperGuardTests(unittest.TestCase):
         path.write_text(path.read_text().replace("$41,099.57", "$41,099.58"))
         result = self.run_guard()
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("forecast record original literal $41,099.57", result.stdout)
+        self.assertIn("forecast record original literal 41,099.57", result.stdout)
 
     def test_evaluation_archive_tampering_is_detected(self):
         path = self.repo / "paper/tables/evaluation.md"

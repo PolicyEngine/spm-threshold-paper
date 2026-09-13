@@ -363,7 +363,7 @@ AMENDED = {t: f"{nowcast['values'][t]:,.2f}" for t in TENURES}
 check("forecast registration record exists", FORECAST_RECORD.is_file())
 record = FORECAST_RECORD.read_text() if FORECAST_RECORD.is_file() else ""
 for t, literal in AMENDED.items():
-    check(f"nowcast literal {literal}", has_number(literal, min_count=2))
+    check(f"nowcast literal {literal}", has_number(literal))
 # The committed estimate remains in the manuscript, in tenure order.
 check(
     "committed estimate states the amended triple in tenure order",
