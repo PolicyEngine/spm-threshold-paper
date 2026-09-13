@@ -26,80 +26,69 @@ format:
         \usepackage{needspace}
         \fvset{fontsize=\small}
 abstract: |
-  Supplemental Poverty Measure (SPM) thresholds reflect spending on basic
-  needs as well as prices. BLS re-estimates them from a rolling five-year
-  Consumer Expenditure Survey window and publishes them in the following
-  year. Poverty projections therefore require an estimate of thresholds
-  that simple inflation adjustment need not reproduce. This paper sets
-  out the threshold calculation, implements an approximate replication
-  from public microdata, and compares price-based and consumption-based
-  projection rules. Under the current research method, retrospective
-  2020–2025 mean absolute errors across housing tenures average 2.29 percent
-  for CPI-U adjustment, 1.65 percent for a composite price index, 0.51
-  percent for replicated consumption growth, and 0.90 percent for an
-  equal blend of the latter two. These comparisons use revised data and
-  overlapping estimation windows. A distinct, pre-committed 2025 nowcast
-  supplies one external validation year: the blend's mean absolute error
-  was 1.17 percent against 2.58 percent for CPI-U adjustment and 0.75
-  percent for consumption growth alone. The largest miss was for renters.
-  For years beyond available microdata, a separate conditional projection
-  advances both expenditure and rent windows through 2035, with explicit
-  assumptions about prices and real spending. Its prospective accuracy
-  has not been established.
-  Sample-treatment sensitivities and unreplicated imputations limit
-  claims about level accuracy and future performance. The results support
-  evaluating consumption growth when projecting quasi-relative poverty
-  thresholds, while keeping retrospective comparisons separate from
-  forecasts made before publication.
+  The Bureau of Labor Statistics (BLS) estimates Supplemental Poverty
+  Measure (SPM) thresholds from a rolling five-year Consumer
+  Expenditure Survey window. BLS updates the thresholds for spending
+  on basic needs and publishes them in the following year. Analysts
+  must therefore estimate unpublished thresholds to project poverty.
+  We reconstruct thresholds approximately from public microdata and
+  compare four projection rules. For 2020–2025, we obtain mean
+  absolute errors across housing tenures of 2.29 percent with the
+  Consumer Price Index for All Urban Consumers (CPI-U), 1.65 percent
+  with a composite price index, 0.51 percent with replicated
+  consumption growth, and 0.90 percent with an equal blend of the
+  latter two. We use revised data and overlapping estimation windows
+  in these retrospective comparisons. We also evaluate a pre-committed
+  2025 nowcast against subsequently published thresholds. The blend
+  yields a mean absolute error of 1.17 percent, compared with 2.58
+  percent for CPI-U adjustment and 0.75 percent for consumption growth
+  alone. We obtain the largest error for renters. Beyond available
+  microdata, we project expenditure and rent records through 2035
+  under explicit assumptions about prices and real spending. We
+  evaluate prospective accuracy for 2025 only and leave several
+  official imputations unreplicated.
 ---
 
 # Introduction
 
-The Supplemental Poverty Measure (SPM) defines a poverty threshold that
-changes with expenditure patterns as well as prices. Its national
-thresholds come from Consumer Expenditure (CE) Interview Survey spending
-on food, clothing, shelter, utilities, telephone, and internet; they vary
-by housing tenure and are adjusted for family composition and local
-housing costs [@itwg2010; @garner2021]. This quasi-relative design follows
-the National Academy of Sciences proposal to update basic-needs standards
-with consumption over time [@citro1995].
+The Bureau of Labor Statistics (BLS) estimates national Supplemental
+Poverty Measure (SPM) thresholds from Consumer Expenditure (CE)
+Interview Survey spending. It includes food, clothing, shelter,
+utilities, telephone, and internet, and varies the thresholds by
+housing tenure. The U.S. Census Bureau adjusts them for family
+composition and local housing costs [@itwg2010; @garner2021]. By
+updating basic-needs standards with consumption, the agencies follow
+the National Academy of Sciences proposal [@citro1995].
 
-The publication calendar creates a practical estimation problem. BLS
-publishes thresholds in the following year: the 2024 thresholds appeared
-in September 2025, and the 2025 thresholds on August 24, 2026
-[@p60-287; @bls2025thresholds]. An analysis conducted before publication
-must estimate the threshold as well as SPM resources. Adjusting the
-last published threshold for inflation accounts for price changes, but
-not necessarily changes in the expenditure distribution from which BLS
-re-estimates the threshold.
+BLS publishes thresholds in the following year. It published the 2024
+thresholds in September 2025 and the 2025 thresholds on August 24,
+2026 [@p60-287; @bls2025thresholds]. Analysts projecting poverty
+before publication must estimate thresholds and SPM resources.
+Adjusting the last published threshold for inflation captures price
+changes. BLS also re-estimates the expenditure distribution when it
+calculates the threshold.
 
-Existing poverty projections illustrate several responses to this gap.
 Urban Institute projections for 2021 adjusted the 2019 thresholds for
-projected inflation [@wheaton2021]. Columbia's monthly poverty framework
-initially carried the latest published thresholds forward, identifying
-the need for more timely consumption data to project new ones
-[@parolin2022]. Price adjustment also has a separate
-measurement purpose: anchored-SPM series hold a reference standard fixed
-in real terms to distinguish changes in resources and policy from changes
-in living standards [@wimer2016; @nasem2019]. That estimand differs from
-predicting the thresholds BLS will publish.
+projected inflation [@wheaton2021]. Columbia's monthly poverty
+framework initially carried the latest published thresholds forward,
+identifying the need for more timely consumption data to project new
+ones [@parolin2022]. Researchers also use price adjustment to hold
+anchored-SPM thresholds fixed in real terms and compare resources and
+policy across years [@wimer2016; @nasem2019]. An anchored standard
+measures resource changes against a fixed real threshold; predicting
+the thresholds BLS will publish requires estimating changes in that
+standard.
 
-This paper examines the latter task. It first describes national threshold
-estimation and its application to SPM units. It then reconstructs
-thresholds from public CE files, quantifies selected methodological
-sensitivities, and compares four one-year projection rules. The main
-research experiment uses the current implementation for 2019–2025
-replication and 2020–2025 retrospective projections. A separately frozen
-2020–2024 comparison and pre-committed 2025 nowcast document the method
-used before the 2025 outcome was published. The completed 2025 evaluation
-provides one external validation year; the current retrospective results
-do not add further prospective observations.
+We compare four rules for projecting BLS thresholds using an
+approximate reconstruction from public CE files. We reconstruct
+2019–2025 thresholds, test sample sensitivities, and evaluate one-year
+projections for 2020–2025. We also evaluate a pre-committed 2025
+nowcast against the thresholds BLS subsequently published.
 
-The final methodological extension addresses years beyond available
-microdata. It advances the CE and American Community Survey (ACS) windows
-under declared price, real-expenditure, and rent assumptions. This
-distinguishes an observed expenditure nowcast from a conditional forecast
-whose future survey records must themselves be projected.
+Beyond available microdata, we project future expenditure and rental
+records and advance both five-year survey windows. These conditional
+forecasts use the CE and American Community Survey (ACS), with
+assumptions about prices, real expenditures, and rents.
 
 # Calculating the thresholds {#sec-production}
 
@@ -109,8 +98,8 @@ BLS estimates a national threshold for a two-adult, two-child reference
 unit in each of three housing tenures: owners with a mortgage, owners
 without a mortgage, and renters. Census applies the thresholds to SPM
 resource units after adjusting for composition and local housing costs,
-and computes poverty status from the corresponding resources
-[@itwg2010; @garner2021].
+and computes poverty status from the corresponding resources [@itwg2010;
+@garner2021].
 
 Under the methodology approved by the SPM Interagency Technical Working
 Group in September 2020, target year $T$ uses five years of CE Interview
@@ -119,14 +108,16 @@ collection quarters, $(T-5)$Q2 through $T$Q1 [@burnsfox2021;
 on food, clothing, shelter, utilities, telephone, and internet (FCSUti),
 including owners' mortgage-principal payments and imputed in-kind
 benefits. The latter include broadband subsidies, energy assistance,
-school lunches, WIC, and rental assistance. Spending is normalized to
-the reference family using the three-parameter equivalence scale and
-updated to target-year dollars with a composite FCSUti price index
-[@betson1996; @garner2021].
+school lunches, rental assistance, and the Special Supplemental
+Nutrition Program for Women, Infants, and Children (WIC). BLS normalizes
+spending to the reference family using the three-parameter equivalence
+scale and updates it to target-year dollars with a composite FCSUti
+price index [@betson1996; @garner2021].
 
-Let $E$ denote the survey-weighted 47th–53rd percentile band of
-reference-family FCSUti expenditures. If $SU$ denotes shelter and
-utilities excluding telephone, the tenure-specific national threshold is
+For housing tenure $h$, let $E$ denote the survey-weighted 47th–53rd
+percentile band of reference-family FCSUti expenditures. Let $SU$
+denote shelter and utilities excluding telephone. BLS calculates the
+tenure-specific national threshold as
 
 $$
 B_{T,h}=s\left(1.2\,\overline{FCSUti}_{E}
@@ -136,25 +127,21 @@ $$
 The pooled expenditure band defines the basic-needs amount. The 1.2
 multiplier allows for other basic goods and services, and replacing the
 pooled housing mean with the tenure-specific mean differentiates the
-three thresholds. The anchor share $s$ is 0.82 in the revised official
-series used here, compared with 0.83 in the preceding series
-[@bls2026corrected].
+three thresholds. The revised official series uses an anchor share $s$
+of 0.82, compared with 0.83 in the preceding series [@bls2026corrected].
 
-The benchmark vintage is the corrected BLS 2005–2024 workbook issued in
-July 2026, followed by the published 2025 values. In particular, historical
-comparisons for 2019–2024 use the revised series rather than the values
-available at each historical date. Source vintages matter when interpreting
-a backtest [@croushore2001]; this paper does not reconstruct historical
-information sets from the corrected series.
+We benchmark against the corrected BLS 2005–2024 workbook issued in July
+2026 and the published 2025 values. In particular, the 2019–2024
+comparisons use this July 2026 vintage. The historical comparisons
+therefore use information unavailable at the forecast dates
+[@croushore2001].
 
 ## Applying a threshold to an SPM unit
 
-National estimation and unit-level application are distinct operations.
-If $q(A,C)$ is the equivalence scale for an already classified unit with
-$A$ adults and $C$ children, normalized to one for two adults and two
-children, the unit receives the corresponding fraction of its tenure's
-reference threshold. For integer counts $A\geq1$ and $C\geq0$, write
-$q(A,C)=e(A,C)/3^{0.7}$, where
+Census scales each tenure’s reference threshold to the unit’s
+composition. Let $q(A,C)$ denote that scale for $A$ adults and $C$
+children, normalized to one for two adults and two children. For integer
+counts $A\geq1$ and $C\geq0$, write $q(A,C)=e(A,C)/3^{0.7}$, where
 
 $$
 e(A,C)=
@@ -167,25 +154,23 @@ e(A,C)=
 $$
 
 The two-adult, no-child case uses Census's stated constant 1.41
-[@spmtechnical]. The counts describe SPM composition roles; assigning
-those roles requires the resource-unit definition, not age counts alone.
-For example, one adult with two children has
-$q(1,2)=2.3^{0.7}/3^{0.7}$, while $q(2,2)=1$.
-Geographic adjustment applies to the housing
-portion. Writing that portion as share $a_{T,h}$ and the local relative
-housing-cost index as $g$, the calculation is
+[@spmtechnical]. Census assigns adults and children to SPM composition
+roles using its resource-unit definition. Age counts alone do not
+determine those roles. For example, one adult with two children has
+$q(1,2)=2.3^{0.7}/3^{0.7}$, while $q(2,2)=1$. Geographic adjustment
+applies to the housing portion. Writing that portion as share $a_{T,h}$
+and the local relative housing-cost index as $g$, the calculation is
 
 $$
 B_{T,h}^{\mathrm{unit}}
 =B_{T,h}\,q(A,C)\left[(1-a_{T,h})+a_{T,h}g\right].
 $$
 
-The bracketed expression is the multiplier on the whole threshold; the
-relative housing-cost index $g$ adjusts only the housing portion. Resources
-below the resulting threshold imply SPM poverty; equality does not.
-The resource definition and classification of adults, children, and SPM
-units must be supplied consistently with the SPM framework. Estimating
-national thresholds does not itself resolve those classifications.
+The bracketed expression multiplies the whole threshold; the relative
+housing-cost index $g$ adjusts only the housing portion. Resources below
+the resulting threshold imply SPM poverty; equality does not. Population
+models must supply SPM membership, composition roles, and resources
+consistently with Census definitions.
 
 ::: {#tbl-current-release}
 {{< include tables/current_release.md >}}
@@ -196,72 +181,64 @@ workbook and exclude telephone and internet.
 :::
 
 Both components in @tbl-current-release use published 2025 values
-[@bls2025thresholds; @blsspmshares]. The geographic index is separately
-dated and estimated. Published national inputs therefore do not make a
-local threshold fully official when its geographic component is modeled.
+[@bls2025thresholds; @blsspmshares]. Geographic indices follow a
+separate estimation and publication schedule. A local threshold that
+uses a modeled geographic index combines official and modeled inputs.
 Local estimation areas comprise metropolitan statistical areas and
 Census's residual metropolitan and nonmetropolitan groups
-[@spmtechnical]. Counties
-identify the applicable area; county-specific thresholds are not
-independently estimated. The annual geographic projection is described
-in @sec-rolling.
+[@spmtechnical]. Counties identify the applicable estimation area.
+@sec-rolling describes the annual geographic projection.
 
 # Replication from public consumption data {#sec-replication}
 
 ## Expenditure construction and estimation sample
 
-The replication reads public CE Interview FMLI files for each target
-year's five-year window. Previous-quarter and current-quarter expenditure
-fields split a single three-month recall period; their sum is multiplied
-by four to annualize spending. Utilities already include telephone, so
-telephone is retained in FCSUti but removed when constructing the narrower
-shelter-utilities measure. Mortgage principal is included using the FMLI
-outlay fields [@cepumd; @blsspmhome].
+We read public CE Interview family-level FMLI files for each target
+year's five-year window. Each record divides one three-month recall
+period between previous-quarter and current-quarter expenditure
+fields. We sum the fields and multiply by four to annualize spending.
+We retain telephone spending in FCSUti and exclude it from the
+narrower shelter-utilities measure. We include mortgage principal from
+the FMLI outlay fields [@cepumd; @blsspmhome].
 
-The food redesign requires a further decision in pooled windows. Newer
-records use a combined grocery summary in place of the earlier food
-summaries. This implementation applies an 80-percent food allocation to
-the combined summary; the BLS errata specifies a narrower item-code
-allocation. This is a recorded approximation. Similarly, public FMLI
-summaries do not directly provide the home-internet spending and in-kind
-imputations required for a complete reproduction of the BLS procedure.
-Those components are omitted here.
+Newer CE records combine grocery spending in one summary. We allocate
+80 percent of that summary to food; BLS specifies a narrower item-code
+allocation in its errata. We omit home-internet spending and in-kind
+imputations because the public FMLI summaries lack those components.
 
-Each consumer unit's expenditures are normalized to the two-adult,
-two-child reference family before estimating the weighted expenditure
-band and tenure-specific housing means. The implementation uses CE
-interview survey weights and an inclusive 47th–53rd percentile band from
-a midpoint weighted cumulative distribution. It uses annual price
-adjustments by collection year rather than BLS's quarterly treatment.
-In the current replication, expenditure-deflation weights are derived
-from the selected CE sample in each target year's window, before selecting
-the percentile band; these differ from the fixed projection-comparator
-weights described in @sec-projection.
-Exact parity with BLS's percentile code has not been established.
+We normalize each consumer unit's expenditures to the two-adult,
+two-child reference family before estimating the expenditure band and
+housing means. We use CE interview survey weights and an inclusive
+47th–53rd percentile band from a midpoint weighted cumulative
+distribution. We adjust prices annually by collection year; BLS
+adjusts them quarterly. For each target year, we derive
+expenditure-deflation weights from the selected CE sample before
+selecting the percentile band. We use separate, fixed weights for the
+price comparator in @sec-projection. We have not verified the
+percentile calculation against BLS's code.
 
-Adult/child classification and housing tenure require explicit sample
-rules. Independent minors can form CE consumer units, so minor-only
-records do not establish the SPM adult/child classification needed for
-exact equivalence scaling. The current research baseline excludes these
-unresolved records. A sensitivity instead imposes one adult while retaining
-the reported child count; that recode is nonofficial and does not resolve
-membership. The baseline also excludes tenure codes 5 and 6 and assigns
-code 3 to owners with a mortgage. These are research sample policies,
-not a claim that BLS uses the same handling.
+Independent minors can form CE consumer units, so age counts alone
+cannot establish the SPM roles needed for equivalence scaling. We
+exclude these unresolved records from the baseline sample. To test
+sensitivity, we assign one adult and retain the reported child count.
+This nonofficial recode leaves membership unresolved. We also exclude
+housing-tenure codes 5 and 6 and assign code 3 to owners with a
+mortgage. We have not established whether BLS applies the same sample
+rules.
 
 ## Replicated levels and sample sensitivities
 
-The current method reconstructs seven target years, 2019–2025.
+We reconstruct seven target years, 2019–2025.
 @tbl-current-replication reports signed deviations from the revised
 published thresholds. Differences vary by tenure and year, including
-positive deviations for owners without mortgages in later windows.
-The comparison measures the combined discrepancy; it does not identify
-the contribution of any particular omitted component or sample rule.
+positive deviations for owners without mortgages in later windows. The
+comparison measures the combined discrepancy; it does not identify the
+contribution of any particular omitted component or sample rule.
 
 ::: {#tbl-current-replication}
 {{< include tables/current_replication.md >}}
 
-Signed current-method replication deviations from published national
+Signed public-data replication deviations from published national
 thresholds. Negative values indicate a lower replication.
 :::
 
@@ -270,34 +247,34 @@ thresholds. Negative values indicate a lower replication.
 
 Unresolved-youth interviews and their weighted share of child-containing
 CE interviews, with maximum absolute threshold changes across tenures
-under separate youth-recode and tenure sensitivities. The latter includes
-tenure codes 5 and 6 as renters. These overlapping windows reuse observations.
+under separate youth-recode and tenure sensitivities. The latter
+includes tenure codes 5 and 6 as renters. These overlapping windows
+reuse observations.
 :::
 
-The tenure sensitivity in @tbl-current-sensitivity reaches 1.74 percent.
-The recorded windows contain no code-3 observations, so assigning that
-code to owners without a mortgage has zero measured effect here; that
-result supplies no evidence about samples in which the code is present.
-The weighted shares describe consumer-unit interviews, not unique
-population counts.
+We obtain a maximum threshold change of 1.74 percent when we include
+tenure codes 5 and 6 as renters (@tbl-current-sensitivity). We observe
+no code-3 records, so assigning that code to owners without a mortgage
+changes no estimates. We cannot infer its effect in a sample that
+contains those records. We count consumer-unit interviews in the
+weighted shares, including repeated interviews.
 
-These are selected sensitivities, not an exhaustive error bound. Annual
-rather than quarterly price adjustment, the food allocation, omitted
-home internet and in-kind imputations, and percentile conventions remain
-unmeasured sources of discrepancy. Sampling and imputation uncertainty
-has not been estimated for the replication. Published BLS standard errors
-provide scale for the level differences, but they do not account for
-replication error or covariance from shared survey inputs.
+We test sensitivity to youth and tenure treatment. Annual price
+adjustment, the food allocation, omitted home internet and in-kind
+imputations, and percentile conventions can also affect the estimates. We
+have not estimated the replication’s sampling and imputation
+uncertainty. Published BLS standard errors provide scale for the level
+differences, but they do not account for replication error or covariance
+from shared survey inputs.
 
 # Projecting thresholds {#sec-projection}
 
 ## Price and consumption growth rules
 
-The projection question is whether changes in public consumption data
-improve on price adjustment of the latest published threshold. Let
-$\widetilde B_{T,h}$ be the replicated national threshold and $P_T$ a
-price index. Starting from an official base $B_{T-1,h}$, the combined rule
-is
+We test whether public consumption growth predicts published thresholds
+more accurately than price adjustment. Let $\widetilde B_{T,h}$ be the
+replicated national threshold and $P_T$ a price index. Starting from an
+official base $B_{T-1,h}$, the combined rule is
 
 $$
 \widehat B_{T,h}=B_{T-1,h}
@@ -309,113 +286,96 @@ We compare All-Items CPI-U adjustment; adjustment by a static-weight
 composite matching the FCSUti components available in the data; the
 replication growth ratio alone; and an equal blend of replication growth
 and composite-price growth. The last three correspond to $\lambda=0$,
-$1$, and $1/2$ when $P$ is the composite index. The blend weights are fixed
-rather than fitted to the small evaluation sample.
+$1$, and $1/2$ when $P$ is the composite index. We fix the blend weights
+at one half.
 
-The projection composite uses five CPI-U components: food, apparel,
-shelter, fuels and utilities, and telephone services. Their respective
-weights are $(0.30, 0.05, 0.45, 0.12, 0.04)/0.96$, with no separate
-home-internet component. These are fixed research weights; they do not
-reproduce the BLS deflator exactly. If $P_{i,T}$ is component $i$'s
-annual-average index, the current projection's price multiplier is
-$\sum_i w_i(P_{i,T}/P_{i,T-1})$. The frozen experiments use the same
-normalized weights, with the fixed-2019-base backtest distinguished from
-the prior-year-based 2025 nowcast below. These projection weights are
-separate from the sample-derived weights used to adjust CE expenditures
-in the current replication.
+We construct the projection composite from five CPI-U components:
+food, apparel, shelter, fuels and utilities, and telephone services.
+We assign respective weights of $(0.30, 0.05, 0.45, 0.12, 0.04)/0.96$,
+with no separate home-internet component, to approximate the BLS
+deflator. For component $i$'s annual-average index $P_{i,T}$, we
+calculate the six-year comparison's price multiplier as $\sum_i
+w_i(P_{i,T}/P_{i,T-1})$. We use the same normalized weights in the
+five-year benchmark and 2025 nowcast. We hold the benchmark's index
+base at 2019 and rebase the nowcast to the prior year. We derive the
+separate expenditure-adjustment weights from each selected CE sample.
 
-Using growth ratios has a specific rationale. If replication differs
-from the official level by a stable proportional factor, that factor
+If replication differs from the official level by a stable proportional factor, that factor
 cancels between adjacent years. A persistent additive difference need
 not cancel, and changing omissions or sample effects can alter growth.
-The method therefore requires empirical evaluation of the ratios, even
-when the replicated levels appear stable.
 
-CPI-U adjustment estimates a different process from annual re-estimation
-of consumption thresholds. Census's analysis of the originally published
-2024 SPM estimates illustrates the distinction: consumption-based
-threshold growth exceeded the CPI-U update, and price-updating the
-thresholds instead would have produced a 2024 rate of 12.4 percent, below
-the published SPM rate [@creamer2025]. That finding concerns the published
-vintage used in that analysis; it does not establish how a particular
-projection rule will perform in every year.
+Census estimated that updating 2024 thresholds for CPI-U growth would
+produce an SPM rate of 12.4 percent, below the published rate
+[@creamer2025]. Census used the threshold and poverty estimates
+published for 2024 in that analysis.
 
-## Current-method retrospective comparison {#sec-current}
+## Retrospective comparison, 2020–2025 {#sec-current}
 
-@tbl-current-projection evaluates six one-year projections for 2020–2025.
-For each target year, all rules start from the prior year's revised
-published threshold. The current composite holds static component weights
-and rebases the price index to each prior year. Replication and price
-inputs use the versions recorded in the September 2026 research replay. Historical availability
-of those exact versions is not inferred.
+We evaluate six one-year projections for 2020–2025
+(@tbl-current-projection). For every target year, we start each rule
+from the prior year's revised published threshold. We hold the
+composite's component weights fixed and rebase its price index to the
+prior year. We use the replication and price inputs recorded in
+September 2026. We do not reconstruct the data available at each
+historical forecast date.
 
-::: {#tbl-current-projection}
+::: {#tbl-current-projection tbl-colwidths="[16,16,24,24,20]"}
 {{< include tables/current_projection.md >}}
 
-Current-method retrospective mean absolute percentage errors across
-three tenures, 2020–2025. The mean row weights the six years equally.
+Retrospective mean absolute percentage errors across three tenures,
+2020–2025. The mean row weights the six years equally.
 :::
 
 Over these six years, the replication ratio has the lowest mean absolute
 error, followed by the blend, composite-price adjustment, and CPI-U
-adjustment. The table also shows substantial variation across years.
-It uses realized prices, which would not have been available in a forecast
-made before the target year's inflation was observed. Adjacent CE windows
-share four of five years, and tenure estimates share observations. The
-resulting errors are dependent retrospective evidence, not eighteen
-independent forecast trials or six prospective validations.
+adjustment. Errors vary across years. We use realized prices, which analysts could not observe before the
+target year ended.
+Adjacent CE windows share four of five years, and tenure estimates share
+observations. These shared observations make the errors dependent, and
+all six comparisons use outcomes known at implementation.
 
-## Frozen comparison used for the 2025 nowcast
+## Five-year benchmark for the 2025 nowcast
 
-The pre-committed 2025 estimate used an earlier, separately preserved
-method version. Its 2020–2024 comparison is shown in @tbl-backtest. This
-experiment also uses corrected actual thresholds and realized price
-indices; it is retrospective. Its fixed-2019-base price composite and
-sample treatment differ from the current research method. Keeping the
-two tables separate preserves the evidence available when the 2025
-nowcast was committed.
+We use a five-year benchmark covering 2020–2024 for the 2025 nowcast
+(@tbl-backtest). We use corrected thresholds and realized prices in
+this retrospective comparison. For this benchmark, we use sample rules and a fixed-2019-base price
+composite that differ from those in the six-year comparison.
+Appendix B identifies the implementation and inputs for each
+experiment.
 
 ::: {#tbl-backtest tbl-colwidths="[34,11,11,11,11,11,11]"}
 {{< include tables/backtest.md >}}
 
-Frozen-method mean absolute percentage errors across three tenure
+Five-year benchmark mean absolute percentage errors across three tenure
 thresholds, projecting each year from the prior year's corrected values.
 :::
 
-CPI-U adjustment has a mean absolute error of 2.23 percent and understates
-threshold growth in four of five years, with a signed mean error of
-−1.9 percent. Composite-price adjustment reduces the mean absolute error
-to 1.57 percent, removing about thirty percent of the CPI-U error in this
-sample. The replication ratio scores 0.41 percent, with a signed mean of
-+0.1 percent and annual signed means ranging from +0.5 to −0.3 percent.
-The equal blend scores 0.76 percent; its annual signed means range from
-−0.1 to −1.4 percent. These are descriptions of the frozen comparison,
-not uncertainty intervals for future forecasts.
-
-The blend remained the primary committed estimate although the final
-frozen comparison ranked the replication ratio first. The method-version
-and amendment chronology is recorded in Appendix A. The external
-validation below reports every rule, including the original and amended
-blend estimates, without choosing the primary forecast after seeing
-published 2025 outcomes.
+CPI-U adjustment has a mean absolute error of 2.23 percent and
+understates threshold growth in four of five years, with a signed mean
+error of −1.9 percent. Composite-price adjustment reduces the mean
+absolute error to 1.57 percent, removing about thirty percent of the
+CPI-U error in this sample. The replication ratio scores 0.41 percent,
+with a signed mean of +0.1 percent and annual signed means ranging from
++0.5 to −0.3 percent. The equal blend scores 0.76 percent; its annual
+signed means range from −0.1 to −1.4 percent. These ranges describe
+variation across the five observed years; they do not quantify future
+forecast uncertainty.
 
 # Pre-committed 2025 validation {#sec-nowcast}
 
 ## The estimate before publication
 
-At the commitment date, 2025 was a nowcasting problem: estimating a
-quantity whose underlying period had occurred but whose official value
-was unpublished [@giannone2008]. The relevant CE collection window,
-2020Q2 through 2025Q1, and eleven months of 2025 CPI observations were
-available. October 2025 CPI was not published; the recorded price inputs
-use the eleven available months. BLS documents this annual-average
-treatment for CPI series without a published October observation
-[@blscpi2025shutdown].
+We estimated the 2025 thresholds after the expenditure period ended
+and before BLS published the outcome, producing a nowcast
+[@giannone2008]. We used the CE window from 2020Q2 through 2025Q1 and
+eleven months of 2025 CPI observations. BLS did not publish October
+2025 CPI. We average the other eleven months following BLS's
+documented treatment [@blscpi2025shutdown].
 
-The committed blend projected \$41,036.34 for owners with mortgages,
+We committed to an equal blend that projected \$41,036.34 for owners with mortgages,
 \$34,135.99 for owners without mortgages, and \$40,755.98 for renters.
-It applies replication and composite-price growth to the corrected 2024
-base fixed in the commitment.
+We apply replication and composite-price growth to the corrected 2024
+thresholds specified in the forecast registration.
 
 ::: {#tbl-nowcast tbl-colwidths="[31,17,18,14,20]"}
 {{< include tables/nowcast.md >}}
@@ -426,73 +386,70 @@ replication and price components. These are model estimates.
 
 Replicated threshold growth ranged from 4.4 to 6.0 percent by tenure,
 against 3.2 percent composite-price growth. Their blend projected
-3.8 to 4.6 percent growth, compared with 2.6 percent realized CPI-U growth.
-The nowcast price component chain-links at the prior year; the frozen
-backtest composite holds a fixed 2019 base. Both definitions are recorded
-with their experiments rather than treating them as interchangeable.
+3.8 to 4.6 percent growth, compared with 2.6 percent realized CPI-U growth. The
+nowcast price component chain-links at the prior year; the five-year
+backtest composite holds a fixed 2019 base. The two composites therefore
+apply the same component weights to different index bases.
 
 ## Evaluation against published thresholds {#sec-evaluation}
 
-BLS published the 2025 thresholds on August 24, 2026:
-\$41,323 for owners with mortgages, \$34,326 for owners without, and
-\$41,701 for renters [@bls2025thresholds]. The linked workbook carries
-full-precision values and standard errors of \$327, \$560, and \$393.
-BLS reports growth of 4.40 to 6.33 percent by tenure over the corrected
-2024 base. All forecast evaluations below use that base as fixed before
-publication.
+BLS published the 2025 thresholds on August 24, 2026: \$41,323 for
+owners with mortgages, \$34,326 for owners without, and \$41,701 for
+renters [@bls2025thresholds]. The linked workbook carries full-precision
+values and standard errors of \$327, \$560, and \$393. BLS reports
+growth of 4.40 to 6.33 percent by tenure over the corrected 2024 base.
+We use that base, fixed before publication, for every forecast
+evaluation.
 
 ::: {#tbl-evaluation tbl-colwidths="[34,17,17,16,16]"}
-{{< include tables/evaluation.md >}}
+{{< include tables/evaluation_main.md >}}
 
 Signed percentage errors against published 2025 thresholds and mean
 absolute error across tenures. The CPI-U rule uses the pinned
-eleven-month 2025 annual average; both committed blend vintages are shown.
+eleven-month 2025 annual average; the blend uses equal weights on
+consumption and composite-price growth.
 :::
 
 ::: {#tbl-evaluation-levels tbl-colwidths="[24,16,18,12,15,15]"}
-{{< include tables/evaluation_levels.md >}}
+{{< include tables/evaluation_levels_main.md >}}
 
 Published 2025 thresholds and the committed nowcast in dollars, with
 BLS's stated growth and the projected growth.
 :::
 
-The amended blend understates the three thresholds by 0.69, 0.55, and
-2.27 percent, giving a mean absolute error of 1.17 percent. Its signed
-mean of −1.17 percent falls inside the −0.1 to −1.4 range described in
-advance, although the renter error lies outside that range. The two
-owner differences are within one published BLS standard error and the
-renter difference is about 2.4 standard errors. These comparisons give
-scale; the BLS standard errors are neither forecast uncertainty bands
-nor a significance test of the model's discrepancies.
+The committed blend understates the three thresholds by 0.69, 0.55, and
+2.27 percent, giving a mean absolute error of 1.17 percent. The signed
+mean error also equals −1.17 percent. The owner
+differences fall within one published BLS standard error; the renter
+difference reaches about 2.4 standard errors. BLS standard errors
+measure official sampling uncertainty, so they cannot bound forecast
+errors or test the model’s discrepancies for significance.
 
-CPI-U adjustment understates all three thresholds by 1.70 to 3.47 percent,
-for a mean absolute error of 2.58 percent. The replication ratio alone
-scores 0.75 percent and has errors on both sides of zero; composite-price
-adjustment scores 2.02 percent. The replication ratio therefore ranks
-first in this validation year as well as in the frozen retrospective
-comparison. The superseded original blend scores 0.98 percent, compared
-with 1.17 percent for the amended blend. Both are reported because both
-were committed before the official outcome. One year cannot establish
-whether any of these rankings will persist.
+CPI-U adjustment understates all three thresholds by
+1.70 to 3.47 percent, for a mean absolute error of 2.58 percent. The replication
+ratio alone scores 0.75 percent and has errors on both sides of zero;
+composite-price adjustment scores 2.02 percent. The replication ratio
+therefore ranks first in this validation year as well as in the
+five-year retrospective comparison. One year cannot establish whether
+any of these rankings will persist.
 
 The largest miss occurs for renters. BLS reports renter growth of 6.33
-percent against 5.33 and 4.40 percent for the two owner tenures. The blend
-projects renter growth of 3.92 percent, and replication alone 4.62
-percent. This analysis does not identify the reason for the difference.
-Omitted imputations, price treatment, sample classification, percentile
-conventions, and other replication differences could affect growth;
-the observed miss does not attribute it to any one of them.
+percent against 5.33 and 4.40 percent for the two owner tenures. The
+blend projects renter growth of 3.92 percent, and replication alone 4.62
+percent. Omitted imputations, price treatment, sample classification,
+and percentile conventions can each affect growth. The comparison does
+not isolate their contributions to the renter miss.
 
 ## Validation of the price comparator
 
 BLS publishes its FCSUti deflator growth alongside the thresholds,
-providing an additional comparison after publication. This comparison uses
-the fixed-2019-base composite from the frozen backtest, rather than the
-prior-year-based composite used in the 2025 nowcast. The fixed-base
+providing an additional comparison after publication. We compare BLS’s
+deflator with the five-year backtest’s fixed-2019-base composite. The
+2025 nowcast uses a separate, prior-year-based composite. The fixed-base
 composite differs from the BLS index by at most 0.7 percentage point in
 each year from 2020 through 2025, with a mean absolute gap of 0.4 point
-and no consistent sign. This is evidence of closeness over those years,
-not exact replication of the deflator.
+and no consistent sign. The composite approximates the deflator over
+these six years.
 
 ```{=latex}
 \Needspace{14\baselineskip}
@@ -501,42 +458,39 @@ not exact replication of the deflator.
 ::: {#tbl-composite-validation tbl-colwidths="[10,18,22,14,18,18]"}
 {{< include tables/composite_validation.md >}}
 
-Year-over-year growth in BLS's FCSUti deflator and the frozen backtest's
-fixed-2019-base composite, with the CPI-U figures alongside.
+Year-over-year growth in BLS's FCSUti deflator and the five-year
+backtest's fixed-2019-base composite, with the CPI-U figures alongside.
 :::
 
 For 2025, the BLS threshold page reports CPI-U growth of 2.70 percent,
 compared with 2.63 percent implied by the eleven-month annual average in
 the pinned CPI observations. The threshold page does not reconcile this
-difference with the CPI program's documented eleven-month averaging
-rule [@blscpi2025shutdown]. We retain the recorded calculation rather
-than substituting a different annual average in the completed forecast
-evaluation.
+difference with the CPI program's documented eleven-month averaging rule
+[@blscpi2025shutdown]. The forecast evaluation uses the recorded
+eleven-month average.
 
 # Conditional forecasts beyond available microdata {#sec-rolling}
 
 ## Projecting expenditure records and rolling windows
 
-The preceding comparisons observe the CE collection window for each
-target year. A future projection instead supplies the unobserved quarters
-and then re-estimates the threshold from the resulting twenty-quarter
-window. The September 9, 2026 information snapshot uses observed CE
-records through 2025Q1. At that cutoff, BLS scheduled the next annual CE
-microdata release for October 29, 2026 [@blsce2025shutdown]. For each
-later quarter the projection reuses the latest observed quarter of
-the same season, preserving survey weights, composition, and record
-identities. Monetary spending is multiplied by the cumulative price
-change and an assumed real-expenditure growth factor. Historical quarters
-leave the window as projected quarters enter; this is not a direct
-inflation adjustment of the final threshold.
+For the retrospective comparisons, we observe the CE collection window
+for each target year. To forecast later thresholds, we supply the
+unobserved quarters and re-estimate each twenty-quarter window. We use
+CE records available on September 9, 2026, through 2025Q1. At that
+date, BLS scheduled the next annual CE microdata release for October
+29, 2026 [@blsce2025shutdown]. For each later quarter, we reuse
+records from the latest observed quarter of the same season. We
+preserve their survey weights, composition, and identities, and
+multiply spending by cumulative price change and an assumed
+real-expenditure growth factor. We remove historical quarters as
+projected quarters enter and recalculate each threshold from the
+resulting sample.
 
-The prospective evaluation will also need to account for the interruption
-of CE collection in October and November 2025. BLS describes adjustments
-for its annual expenditure estimates and states that those adjustments
-will not be applied directly to the public-use files
-[@blsce2025shutdown]. This projection uses seasonal donor records; it
-does not estimate the effect of that missing-data treatment on future
-published SPM thresholds.
+BLS interrupted CE collection in October and November 2025. It adjusts
+its annual expenditure estimates for this interruption but does not
+apply those adjustments directly to the public-use files
+[@blsce2025shutdown]. We use seasonal donor records and do not estimate how that missing-data
+treatment affects future published SPM thresholds.
 
 Let $r$ be an annual log growth rate for real expenditures. A donor
 record from year $d$ projected to year $t$ receives the multiplier
@@ -545,31 +499,32 @@ CE trend. To estimate the latter, we construct five nonoverlapping
 annual collection blocks ending in 2021–2025, express them in common
 origin-year prices with fixed origin-window component weights, and
 compute each block's survey-weighted mean in the 47th–53rd percentile
-FCSUti band. An ordinary least-squares regression of log means on year
-provides a slope. The applied slope is half that estimate; the 0.5
-shrinkage was declared independently of the reported forecast scores.
+FCSUti band. We regress the log means on year by ordinary least squares to estimate
+a slope, and we apply half that estimate. We chose the 0.5
+shrinkage independently of the reported forecast scores.
 
-We report rates as compounded annual equivalents, $\exp(r)-1$, not as
-the log rate $r$ that enters the multiplier. The applied annual
-real-growth rate is 0.914 percent, from an applied log rate of 0.910
-percent. Using ten annual blocks gives 0.817 percent; excluding the two
+We express growth rates as compounded annual equivalents, $\exp(r)-1$.
+The expenditure multiplier uses the log rate $r$. We apply annual
+real growth of 0.914 percent, from an applied log rate of 0.910
+percent. Using ten annual blocks, we obtain 0.817 percent; excluding the two
 blocks ending in 2021 and 2022 from the five-block fit leaves three
-blocks and gives −0.135 percent. These alternatives demonstrate
-sensitivity to the fitting window. They are not confidence intervals:
+blocks and gives −0.135 percent. Ordinary regression uncertainty omits
 repeated interviews, survey design, serial dependence, and future
-structural changes are not captured by ordinary regression uncertainty.
-The zero-real scenario supplies a separate comparison rather than a
-lower statistical bound.
+structural changes. Neither these sensitivities nor the zero-real
+scenario bound forecast uncertainty.
 
-The nominal path uses annual CPI-U growth from CBO's February 2026
-economic projections, rebased to the observed 2025 annual index
-[@cbodata2026]. Applying that same growth rate to each expenditure price
-component and to rents is an assumption of this projection, not a CBO
-forecast for each component. Real growth and prices both affect projected
-spending; setting real growth to zero still allows changes from replacing
-older observations in the rolling window.
+We use annual CPI-U growth from the Congressional Budget Office
+(CBO)’s February 2026 economic projections and rebase the nominal path
+to the observed 2025 annual index [@cbodata2026]. We assume that every
+expenditure price component and rents grow at CBO’s projected aggregate
+rate. Real growth and prices both affect projected spending; setting
+real growth to zero still allows changes from replacing older
+observations in the rolling window.
 
-For origin $O=2025$, the national projection is
+We anchor each tenure's national threshold and housing share to
+published 2025 values. Let $\widetilde a_{T,h}$ denote the housing
+share that we estimate from the projected microdata for target year
+$T$ and tenure $h$. For origin $O=2025$, we calculate
 
 $$
 \widehat B_{T,h}=B_{O,h}^{\mathrm{published}}
@@ -578,65 +533,62 @@ $$
 \frac{\widetilde a_{T,h}}{\widetilde a_{O,h}}.
 $$
 
-Thus both the national base and housing share start from published
-2025 values, with subsequent changes estimated from the projected
-microdata. The percentile band is selected again for every target
-window. Changes in band membership can make the tenure-specific
-threshold under the positive-real-growth scenario slightly lower than
-under zero real growth in a particular year; the scenarios do not
-preserve a fixed ranking of selected observations.
+We estimate subsequent changes from the microdata and select the
+percentile band again for every target window. Changes
+in band membership can make the tenure-specific threshold under the
+positive-real-growth scenario slightly lower than under zero real growth
+in a particular year; the scenarios do not preserve a fixed ranking of
+selected observations.
 
 ::: {#tbl-rolling-projection}
 {{< include tables/rolling_projection.md >}}
 
 Conditional national reference thresholds under the CE-trend and
-zero-real-growth scenarios. The 2025 bases are published; later values
-are modeled. These scenarios do not constitute prediction intervals.
+zero-real-growth scenarios. BLS supplies the 2025 bases; the projection
+estimates later values. These scenarios do not constitute prediction
+intervals.
 :::
 
 ## Projecting local relative housing costs
 
-The geographic window for threshold year $T$ comprises ACS years
-$T-5$ through $T-1$. Public-use geography requires fractional allocation
-from Public Use Microdata Areas to SPM estimation areas. The projection
-uses the declared February 2013 metropolitan delineation and records
-the crosswalk and source vintages. These allocations, public-data
-topcoding, and the public rental sample limit exact reproduction of
-the Census calculation [@acs2024pumd].
+For threshold year $T$, we use ACS years $T-5$ through $T-1$. We
+allocate each Public Use Microdata Area (PUMA) fractionally to SPM
+estimation areas using a geographic crosswalk. We use the February
+2013 metropolitan delineation and record the crosswalk and source
+versions. Fractional allocation, public-data topcoding, and the public
+rental sample limit exact reproduction of the Census calculation
+[@acs2024pumd].
 
-The rental sample contains occupied, cash-rented two-bedroom housing
-units with complete kitchen and plumbing facilities, positive gross
-rent, and positive housing weights. This follows the housing-unit
-definition used for the SPM geographic adjustment [@spmtechnical].
-For each complete five-year PUMS product, we retain its housing weights
-(`WGTP`) and identify survey-year cohorts from the record identifiers;
-we do not combine overlapping products as independent observations.
-Monthly gross rent is `GRNTP` multiplied once by `ADJHSG` divided by
-$10^6$, placing the product's observations on a common dollar basis
-[@acs2024accuracy]. Area estimation multiplies housing weights by the
-PUMA-to-area allocation fractions. After sorting adjusted rents, the
-median is the first observed value whose cumulative weight reaches
-50 percent. This is a discrete weighted median without interpolation,
-an additional approximation in the public-data reconstruction. Future
-donor copies retain the original product weights; no annual reweighting
-or population-growth adjustment is imposed.
+We select occupied, cash-rented two-bedroom housing units with
+complete kitchen and plumbing facilities, positive gross rent, and
+positive housing weights [@spmtechnical]. For each complete five-year
+Public Use Microdata Sample (PUMS) product, we retain housing weights
+(`WGTP`) and group records by survey year using their identifiers. We
+do not combine overlapping products as independent observations. We
+multiply monthly gross rent (`GRNTP`) once by the housing-dollar
+adjustment (`ADJHSG`), divided by $10^6$, to express rent on the
+product's common dollar basis [@acs2024accuracy]. We multiply housing
+weights by PUMA-to-area allocation fractions, sort the adjusted rents,
+and select the first value whose cumulative weight reaches 50 percent.
+We do not interpolate between values. For future donor copies, we
+retain the original product weights without annual reweighting or a
+population-growth adjustment.
 
-Observed ACS cohorts are used through 2024. Each later cohort copies
-the 2024 donor records, scales nominal rents, and converts them to a
-common price basis. Local and national weighted rent medians are
-recomputed from each complete five-cohort window. Equal nationwide
-rent growth therefore does not imply constant local relative costs:
-the mix changes as older observed cohorts leave the window. Once all
-five cohorts use the same donor distribution, the relative indices
-stabilize under this assumption. In this snapshot that occurs in 2029.
-The whole-threshold factor can continue changing as the housing share
-changes.
+We use observed ACS cohorts through 2024. For each later cohort, we copy
+the 2024 donor records and scale rents to a common price basis. We
+recompute local and national weighted rent medians from each complete
+five-cohort window. Equal nationwide rent growth
+therefore does not imply constant local relative costs: the mix changes
+as older observed cohorts leave the window. Once all five cohorts use
+the same donor distribution, the relative indices stabilize under this
+assumption. In this snapshot that occurs in 2029. The whole-threshold
+factor can continue changing as the housing share changes.
 
-The public-data products used for the 2024 anchor and subsequent
-windows differ. To avoid treating a product change as rent growth, we
-bridge them over the common 2020–2023 years. If $m^{v}_{W,j}$ is area
-$j$'s local-to-national rent-median ratio for window $W$ in product $v$,
-then, for an area with a published 2024 anchor,
+The public-data products used for the 2024 anchor and subsequent windows
+differ. To avoid treating a product change as rent growth, we bridge
+them over the common 2020–2023 years. If $m^{v}_{W,j}$ is area $j$'s
+local-to-national rent-median ratio for window $W$ in product $v$, then,
+for an area with a published 2024 anchor,
 
 $$
 \widehat g_{T,j}=g^{\mathrm{published}}_{2024,j}
@@ -645,13 +597,13 @@ $$
 $$
 
 Unpublished residual groups retain explicitly modeled, unanchored
-indices. The menu contains 342 published and seven modeled areas in
+indices. We estimate indices for 342 published and seven modeled areas in
 2022, and 341 published and eight modeled areas from 2023. Annual
-comparisons distinguish published-index revisions and assignment
-changes from projected rent growth. In particular, the Massachusetts
+comparisons distinguish published-index revisions and assignment changes
+from projected rent growth. In particular, the Massachusetts
 nonmetropolitan published index changes between 2022 and 2023, and
 Sumter County moves from a published residual group to an unanchored
-modeled group; neither discontinuity is smoothed into a rent forecast.
+modeled group; we preserve both discontinuities separately from forecast rent growth.
 
 ```{=latex}
 \Needspace{24\baselineskip}
@@ -660,127 +612,91 @@ modeled group; neither discontinuity is smoothed into a rent forecast.
 ::: {#tbl-rolling-validation}
 {{< include tables/rolling_validation.md >}}
 
-Retrospective geographic comparison and late-horizon donor support.
-Repeated copies of the same donor are counted once when measuring
-independent support. These diagnostics do not measure prospective
+Retrospective geographic comparison and late-horizon donor support. The
+support count includes each donor once, regardless of how many projected
+copies enter the window. These diagnostics do not measure prospective
 national-threshold accuracy.
 :::
 
 The 2023-origin, 2024-target geographic comparison covers 341 areas with
-published anchors.
-It is retrospective and does not validate the unanchored residual
-groups or future rent assumptions. Support narrows as observed cohorts
-leave: 31 areas carry thin-donor warnings in projected years. Preserving
-record identity avoids mistaking five projected copies for five
-independent samples. No estimate is silently replaced by a national
-factor or a carried prior-year value when support is thin.
+published anchors. This retrospective comparison excludes the unanchored
+residual groups and does not test future rent assumptions. Support
+narrows as observed cohorts leave: 31 areas carry thin-donor warnings in
+projected years. Preserving record identity avoids mistaking five
+projected copies for five independent samples. We retain each area’s calculated factor when support is thin and flag
+its donor count.
 
 # Discussion {#sec-discussion}
 
-The results distinguish two tasks: estimating a threshold level and
-projecting its growth. The public-data replication does not reproduce
-every component of the official method, and its level discrepancies
-remain material. Growth ratios can nevertheless be useful when some
-proportional discrepancies persist across adjacent windows. Their
-performance must be judged directly; agreement in levels is neither
-necessary nor sufficient for accurate growth projections.
+We approximate published threshold levels from public CE data. Sample
+treatment, price adjustment, and omitted imputations can affect the
+estimates; we do not isolate their contributions to the observed
+discrepancies. Stable proportional differences cancel in adjacent-year
+growth ratios. We evaluate those growth ratios separately from
+threshold levels.
 
 In the periods examined, consumption-based growth improves on CPI-U
-adjustment as a predictor of published SPM thresholds. That pattern is
-consistent with the measure's quasi-relative construction: annual
-re-estimation can reflect consumption changes that price adjustment
-alone omits. The results do not isolate how much of the difference is
-attributable to real spending, relative prices, sample composition, or
-in-kind benefits. They also do not make price-indexed anchored measures
-inappropriate; those measures deliberately estimate a fixed real
-standard rather than the threshold BLS will publish.
+adjustment as a predictor of published SPM thresholds. Annual
+re-estimation reflects consumption changes that price adjustment alone
+omits, consistent with the measure’s quasi-relative construction. The
+comparisons do not separate contributions from real spending, relative
+prices, sample composition, and in-kind benefits. Price-indexed anchored
+measures serve a different purpose: they hold the real standard fixed.
 
-The evidence for prospective accuracy remains limited. The current
-six-year comparison uses revised data and an implementation applied
-after outcomes were known. The frozen five-year comparison informed a
-single 2025 validation. Overlapping CE windows and shared tenure samples
-reduce the independent variation in both comparisons. The replication
-ratio's lower average errors therefore motivate further validation,
-without establishing a universally preferred rule or fitted combination
-weight.
+We evaluate prospective performance against one year's outcome. We run
+the six-year comparison on revised data after BLS published all six
+outcomes and use a five-year benchmark for the 2025 nowcast. We reuse
+CE observations across overlapping windows and housing-tenure
+estimates. These dependent comparisons cannot establish a general
+method ranking or estimate combination weights.
 
-The information horizon also matters. When the complete CE window is
-available but BLS thresholds are not, consumption replication can supply
-a nowcast. Beyond the available CE window, it requires assumptions about
-future consumption as well as prices. The conditional extension here
-specifies those assumptions and advances both survey windows, but its
-longer-horizon accuracy has not been prospectively validated. Method
-changes, benefit imputations, and changes in sample composition can
-also alter growth relationships. The sample and trend sensitivities
-identify specific uncertainties but do not provide forecast intervals.
+When BLS releases the complete CE window before publishing thresholds,
+we can estimate a nowcast from observed consumption. For later years,
+we project both survey windows under assumptions about consumption and
+prices. We have not evaluated those longer-horizon projections
+prospectively. Changes to BLS methods, benefit imputations, and sample
+composition can alter growth relationships. We test sample and trend
+assumptions without constructing forecast intervals.
 
 Threshold choice affects modeled poverty through the distribution of
-resources near the line. A poverty-rate impact estimate therefore requires
-a specified population and resource model.
+resources near the line. A poverty-rate impact estimate therefore
+requires a specified population and resource model.
 
-# Appendix A: method versions and forecast commitment {.unnumbered}
+# Appendix A: replication benchmark {.unnumbered}
 
-The frozen replication used for the 2025 commitment has mean absolute
-deviations across tenures of 1.5 to 2.1 percent per year against revised
-2019–2024 thresholds, and 1.0 to 1.6 percent against the preceding
-published series with its corresponding anchor share. Published BLS
-sampling standard errors span 0.7 to 2.1 percent of the revised threshold
-levels in those years. These standard errors describe official threshold
+The replication used for the 2025 nowcast has mean absolute deviations
+across tenures of 1.5 to 2.1 percent per year against revised 2019–2024
+thresholds, and 1.0 to 1.6 percent against the preceding published
+series with its corresponding anchor share. Published BLS sampling
+standard errors span 0.7 to 2.1 percent of the revised threshold levels
+in those years. These standard errors describe official threshold
 estimation; they do not quantify the uncertainty of the replication.
 
 ::: {#tbl-replication}
 {{< include tables/replication.md >}}
 
-Frozen-method replication deviations by tenure, with the anchor share
-matched to each reference vintage. These results are preserved separately
-from the current-method replication.
+Benchmark replication deviations by tenure, with the anchor share
+matched to each reference vintage. The benchmark uses the 2025 nowcast
+implementation.
 :::
-
-The original 2025 blend was committed before a correction to the
-composite-price construction, which had combined CPI components without
-putting them on a common index base. The correction changed the
-retrospective method ranking; the equal blend was retained as the primary
-forecast, and all component rules were included in the promised
-external evaluation. This was one pre-publication amendment, not a rule
-selected using the published 2025 outcome.
-
-The amendment moved estimates by 0.1 to 0.3 percent: owners with
-mortgages from \$41,099.57 to \$41,036.34, owners without from
-\$34,250.70 to \$34,135.99, and renters from \$40,791.72 to \$40,755.98.
-The original and amended values, corrected 2024 base, and evaluation
-rules remain fixed in the repository. This use of preregistration
-[@nosek2018] separates the recorded forecast from later method development.
-
-The [August 7, 2026 archived page](https://web.archive.org/web/20260807211521/https://spm-threshold-paper.vercel.app/)
-and retained OpenTimestamps evidence
-precede the August 24 publication. The original forecast tags, manifests,
-and proof files remain unchanged. A dated September 8 amendment corrects
-two artifact hashes in a secondary manifest without claiming that its
-old timestamp covers the amendment. The repository documents those
-identities and checks the retained bytes; this revision does not
-independently reverify blockchain attestations.
-
-This paper makes no new threshold forecast commitment or scheduled cutoff.
-The previously discussed 2026 CE collection window already closed in 2026Q1.
-Any future commitment would require an actual timestamp and a recorded
-available-input cutoff before the outcome is published.
 
 # Appendix B: reproducibility {.unnumbered}
 
-The [paper repository](https://github.com/PolicyEngine/spm-threshold-paper)
+The [paper
+repository](https://github.com/PolicyEngine/spm-threshold-paper)
 provides the manuscript, table generators, verification tests, and
-recorded inputs. Its [source-data provenance](https://github.com/PolicyEngine/spm-threshold-paper/blob/cc858aa610cc414215fe3e1fc4038b5248810743/data/PROVENANCE.md)
-describes the preserved experimental collections. The
-companion calculator source [@spmcalculator2026] contains the
-expenditure and geographic estimators, source acquisition
-scripts, and standalone implementation at the rolling projection's
-exact revision.
+recorded inputs. Its [source-data
+provenance](https://github.com/PolicyEngine/spm-threshold-paper/blob/cc858aa610cc414215fe3e1fc4038b5248810743/data/PROVENANCE.md)
+describes the experimental collections. The companion calculator source
+[@spmcalculator2026] contains the expenditure and geographic estimators,
+source acquisition scripts, and standalone implementation at the rolling
+projection's exact revision.
 
-The paper repository preserves the inputs and generated tables for the frozen
-experiments, together with a separate current-method artifact containing
-source hashes, methodology choices, and sample diagnostics. The
-2019–2025 retrospective experiment retains its original implementation
-pin, spm-calculator development version 0.5.0 at commit
+The paper repository preserves the inputs and generated tables for the
+five-year benchmark and 2025 nowcast, together with a separate six-year
+replication artifact containing source hashes, methodology choices, and
+sample diagnostics. The 2019–2025 retrospective experiment uses
+spm-calculator 0.5.0 at commit
 `0d7fa0d77b0a88064ab7b9fe70557309b5f7901f`. The conditional rolling
 projection uses the separate 1.0.0 release candidate at commit
 `78bae15f76152c6076dd909a09f6b63dc2ec8c34`. The candidate's content
@@ -790,63 +706,59 @@ digest is:
 3d86d5c4c0423480e6b69b75d222ffa4a7a2639e4094df5ba2504af01be17173
 ```
 
-Exact source and release identities are recorded alongside the inputs;
-`data/PROVENANCE.md` describes the separate collections. The repository
-also preserves a historical poverty sensitivity. Its receipt lacks
-immutable model and population dataset identities, so exact replay has
-not been established.
+The input manifests record exact source and release identities. The
+[data
+provenance](https://github.com/PolicyEngine/spm-threshold-paper/blob/master/data/PROVENANCE.md)
+and [forecast
+registration](https://github.com/PolicyEngine/spm-threshold-paper/blob/master/docs/forecast-record.md)
+identify each experiment’s inputs and evidence.
 
 To verify the reported tables, clone the paper repository with its full
 tag history and check out the manuscript revision being evaluated. Run
-`python3 -B scripts/check_paper.py` and
-`python3 -B -m unittest discover -s tests -v`. Quarto 1.9.36 and TeX Live
-2026 render this revision with `quarto render --to html` and
-`quarto render --to pdf`. These commands regenerate the tables from
-the preserved artifacts; regenerating the underlying CE and ACS
-estimates additionally requires the pinned calculator and its source
-files. The repository README gives the build commands and separates
-this verification from raw-data replication.
+`python3 -B scripts/check_paper.py` and `python3 -B -m unittest discover
+-s tests -v`. Quarto 1.9.36 and TeX Live 2026 render this revision with
+`quarto render --to html` and `quarto render --to pdf`. These commands
+regenerate the tables from the recorded artifacts; regenerating the
+underlying CE and ACS estimates additionally requires the pinned
+calculator and its source files. The [experiment replay
+guide](https://github.com/PolicyEngine/spm-threshold-paper/blob/master/docs/reproducing-experiments.md)
+provides commands and source-file requirements for raw-data replication.
 
-The rolling projection is a portable artifact shared by the paper and
-standalone calculator, with year-specific national bases, housing shares,
-geographic indices, assignments, and source fingerprints. The pinned
-calculator includes PolicyEngine, Microcosm, and native Axiom adapters
-that consume these quantities through explicit contracts. Population
-sources supply native SPM membership and composition roles;
-tax-benefit models retain responsibility for resources, including
-ordinary income, program awards, and the housing-assistance cap, and the
-population system retains its weights. A change of
-rules engine does not require a second expenditure forecast. Runtime
-parity and release integration are separate checks from the statistical
-validity of the projection. The snapshot date does not reconstruct
-historical information sets or certify a public deployment.
+The standalone calculator provides a portable projection artifact
+containing year-specific national bases, housing shares, geographic
+indices, assignments, and source fingerprints. It includes adapters for
+PolicyEngine's tax-benefit model, Microcosm's population-data tools, and
+Axiom's rules engine. The PolicyEngine and Microcosm adapters apply the same forecast to supplied SPM membership,
+composition, and geography. The Axiom adapter exports forecast inputs
+to RuleSpec and invokes the Axiom core runtime to calculate
+thresholds. Population models supply resources and weights separately.
+Researchers can reuse the expenditure forecast across engines; each
+adopting model requires its own runtime and release verification.
 
-The resource conventions below are specified separately in the
-[PolicyEngine-US resource contract](https://github.com/PolicyEngine/policyengine-us/blob/7b2ef566aee52db17fe1d8ab5d0a744669802506/docs/spm.md).
-That contract is outside the calculator artifacts pinned above and does
-not reproduce or revise the preserved historical poverty sensitivity.
-In population applications, the threshold's housing portion limits the
-housing subsidy counted as an SPM resource. The accompanying resource
-specification sums modeled awards within a household, allocates the total
-to SPM units by member share, and applies each unit's cap after allocation,
-following Census's subsidy proration [@spmtechnical, p. 14]. It treats
-interview-time public or reduced-rent housing status as full-year
-assistance to a program family represented by the householder's SPM unit,
-because the survey does not identify that family. For units whose modeled
-award is positive before allocation, it allocates their tenant
-contributions by the same member shares; Census
-does not document this split, so it is a declared consistency assumption
-rather than verified production parity. Program eligibility and awards
-do not depend on the cap. These choices concern resource valuation and
-do not change the threshold estimates reported here. They do not revise
-the separately preserved historical poverty sensitivity.
+In the linked [resource
+implementation](https://github.com/PolicyEngine/policyengine-us/blob/7b2ef566aee52db17fe1d8ab5d0a744669802506/docs/spm.md),
+PolicyEngine-US sums modeled housing awards within each household and
+allocates the total to SPM units by member share, following Census's
+subsidy proration [@spmtechnical, p. 14]. It also sums tenant payments
+from units with positive awards and allocates those payments by the
+same shares. It caps each unit's SPM housing resource at the housing
+portion of its threshold less allocated tenant payments, with a
+minimum of zero. The model calculates eligibility and program awards
+for the U.S. Department of Housing and Urban Development (HUD) separately.
 
-Tables regenerate from the recorded artifacts. The build checks their
-hashes before generating outputs in temporary storage and comparing the
-results with the saved tables and evaluation JSON. Archived tables no
-longer used in the manuscript remain preserved and checked. These checks
-support reproducibility of the recorded experiments, while the method
-limitations described above constrain their interpretation.
+Under that resource specification, population-data producers use the
+householder's SPM unit to represent an assisted family and treat
+interview-time housing receipt as full-year receipt. They represent
+reported public housing and reduced rent through the HUD-family
+calculation, including reduced-rent programs that may fall outside
+HUD. The specification assumes the multi-unit tenant-payment split;
+Census does not document it. These resource conventions do not alter
+the threshold estimates.
+
+The build verifies artifact hashes, regenerates tables in temporary
+storage, and compares the outputs with the saved tables and evaluation
+JSON. It also checks the supporting forecast record and its tables.
+
 
 # References {.unnumbered}
 

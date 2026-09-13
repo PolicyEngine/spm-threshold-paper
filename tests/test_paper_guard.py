@@ -23,7 +23,7 @@ ROLLING_ACS_HEADING = "## Projecting local relative housing costs\n"
 ROLLING_PROSE_MUTATIONS = (
     (
         "applied compounded rate",
-        (("real-growth rate is 0.914 percent", "real-growth rate is 0.924 percent"),),
+        (("real growth of 0.914 percent", "real growth of 0.924 percent"),),
         DISCUSSION_HEADING,
         "We report rates as compounded annual equivalents, $\\exp(r)-1$, not as "
         "the log rate $r$ that enters the multiplier. The applied annual "
@@ -456,6 +456,57 @@ class PaperGuardTests(unittest.TestCase):
         result = self.run_guard()
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("generated tables present == expected", result.stdout)
+
+    def test_forecast_record_is_required(self):
+        (self.repo / "docs/forecast-record.md").unlink()
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("forecast registration record exists", result.stdout)
+
+    def test_forecast_record_mutation_is_detected(self):
+        path = self.repo / "docs/forecast-record.md"
+        path.write_text(path.read_text().replace("$41,099.57", "$41,099.58"))
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("forecast record original literal 41,099.57", result.stdout)
+
+    def test_evaluation_archive_tampering_is_detected(self):
+        path = self.repo / "paper/tables/evaluation.md"
+        path.write_text(path.read_text().replace("0.98%", "0.99%"))
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(
+            "generated output drifted: paper/tables/evaluation.md", result.stdout
+        )
+
+    def test_evaluation_main_matches_the_four_primary_rules(self):
+        archive = (self.repo / "paper/tables/evaluation.md").read_text().splitlines()
+        main = (self.repo / "paper/tables/evaluation_main.md").read_text().splitlines()
+        self.assertEqual(main[:2], archive[:2])
+        self.assertEqual(len(main), 6)
+        self.assertEqual(
+            main[2:],
+            [
+                archive[2].replace(
+                    "**Amended nowcast (50/50 blend, committed)**",
+                    "**Committed equal blend**",
+                ),
+                archive[4].replace(
+                    "CE replication growth ratio alone", "CE replication growth ratio"
+                ),
+                archive[5].replace(
+                    "FCSUti-composite CPI aging alone", "Composite-price adjustment"
+                ),
+                archive[6].replace(
+                    "All-Items CPI-U aging (status quo)", "All-Items CPI-U adjustment"
+                ),
+            ],
+        )
+        levels = (self.repo / "paper/tables/evaluation_levels.md").read_text()
+        main_levels = (self.repo / "paper/tables/evaluation_levels_main.md").read_text()
+        self.assertEqual(
+            main_levels, levels.replace("Amended nowcast", "Committed nowcast")
+        )
 
     def test_archived_table_still_checked_when_not_in_article(self):
         qmd = (self.repo / "paper/index.qmd").read_text()

@@ -1,22 +1,18 @@
 # Calculating and projecting Supplemental Poverty Measure thresholds
 
-[Manuscript source](paper/index.qmd) ·
-[Data provenance](data/PROVENANCE.md) ·
-[Pinned companion calculator](https://github.com/PolicyEngine/spm-calculator/tree/78bae15f76152c6076dd909a09f6b63dc2ec8c34)
+[Read the paper](https://spm-threshold-paper.vercel.app/) ·
+[Download the PDF](https://spm-threshold-paper.vercel.app/index.pdf) ·
+[Manuscript source](paper/index.qmd)
 
-Working paper on national SPM threshold estimation from public Consumer
-Expenditure Survey microdata, family and geographic adjustments, and
-projection from consumption and price growth. The manuscript presents
-current-method replication and sample sensitivities, retrospective
-comparisons, and a separately preserved pre-committed 2025 validation.
-It also constructs conditional forecasts through 2035 by advancing the
-CE and ACS windows with explicit price, real-spending, and rent assumptions.
-
-The current six-year results use revised inputs and overlapping CE
-windows. They are separate from the single prospective validation year.
-Method limitations and the forecast amendment history are reported in
-the manuscript. The repository preserves source artifacts, method
-versions, and forecast commitment evidence.
+The Bureau of Labor Statistics calculates Supplemental Poverty Measure (SPM)
+thresholds from spending on basic needs. The U.S. Census Bureau adjusts them
+for family composition and local housing costs. We reconstruct national
+thresholds from public Consumer Expenditure (CE) Survey data and compare four
+projection rules. We evaluate retrospective projections and a pre-committed
+2025 nowcast, then project thresholds through 2035 by advancing the CE and
+American Community Survey (ACS) windows. We specify prices, real spending,
+and rents for the future scenarios and evaluate prospective accuracy for
+2025 only.
 
 ## Build and verify
 
@@ -29,64 +25,38 @@ quarto render --to pdf
 
 The guard and table generators use the Python standard library. Quarto
 1.9.36 and TeX Live 2026 render the HTML and PDF to `_output/paper/`.
-Clone with full tag history and check out the exact revision to reproduce
-it. The guard first checks artifact hashes and frozen Git identities,
-then generates tables and evaluation JSON in temporary storage and
-compares every output byte with the checkout, including archived tables
-that the manuscript no longer includes. It never repairs or
-restores source artifacts. The regression tests verify that failed checks
-leave source bytes unchanged.
+Clone with full tag history and check out the desired source commit.
+The guard checks input hashes and forecast registrations, generates tables
+and evaluation JSON in temporary storage, and compares outputs with the
+recorded files. The tests check that input corruption fails verification
+without changing source bytes.
 
-This is an artifact-level verification: it re-derives tables from the
-preserved experimental outputs. The [experiment replay guide](docs/reproducing-experiments.md)
-gives executable commands, source links, and input prerequisites separately
-for the 0.5.0 retrospective CE experiment and the 1.0.0 rolling CE/ACS
-projection. The historical population sensitivity lacks
-immutable model and dataset identities, so exact replay of that result
-has not been established. No published package or deployed application is
-required to render the paper.
+The [experiment replay guide](docs/reproducing-experiments.md) supplies
+commands, source links, and input requirements for the CE and ACS estimators.
+The [data provenance](data/PROVENANCE.md) identifies each experimental
+collection. The [forecast record](docs/forecast-record.md) provides the
+registration evidence and supporting evaluations. These files distinguish
+table verification from replication of the underlying survey estimates.
 
-## Preserved forecast evidence
+## Companion calculator
 
-The tags `v1.0-original-nowcast` and `v1.1-amended-nowcast`, forecast
-bytes, and all original OpenTimestamps manifest/proof pairs are preserved.
-Two hashes in `data/COMMITMENT-MANIFEST.txt` were incorrect; the dated
-`data/COMMITMENT-AMENDMENT-2026-09-08.txt` records the exact tag hashes and
-the original manifest digest. The original proof does not cover that
-amendment. This revision verifies retained proof bytes and Git identities;
-it does not independently reverify blockchain attestations.
-
-`data/SHA256SUMS` continues to cover only the frozen artifacts. New inputs
-have their own `data/current/SHA256SUMS`; they do not replace the frozen
-forecast or become a new prospective commitment. `data/PROVENANCE.md`
-describes both collections and the original implementation pin.
-
-## September 11, 2026 development poverty-rate prediction
-
-**Status as of September 13, 2026:** these development estimates remain
-provisional pending a comparison on the final, qualified model and
-population release. They are separate from the paper's threshold-method
-results.
-
-`data/predictions/2025-spm-poverty-rates-2026-09-11.json` records, before the
-Census Bureau's 2026-09-15 release, a pre-committed prediction for the 2025 SPM
-poverty rate: the Census 2024 rate plus the modeled 2024-to-2025 change under
-the rolling CE and ACS threshold method (13.2 percent overall on the corrected
-2024 series; 14.3 for children; 14.6 for people 65 and over). Its SHA-256 is in
-`data/predictions/SHA256SUMS` and the OpenTimestamps proof is beside it. The
-file is never edited; any revision is a dated amendment file.
-
-## Companion implementation
-
-The companion spm-calculator provides a portable artifact, standalone
-unit calculations, CE research replication, rolling projections, and
-PolicyEngine, Microcosm, and native Axiom adapters. The rolling projection
-pins the 1.0.0 release candidate at commit
-`78bae15f76152c6076dd909a09f6b63dc2ec8c34`, with content digest
+[SPM Calculator](https://github.com/PolicyEngine/spm-calculator) provides
+standalone unit calculations, CE replication, rolling forecasts, and adapters
+for PolicyEngine, Microcosm, and the Axiom rules engine. The paper and calculator
+consume the same rolling projection artifact: version 1.0.0 release candidate
+at commit `78bae15f76152c6076dd909a09f6b63dc2ec8c34`, with content digest
 `3d86d5c4c0423480e6b69b75d222ffa4a7a2639e4094df5ba2504af01be17173`.
-The paper consumes the same projection bytes as the calculator.
 
-The 2019–2025 retrospective experiment retains its separate development
-version 0.5.0 pin at `0d7fa0d77b0a88064ab7b9fe70557309b5f7901f`.
-These source identities document reproducibility; they do not certify
-publication, deployment, or a population-model migration.
+The 2019–2025 retrospective experiment uses a separate implementation:
+version 0.5.0 at commit
+`0d7fa0d77b0a88064ab7b9fe70557309b5f7901f`.
+
+## Separate 2025 poverty-rate prediction
+
+The [September 11 prediction](data/predictions/2025-spm-poverty-rates-2026-09-11.json)
+records 13.2 percent overall, 14.3 percent for children, and 14.6 percent
+for people 65 and over. It adds the modeled 2024-to-2025 change to Census's
+2024 rate. These development estimates remain provisional pending a
+comparison on the qualified model and population release. The threshold-method
+results do not depend on them. The prediction's checksum and timestamp proof
+accompany the file; any subsequent estimate receives its own dated record.
