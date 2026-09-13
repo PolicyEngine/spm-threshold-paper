@@ -367,7 +367,7 @@ check(
 nowcast = json.loads((DATA / "nowcast_2025.json").read_text())
 AMENDED = {t: f"{nowcast['values'][t]:,.2f}" for t in TENURES}
 check("forecast registration record exists", FORECAST_RECORD.is_file())
-record = FORECAST_RECORD.read_text() if FORECAST_RECORD.is_file() else ""
+record_text = FORECAST_RECORD.read_text() if FORECAST_RECORD.is_file() else ""
 SUPPORTING_COMMIT = "20bfbe1abcb83b4f9f60fbe54789144321ff62b0"
 SUPPORTING_URL_BASE = (
     f"https://github.com/PolicyEngine/spm-threshold-paper/blob/{SUPPORTING_COMMIT}/"
@@ -426,7 +426,7 @@ ORIG_LIT = {t: f"{v:,.2f}" for t, v in ORIGINAL.items()}
 for t in TENURES:
     check(
         f"forecast record original literal {ORIG_LIT[t]}",
-        has_number(ORIG_LIT[t], text=record),
+        has_number(ORIG_LIT[t], text=record_text),
     )
 check(
     "forecast record pairs original -> amended per tenure, in order",
@@ -440,27 +440,27 @@ check(
             AMENDED["renter"],
         ],
         window=60,
-        text=record,
+        text=record_text,
     ),
 )
 shifts = [abs(nowcast["values"][t] / ORIGINAL[t] - 1) for t in TENURES]
 check(
     "forecast record size 0.1 to 0.3 percent",
-    has_number("0.1 to 0.3", text=record)
+    has_number("0.1 to 0.3", text=record_text)
     and 0.0005 <= min(shifts)
     and max(shifts) < 0.0035,
 )
 check(
     "forecast record preserves correction rationale and chronology",
-    "different index bases" in record
-    and "corrected the calculation before BLS" in record
-    and "equal blend remained the primary forecast" in record,
+    "different index bases" in record_text
+    and "corrected the calculation before BLS" in record_text
+    and "equal blend remained the primary forecast" in record_text,
 )
 check(
     "forecast record preserves timestamp qualification",
-    "August 7, 2026 archived page" in record
-    and "precede the August 24 publication" in record
-    and "original timestamp does not cover that amendment" in record,
+    "August 7, 2026 archived page" in record_text
+    and "precede the August 24 publication" in record_text
+    and "original timestamp does not cover that amendment" in record_text,
 )
 
 _prov = nowcast["method"] + " ".join(nowcast["caveats"])
@@ -709,7 +709,7 @@ for label, value, literal in [
     check(label, has_number(literal) and f"{value:.2%}".rstrip("%") == literal)
 check(
     "forecast record evaluation original MAE 0.98",
-    has_number("0.98", text=record)
+    has_number("0.98", text=record_text)
     and has_number("0.98")
     and f"{original['mae']:.2%}".rstrip("%") == "0.98",
 )
