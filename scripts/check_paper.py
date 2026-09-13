@@ -709,7 +709,9 @@ for label, value, literal in [
     check(label, has_number(literal) and f"{value:.2%}".rstrip("%") == literal)
 check(
     "forecast record evaluation original MAE 0.98",
-    has_number("0.98", text=record) and f"{original['mae']:.2%}".rstrip("%") == "0.98",
+    has_number("0.98", text=record)
+    and has_number("0.98")
+    and f"{original['mae']:.2%}".rstrip("%") == "0.98",
 )
 check(
     "evaluation per-tenure misses 0.69, 0.55, 2.27 in order",
