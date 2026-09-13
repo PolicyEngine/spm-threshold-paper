@@ -57,6 +57,7 @@ from verify_commitments import verify_commitments
 REPO = Path(__file__).resolve().parent.parent
 DATA = REPO / "data"
 TABLES = REPO / "paper" / "tables"
+FORECAST_RECORD = REPO / "docs" / "forecast-record.md"
 QMD = (REPO / "paper" / "index.qmd").read_text()
 
 TENURES = ("owner_with_mortgage", "owner_without_mortgage", "renter")
@@ -68,7 +69,9 @@ EXPECTED_TABLES = {
     "backtest.md",
     "nowcast.md",
     "evaluation.md",
+    "evaluation_main.md",
     "evaluation_levels.md",
+    "evaluation_levels_main.md",
     "composite_validation.md",
     "current_release.md",
     "current_replication.md",
@@ -77,7 +80,12 @@ EXPECTED_TABLES = {
     "rolling_projection.md",
     "rolling_validation.md",
 }
-ARCHIVED_TABLES = {"correction.md", "package_errors.md"}
+ARCHIVED_TABLES = {
+    "correction.md",
+    "package_errors.md",
+    "evaluation.md",
+    "evaluation_levels.md",
+}
 ARTICLE_TABLES = EXPECTED_TABLES - ARCHIVED_TABLES
 GENERATORS = ("build_tables.py", "evaluate_nowcast_2025.py", "build_current_tables.py")
 
@@ -358,9 +366,43 @@ check(
 # (d) Load-bearing prose figures re-derive from the artifacts.
 nowcast = json.loads((DATA / "nowcast_2025.json").read_text())
 AMENDED = {t: f"{nowcast['values'][t]:,.2f}" for t in TENURES}
+check("forecast registration record exists", FORECAST_RECORD.is_file())
+record_text = FORECAST_RECORD.read_text() if FORECAST_RECORD.is_file() else ""
+SUPPORTING_COMMIT = "20bfbe1abcb83b4f9f60fbe54789144321ff62b0"
+SUPPORTING_URL_BASE = (
+    f"https://github.com/PolicyEngine/spm-threshold-paper/blob/{SUPPORTING_COMMIT}/"
+)
+FORECAST_RECORD_URL = SUPPORTING_URL_BASE + "docs/forecast-record.md"
+for supporting_path in (
+    "docs/forecast-record.md",
+    "data/PROVENANCE.md",
+    "docs/reproducing-experiments.md",
+):
+    pinned = subprocess.run(
+        ["git", "show", f"{SUPPORTING_COMMIT}:{supporting_path}"],
+        cwd=REPO,
+        capture_output=True,
+    )
+    local_path = REPO / supporting_path
+    check(
+        f"pinned supporting document matches: {supporting_path}",
+        pinned.returncode == 0
+        and local_path.is_file()
+        and pinned.stdout == local_path.read_bytes(),
+    )
+    check(
+        f"manuscript links fixed supporting document: {supporting_path}",
+        SUPPORTING_URL_BASE + supporting_path in QMD,
+    )
+check(
+    "nowcast section links to the fixed forecast registration record",
+    FORECAST_RECORD_URL in QMD.split("# Pre-committed 2025 validation", 1)[-1].split(
+        "## Evaluation against published thresholds", 1
+    )[0],
+)
 for t, literal in AMENDED.items():
-    check(f"nowcast literal {literal}", has_number(literal, min_count=2))
-# Ordered tenure triples: committed estimate and amendment chronology.
+    check(f"nowcast literal {literal}", has_number(literal))
+# The committed estimate remains in the manuscript, in tenure order.
 check(
     "committed estimate states the amended triple in tenure order",
     has_ordered(
@@ -382,9 +424,12 @@ ORIGINAL = {
 }
 ORIG_LIT = {t: f"{v:,.2f}" for t, v in ORIGINAL.items()}
 for t in TENURES:
-    check(f"pre-amendment literal {ORIG_LIT[t]}", has_number(ORIG_LIT[t]))
+    check(
+        f"forecast record original literal {ORIG_LIT[t]}",
+        has_number(ORIG_LIT[t], text=record_text),
+    )
 check(
-    "amendment sentence pairs original -> amended per tenure, in order",
+    "forecast record pairs original -> amended per tenure, in order",
     has_ordered(
         [
             ORIG_LIT["owner_with_mortgage"],
@@ -395,12 +440,27 @@ check(
             AMENDED["renter"],
         ],
         window=60,
+        text=record_text,
     ),
 )
 shifts = [abs(nowcast["values"][t] / ORIGINAL[t] - 1) for t in TENURES]
 check(
-    "amendment size 0.1 to 0.3 percent",
-    has_number("0.1 to 0.3") and 0.0005 <= min(shifts) and max(shifts) < 0.0035,
+    "forecast record size 0.1 to 0.3 percent",
+    has_number("0.1 to 0.3", text=record_text)
+    and 0.0005 <= min(shifts)
+    and max(shifts) < 0.0035,
+)
+check(
+    "forecast record preserves correction rationale and chronology",
+    "different index bases" in record_text
+    and "corrected the calculation before BLS" in record_text
+    and "equal blend remained the primary forecast" in record_text,
+)
+check(
+    "forecast record preserves timestamp qualification",
+    "August 7, 2026 archived page" in record_text
+    and "precede the August 24 publication" in record_text
+    and "original timestamp does not cover that amendment" in record_text,
 )
 
 _prov = nowcast["method"] + " ".join(nowcast["caveats"])
@@ -642,12 +702,17 @@ comp = R["FCSUti-composite CPI aging alone"]
 cpiu = R["All-Items CPI-U aging (status quo)"]
 for label, value, literal in [
     ("evaluation amended MAE 1.17", amended["mae"], "1.17"),
-    ("evaluation original MAE 0.98", original["mae"], "0.98"),
     ("evaluation replication MAE 0.75", repl["mae"], "0.75"),
     ("evaluation composite MAE 2.02", comp["mae"], "2.02"),
     ("evaluation CPI-U MAE 2.58", cpiu["mae"], "2.58"),
 ]:
     check(label, has_number(literal) and f"{value:.2%}".rstrip("%") == literal)
+check(
+    "forecast record evaluation original MAE 0.98",
+    has_number("0.98", text=record_text)
+    and has_number("0.98")
+    and f"{original['mae']:.2%}".rstrip("%") == "0.98",
+)
 check(
     "evaluation per-tenure misses 0.69, 0.55, 2.27 in order",
     has_ordered(["0.69", "0.55", "2.27"], window=20)
@@ -657,8 +722,8 @@ check(
 )
 ev_signed = sum(amended["errors"].values()) / 3
 check(
-    "evaluation signed mean −1.17 inside stated range",
-    "−1.17" in QMD and -0.014 <= ev_signed <= -0.001,
+    "evaluation signed mean −1.17",
+    "−1.17" in QMD and abs(ev_signed - (-0.0117)) < 0.00005,
 )
 cpiu_errs = [abs(v) for v in cpiu["errors"].values()]
 cpiu_error_range = f"{min(cpiu_errs):.2%} to {max(cpiu_errs):.2%}".replace("%", "")
