@@ -415,8 +415,8 @@ check(
 rate = json.loads((DATA / "nowcast_rate_impact.json").read_text())
 delta_2025 = rate["2025"]["all"]["delta_pp"]
 check(
-    "poverty sensitivity 0.4pp",
-    has_number("0.4 percentage points", min_count=1) and abs(delta_2025 - 0.4) < 0.05,
+    "archived poverty sensitivity rounds to 0.4pp",
+    abs(delta_2025 - 0.4) < 0.05,
 )
 
 backtest = (TABLES / "backtest.md").read_text()

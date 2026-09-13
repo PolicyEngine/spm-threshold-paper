@@ -6,7 +6,7 @@ author:
     affiliations:
       - name: PolicyEngine
     email: max@policyengine.org
-date: 2026-09-12
+date: 2026-09-13
 date-format: long
 bibliography: ../bibliography/references.bib
 format:
@@ -715,17 +715,8 @@ also alter growth relationships. The sample and trend sensitivities
 identify specific uncertainties but do not provide forecast intervals.
 
 Threshold choice affects modeled poverty through the distribution of
-resources near the line, not through threshold growth alone. In a frozen
-historical PolicyEngine simulation, projected SPM poverty under the
-committed 2025 nowcast was 0.4 percentage points higher than under
-CPI-U-adjusted thresholds. That simulation uses the model's CPI-U
-parameters, rather than the realized annual-average CPI-U rule evaluated
-above. The recorded sensitivity depends on its original population and
-model vintage; it is not a result from the current model or a general
-conversion between threshold errors and
-poverty-rate errors. Its saved receipt lacks immutable model and dataset
-identities, so an exact independent replay of this historical sensitivity
-has not been established.
+resources near the line. A poverty-rate impact estimate therefore requires
+a specified population and resource model.
 
 # Appendix A: method versions and forecast commitment {.unnumbered}
 
@@ -769,8 +760,8 @@ old timestamp covers the amendment. The repository documents those
 identities and checks the retained bytes; this revision does not
 independently reverify blockchain attestations.
 
-This paper makes no new forecast commitment or scheduled cutoff. The
-previously discussed 2026 CE collection window already closed in 2026Q1.
+This paper makes no new threshold forecast commitment or scheduled cutoff.
+The previously discussed 2026 CE collection window already closed in 2026Q1.
 Any future commitment would require an actual timestamp and a recorded
 available-input cutoff before the outcome is published.
 
@@ -800,9 +791,10 @@ digest is:
 ```
 
 Exact source and release identities are recorded alongside the inputs;
-`data/PROVENANCE.md` describes the separate collections. The frozen
-poverty sensitivity additionally requires its original model and
-population dataset to reproduce.
+`data/PROVENANCE.md` describes the separate collections. The repository
+also preserves a historical poverty sensitivity. Its receipt lacks
+immutable model and population dataset identities, so exact replay has
+not been established.
 
 To verify the reported tables, clone the paper repository with its full
 tag history and check out the manuscript revision being evaluated. Run
