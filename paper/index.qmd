@@ -113,10 +113,10 @@ spending to the reference family using the three-parameter equivalence
 scale and updates it to target-year dollars with a composite FCSUti
 price index [@betson1996; @garner2021].
 
-For housing tenure $h$, let $E$ denote the survey-weighted 47th–53rd
-percentile band of reference-family FCSUti expenditures. Let $SU$
-denote shelter and utilities excluding telephone. BLS calculates the
-tenure-specific national threshold as
+Let $E$ denote the pooled, survey-weighted 47th–53rd percentile band
+of reference-family FCSUti expenditures across all housing tenures.
+Let $SU$ denote shelter and utilities excluding telephone. For housing
+tenure $h$, BLS calculates the national threshold as
 
 $$
 B_{T,h}=s\left(1.2\,\overline{FCSUti}_{E}
@@ -376,6 +376,11 @@ composite. The [forecast
 record](https://github.com/PolicyEngine/spm-threshold-paper/blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0/docs/forecast-record.md)
 links the August 7 archived page, tags, and timestamp proof that
 document both forecasts before BLS’s August 24 publication.
+
+We retained the equal blend as the primary forecast after the correction
+ranked the replication ratio first.^[The superseded blend had a mean
+absolute error of 0.98 percent, compared with 1.17 percent for the
+committed blend. The forecast record preserves both evaluations.]
 
 We committed to an equal blend that projected \$41,036.34 for owners with mortgages,
 \$34,135.99 for owners without mortgages, and \$40,755.98 for renters.
