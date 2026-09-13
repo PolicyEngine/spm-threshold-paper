@@ -368,10 +368,32 @@ nowcast = json.loads((DATA / "nowcast_2025.json").read_text())
 AMENDED = {t: f"{nowcast['values'][t]:,.2f}" for t in TENURES}
 check("forecast registration record exists", FORECAST_RECORD.is_file())
 record = FORECAST_RECORD.read_text() if FORECAST_RECORD.is_file() else ""
-FORECAST_RECORD_URL = (
-    "https://github.com/PolicyEngine/spm-threshold-paper/blob/"
-    "20bfbe1abcb83b4f9f60fbe54789144321ff62b0/docs/forecast-record.md"
+SUPPORTING_COMMIT = "20bfbe1abcb83b4f9f60fbe54789144321ff62b0"
+SUPPORTING_URL_BASE = (
+    f"https://github.com/PolicyEngine/spm-threshold-paper/blob/{SUPPORTING_COMMIT}/"
 )
+FORECAST_RECORD_URL = SUPPORTING_URL_BASE + "docs/forecast-record.md"
+for supporting_path in (
+    "docs/forecast-record.md",
+    "data/PROVENANCE.md",
+    "docs/reproducing-experiments.md",
+):
+    pinned = subprocess.run(
+        ["git", "show", f"{SUPPORTING_COMMIT}:{supporting_path}"],
+        cwd=REPO,
+        capture_output=True,
+    )
+    local_path = REPO / supporting_path
+    check(
+        f"pinned supporting document matches: {supporting_path}",
+        pinned.returncode == 0
+        and local_path.is_file()
+        and pinned.stdout == local_path.read_bytes(),
+    )
+    check(
+        f"manuscript links fixed supporting document: {supporting_path}",
+        SUPPORTING_URL_BASE + supporting_path in QMD,
+    )
 check(
     "nowcast section links to the fixed forecast registration record",
     FORECAST_RECORD_URL in QMD.split("# Pre-committed 2025 validation", 1)[-1].split(

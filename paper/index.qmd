@@ -299,14 +299,14 @@ five-year benchmark and 2025 nowcast. We hold the benchmark's index
 base at 2019 and rebase the nowcast to the prior year. We derive the
 separate expenditure-adjustment weights from each selected CE sample.
 
-If replication differs from the official level by a stable proportional factor, that factor
-cancels between adjacent years. A persistent additive difference need
+If replication differs from the official level by a stable proportional
+factor, that factor cancels between adjacent years. A persistent additive difference need
 not cancel, and changing omissions or sample effects can alter growth.
 
-Census estimated that updating 2024 thresholds for CPI-U growth would
-produce an SPM rate of 12.4 percent, below the published rate
-[@creamer2025]. Census used the threshold and poverty estimates
-published for 2024 in that analysis.
+Census estimated that updating the 2023 SPM thresholds by CPI-U growth
+would produce a 2024 SPM rate of 12.4 percent, below the published
+2024 rate [@creamer2025]. Census used the threshold and poverty
+estimates published for 2024 in that analysis.
 
 ## Retrospective comparison, 2020–2025 {#sec-current}
 
@@ -372,9 +372,10 @@ eleven months of 2025 CPI observations. BLS did not publish October
 documented treatment [@blscpi2025shutdown].
 
 We amended the forecast on July 18, 2026 to correct the price
-composite. The [August 7
-registration](https://github.com/PolicyEngine/spm-threshold-paper/blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0/docs/forecast-record.md)
-records both forecasts before BLS’s August 24 publication.
+composite. The [forecast
+record](https://github.com/PolicyEngine/spm-threshold-paper/blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0/docs/forecast-record.md)
+links the August 7 archived page, tags, and timestamp proof that
+document both forecasts before BLS’s August 24 publication.
 
 We committed to an equal blend that projected \$41,036.34 for owners with mortgages,
 \$34,135.99 for owners without mortgages, and \$40,755.98 for renters.
@@ -700,7 +701,7 @@ The [paper
 repository](https://github.com/PolicyEngine/spm-threshold-paper)
 provides the manuscript, table generators, verification tests, and
 recorded inputs. Its [source-data
-provenance](https://github.com/PolicyEngine/spm-threshold-paper/blob/cc858aa610cc414215fe3e1fc4038b5248810743/data/PROVENANCE.md)
+provenance](https://github.com/PolicyEngine/spm-threshold-paper/blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0/data/PROVENANCE.md)
 describes the experimental collections. The companion calculator source
 [@spmcalculator2026] contains the expenditure and geographic estimators,
 source acquisition scripts, and standalone implementation at the rolling
@@ -727,7 +728,7 @@ The input manifests record exact source and release identities. The
 [data
 provenance](https://github.com/PolicyEngine/spm-threshold-paper/blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0/data/PROVENANCE.md)
 and [forecast
-registration](https://github.com/PolicyEngine/spm-threshold-paper/blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0/docs/forecast-record.md)
+record](https://github.com/PolicyEngine/spm-threshold-paper/blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0/docs/forecast-record.md)
 identify each experiment’s inputs and evidence.
 
 To verify the reported tables, clone the paper repository with its full

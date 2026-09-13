@@ -481,6 +481,25 @@ class PaperGuardTests(unittest.TestCase):
             result.stdout,
         )
 
+    def test_pinned_supporting_documents_match_linked_commit(self):
+        for name in (
+            "docs/forecast-record.md",
+            "data/PROVENANCE.md",
+            "docs/reproducing-experiments.md",
+        ):
+            with self.subTest(path=name):
+                path = self.repo / name
+                original = path.read_bytes()
+                # Retain every guarded literal: altered supporting prose
+                # must still fail if the manuscript links unchanged bytes.
+                path.write_bytes(original + b"\nUnregistered supporting text.\n")
+                result = self.run_guard()
+                path.write_bytes(original)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(
+                    f"pinned supporting document matches: {name}", result.stdout
+                )
+
     def test_forecast_record_mutation_is_detected(self):
         path = self.repo / "docs/forecast-record.md"
         path.write_text(path.read_text().replace("$41,099.57", "$41,099.58"))
