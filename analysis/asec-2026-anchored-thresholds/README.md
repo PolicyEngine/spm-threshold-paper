@@ -26,3 +26,7 @@ The chained variant uses C-CPI-U (`SUUR0000SA0`) annual means, 174.372 for 2024 
 - `replicate_and_anchor.py`: run in a directory containing `pppub26.csv`; optional argument is the price factor (default 32649/31812).
 - `anchored_results.json`, `anchored_results_chained.json`: outputs.
 - `bls_ccpi.json`: BLS API response for `SUUR0000SA0` and `CUUR0000SA0`, 2024 to 2025.
+
+## By state and by detailed age
+
+`state_age_anchored.py` extends the recomputation to the 51 states (from `hhpub26.csv` `GESTFIPS`, joined to the person file on `H_SEQ`) and to detailed age groups, with standard errors from the 160 ASEC replicate weights (`asec_csv_repwgt_2026.csv`; variance = 4/160 times the sum of squared replicate deviations; `PWWGT0` equals `MARSUPWT`/100). Outputs: `state_age_results.json`, `by_state.csv`. Run it with the scratch directory holding the three CSV files as the first argument and the output directory as the second.
