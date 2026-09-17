@@ -62,3 +62,7 @@ the modeled 2024-to-2025 change to Census's
 comparison on the qualified model and population release. The threshold-method
 results do not depend on them. The prediction's checksum and timestamp proof
 accompany the file; any subsequent estimate receives its own dated record.
+
+## License
+
+Code in this repository is released under the [MIT License](LICENSE). Original text and figures are released under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) with attribution to PolicyEngine. Third-party data and materials keep their own terms.
