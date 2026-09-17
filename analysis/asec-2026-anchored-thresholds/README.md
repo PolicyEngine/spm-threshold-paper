@@ -30,3 +30,7 @@ The chained variant uses C-CPI-U (`SUUR0000SA0`) annual means, 174.372 for 2024 
 ## By state and by detailed age
 
 `state_age_anchored.py` extends the recomputation to the 51 states (from `hhpub26.csv` `GESTFIPS`, joined to the person file on `H_SEQ`) and to detailed age groups, with standard errors from the 160 ASEC replicate weights (`asec_csv_repwgt_2026.csv`; variance = 4/160 times the sum of squared replicate deviations; `PWWGT0` equals `MARSUPWT`/100). Outputs: `state_age_results.json`, `by_state.csv`. Run it with the scratch directory holding the three CSV files as the first argument and the output directory as the second.
+
+## State tile maps
+
+`state_tile_map.py` renders a state tile map (11 by 8 grid, teal shading, the layout of the PolicyEngine slides' state map) from any CSV with a `state` column. The post uses it twice: `by_state.csv` for the 2025 threshold effect (default arguments) and `census_table17_state_3yr.csv` (P60-290 Table 17, SPM percent and margin of error, three-year average 2023 to 2025) with `--value spm_pct --se spm_moe` and the 9/12/15/18 percent bins. It needs Playwright with its Chromium (`uv run --with playwright --with pandas python state_tile_map.py ...` after `playwright install chromium`).
