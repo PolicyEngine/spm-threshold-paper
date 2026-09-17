@@ -1,0 +1,120 @@
+{
+ "replication_2024_published_flag": {
+  "all": 12.93,
+  "under_18": 13.35,
+  "under_6": 14.5,
+  "age_18_64": 12.16,
+  "age_65_plus": 14.95
+ },
+ "recomputed_2024_original_thresholds": {
+  "all": 12.93,
+  "under_18": 13.35,
+  "under_6": 14.5,
+  "age_18_64": 12.16,
+  "age_65_plus": 14.95
+ },
+ "recomputed_2024_corrected_thresholds": {
+  "all": 12.94,
+  "under_18": 13.34,
+  "under_6": 14.56,
+  "age_18_64": 12.16,
+  "age_65_plus": 15.06
+ },
+ "actual_2025_census_table_5": {
+  "all": 13.11,
+  "under_18": 13.4,
+  "under_6": 14.15,
+  "age_18_64": 12.28,
+  "age_65_plus": 15.37
+ },
+ "projected_2025_by_uniform_resource_growth_pct": {
+  "cpi_u_2.63": {
+   "all": 13.72,
+   "under_18": 14.38,
+   "under_6": 15.54,
+   "age_18_64": 12.84,
+   "age_65_plus": 15.88
+  },
+  "3.5": {
+   "all": 13.5,
+   "under_18": 14.13,
+   "under_6": 15.33,
+   "age_18_64": 12.65,
+   "age_65_plus": 15.58
+  },
+  "4.0": {
+   "all": 13.36,
+   "under_18": 13.93,
+   "under_6": 15.14,
+   "age_18_64": 12.53,
+   "age_65_plus": 15.4
+  },
+  "4.5": {
+   "all": 13.21,
+   "under_18": 13.71,
+   "under_6": 14.9,
+   "age_18_64": 12.41,
+   "age_65_plus": 15.25
+  },
+  "5.0": {
+   "all": 13.1,
+   "under_18": 13.56,
+   "under_6": 14.76,
+   "age_18_64": 12.31,
+   "age_65_plus": 15.15
+  },
+  "6.0": {
+   "all": 12.82,
+   "under_18": 13.18,
+   "under_6": 14.34,
+   "age_18_64": 12.07,
+   "age_65_plus": 14.84
+  }
+ },
+ "threshold_effect_pp": {
+  "all": 0.78,
+  "under_18": 1.04,
+  "under_6": 0.98,
+  "age_18_64": 0.68,
+  "age_65_plus": 0.82
+ },
+ "uniform_resource_growth_pct_that_matches_actual_2025": {
+  "all": 4.93,
+  "under_18": 5.47,
+  "under_6": 6.77,
+  "age_18_64": 5.16,
+  "age_65_plus": 4.05
+ },
+ "raw_file_with_model_growth": {
+  "uniform_model_median_growth_pct": 4.61,
+  "projected_2025_uniform": {
+   "all": 13.19,
+   "under_18": 13.69,
+   "under_6": 14.88,
+   "age_18_64": 12.4,
+   "age_65_plus": 15.23
+  },
+  "error_uniform_pp": {
+   "all": 0.08,
+   "under_18": 0.29,
+   "under_6": 0.73,
+   "age_18_64": 0.12,
+   "age_65_plus": -0.14
+  },
+  "projected_2025_group_specific": {
+   "under_18": 14.07,
+   "age_18_64": 12.36,
+   "age_65_plus": 14.29
+  },
+  "error_group_specific_pp": {
+   "under_18": 0.67,
+   "age_18_64": 0.08,
+   "age_65_plus": -1.08
+  },
+  "registered_prediction_error_pp": {
+   "all": 0.09,
+   "under_18": 0.9,
+   "age_65_plus": -0.77
+  }
+ }
+}
