@@ -1,0 +1,30 @@
+{
+ "All people": {
+  "y2024_census": 13.0,
+  "anchored_2025": 12.3089,
+  "published_2025": 13.1117,
+  "resources_step": -0.6911,
+  "threshold_step": 0.8028
+ },
+ "Under 18": {
+  "y2024_census": 13.5,
+  "anchored_2025": 12.306,
+  "published_2025": 13.3913,
+  "resources_step": -1.194,
+  "threshold_step": 1.0853
+ },
+ "18 to 64": {
+  "y2024_census": 12.2,
+  "anchored_2025": 11.5482,
+  "published_2025": 12.2773,
+  "resources_step": -0.6518,
+  "threshold_step": 0.7291
+ },
+ "65 and over": {
+  "y2024_census": 15.1,
+  "anchored_2025": 14.6601,
+  "published_2025": 15.3779,
+  "resources_step": -0.4399,
+  "threshold_step": 0.7178
+ }
+}
