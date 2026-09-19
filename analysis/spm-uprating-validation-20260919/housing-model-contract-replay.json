@@ -1,0 +1,1397 @@
+{
+  "schema": "spm-housing-model-contract-successor-v1",
+  "scope": "MODEL-CONTRACT ONLY; not Census scientific qualification or population acceptance",
+  "model_assumption": "A4: household-summed awards and recipient-only tenant payments, each prorated to every household SPM by headcount",
+  "dtype_contract": "float32 allocated amounts; float64 cap using unrounded canonical housing portion; float32 final amount",
+  "original_artifacts_modified": false,
+  "heavy_model_runs": 0,
+  "status": "PASS",
+  "cells_passed": 16,
+  "cells_expected": 16,
+  "script_sha256": "9e09541549df092aae385e4ae87d8e91c004c4e6a44054c0f55fddecfbf4ef7c",
+  "runtime_versions": {
+    "numpy": "2.5.3",
+    "pandas": "3.0.5",
+    "spm-calculator": "1.0.0",
+    "policyengine-us": "2.2.1",
+    "policyengine-core": "3.32.5"
+  },
+  "cells": [
+    {
+      "cell": "canonical-direct_country-2024-ce_trend-seed0",
+      "status": "PASS",
+      "native_records": 59900,
+      "person_records": 166321,
+      "zero_raw_award_units_receiving_positive_allocation": 12,
+      "canonical_housing_portion": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_native": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_person": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "superseded_unallocated_oracle_native": {
+        "bit_identical": false,
+        "different_records": 20,
+        "max_absolute_error": 9225.0
+      },
+      "original_calculator_replay": {
+        "reference_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0016367499993066303
+        },
+        "unadjusted_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.003787608817219734
+        },
+        "geographic_factor": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 5.953165294059204e-08
+        },
+        "threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.003878060058923438
+        },
+        "housing_portion": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0019374196490389295
+        },
+        "housing_cap": {
+          "single_cast_bit_identical": false,
+          "finite": true,
+          "max_absolute_error": 9225.0
+        }
+      },
+      "inputs": {
+        "all-vectors-checkpoint.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2024-ce_trend-seed0/all-vectors-checkpoint.json",
+          "sha256": "debd80284f598250c3d63a91ed4a9e68f1b6ff518b561db4189cc08b217762eb"
+        },
+        "native-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2024-ce_trend-seed0/native-vectors.pkl",
+          "sha256": "540b9a01caad377501d9aef478cbede54de166d14a5541442db225eb3e99f0ee"
+        },
+        "person-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2024-ce_trend-seed0/person-vectors.pkl",
+          "sha256": "aecd3e978bec010a960dc4f0f1d157fc26620fb3c2a146c52d45b5ef2fbb397b"
+        },
+        "input-identities-and-role.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2024-ce_trend-seed0/input-identities-and-role.pkl",
+          "sha256": "f74fc69a1dec9be7b6dcc5af37970a5f6c202a37405261313ee78e5eced00f8c"
+        },
+        "calculator-replay.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2024-ce_trend-seed0/calculator-replay.json",
+          "sha256": "be46a649bc75f9c8f53b73e94094fe640d45597878348646e9881f275f5d1537"
+        }
+      },
+      "config_sha256": "4c866fe592d5aa770ff54889205da3b3faa697cccac6dacaae1bd9a07bab0e83",
+      "dataset_sha256": "6496cc4393d4d3c6574f76eca231de5898c803b9067645591fd5c4d3e65aee84",
+      "forecast_content_sha256": "3d86d5c4c0423480e6b69b75d222ffa4a7a2639e4094df5ba2504af01be17173",
+      "calculator_wheel_sha256": "e354937a5e1a4045d4966ed594a528d8b02866fabaac9bb5672017004b627305",
+      "verified_calculator_package_members": 62
+    },
+    {
+      "cell": "canonical-direct_country-2024-ce_trend-seed42",
+      "status": "PASS",
+      "native_records": 59900,
+      "person_records": 166321,
+      "zero_raw_award_units_receiving_positive_allocation": 12,
+      "canonical_housing_portion": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_native": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_person": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "superseded_unallocated_oracle_native": {
+        "bit_identical": false,
+        "different_records": 20,
+        "max_absolute_error": 9225.0
+      },
+      "original_calculator_replay": {
+        "reference_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0016367499993066303
+        },
+        "unadjusted_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.003787608817219734
+        },
+        "geographic_factor": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 5.953165294059204e-08
+        },
+        "threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.003878060058923438
+        },
+        "housing_portion": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0019374196490389295
+        },
+        "housing_cap": {
+          "single_cast_bit_identical": false,
+          "finite": true,
+          "max_absolute_error": 9225.0
+        }
+      },
+      "inputs": {
+        "all-vectors-checkpoint.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2024-ce_trend-seed42/all-vectors-checkpoint.json",
+          "sha256": "05a4f7b660e480698e6b9aad68070fc338ea6139a2e4df527b32879f30aec2b2"
+        },
+        "native-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2024-ce_trend-seed42/native-vectors.pkl",
+          "sha256": "540b9a01caad377501d9aef478cbede54de166d14a5541442db225eb3e99f0ee"
+        },
+        "person-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2024-ce_trend-seed42/person-vectors.pkl",
+          "sha256": "aecd3e978bec010a960dc4f0f1d157fc26620fb3c2a146c52d45b5ef2fbb397b"
+        },
+        "input-identities-and-role.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2024-ce_trend-seed42/input-identities-and-role.pkl",
+          "sha256": "f74fc69a1dec9be7b6dcc5af37970a5f6c202a37405261313ee78e5eced00f8c"
+        },
+        "calculator-replay.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2024-ce_trend-seed42/calculator-replay.json",
+          "sha256": "be46a649bc75f9c8f53b73e94094fe640d45597878348646e9881f275f5d1537"
+        }
+      },
+      "config_sha256": "4c866fe592d5aa770ff54889205da3b3faa697cccac6dacaae1bd9a07bab0e83",
+      "dataset_sha256": "6496cc4393d4d3c6574f76eca231de5898c803b9067645591fd5c4d3e65aee84",
+      "forecast_content_sha256": "3d86d5c4c0423480e6b69b75d222ffa4a7a2639e4094df5ba2504af01be17173",
+      "calculator_wheel_sha256": "e354937a5e1a4045d4966ed594a528d8b02866fabaac9bb5672017004b627305",
+      "verified_calculator_package_members": 62
+    },
+    {
+      "cell": "canonical-direct_country-2025-ce_trend-seed0",
+      "status": "PASS",
+      "native_records": 59900,
+      "person_records": 166321,
+      "zero_raw_award_units_receiving_positive_allocation": 12,
+      "canonical_housing_portion": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_native": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_person": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "superseded_unallocated_oracle_native": {
+        "bit_identical": false,
+        "different_records": 18,
+        "max_absolute_error": 9881.09375
+      },
+      "original_calculator_replay": {
+        "reference_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0016262499993899837
+        },
+        "unadjusted_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0037051785475341603
+        },
+        "geographic_factor": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 5.939878011673727e-08
+        },
+        "threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0039007525047054514
+        },
+        "housing_portion": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0019482935385894962
+        },
+        "housing_cap": {
+          "single_cast_bit_identical": false,
+          "finite": true,
+          "max_absolute_error": 9881.09375
+        }
+      },
+      "inputs": {
+        "all-vectors-checkpoint.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2025-ce_trend-seed0/all-vectors-checkpoint.json",
+          "sha256": "481eeecfab55cef1710761ed57bb1d3339de47646423dfdeb8963d3c73652495"
+        },
+        "native-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2025-ce_trend-seed0/native-vectors.pkl",
+          "sha256": "a1228f828b3c16e0eaecacc379170bc597c54d6da8efcafaeb10d121dfeae8bf"
+        },
+        "person-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2025-ce_trend-seed0/person-vectors.pkl",
+          "sha256": "97dcdc80cd1a9cf2dd5881aa117f14c0cee894d4bbed37394057b824c3bdd224"
+        },
+        "input-identities-and-role.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2025-ce_trend-seed0/input-identities-and-role.pkl",
+          "sha256": "f74fc69a1dec9be7b6dcc5af37970a5f6c202a37405261313ee78e5eced00f8c"
+        },
+        "calculator-replay.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2025-ce_trend-seed0/calculator-replay.json",
+          "sha256": "b608a75b290df989f4490ac4cf836d4475901247992acaf56f5b1984b4492c71"
+        }
+      },
+      "config_sha256": "4c866fe592d5aa770ff54889205da3b3faa697cccac6dacaae1bd9a07bab0e83",
+      "dataset_sha256": "6496cc4393d4d3c6574f76eca231de5898c803b9067645591fd5c4d3e65aee84",
+      "forecast_content_sha256": "3d86d5c4c0423480e6b69b75d222ffa4a7a2639e4094df5ba2504af01be17173",
+      "calculator_wheel_sha256": "e354937a5e1a4045d4966ed594a528d8b02866fabaac9bb5672017004b627305",
+      "verified_calculator_package_members": 62
+    },
+    {
+      "cell": "canonical-direct_country-2025-ce_trend-seed42",
+      "status": "PASS",
+      "native_records": 59900,
+      "person_records": 166321,
+      "zero_raw_award_units_receiving_positive_allocation": 12,
+      "canonical_housing_portion": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_native": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_person": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "superseded_unallocated_oracle_native": {
+        "bit_identical": false,
+        "different_records": 18,
+        "max_absolute_error": 9881.09375
+      },
+      "original_calculator_replay": {
+        "reference_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0016262499993899837
+        },
+        "unadjusted_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0037051785475341603
+        },
+        "geographic_factor": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 5.939878011673727e-08
+        },
+        "threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0039007525047054514
+        },
+        "housing_portion": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0019482935385894962
+        },
+        "housing_cap": {
+          "single_cast_bit_identical": false,
+          "finite": true,
+          "max_absolute_error": 9881.09375
+        }
+      },
+      "inputs": {
+        "all-vectors-checkpoint.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2025-ce_trend-seed42/all-vectors-checkpoint.json",
+          "sha256": "b52202fd51cdbf780cc01711501de77278afc1a887634fb5a9d4247746879d23"
+        },
+        "native-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2025-ce_trend-seed42/native-vectors.pkl",
+          "sha256": "a1228f828b3c16e0eaecacc379170bc597c54d6da8efcafaeb10d121dfeae8bf"
+        },
+        "person-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2025-ce_trend-seed42/person-vectors.pkl",
+          "sha256": "97dcdc80cd1a9cf2dd5881aa117f14c0cee894d4bbed37394057b824c3bdd224"
+        },
+        "input-identities-and-role.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2025-ce_trend-seed42/input-identities-and-role.pkl",
+          "sha256": "f74fc69a1dec9be7b6dcc5af37970a5f6c202a37405261313ee78e5eced00f8c"
+        },
+        "calculator-replay.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2025-ce_trend-seed42/calculator-replay.json",
+          "sha256": "b608a75b290df989f4490ac4cf836d4475901247992acaf56f5b1984b4492c71"
+        }
+      },
+      "config_sha256": "4c866fe592d5aa770ff54889205da3b3faa697cccac6dacaae1bd9a07bab0e83",
+      "dataset_sha256": "6496cc4393d4d3c6574f76eca231de5898c803b9067645591fd5c4d3e65aee84",
+      "forecast_content_sha256": "3d86d5c4c0423480e6b69b75d222ffa4a7a2639e4094df5ba2504af01be17173",
+      "calculator_wheel_sha256": "e354937a5e1a4045d4966ed594a528d8b02866fabaac9bb5672017004b627305",
+      "verified_calculator_package_members": 62
+    },
+    {
+      "cell": "canonical-direct_country-2026-ce_trend-seed0",
+      "status": "PASS",
+      "native_records": 59900,
+      "person_records": 166321,
+      "zero_raw_award_units_receiving_positive_allocation": 11,
+      "canonical_housing_portion": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_native": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_person": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "superseded_unallocated_oracle_native": {
+        "bit_identical": false,
+        "different_records": 16,
+        "max_absolute_error": 10432.7177734375
+      },
+      "original_calculator_replay": {
+        "reference_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.001683231399510987
+        },
+        "unadjusted_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.003823647726676427
+        },
+        "geographic_factor": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 5.952002646303356e-08
+        },
+        "threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0039025901205604896
+        },
+        "housing_portion": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0038184857548912987
+        },
+        "housing_cap": {
+          "single_cast_bit_identical": false,
+          "finite": true,
+          "max_absolute_error": 10432.7177734375
+        }
+      },
+      "inputs": {
+        "all-vectors-checkpoint.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2026-ce_trend-seed0/all-vectors-checkpoint.json",
+          "sha256": "31bb5ab45d7d3450a8b86b430408bacec104dec81983cecec29109bbb6f21c1e"
+        },
+        "native-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2026-ce_trend-seed0/native-vectors.pkl",
+          "sha256": "a6da923147762bee31f7dbc39c0e282aa7b08b359531c56332d80ad6896d1e52"
+        },
+        "person-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2026-ce_trend-seed0/person-vectors.pkl",
+          "sha256": "d9fb5b0cb5a0335a02245facbc256fb8581aec6eb32c42159aa1cffaeb601606"
+        },
+        "input-identities-and-role.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2026-ce_trend-seed0/input-identities-and-role.pkl",
+          "sha256": "f74fc69a1dec9be7b6dcc5af37970a5f6c202a37405261313ee78e5eced00f8c"
+        },
+        "calculator-replay.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2026-ce_trend-seed0/calculator-replay.json",
+          "sha256": "19d5f0c72bbdadd6499a5c02c5d19acb4b1e479b872e75a091c63649b88906e2"
+        }
+      },
+      "config_sha256": "4c866fe592d5aa770ff54889205da3b3faa697cccac6dacaae1bd9a07bab0e83",
+      "dataset_sha256": "6496cc4393d4d3c6574f76eca231de5898c803b9067645591fd5c4d3e65aee84",
+      "forecast_content_sha256": "3d86d5c4c0423480e6b69b75d222ffa4a7a2639e4094df5ba2504af01be17173",
+      "calculator_wheel_sha256": "e354937a5e1a4045d4966ed594a528d8b02866fabaac9bb5672017004b627305",
+      "verified_calculator_package_members": 62
+    },
+    {
+      "cell": "canonical-direct_country-2026-ce_trend-seed42",
+      "status": "PASS",
+      "native_records": 59900,
+      "person_records": 166321,
+      "zero_raw_award_units_receiving_positive_allocation": 11,
+      "canonical_housing_portion": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_native": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_person": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "superseded_unallocated_oracle_native": {
+        "bit_identical": false,
+        "different_records": 16,
+        "max_absolute_error": 10432.7177734375
+      },
+      "original_calculator_replay": {
+        "reference_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.001683231399510987
+        },
+        "unadjusted_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.003823647726676427
+        },
+        "geographic_factor": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 5.952002646303356e-08
+        },
+        "threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0039025901205604896
+        },
+        "housing_portion": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0038184857548912987
+        },
+        "housing_cap": {
+          "single_cast_bit_identical": false,
+          "finite": true,
+          "max_absolute_error": 10432.7177734375
+        }
+      },
+      "inputs": {
+        "all-vectors-checkpoint.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2026-ce_trend-seed42/all-vectors-checkpoint.json",
+          "sha256": "f3dac3357dd646c00930e8e4f62d39db108e6147ac40207c3ac1acba43f88888"
+        },
+        "native-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2026-ce_trend-seed42/native-vectors.pkl",
+          "sha256": "a6da923147762bee31f7dbc39c0e282aa7b08b359531c56332d80ad6896d1e52"
+        },
+        "person-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2026-ce_trend-seed42/person-vectors.pkl",
+          "sha256": "d9fb5b0cb5a0335a02245facbc256fb8581aec6eb32c42159aa1cffaeb601606"
+        },
+        "input-identities-and-role.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2026-ce_trend-seed42/input-identities-and-role.pkl",
+          "sha256": "f74fc69a1dec9be7b6dcc5af37970a5f6c202a37405261313ee78e5eced00f8c"
+        },
+        "calculator-replay.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2026-ce_trend-seed42/calculator-replay.json",
+          "sha256": "19d5f0c72bbdadd6499a5c02c5d19acb4b1e479b872e75a091c63649b88906e2"
+        }
+      },
+      "config_sha256": "4c866fe592d5aa770ff54889205da3b3faa697cccac6dacaae1bd9a07bab0e83",
+      "dataset_sha256": "6496cc4393d4d3c6574f76eca231de5898c803b9067645591fd5c4d3e65aee84",
+      "forecast_content_sha256": "3d86d5c4c0423480e6b69b75d222ffa4a7a2639e4094df5ba2504af01be17173",
+      "calculator_wheel_sha256": "e354937a5e1a4045d4966ed594a528d8b02866fabaac9bb5672017004b627305",
+      "verified_calculator_package_members": 62
+    },
+    {
+      "cell": "canonical-direct_country-2026-zero_real-seed0",
+      "status": "PASS",
+      "native_records": 59900,
+      "person_records": 166321,
+      "zero_raw_award_units_receiving_positive_allocation": 11,
+      "canonical_housing_portion": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_native": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_person": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "superseded_unallocated_oracle_native": {
+        "bit_identical": false,
+        "different_records": 16,
+        "max_absolute_error": 10432.7177734375
+      },
+      "original_calculator_replay": {
+        "reference_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.001496054137533065
+        },
+        "unadjusted_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.00373338206554763
+        },
+        "geographic_factor": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 5.95837963413004e-08
+        },
+        "threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0039004865975584835
+        },
+        "housing_portion": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0036933633527951315
+        },
+        "housing_cap": {
+          "single_cast_bit_identical": false,
+          "finite": true,
+          "max_absolute_error": 10432.7177734375
+        }
+      },
+      "inputs": {
+        "all-vectors-checkpoint.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2026-zero_real-seed0/all-vectors-checkpoint.json",
+          "sha256": "521e1009ee5798513f6f2fb906d976e26e8f5895e51405a9ac19d5a2ce6847b8"
+        },
+        "native-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2026-zero_real-seed0/native-vectors.pkl",
+          "sha256": "adae0d55c50da4cf4d3ef1e4af2068877590cb9e3ea6072c0387d8bb1d0a7769"
+        },
+        "person-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2026-zero_real-seed0/person-vectors.pkl",
+          "sha256": "e8b8e259a1e6fc5bb2df531822c585969cba93bde3dba83ea3bd7d046e499fb3"
+        },
+        "input-identities-and-role.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2026-zero_real-seed0/input-identities-and-role.pkl",
+          "sha256": "f74fc69a1dec9be7b6dcc5af37970a5f6c202a37405261313ee78e5eced00f8c"
+        },
+        "calculator-replay.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2026-zero_real-seed0/calculator-replay.json",
+          "sha256": "3526d123c045ecf85290dd401284f11120dcfb94b7895641c979b90d7eef3a75"
+        }
+      },
+      "config_sha256": "2606ef8bf070c185bb07986e488a8490b6cc3e6f40257d8d8f7cd8e353695f45",
+      "dataset_sha256": "6496cc4393d4d3c6574f76eca231de5898c803b9067645591fd5c4d3e65aee84",
+      "forecast_content_sha256": "3d86d5c4c0423480e6b69b75d222ffa4a7a2639e4094df5ba2504af01be17173",
+      "calculator_wheel_sha256": "e354937a5e1a4045d4966ed594a528d8b02866fabaac9bb5672017004b627305",
+      "verified_calculator_package_members": 62
+    },
+    {
+      "cell": "canonical-direct_country-2026-zero_real-seed42",
+      "status": "PASS",
+      "native_records": 59900,
+      "person_records": 166321,
+      "zero_raw_award_units_receiving_positive_allocation": 11,
+      "canonical_housing_portion": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_native": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_person": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "superseded_unallocated_oracle_native": {
+        "bit_identical": false,
+        "different_records": 16,
+        "max_absolute_error": 10432.7177734375
+      },
+      "original_calculator_replay": {
+        "reference_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.001496054137533065
+        },
+        "unadjusted_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.00373338206554763
+        },
+        "geographic_factor": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 5.95837963413004e-08
+        },
+        "threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0039004865975584835
+        },
+        "housing_portion": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0036933633527951315
+        },
+        "housing_cap": {
+          "single_cast_bit_identical": false,
+          "finite": true,
+          "max_absolute_error": 10432.7177734375
+        }
+      },
+      "inputs": {
+        "all-vectors-checkpoint.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2026-zero_real-seed42/all-vectors-checkpoint.json",
+          "sha256": "36754f83c4965d7f49d77a7f034c99f9e006aa25d7a148a08025d37709f35503"
+        },
+        "native-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2026-zero_real-seed42/native-vectors.pkl",
+          "sha256": "adae0d55c50da4cf4d3ef1e4af2068877590cb9e3ea6072c0387d8bb1d0a7769"
+        },
+        "person-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2026-zero_real-seed42/person-vectors.pkl",
+          "sha256": "e8b8e259a1e6fc5bb2df531822c585969cba93bde3dba83ea3bd7d046e499fb3"
+        },
+        "input-identities-and-role.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2026-zero_real-seed42/input-identities-and-role.pkl",
+          "sha256": "f74fc69a1dec9be7b6dcc5af37970a5f6c202a37405261313ee78e5eced00f8c"
+        },
+        "calculator-replay.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/direct_country/canonical-direct_country-2026-zero_real-seed42/calculator-replay.json",
+          "sha256": "3526d123c045ecf85290dd401284f11120dcfb94b7895641c979b90d7eef3a75"
+        }
+      },
+      "config_sha256": "2606ef8bf070c185bb07986e488a8490b6cc3e6f40257d8d8f7cd8e353695f45",
+      "dataset_sha256": "6496cc4393d4d3c6574f76eca231de5898c803b9067645591fd5c4d3e65aee84",
+      "forecast_content_sha256": "3d86d5c4c0423480e6b69b75d222ffa4a7a2639e4094df5ba2504af01be17173",
+      "calculator_wheel_sha256": "e354937a5e1a4045d4966ed594a528d8b02866fabaac9bb5672017004b627305",
+      "verified_calculator_package_members": 62
+    },
+    {
+      "cell": "canonical-base_wrapper-2024-ce_trend-seed0",
+      "status": "PASS",
+      "native_records": 59900,
+      "person_records": 166321,
+      "zero_raw_award_units_receiving_positive_allocation": 12,
+      "canonical_housing_portion": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_native": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_person": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "superseded_unallocated_oracle_native": {
+        "bit_identical": false,
+        "different_records": 20,
+        "max_absolute_error": 9225.0
+      },
+      "original_calculator_replay": {
+        "reference_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0016367499993066303
+        },
+        "unadjusted_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.003787608817219734
+        },
+        "geographic_factor": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 5.953165294059204e-08
+        },
+        "threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.003878060058923438
+        },
+        "housing_portion": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0019374196490389295
+        },
+        "housing_cap": {
+          "single_cast_bit_identical": false,
+          "finite": true,
+          "max_absolute_error": 9225.0
+        }
+      },
+      "inputs": {
+        "all-vectors-checkpoint.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2024-ce_trend-seed0/all-vectors-checkpoint.json",
+          "sha256": "7352f59979e386d96f1cd7bc8ab7137c5aa2baf416cacb7043c792e1c34a55be"
+        },
+        "native-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2024-ce_trend-seed0/native-vectors.pkl",
+          "sha256": "540b9a01caad377501d9aef478cbede54de166d14a5541442db225eb3e99f0ee"
+        },
+        "person-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2024-ce_trend-seed0/person-vectors.pkl",
+          "sha256": "aecd3e978bec010a960dc4f0f1d157fc26620fb3c2a146c52d45b5ef2fbb397b"
+        },
+        "input-identities-and-role.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2024-ce_trend-seed0/input-identities-and-role.pkl",
+          "sha256": "f74fc69a1dec9be7b6dcc5af37970a5f6c202a37405261313ee78e5eced00f8c"
+        },
+        "calculator-replay.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2024-ce_trend-seed0/calculator-replay.json",
+          "sha256": "be46a649bc75f9c8f53b73e94094fe640d45597878348646e9881f275f5d1537"
+        }
+      },
+      "config_sha256": "551374ce12ffadf05ec01183158741911ff473ee4c192ee323c2609fad460c1c",
+      "dataset_sha256": "6496cc4393d4d3c6574f76eca231de5898c803b9067645591fd5c4d3e65aee84",
+      "forecast_content_sha256": "3d86d5c4c0423480e6b69b75d222ffa4a7a2639e4094df5ba2504af01be17173",
+      "calculator_wheel_sha256": "e354937a5e1a4045d4966ed594a528d8b02866fabaac9bb5672017004b627305",
+      "verified_calculator_package_members": 62
+    },
+    {
+      "cell": "canonical-base_wrapper-2024-ce_trend-seed42",
+      "status": "PASS",
+      "native_records": 59900,
+      "person_records": 166321,
+      "zero_raw_award_units_receiving_positive_allocation": 12,
+      "canonical_housing_portion": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_native": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_person": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "superseded_unallocated_oracle_native": {
+        "bit_identical": false,
+        "different_records": 20,
+        "max_absolute_error": 9225.0
+      },
+      "original_calculator_replay": {
+        "reference_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0016367499993066303
+        },
+        "unadjusted_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.003787608817219734
+        },
+        "geographic_factor": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 5.953165294059204e-08
+        },
+        "threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.003878060058923438
+        },
+        "housing_portion": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0019374196490389295
+        },
+        "housing_cap": {
+          "single_cast_bit_identical": false,
+          "finite": true,
+          "max_absolute_error": 9225.0
+        }
+      },
+      "inputs": {
+        "all-vectors-checkpoint.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2024-ce_trend-seed42/all-vectors-checkpoint.json",
+          "sha256": "3118f6c9e998aecb54d835cf32e6bfa8c2ac240d7a76d0e2ab564b86813933fe"
+        },
+        "native-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2024-ce_trend-seed42/native-vectors.pkl",
+          "sha256": "540b9a01caad377501d9aef478cbede54de166d14a5541442db225eb3e99f0ee"
+        },
+        "person-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2024-ce_trend-seed42/person-vectors.pkl",
+          "sha256": "aecd3e978bec010a960dc4f0f1d157fc26620fb3c2a146c52d45b5ef2fbb397b"
+        },
+        "input-identities-and-role.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2024-ce_trend-seed42/input-identities-and-role.pkl",
+          "sha256": "f74fc69a1dec9be7b6dcc5af37970a5f6c202a37405261313ee78e5eced00f8c"
+        },
+        "calculator-replay.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2024-ce_trend-seed42/calculator-replay.json",
+          "sha256": "be46a649bc75f9c8f53b73e94094fe640d45597878348646e9881f275f5d1537"
+        }
+      },
+      "config_sha256": "551374ce12ffadf05ec01183158741911ff473ee4c192ee323c2609fad460c1c",
+      "dataset_sha256": "6496cc4393d4d3c6574f76eca231de5898c803b9067645591fd5c4d3e65aee84",
+      "forecast_content_sha256": "3d86d5c4c0423480e6b69b75d222ffa4a7a2639e4094df5ba2504af01be17173",
+      "calculator_wheel_sha256": "e354937a5e1a4045d4966ed594a528d8b02866fabaac9bb5672017004b627305",
+      "verified_calculator_package_members": 62
+    },
+    {
+      "cell": "canonical-base_wrapper-2025-ce_trend-seed0",
+      "status": "PASS",
+      "native_records": 59900,
+      "person_records": 166321,
+      "zero_raw_award_units_receiving_positive_allocation": 12,
+      "canonical_housing_portion": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_native": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_person": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "superseded_unallocated_oracle_native": {
+        "bit_identical": false,
+        "different_records": 18,
+        "max_absolute_error": 9881.09375
+      },
+      "original_calculator_replay": {
+        "reference_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0016262499993899837
+        },
+        "unadjusted_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0037051785475341603
+        },
+        "geographic_factor": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 5.939878011673727e-08
+        },
+        "threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0039007525047054514
+        },
+        "housing_portion": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0019482935385894962
+        },
+        "housing_cap": {
+          "single_cast_bit_identical": false,
+          "finite": true,
+          "max_absolute_error": 9881.09375
+        }
+      },
+      "inputs": {
+        "all-vectors-checkpoint.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2025-ce_trend-seed0/all-vectors-checkpoint.json",
+          "sha256": "f03aede2493cb5f442f246168b75f0e8ac11c6f0a03b153a334c1b6e48dfbe4c"
+        },
+        "native-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2025-ce_trend-seed0/native-vectors.pkl",
+          "sha256": "a1228f828b3c16e0eaecacc379170bc597c54d6da8efcafaeb10d121dfeae8bf"
+        },
+        "person-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2025-ce_trend-seed0/person-vectors.pkl",
+          "sha256": "97dcdc80cd1a9cf2dd5881aa117f14c0cee894d4bbed37394057b824c3bdd224"
+        },
+        "input-identities-and-role.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2025-ce_trend-seed0/input-identities-and-role.pkl",
+          "sha256": "f74fc69a1dec9be7b6dcc5af37970a5f6c202a37405261313ee78e5eced00f8c"
+        },
+        "calculator-replay.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2025-ce_trend-seed0/calculator-replay.json",
+          "sha256": "b608a75b290df989f4490ac4cf836d4475901247992acaf56f5b1984b4492c71"
+        }
+      },
+      "config_sha256": "551374ce12ffadf05ec01183158741911ff473ee4c192ee323c2609fad460c1c",
+      "dataset_sha256": "6496cc4393d4d3c6574f76eca231de5898c803b9067645591fd5c4d3e65aee84",
+      "forecast_content_sha256": "3d86d5c4c0423480e6b69b75d222ffa4a7a2639e4094df5ba2504af01be17173",
+      "calculator_wheel_sha256": "e354937a5e1a4045d4966ed594a528d8b02866fabaac9bb5672017004b627305",
+      "verified_calculator_package_members": 62
+    },
+    {
+      "cell": "canonical-base_wrapper-2025-ce_trend-seed42",
+      "status": "PASS",
+      "native_records": 59900,
+      "person_records": 166321,
+      "zero_raw_award_units_receiving_positive_allocation": 12,
+      "canonical_housing_portion": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_native": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_person": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "superseded_unallocated_oracle_native": {
+        "bit_identical": false,
+        "different_records": 18,
+        "max_absolute_error": 9881.09375
+      },
+      "original_calculator_replay": {
+        "reference_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0016262499993899837
+        },
+        "unadjusted_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0037051785475341603
+        },
+        "geographic_factor": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 5.939878011673727e-08
+        },
+        "threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0039007525047054514
+        },
+        "housing_portion": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0019482935385894962
+        },
+        "housing_cap": {
+          "single_cast_bit_identical": false,
+          "finite": true,
+          "max_absolute_error": 9881.09375
+        }
+      },
+      "inputs": {
+        "all-vectors-checkpoint.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2025-ce_trend-seed42/all-vectors-checkpoint.json",
+          "sha256": "1fd9b7bf69afb2f0bfcf95131ccb75b89a58d5ba0fdd86326fac1fd8b74f165d"
+        },
+        "native-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2025-ce_trend-seed42/native-vectors.pkl",
+          "sha256": "a1228f828b3c16e0eaecacc379170bc597c54d6da8efcafaeb10d121dfeae8bf"
+        },
+        "person-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2025-ce_trend-seed42/person-vectors.pkl",
+          "sha256": "97dcdc80cd1a9cf2dd5881aa117f14c0cee894d4bbed37394057b824c3bdd224"
+        },
+        "input-identities-and-role.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2025-ce_trend-seed42/input-identities-and-role.pkl",
+          "sha256": "f74fc69a1dec9be7b6dcc5af37970a5f6c202a37405261313ee78e5eced00f8c"
+        },
+        "calculator-replay.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2025-ce_trend-seed42/calculator-replay.json",
+          "sha256": "b608a75b290df989f4490ac4cf836d4475901247992acaf56f5b1984b4492c71"
+        }
+      },
+      "config_sha256": "551374ce12ffadf05ec01183158741911ff473ee4c192ee323c2609fad460c1c",
+      "dataset_sha256": "6496cc4393d4d3c6574f76eca231de5898c803b9067645591fd5c4d3e65aee84",
+      "forecast_content_sha256": "3d86d5c4c0423480e6b69b75d222ffa4a7a2639e4094df5ba2504af01be17173",
+      "calculator_wheel_sha256": "e354937a5e1a4045d4966ed594a528d8b02866fabaac9bb5672017004b627305",
+      "verified_calculator_package_members": 62
+    },
+    {
+      "cell": "canonical-base_wrapper-2026-ce_trend-seed0",
+      "status": "PASS",
+      "native_records": 59900,
+      "person_records": 166321,
+      "zero_raw_award_units_receiving_positive_allocation": 11,
+      "canonical_housing_portion": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_native": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_person": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "superseded_unallocated_oracle_native": {
+        "bit_identical": false,
+        "different_records": 16,
+        "max_absolute_error": 10432.7177734375
+      },
+      "original_calculator_replay": {
+        "reference_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.001683231399510987
+        },
+        "unadjusted_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.003823647726676427
+        },
+        "geographic_factor": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 5.952002646303356e-08
+        },
+        "threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0039025901205604896
+        },
+        "housing_portion": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0038184857548912987
+        },
+        "housing_cap": {
+          "single_cast_bit_identical": false,
+          "finite": true,
+          "max_absolute_error": 10432.7177734375
+        }
+      },
+      "inputs": {
+        "all-vectors-checkpoint.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2026-ce_trend-seed0/all-vectors-checkpoint.json",
+          "sha256": "1be43c37fe2d464562e0cd3b80feec3a2940c9fb85f43b2bd06fdefad50d98d1"
+        },
+        "native-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2026-ce_trend-seed0/native-vectors.pkl",
+          "sha256": "a6da923147762bee31f7dbc39c0e282aa7b08b359531c56332d80ad6896d1e52"
+        },
+        "person-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2026-ce_trend-seed0/person-vectors.pkl",
+          "sha256": "d9fb5b0cb5a0335a02245facbc256fb8581aec6eb32c42159aa1cffaeb601606"
+        },
+        "input-identities-and-role.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2026-ce_trend-seed0/input-identities-and-role.pkl",
+          "sha256": "f74fc69a1dec9be7b6dcc5af37970a5f6c202a37405261313ee78e5eced00f8c"
+        },
+        "calculator-replay.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2026-ce_trend-seed0/calculator-replay.json",
+          "sha256": "19d5f0c72bbdadd6499a5c02c5d19acb4b1e479b872e75a091c63649b88906e2"
+        }
+      },
+      "config_sha256": "551374ce12ffadf05ec01183158741911ff473ee4c192ee323c2609fad460c1c",
+      "dataset_sha256": "6496cc4393d4d3c6574f76eca231de5898c803b9067645591fd5c4d3e65aee84",
+      "forecast_content_sha256": "3d86d5c4c0423480e6b69b75d222ffa4a7a2639e4094df5ba2504af01be17173",
+      "calculator_wheel_sha256": "e354937a5e1a4045d4966ed594a528d8b02866fabaac9bb5672017004b627305",
+      "verified_calculator_package_members": 62
+    },
+    {
+      "cell": "canonical-base_wrapper-2026-ce_trend-seed42",
+      "status": "PASS",
+      "native_records": 59900,
+      "person_records": 166321,
+      "zero_raw_award_units_receiving_positive_allocation": 11,
+      "canonical_housing_portion": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_native": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_person": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "superseded_unallocated_oracle_native": {
+        "bit_identical": false,
+        "different_records": 16,
+        "max_absolute_error": 10432.7177734375
+      },
+      "original_calculator_replay": {
+        "reference_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.001683231399510987
+        },
+        "unadjusted_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.003823647726676427
+        },
+        "geographic_factor": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 5.952002646303356e-08
+        },
+        "threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0039025901205604896
+        },
+        "housing_portion": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0038184857548912987
+        },
+        "housing_cap": {
+          "single_cast_bit_identical": false,
+          "finite": true,
+          "max_absolute_error": 10432.7177734375
+        }
+      },
+      "inputs": {
+        "all-vectors-checkpoint.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2026-ce_trend-seed42/all-vectors-checkpoint.json",
+          "sha256": "6dd954301e0a0e3d0f85d5c984500b3447582ab9804241e5d2d494dc712ce417"
+        },
+        "native-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2026-ce_trend-seed42/native-vectors.pkl",
+          "sha256": "a6da923147762bee31f7dbc39c0e282aa7b08b359531c56332d80ad6896d1e52"
+        },
+        "person-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2026-ce_trend-seed42/person-vectors.pkl",
+          "sha256": "d9fb5b0cb5a0335a02245facbc256fb8581aec6eb32c42159aa1cffaeb601606"
+        },
+        "input-identities-and-role.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2026-ce_trend-seed42/input-identities-and-role.pkl",
+          "sha256": "f74fc69a1dec9be7b6dcc5af37970a5f6c202a37405261313ee78e5eced00f8c"
+        },
+        "calculator-replay.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2026-ce_trend-seed42/calculator-replay.json",
+          "sha256": "19d5f0c72bbdadd6499a5c02c5d19acb4b1e479b872e75a091c63649b88906e2"
+        }
+      },
+      "config_sha256": "551374ce12ffadf05ec01183158741911ff473ee4c192ee323c2609fad460c1c",
+      "dataset_sha256": "6496cc4393d4d3c6574f76eca231de5898c803b9067645591fd5c4d3e65aee84",
+      "forecast_content_sha256": "3d86d5c4c0423480e6b69b75d222ffa4a7a2639e4094df5ba2504af01be17173",
+      "calculator_wheel_sha256": "e354937a5e1a4045d4966ed594a528d8b02866fabaac9bb5672017004b627305",
+      "verified_calculator_package_members": 62
+    },
+    {
+      "cell": "canonical-base_wrapper-2026-zero_real-seed0",
+      "status": "PASS",
+      "native_records": 59900,
+      "person_records": 166321,
+      "zero_raw_award_units_receiving_positive_allocation": 11,
+      "canonical_housing_portion": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_native": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_person": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "superseded_unallocated_oracle_native": {
+        "bit_identical": false,
+        "different_records": 16,
+        "max_absolute_error": 10432.7177734375
+      },
+      "original_calculator_replay": {
+        "reference_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.001496054137533065
+        },
+        "unadjusted_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.00373338206554763
+        },
+        "geographic_factor": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 5.95837963413004e-08
+        },
+        "threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0039004865975584835
+        },
+        "housing_portion": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0036933633527951315
+        },
+        "housing_cap": {
+          "single_cast_bit_identical": false,
+          "finite": true,
+          "max_absolute_error": 10432.7177734375
+        }
+      },
+      "inputs": {
+        "all-vectors-checkpoint.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2026-zero_real-seed0/all-vectors-checkpoint.json",
+          "sha256": "cb845ac15aba9a20160a8098598608a0c27ff41a682b706d8b4c027175309d5c"
+        },
+        "native-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2026-zero_real-seed0/native-vectors.pkl",
+          "sha256": "adae0d55c50da4cf4d3ef1e4af2068877590cb9e3ea6072c0387d8bb1d0a7769"
+        },
+        "person-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2026-zero_real-seed0/person-vectors.pkl",
+          "sha256": "e8b8e259a1e6fc5bb2df531822c585969cba93bde3dba83ea3bd7d046e499fb3"
+        },
+        "input-identities-and-role.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2026-zero_real-seed0/input-identities-and-role.pkl",
+          "sha256": "f74fc69a1dec9be7b6dcc5af37970a5f6c202a37405261313ee78e5eced00f8c"
+        },
+        "calculator-replay.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2026-zero_real-seed0/calculator-replay.json",
+          "sha256": "3526d123c045ecf85290dd401284f11120dcfb94b7895641c979b90d7eef3a75"
+        }
+      },
+      "config_sha256": "63502a23bdbad38444d5c74f660bcd49d400f06c996f812a8ef8a3a8caf1696e",
+      "dataset_sha256": "6496cc4393d4d3c6574f76eca231de5898c803b9067645591fd5c4d3e65aee84",
+      "forecast_content_sha256": "3d86d5c4c0423480e6b69b75d222ffa4a7a2639e4094df5ba2504af01be17173",
+      "calculator_wheel_sha256": "e354937a5e1a4045d4966ed594a528d8b02866fabaac9bb5672017004b627305",
+      "verified_calculator_package_members": 62
+    },
+    {
+      "cell": "canonical-base_wrapper-2026-zero_real-seed42",
+      "status": "PASS",
+      "native_records": 59900,
+      "person_records": 166321,
+      "zero_raw_award_units_receiving_positive_allocation": 11,
+      "canonical_housing_portion": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_native": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "model_contract_person": {
+        "bit_identical": true,
+        "different_records": 0,
+        "max_absolute_error": 0.0
+      },
+      "superseded_unallocated_oracle_native": {
+        "bit_identical": false,
+        "different_records": 16,
+        "max_absolute_error": 10432.7177734375
+      },
+      "original_calculator_replay": {
+        "reference_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.001496054137533065
+        },
+        "unadjusted_threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.00373338206554763
+        },
+        "geographic_factor": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 5.95837963413004e-08
+        },
+        "threshold": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0039004865975584835
+        },
+        "housing_portion": {
+          "single_cast_bit_identical": true,
+          "finite": true,
+          "max_absolute_error": 0.0036933633527951315
+        },
+        "housing_cap": {
+          "single_cast_bit_identical": false,
+          "finite": true,
+          "max_absolute_error": 10432.7177734375
+        }
+      },
+      "inputs": {
+        "all-vectors-checkpoint.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2026-zero_real-seed42/all-vectors-checkpoint.json",
+          "sha256": "49c81abfe72a7f59f2e9ab283c42f276c0f0834f1146bc45c976a029ecaa3124"
+        },
+        "native-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2026-zero_real-seed42/native-vectors.pkl",
+          "sha256": "adae0d55c50da4cf4d3ef1e4af2068877590cb9e3ea6072c0387d8bb1d0a7769"
+        },
+        "person-vectors.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2026-zero_real-seed42/person-vectors.pkl",
+          "sha256": "e8b8e259a1e6fc5bb2df531822c585969cba93bde3dba83ea3bd7d046e499fb3"
+        },
+        "input-identities-and-role.pkl": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2026-zero_real-seed42/input-identities-and-role.pkl",
+          "sha256": "f74fc69a1dec9be7b6dcc5af37970a5f6c202a37405261313ee78e5eced00f8c"
+        },
+        "calculator-replay.json": {
+          "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/endpoints/base_wrapper/canonical-base_wrapper-2026-zero_real-seed42/calculator-replay.json",
+          "sha256": "3526d123c045ecf85290dd401284f11120dcfb94b7895641c979b90d7eef3a75"
+        }
+      },
+      "config_sha256": "63502a23bdbad38444d5c74f660bcd49d400f06c996f812a8ef8a3a8caf1696e",
+      "dataset_sha256": "6496cc4393d4d3c6574f76eca231de5898c803b9067645591fd5c4d3e65aee84",
+      "forecast_content_sha256": "3d86d5c4c0423480e6b69b75d222ffa4a7a2639e4094df5ba2504af01be17173",
+      "calculator_wheel_sha256": "e354937a5e1a4045d4966ed594a528d8b02866fabaac9bb5672017004b627305",
+      "verified_calculator_package_members": 62
+    }
+  ]
+}

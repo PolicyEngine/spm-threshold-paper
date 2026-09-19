@@ -1,0 +1,21 @@
+{
+  "country_source_sha": "238321d3b9ff44d2b6f3cbe378040be263221d47",
+  "installed_model_version": "2.6.8",
+  "files_checked": 17339,
+  "all_tracked_package_files_equal": true,
+  "file_manifest_sha256": "70a71a502f12568a5745f16732915c4c0a4ca7738e1c55d451d9a50a8b2f0df1",
+  "git_archive_sha256": "b845562f08e9166f0dd20386214567cc9705b71557d9017a6084e85c57e1f86b",
+  "installed_package_path": "/Users/maxghenis/spm-rebuild-20260908/worktrees/spm-uprating-validation-20260919/.venv/lib/python3.13/site-packages/policyengine_us",
+  "method": "Compare every regular file under policyengine_us in git archive with the installed distribution; reject any missing or unequal file.",
+  "package_versions": {
+    "policyengine": "6.0.0",
+    "policyengine-us": "2.6.8",
+    "policyengine-core": "3.32.5",
+    "spm-calculator": "1.0.0",
+    "microdf-python": "1.3.0",
+    "numpy": "2.5.3",
+    "pandas": "3.0.5"
+  },
+  "runner_sha256": "dbcd662a55b9c74c7a5d6fb8f8bcb53c1c25beb737a2edc2f776bf7e91dfe0b4",
+  "verification_script_sha256": "0546435dd79d33336f8b0fbd40144a56bd7f4f0ec85242fa97f025a5ac69f250"
+}

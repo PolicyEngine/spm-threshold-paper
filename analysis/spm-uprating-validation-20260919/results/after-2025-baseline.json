@@ -1,0 +1,481 @@
+{
+  "format": "spm/uprating-validation-cell/v1",
+  "started_at_utc": "2026-09-19T12:37:00.644865+00:00",
+  "year": 2025,
+  "variant": "baseline",
+  "groups": {
+    "all": {
+      "people": 343234872.2962102,
+      "poor_people": 45750891.498917356,
+      "spm_pct": 13.329324958401816,
+      "spm_unit_resources_usd": {
+        "mean": 118772.7600462987,
+        "p25": 48704.26953125,
+        "median": 81423.3046875,
+        "p75": 143701.359375
+      },
+      "spm_unit_threshold_usd": {
+        "mean": 37802.56731851193,
+        "p25": 26141.94140625,
+        "median": 36811.7265625,
+        "p75": 46428.125
+      },
+      "resource_threshold_ratio": {
+        "mean": 3.3830063058480553,
+        "p25": 1.3448060750961304,
+        "median": 2.30420184135437,
+        "p75": 3.890876293182373
+      },
+      "resource_ratio_band_pct": {
+        "below_0_75": 6.83471272349668,
+        "0_75_to_below_1": 6.494612234905139,
+        "1_to_below_1_25": 8.27657258439997,
+        "1_25_to_below_1_5": 8.60329291927128,
+        "1_5_or_more": 69.79080953792692
+      },
+      "component_person_mapped_mean_usd": {
+        "employment_income": 32823.3721402409,
+        "social_security": 4622.466655122637,
+        "unemployment_compensation": 109.16100676955946,
+        "spm_unit_capped_housing_subsidy": 38.58676664470779
+      }
+    },
+    "under_4": {
+      "people": 14376190.509578522,
+      "poor_people": 2613300.330305218,
+      "spm_pct": 18.177975094055945,
+      "spm_unit_resources_usd": {
+        "mean": 98674.86957774931,
+        "p25": 46190.015625,
+        "median": 67802.6953125,
+        "p75": 115584.828125
+      },
+      "spm_unit_threshold_usd": {
+        "mean": 43445.494297888836,
+        "p25": 36059.1328125,
+        "median": 41711.91015625,
+        "p75": 49121.7109375
+      },
+      "resource_threshold_ratio": {
+        "mean": 2.304448601990772,
+        "p25": 1.1188828945159912,
+        "median": 1.5730489492416382,
+        "p75": 2.6780357360839844
+      },
+      "resource_ratio_band_pct": {
+        "below_0_75": 8.44869622287151,
+        "0_75_to_below_1": 9.729278871184436,
+        "1_to_below_1_25": 14.281340529642367,
+        "1_25_to_below_1_5": 14.541471028424576,
+        "1_5_or_more": 52.9992133478771
+      },
+      "component_person_mapped_mean_usd": {
+        "employment_income": 0.0,
+        "social_security": 58.08633451271413,
+        "unemployment_compensation": 0.0,
+        "spm_unit_capped_housing_subsidy": 109.45181568842297
+      }
+    },
+    "under_6": {
+      "people": 22908686.56986118,
+      "poor_people": 4219733.390788771,
+      "spm_pct": 18.419796254667347,
+      "spm_unit_resources_usd": {
+        "mean": 100131.91621882288,
+        "p25": 46409.703125,
+        "median": 68387.75,
+        "p75": 116595.5625
+      },
+      "spm_unit_threshold_usd": {
+        "mean": 43887.24314628815,
+        "p25": 36199.6015625,
+        "median": 41953.890625,
+        "p75": 49669.44140625
+      },
+      "resource_threshold_ratio": {
+        "mean": 2.3008863132149773,
+        "p25": 1.1003177165985107,
+        "median": 1.5714081525802612,
+        "p75": 2.674201250076294
+      },
+      "resource_ratio_band_pct": {
+        "below_0_75": 8.346182352125254,
+        "0_75_to_below_1": 10.07361390254209,
+        "1_to_below_1_25": 15.006695806142279,
+        "1_25_to_below_1_5": 13.684039671781246,
+        "1_5_or_more": 52.88946826740914
+      },
+      "component_person_mapped_mean_usd": {
+        "employment_income": 0.0,
+        "social_security": 36.45168431683443,
+        "unemployment_compensation": 0.0,
+        "spm_unit_capped_housing_subsidy": 87.86269137460884
+      }
+    },
+    "under_18": {
+      "people": 77394991.81778231,
+      "poor_people": 12953249.667805225,
+      "spm_pct": 16.736547628691756,
+      "spm_unit_resources_usd": {
+        "mean": 109514.47464116252,
+        "p25": 47669.90625,
+        "median": 74149.4140625,
+        "p75": 129075.8828125
+      },
+      "spm_unit_threshold_usd": {
+        "mean": 44448.71857139353,
+        "p25": 36698.01171875,
+        "median": 42500.515625,
+        "p75": 50317.84765625
+      },
+      "resource_threshold_ratio": {
+        "mean": 2.482132587642389,
+        "p25": 1.1385242938995361,
+        "median": 1.6821595430374146,
+        "p75": 2.887877941131592
+      },
+      "resource_ratio_band_pct": {
+        "below_0_75": 7.34502542818962,
+        "0_75_to_below_1": 9.391522200502136,
+        "1_to_below_1_25": 13.532725398703835,
+        "1_25_to_below_1_5": 13.024093354875099,
+        "1_5_or_more": 56.70663361772932
+      },
+      "component_person_mapped_mean_usd": {
+        "employment_income": 364.13863148172334,
+        "social_security": 202.68537348140748,
+        "unemployment_compensation": 0.700644960642483,
+        "spm_unit_capped_housing_subsidy": 55.621822247684186
+      }
+    },
+    "age_6_17": {
+      "people": 54486305.247921124,
+      "poor_people": 8733516.277016453,
+      "spm_pct": 16.028828229915025,
+      "spm_unit_resources_usd": {
+        "mean": 113459.35747259638,
+        "p25": 48018.953125,
+        "median": 77706.171875,
+        "p75": 133931.140625
+      },
+      "spm_unit_threshold_usd": {
+        "mean": 44684.79008462777,
+        "p25": 36837.984375,
+        "median": 42968.27734375,
+        "p75": 50539.23828125
+      },
+      "resource_threshold_ratio": {
+        "mean": 2.5583373160401,
+        "p25": 1.1552332639694214,
+        "median": 1.7425365447998047,
+        "p75": 2.9823944568634033
+      },
+      "resource_ratio_band_pct": {
+        "below_0_75": 6.924090478144299,
+        "0_75_to_below_1": 9.104737751770726,
+        "1_to_below_1_25": 12.912996717824957,
+        "1_25_to_below_1_5": 12.746619900616354,
+        "1_5_or_more": 58.31155515164366
+      },
+      "component_person_mapped_mean_usd": {
+        "employment_income": 517.2401812865022,
+        "social_security": 272.5780825776667,
+        "unemployment_compensation": 0.9952300995517463,
+        "spm_unit_capped_housing_subsidy": 42.06619644028349
+      }
+    },
+    "age_18_64": {
+      "people": 204103988.84919518,
+      "poor_people": 26130676.60687112,
+      "spm_pct": 12.802629068743043,
+      "spm_unit_resources_usd": {
+        "mean": 122179.03174055275,
+        "p25": 50079.4609375,
+        "median": 86350.8515625,
+        "p75": 150042.046875
+      },
+      "spm_unit_threshold_usd": {
+        "mean": 38035.06880716831,
+        "p25": 26841.671875,
+        "median": 36979.9765625,
+        "p75": 46489.96875
+      },
+      "resource_threshold_ratio": {
+        "mean": 3.4115187465404184,
+        "p25": 1.3932063579559326,
+        "median": 2.4133176803588867,
+        "p75": 3.9822795391082764
+      },
+      "resource_ratio_band_pct": {
+        "below_0_75": 6.625068480152,
+        "0_75_to_below_1": 6.177560588591043,
+        "1_to_below_1_25": 7.5508652187145255,
+        "1_25_to_below_1_5": 7.976290239752824,
+        "1_5_or_more": 71.67021547278961
+      },
+      "component_person_mapped_mean_usd": {
+        "employment_income": 50386.125991374254,
+        "social_security": 2165.335269481359,
+        "unemployment_compensation": 166.98772699687305,
+        "spm_unit_capped_housing_subsidy": 40.6202280223178
+      }
+    },
+    "age_65_74": {
+      "people": 35767880.37389358,
+      "poor_people": 3943962.680814823,
+      "spm_pct": 11.026548511086666,
+      "spm_unit_resources_usd": {
+        "mean": 122862.25607392436,
+        "p25": 46947.4921875,
+        "median": 78515.6640625,
+        "p75": 144291.15625
+      },
+      "spm_unit_threshold_usd": {
+        "mean": 29441.864143338385,
+        "p25": 21610.625,
+        "median": 24869.984375,
+        "p75": 33557.9296875
+      },
+      "resource_threshold_ratio": {
+        "mean": 4.4779053387606345,
+        "p25": 1.7536414861679077,
+        "median": 2.8581089973449707,
+        "p75": 4.888967514038086
+      },
+      "resource_ratio_band_pct": {
+        "below_0_75": 7.03195096666606,
+        "0_75_to_below_1": 3.994597544420606,
+        "1_to_below_1_25": 4.036976330638707,
+        "1_25_to_below_1_5": 4.5712481888706815,
+        "1_5_or_more": 80.36522696940393
+      },
+      "component_person_mapped_mean_usd": {
+        "employment_income": 21593.61699343007,
+        "social_security": 16633.45214159929,
+        "unemployment_compensation": 77.55349191205819,
+        "spm_unit_capped_housing_subsidy": 9.702502500186855
+      }
+    },
+    "age_75_plus": {
+      "people": 25968011.255339153,
+      "poor_people": 2723002.5434261924,
+      "spm_pct": 10.48598799750724,
+      "spm_unit_resources_usd": {
+        "mean": 113960.63484344646,
+        "p25": 44844.40234375,
+        "median": 72797.078125,
+        "p75": 128004.6640625
+      },
+      "spm_unit_threshold_usd": {
+        "mean": 27682.86005677889,
+        "p25": 21041.12109375,
+        "median": 24038.919921875,
+        "p75": 30324.849609375
+      },
+      "resource_threshold_ratio": {
+        "mean": 4.335770585648238,
+        "p25": 1.6762923002243042,
+        "median": 2.7343006134033203,
+        "p75": 4.64682149887085
+      },
+      "resource_ratio_band_pct": {
+        "below_0_75": 6.689872398677213,
+        "0_75_to_below_1": 3.796115598830026,
+        "1_to_below_1_25": 4.154625651622354,
+        "1_25_to_below_1_5": 5.909348767532824,
+        "1_5_or_more": 79.45003758333756
+      },
+      "component_person_mapped_mean_usd": {
+        "employment_income": 6992.3040982544335,
+        "social_security": 20564.070998310897,
+        "unemployment_compensation": 21.443791424514753,
+        "spm_unit_capped_housing_subsidy": 11.617559959862229
+      }
+    },
+    "age_65_plus": {
+      "people": 61735891.629232734,
+      "poor_people": 6666965.2242410155,
+      "spm_pct": 10.799172164355882,
+      "spm_unit_resources_usd": {
+        "mean": 119117.96091265777,
+        "p25": 45744.72265625,
+        "median": 75840.21875,
+        "p75": 138181.984375
+      },
+      "spm_unit_threshold_usd": {
+        "mean": 28701.973024695573,
+        "p25": 21273.9765625,
+        "median": 24739.73046875,
+        "p75": 31982.59765625
+      },
+      "resource_threshold_ratio": {
+        "mean": 4.418119098193084,
+        "p25": 1.7246936559677124,
+        "median": 2.8033642768859863,
+        "p75": 4.769969463348389
+      },
+      "resource_ratio_band_pct": {
+        "below_0_75": 6.8880622194670424,
+        "0_75_to_below_1": 3.9111099448888424,
+        "1_to_below_1_25": 4.086463246772267,
+        "1_25_to_below_1_5": 5.134094370734537,
+        "1_5_or_more": 79.9802702181373
+      },
+      "component_person_mapped_mean_usd": {
+        "employment_income": 15451.856542608151,
+        "social_security": 18286.791099179096,
+        "unemployment_compensation": 53.95202936989737,
+        "spm_unit_capped_housing_subsidy": 10.508034458259742
+      }
+    }
+  },
+  "spm_pct": {
+    "all": 13.329324958401816,
+    "under_4": 18.177975094055945,
+    "under_6": 18.419796254667347,
+    "under_18": 16.736547628691756,
+    "age_6_17": 16.028828229915025,
+    "age_18_64": 12.802629068743043,
+    "age_65_74": 11.026548511086666,
+    "age_75_plus": 10.48598799750724,
+    "age_65_plus": 10.799172164355882
+  },
+  "anchor_factors": null,
+  "provenance": {
+    "status": "controlled experimental runtime; not a new certified bundle",
+    "interface": "policyengine_us.Microsimulation (explicit model-development comparison)",
+    "development_country_model": true,
+    "bundle_certified": false,
+    "runtime_label": "after-uprating",
+    "country_source_sha_declared": "44001a4c24ae5d1bce9179e2bb285b41cae6a272",
+    "expected_model_version": "2.6.9",
+    "country_import_path": "/Users/maxghenis/spm-rebuild-20260908/worktrees/spm-uprating-validation-20260919/.venv/lib/python3.13/site-packages/policyengine_us/__init__.py",
+    "country_init_sha256": "4816cc93528d4b0e752d0c27242911fa4d35c97c26ac7ff171c468cf5ae3e670",
+    "package_versions": {
+      "policyengine": "6.0.0",
+      "policyengine-us": "2.6.9",
+      "policyengine-core": "3.32.5",
+      "spm-calculator": "1.0.0",
+      "microdf-python": "1.3.0",
+      "numpy": "2.5.3",
+      "pandas": "3.0.5"
+    },
+    "dataset_path": "/Users/maxghenis/spm-rebuild-20260908/rollout/requalification-registry-20260915/dataset/populace_us_2024.h5",
+    "dataset_sha256": "6496cc4393d4d3c6574f76eca231de5898c803b9067645591fd5c4d3e65aee84",
+    "expected_dataset_sha256": "6496cc4393d4d3c6574f76eca231de5898c803b9067645591fd5c4d3e65aee84",
+    "runner_path": "/Users/maxghenis/spm-rebuild-20260908/worktrees/spm-uprating-validation-20260919/analysis/spm-uprating-validation-20260919/run_cell.py",
+    "runner_sha256": "dbcd662a55b9c74c7a5d6fb8f8bcb53c1c25beb737a2edc2f776bf7e91dfe0b4",
+    "python": "3.13.9 (main, Oct 31 2025, 23:20:42) [Clang 21.1.4 ]",
+    "python_executable": "/Users/maxghenis/spm-rebuild-20260908/worktrees/spm-uprating-validation-20260919/.venv/bin/python",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "caller_seed": 0,
+    "pythonhashseed": "0",
+    "seed_note": "Caller Python/NumPy seed before construction and calculation; Core also applies its own deterministic construction/per-variable seeds.",
+    "bundle_reference_metadata": null,
+    "spm_config": {
+      "forecast_content_sha256": "3d86d5c4c0423480e6b69b75d222ffa4a7a2639e4094df5ba2504af01be17173",
+      "scenario": "ce_trend",
+      "geography_kind": "county",
+      "geography_id": null,
+      "county_vintage": "2020",
+      "as_of": null
+    },
+    "spm_provenance": {
+      "forecast_id": "spm-rolling-2026-09-09",
+      "forecast_sha256": "3d86d5c4c0423480e6b69b75d222ffa4a7a2639e4094df5ba2504af01be17173",
+      "scenario": "ce_trend",
+      "geography_kind": "county",
+      "runtime_versions": {
+        "policyengine": "6.0.0",
+        "policyengine-us": "2.6.9",
+        "policyengine-core": "3.32.5",
+        "spm-calculator": "1.0.0"
+      },
+      "years": {
+        "2025": {
+          "acs_window": {
+            "end": 2024,
+            "observed_cohort_years": [
+              2020,
+              2021,
+              2022,
+              2023,
+              2024
+            ],
+            "observed_years": 5,
+            "projected_cohort_years": [],
+            "projected_years": 0,
+            "start": 2020
+          },
+          "ce_window": {
+            "end": "2025Q1",
+            "observed_quarters": 20,
+            "projected_quarters": 0,
+            "start": "2020Q2"
+          },
+          "geography_status": "mixed",
+          "housing_share_source_ids": [
+            "bls-spm-shares"
+          ],
+          "housing_share_status": "published_anchor",
+          "housing_shares": {
+            "owner_with_mortgage": 0.42850748240000003,
+            "owner_without_mortgage": 0.3120194707,
+            "renter": 0.4336857704
+          },
+          "national_source_ids": [
+            "bls-spm-thresholds"
+          ],
+          "national_status": "published",
+          "thresholds": {
+            "owner_with_mortgage": 41322.707394,
+            "owner_without_mortgage": 34325.99772,
+            "renter": 41700.555713
+          }
+        }
+      },
+      "composition_method": "age >= 18 or age >= 15 with explicit SPM independence role; native SPM membership",
+      "storage_method": "canonical final amount cast once to model dtype"
+    }
+  },
+  "runtime": {
+    "load_seconds": 12.921628792071715,
+    "total_seconds": 286.0500228749588,
+    "peak_rss_gb": 37.047402496
+  },
+  "interpretation": {
+    "threshold_effect": "2025 baseline rate minus 2025 rate with national tenure threshold bases held at 2024 values plus CPI-U; conditional on 2025 resources and geography/composition.",
+    "residual_label": "Change with national threshold bases held constant in real terms",
+    "residual_note": "Anchored 2025 rate minus 2024 rate; includes resources, geography, composition and weighting, not an isolated causal resource effect.",
+    "distribution_note": "Resources and thresholds are associated SPM-unit amounts mapped to people; their quantiles are person-weighted. Ratios of annual medians are not medians of individual growth."
+  },
+  "publication_copy": {
+    "source_file": "after-2025-baseline.json",
+    "source_file_sha256": "81285bee6017b3f232653b4ebdc3b03dbfe81a33b19ae99d68cb7a4caf11d865",
+    "source_bytes": 27931122,
+    "aggregate_statistics_unchanged": true,
+    "omitted_calculator_metadata": [
+      {
+        "json_pointer": "/provenance/spm_provenance/geographies",
+        "entries": 6849,
+        "canonical_json_sha256": "c24405e8574d6b0050653c87f2adf86ff045d7f265a8b73f4780625b999353bc"
+      },
+      {
+        "json_pointer": "/provenance/spm_provenance/years/2025/geography_by_area",
+        "entries": 349,
+        "canonical_json_sha256": "4fc1f3844ac73f8484712884b29466a380e6993c1a30a9c989ee66a09186c71e"
+      },
+      {
+        "json_pointer": "/provenance/spm_provenance/years/2025/median_diagnostics",
+        "entries": 349,
+        "canonical_json_sha256": "f1c30a139d071eb05e97dc7090b6c23617775be3e82dc309d5c15541cb5fa6a9"
+      },
+      {
+        "json_pointer": "/provenance/spm_provenance/years/2025/rent_indices",
+        "entries": 349,
+        "canonical_json_sha256": "588db35cdde01598334ea859af2c1ba61d3a7fd68b251a60522ba776bb855272"
+      }
+    ],
+    "note": "The abbreviated spm_provenance is not a complete calculator receipt. Retain the full source file for geography-level audit."
+  }
+}
