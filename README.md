@@ -63,6 +63,13 @@ comparison on the qualified model and population release. The threshold-method
 results do not depend on them. The prediction's checksum and timestamp proof
 accompany the file; any subsequent estimate receives its own dated record.
 
+## September 19 model diagnostics
+
+The [uprating and housing diagnostic](analysis/spm-uprating-validation-20260919/README.md)
+compares two country-model revisions on the same population and replays saved
+housing-cap results. It preserves the registered forecast and distinguishes
+experimental model results from certified releases.
+
 ## License
 
 Code in this repository is released under the [MIT License](LICENSE). Original text and figures are released under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) with attribution to PolicyEngine. Third-party data and materials keep their own terms.

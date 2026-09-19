@@ -1,0 +1,684 @@
+{
+  "format": "spm/controlled-uprating-comparison/v1",
+  "scope": "Retrospective joint effect of #9526 and #9527 on the fixed population; no forecast amendment or claim of forecasting skill.",
+  "residual_label": "Change with national threshold bases held constant in real terms",
+  "residual_note": "The cross-year remainder includes resources, geography, composition and weighting; it is not an isolated causal resource effect.",
+  "sources": {
+    "before": {
+      "sha": "238321d3b9ff44d2b6f3cbe378040be263221d47",
+      "package_version": "2.6.8"
+    },
+    "after": {
+      "sha": "44001a4c24ae5d1bce9179e2bb285b41cae6a272",
+      "package_version": "2.6.9"
+    }
+  },
+  "matched_provenance": {
+    "dataset_sha256": "6496cc4393d4d3c6574f76eca231de5898c803b9067645591fd5c4d3e65aee84",
+    "runner_sha256": "dbcd662a55b9c74c7a5d6fb8f8bcb53c1c25beb737a2edc2f776bf7e91dfe0b4",
+    "caller_seed": 0,
+    "pythonhashseed": "0",
+    "spm_config": {
+      "forecast_content_sha256": "3d86d5c4c0423480e6b69b75d222ffa4a7a2639e4094df5ba2504af01be17173",
+      "scenario": "ce_trend",
+      "geography_kind": "county",
+      "geography_id": null,
+      "county_vintage": "2020",
+      "as_of": null
+    },
+    "python": "3.13.9 (main, Oct 31 2025, 23:20:42) [Clang 21.1.4 ]",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "interface": "policyengine_us.Microsimulation (explicit model-development comparison)",
+    "seed_note": "Caller Python/NumPy seed before construction and calculation; Core also applies its own deterministic construction/per-variable seeds.",
+    "non_country_package_versions": {
+      "policyengine": "6.0.0",
+      "policyengine-core": "3.32.5",
+      "spm-calculator": "1.0.0",
+      "microdf-python": "1.3.0",
+      "numpy": "2.5.3",
+      "pandas": "3.0.5"
+    }
+  },
+  "groups": {
+    "all": {
+      "before": {
+        "rate_2024_pct": 13.043619673947223,
+        "rate_2025_pct": 13.208016541504056,
+        "rate_2025_anchored_pct": 12.50371619801965,
+        "change_pp": 0.16439686755683347,
+        "threshold_contribution_pp": 0.7043003434844071,
+        "constant_real_national_base_change_pp": -0.5399034759275736
+      },
+      "after": {
+        "rate_2024_pct": 13.043619673947223,
+        "rate_2025_pct": 13.329324958401816,
+        "rate_2025_anchored_pct": 12.672598294739402,
+        "change_pp": 0.2857052844545933,
+        "threshold_contribution_pp": 0.6567266636624147,
+        "constant_real_national_base_change_pp": -0.3710213792078214
+      },
+      "after_minus_before": {
+        "rate_2024_pct": 0.0,
+        "rate_2025_pct": 0.12130841689775984,
+        "rate_2025_anchored_pct": 0.16888209671975218,
+        "change_pp": 0.12130841689775984,
+        "threshold_contribution_pp": -0.04757367982199234,
+        "constant_real_national_base_change_pp": 0.16888209671975218
+      }
+    },
+    "under_4": {
+      "before": {
+        "rate_2024_pct": 17.026513752961918,
+        "rate_2025_pct": 18.177973502917265,
+        "rate_2025_anchored_pct": 16.10261594304896,
+        "change_pp": 1.1514597499553467,
+        "threshold_contribution_pp": 2.075357559868305,
+        "constant_real_national_base_change_pp": -0.9238978099129582
+      },
+      "after": {
+        "rate_2024_pct": 17.026513752961918,
+        "rate_2025_pct": 18.177975094055945,
+        "rate_2025_anchored_pct": 16.422401732381235,
+        "change_pp": 1.151461341094027,
+        "threshold_contribution_pp": 1.7555733616747098,
+        "constant_real_national_base_change_pp": -0.6041120205806827
+      },
+      "after_minus_before": {
+        "rate_2024_pct": 0.0,
+        "rate_2025_pct": 1.5911386803679761e-06,
+        "rate_2025_anchored_pct": 0.3197857893322755,
+        "change_pp": 1.5911386803679761e-06,
+        "threshold_contribution_pp": -0.31978419819359516,
+        "constant_real_national_base_change_pp": 0.3197857893322755
+      }
+    },
+    "under_6": {
+      "before": {
+        "rate_2024_pct": 17.129847240170843,
+        "rate_2025_pct": 18.273419878600496,
+        "rate_2025_anchored_pct": 16.285036933751947,
+        "change_pp": 1.143572638429653,
+        "threshold_contribution_pp": 1.9883829448485493,
+        "constant_real_national_base_change_pp": -0.8448103064188963
+      },
+      "after": {
+        "rate_2024_pct": 17.129847240170843,
+        "rate_2025_pct": 18.419796254667347,
+        "rate_2025_anchored_pct": 16.614243884144013,
+        "change_pp": 1.2899490144965036,
+        "threshold_contribution_pp": 1.8055523705233334,
+        "constant_real_national_base_change_pp": -0.5156033560268298
+      },
+      "after_minus_before": {
+        "rate_2024_pct": 0.0,
+        "rate_2025_pct": 0.1463763760668506,
+        "rate_2025_anchored_pct": 0.3292069503920665,
+        "change_pp": 0.1463763760668506,
+        "threshold_contribution_pp": -0.18283057432521588,
+        "constant_real_national_base_change_pp": 0.3292069503920665
+      }
+    },
+    "under_18": {
+      "before": {
+        "rate_2024_pct": 15.710121017726033,
+        "rate_2025_pct": 16.5667594104835,
+        "rate_2025_anchored_pct": 15.168197344469316,
+        "change_pp": 0.8566383927574659,
+        "threshold_contribution_pp": 1.3985620660141826,
+        "constant_real_national_base_change_pp": -0.5419236732567168
+      },
+      "after": {
+        "rate_2024_pct": 15.710121017726033,
+        "rate_2025_pct": 16.736547628691756,
+        "rate_2025_anchored_pct": 15.398464776370846,
+        "change_pp": 1.0264266109657232,
+        "threshold_contribution_pp": 1.3380828523209107,
+        "constant_real_national_base_change_pp": -0.31165624135518755
+      },
+      "after_minus_before": {
+        "rate_2024_pct": 0.0,
+        "rate_2025_pct": 0.1697882182082573,
+        "rate_2025_anchored_pct": 0.2302674319015292,
+        "change_pp": 0.1697882182082573,
+        "threshold_contribution_pp": -0.060479213693271916,
+        "constant_real_national_base_change_pp": 0.2302674319015292
+      }
+    },
+    "age_6_17": {
+      "before": {
+        "rate_2024_pct": 15.113199225170176,
+        "rate_2025_pct": 15.849196537255708,
+        "rate_2025_anchored_pct": 14.69862378863229,
+        "change_pp": 0.7359973120855319,
+        "threshold_contribution_pp": 1.1505727486234179,
+        "constant_real_national_base_change_pp": -0.414575436537886
+      },
+      "after": {
+        "rate_2024_pct": 15.113199225170176,
+        "rate_2025_pct": 16.028828229915025,
+        "rate_2025_anchored_pct": 14.887292246109698,
+        "change_pp": 0.915629004744849,
+        "threshold_contribution_pp": 1.1415359838053263,
+        "constant_real_national_base_change_pp": -0.2259069790604773
+      },
+      "after_minus_before": {
+        "rate_2024_pct": 0.0,
+        "rate_2025_pct": 0.1796316926593171,
+        "rate_2025_anchored_pct": 0.18866845747740868,
+        "change_pp": 0.1796316926593171,
+        "threshold_contribution_pp": -0.00903676481809157,
+        "constant_real_national_base_change_pp": 0.18866845747740868
+      }
+    },
+    "age_18_64": {
+      "before": {
+        "rate_2024_pct": 12.506338561257133,
+        "rate_2025_pct": 12.678473556452305,
+        "rate_2025_anchored_pct": 12.105261805959495,
+        "change_pp": 0.17213499519517228,
+        "threshold_contribution_pp": 0.5732117504928098,
+        "constant_real_national_base_change_pp": -0.40107675529763753
+      },
+      "after": {
+        "rate_2024_pct": 12.506338561257133,
+        "rate_2025_pct": 12.802629068743043,
+        "rate_2025_anchored_pct": 12.279383701777755,
+        "change_pp": 0.2962905074859101,
+        "threshold_contribution_pp": 0.5232453669652877,
+        "constant_real_national_base_change_pp": -0.22695485947937755
+      },
+      "after_minus_before": {
+        "rate_2024_pct": 0.0,
+        "rate_2025_pct": 0.12415551229073785,
+        "rate_2025_anchored_pct": 0.17412189581826,
+        "change_pp": 0.12415551229073785,
+        "threshold_contribution_pp": -0.04996638352752214,
+        "constant_real_national_base_change_pp": 0.17412189581826
+      }
+    },
+    "age_65_74": {
+      "before": {
+        "rate_2024_pct": 11.582265428916276,
+        "rate_2025_pct": 10.956160275302624,
+        "rate_2025_anchored_pct": 10.662712201742822,
+        "change_pp": -0.6261051536136524,
+        "threshold_contribution_pp": 0.2934480735598015,
+        "constant_real_national_base_change_pp": -0.9195532271734539
+      },
+      "after": {
+        "rate_2024_pct": 11.582265428916276,
+        "rate_2025_pct": 11.026548511086666,
+        "rate_2025_anchored_pct": 10.747044902391929,
+        "change_pp": -0.55571691782961,
+        "threshold_contribution_pp": 0.27950360869473734,
+        "constant_real_national_base_change_pp": -0.8352205265243473
+      },
+      "after_minus_before": {
+        "rate_2024_pct": 0.0,
+        "rate_2025_pct": 0.07038823578404241,
+        "rate_2025_anchored_pct": 0.08433270064910658,
+        "change_pp": 0.07038823578404241,
+        "threshold_contribution_pp": -0.013944464865064177,
+        "constant_real_national_base_change_pp": 0.08433270064910658
+      }
+    },
+    "age_75_plus": {
+      "before": {
+        "rate_2024_pct": 11.332164495206944,
+        "rate_2025_pct": 10.461409760703045,
+        "rate_2025_anchored_pct": 10.230051324460252,
+        "change_pp": -0.8707547345038993,
+        "threshold_contribution_pp": 0.23135843624279318,
+        "constant_real_national_base_change_pp": -1.1021131707466925
+      },
+      "after": {
+        "rate_2024_pct": 11.332164495206944,
+        "rate_2025_pct": 10.48598799750724,
+        "rate_2025_anchored_pct": 10.291253680168483,
+        "change_pp": -0.8461764976997053,
+        "threshold_contribution_pp": 0.19473431733875657,
+        "constant_real_national_base_change_pp": -1.0409108150384618
+      },
+      "after_minus_before": {
+        "rate_2024_pct": 0.0,
+        "rate_2025_pct": 0.02457823680419402,
+        "rate_2025_anchored_pct": 0.06120235570823063,
+        "change_pp": 0.02457823680419402,
+        "threshold_contribution_pp": -0.03662411890403661,
+        "constant_real_national_base_change_pp": 0.06120235570823063
+      }
+    },
+    "age_65_plus": {
+      "before": {
+        "rate_2024_pct": 11.477065298423444,
+        "rate_2025_pct": 10.748053020468337,
+        "rate_2025_anchored_pct": 10.480721754459827,
+        "change_pp": -0.7290122779551069,
+        "threshold_contribution_pp": 0.26733126600850987,
+        "constant_real_national_base_change_pp": -0.9963435439636168
+      },
+      "after": {
+        "rate_2024_pct": 11.477065298423444,
+        "rate_2025_pct": 10.799172164355882,
+        "rate_2025_anchored_pct": 10.555325121946115,
+        "change_pp": -0.6778931340675616,
+        "threshold_contribution_pp": 0.24384704240976696,
+        "constant_real_national_base_change_pp": -0.9217401764773285
+      },
+      "after_minus_before": {
+        "rate_2024_pct": 0.0,
+        "rate_2025_pct": 0.05111914388754535,
+        "rate_2025_anchored_pct": 0.07460336748628826,
+        "change_pp": 0.05111914388754535,
+        "threshold_contribution_pp": -0.023484223598742915,
+        "constant_real_national_base_change_pp": 0.07460336748628826
+      }
+    }
+  },
+  "checks": {
+    "same_year_populations_match": true,
+    "anchor_threshold_mean_and_quantile_bounds_pass": true,
+    "anchor_bound_relative_tolerance": 1e-06,
+    "comparison_tolerance": {
+      "absolute": 1e-08,
+      "relative": 1e-12
+    },
+    "base_year_2024": {
+      "all": {
+        "rates_match": true,
+        "rate_difference_pp": 0.0,
+        "resources": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        },
+        "thresholds": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        }
+      },
+      "under_4": {
+        "rates_match": true,
+        "rate_difference_pp": 0.0,
+        "resources": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        },
+        "thresholds": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        }
+      },
+      "under_6": {
+        "rates_match": true,
+        "rate_difference_pp": 0.0,
+        "resources": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        },
+        "thresholds": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        }
+      },
+      "under_18": {
+        "rates_match": true,
+        "rate_difference_pp": 0.0,
+        "resources": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        },
+        "thresholds": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        }
+      },
+      "age_6_17": {
+        "rates_match": true,
+        "rate_difference_pp": 0.0,
+        "resources": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        },
+        "thresholds": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        }
+      },
+      "age_18_64": {
+        "rates_match": true,
+        "rate_difference_pp": 0.0,
+        "resources": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        },
+        "thresholds": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        }
+      },
+      "age_65_74": {
+        "rates_match": true,
+        "rate_difference_pp": 0.0,
+        "resources": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        },
+        "thresholds": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        }
+      },
+      "age_75_plus": {
+        "rates_match": true,
+        "rate_difference_pp": 0.0,
+        "resources": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        },
+        "thresholds": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        }
+      },
+      "age_65_plus": {
+        "rates_match": true,
+        "rate_difference_pp": 0.0,
+        "resources": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        },
+        "thresholds": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        }
+      }
+    },
+    "baseline_to_anchored_2025_resource_summaries": {
+      "before": {
+        "all": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        },
+        "under_4": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        },
+        "under_6": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        },
+        "under_18": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        },
+        "age_6_17": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        },
+        "age_18_64": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        },
+        "age_65_74": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        },
+        "age_75_plus": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        },
+        "age_65_plus": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        }
+      },
+      "after": {
+        "all": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        },
+        "under_4": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        },
+        "under_6": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        },
+        "under_18": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        },
+        "age_6_17": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        },
+        "age_18_64": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        },
+        "age_65_74": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        },
+        "age_75_plus": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        },
+        "age_65_plus": {
+          "match": true,
+          "after_minus_before": {
+            "mean": 0.0,
+            "p25": 0.0,
+            "median": 0.0,
+            "p75": 0.0
+          }
+        }
+      }
+    },
+    "resource_check_note": "Equality of recorded summaries does not prove person-by-person resource equality; anchor-check differences are anchored minus baseline."
+  },
+  "bundle_certified": false,
+  "input_files": [
+    {
+      "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/spm-uprating-validation-20260919/results/after-2024-baseline.json",
+      "sha256": "f2a40fbfef2cfd0efc7f72eaea054fafbbe788273208869ea3355f0c7e4a48f0"
+    },
+    {
+      "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/spm-uprating-validation-20260919/results/after-2025-anchored_2024_cpi.json",
+      "sha256": "db077e408f80dbc262015274e8c1e4b971f2a300bb037fee6db8ca148420ce02"
+    },
+    {
+      "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/spm-uprating-validation-20260919/results/after-2025-baseline.json",
+      "sha256": "81285bee6017b3f232653b4ebdc3b03dbfe81a33b19ae99d68cb7a4caf11d865"
+    },
+    {
+      "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/spm-uprating-validation-20260919/results/before-2024-baseline.json",
+      "sha256": "10575a386fbf0b0472633e09f35180f42e706b222aaad90729483ae4ccbd2ec2"
+    },
+    {
+      "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/spm-uprating-validation-20260919/results/before-2025-anchored_2024_cpi.json",
+      "sha256": "62ecb2659f4e77a650615443d83f7e42972c68c6b300515dde281917d3312333"
+    },
+    {
+      "path": "/Users/maxghenis/spm-rebuild-20260908/rollout/spm-uprating-validation-20260919/results/before-2025-baseline.json",
+      "sha256": "06194b64f3c337dbec188565e6ffa49883ad6a85bc6c7985ef72e67933916d0b"
+    }
+  ],
+  "summarizer_sha256": "e3e7bde6e873727476a46d0e81fe31d9d00abfff90adc50063061c0705cf306e"
+}

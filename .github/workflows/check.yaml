@@ -23,3 +23,17 @@ jobs:
         run: python scripts/check_paper.py
       - name: Guard mutation tests
         run: python -m unittest discover -s tests -v
+
+  diagnostic-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@d0d8abe699bfb85fec6de9f7adb5ae17292296ff # v6
+        with:
+          python-version: "3.13"
+      - name: Weighted diagnostics and housing replay fixtures
+        run: >-
+          uv run --no-project --with microdf-python==1.3.0 --with pytest==8.4.2
+          python -m pytest tests/test_spm_uprating_validation.py
+          tests/test_spm_uprating_summary.py
+          analysis/spm-uprating-validation-20260919/test_housing_replay.py -q
