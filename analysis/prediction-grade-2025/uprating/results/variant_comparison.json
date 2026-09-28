@@ -178,6 +178,24 @@
     "age_65_plus": -0.188
    }
   },
+  "all_three_ss_66plus": {
+   "rate_2025_pct": {
+    "all": 13.191,
+    "under_18": 16.243,
+    "age_18_64": 12.576,
+    "age_65_plus": 11.4
+   },
+   "change_pp": {
+    "all": 0.173,
+    "under_18": 0.533,
+    "age_65_plus": -0.024
+   },
+   "miss_pp": {
+    "all": 0.103,
+    "under_18": 0.593,
+    "age_65_plus": -0.264
+   }
+  },
   "all_four": {
    "rate_2025_pct": {
     "all": 13.114,

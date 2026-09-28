@@ -118,7 +118,8 @@
   "median_growth_pct": 4.01,
   "recipients_growth_pct": 4.66,
   "total_growth_pct": 8.77,
-  "age_adjusted_mean_growth_pct": 3.45
+  "age_adjusted_mean_growth_pct": 3.45,
+  "age_adjusted_mean_growth_66_plus_pct": 4.04
  },
  "social_security_65_plus": {
   "2024": {

@@ -215,6 +215,28 @@
     "resources": -0.34
    }
   },
+  "all_three_ss_66plus": {
+   "all": {
+    "change": 0.173,
+    "threshold": 0.677,
+    "resources": -0.504
+   },
+   "under_18": {
+    "change": 0.533,
+    "threshold": 1.129,
+    "resources": -0.595
+   },
+   "age_18_64": {
+    "change": 0.097,
+    "threshold": 0.587,
+    "resources": -0.491
+   },
+   "age_65_plus": {
+    "change": -0.024,
+    "threshold": 0.409,
+    "resources": -0.433
+   }
+  },
   "all_four": {
    "all": {
     "change": 0.096,

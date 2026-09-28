@@ -102,27 +102,27 @@ rates for the sources that stood out:
 
 | Source | Per-record growth in the model | Survey, 2024 to 2025 |
 | --- | ---: | ---: |
-| Wages | +4.9% | +4.1% to +5.3% in every wage decile; +6.6% in the bottom decile of family resources over need |
-| Social Security | +8.3% | +3.45% per recipient at the 2024 age mix; COLA 2.5% |
-| Pensions and annuities, 65 and over | +19.5% | +3.7% (median) to +6.6% (mean) per recipient |
+| Wages | +4.9% | +4.1% to +5.3% in every wage decile |
+| Social Security | +8.3% | +4.04% per recipient 66 and over at the 2024 age mix; COLA 2.5% |
+| Pensions and retirement distributions | +19.5% | pensions and annuities per recipient 65 and over: +3.7% (median) to +6.6% (mean) |
 | Self-employment | −5.8% | +8.7% (median, positive values) per recipient |
 
 | 2025 run | All people | Under 18 | 65 and over |
 | --- | ---: | ---: | ---: |
 | Census change | +0.07 | −0.06 | +0.24 |
 | Registered (baseline) | +0.22 | +0.86 | −0.52 |
-| Wages grown by wage decile | +0.24 | +0.85 | −0.52 |
-| Wages grown by decile of family resources over need | +0.09 | +0.71 | −0.59 |
 | Social Security at the COLA, pensions at CPI-U | +0.47 | +0.98 | +0.21 |
 | Self-employment grown with wages | +0.01 | +0.47 | −0.59 |
-| Those three together | +0.25 | +0.57 | +0.15 |
-| All four together | +0.10 | +0.42 | +0.06 |
+| Those three, Social Security at the COLA | +0.25 | +0.57 | +0.15 |
+| Those three, Social Security at 4.04% | +0.17 | +0.53 | −0.02 |
+| Wages grown by wage decile | +0.24 | +0.85 | −0.52 |
+| Wages grown by decile of family resources over need (within sampling error) | +0.09 | +0.71 | −0.59 |
 
-Aging wages by wage level does nothing for 2025; aging them by family income relative to need helps children.
-Social Security and pension growth at aggregate rates drives most of the senior miss, and self-employment falling
-with CBO's business-income projection drives about two-fifths of the child miss. With all four changes the child miss
-halves and the senior miss falls from 0.76 to 0.18 points. Census's changes are not statistically significant, so
-these reruns show which assumptions matter, not the right values. Details: [`uprating/README.md`](uprating/README.md).
+Changing Social Security, pensions and self-employment cuts the child miss by about a third and the senior miss from
+0.76 to 0.09–0.26 points. Aging wages by wage level does nothing for 2025; a family-income gradient in wage growth
+could matter, but the survey cannot distinguish one from sampling error. Census's changes are not statistically
+significant, so these reruns show which assumptions matter, not the right values. Details:
+[`uprating/README.md`](uprating/README.md).
 
 ## Reproducing
 

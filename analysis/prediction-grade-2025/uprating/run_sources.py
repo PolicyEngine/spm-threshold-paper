@@ -10,6 +10,7 @@ on them is computed:
   all_three            ss_cola_pension_cpi and se_like_wages together
   all_three_cpi_avg    all_three, with pensions at CPI-U annual-average growth (2.63%) instead of January over January
   all_three_ss_survey  all_three_cpi_avg, with Social Security at the survey's age-adjusted per-recipient growth (3.45%)
+  all_three_ss_66plus  all_three_cpi_avg, with Social Security at the survey's age-adjusted growth for recipients 66+ (4.04%)
   wages_by_family_decile  wages grow by the survey's growth of mean wages within each decile of the earner's SPM
                        unit's resources over threshold (needs sources-2024-baseline.npz in the working directory)
   all_four             all_three_cpi_avg and wages_by_family_decile together
@@ -38,6 +39,8 @@ FAMILY_DECILE_GROWTH_PCT = [6.57, 4.88, 5.66, 5.59, 4.31, 4.73, 6.12, 3.04, 3.5,
 CPI_ANNUAL_AVERAGE = 32649 / 31812
 # ASEC 2025 -> 2026 Social Security per recipient, holding the 2024 recipient age mix (asec/survey_growth.py)
 SS_SURVEY_AGE_ADJUSTED = 1.0345
+# Same, recipients 66 and over only (four age bands)
+SS_SURVEY_66_PLUS = 1.0404
 # ASEC 2025 -> 2026, all earners 16+, growth of mean wage within each wage decile (asec/wage_deciles.json)
 WAGE_DECILE_GROWTH_PCT = [4.85, 4.62, 4.43, 5.11, 4.43, 4.61, 4.26, 4.12, 4.65, 5.31]
 
@@ -75,14 +78,16 @@ if year == 2025 and variant != "baseline":
     cpi = p.gov.bls.cpi.cpi_u("2025-01-01") / p.gov.bls.cpi.cpi_u("2024-01-01")  # January over January
     wage = p.calibration.gov.irs.soi.employment_income("2025-01-01") / p.calibration.gov.irs.soi.employment_income("2024-01-01")
     ss_rate = {"ss_cola": cola, "ss_cola_pension_cpi": cola, "all_three": cola, "all_three_cpi_avg": cola,
-               "all_three_ss_survey": SS_SURVEY_AGE_ADJUSTED, "all_four": cola}.get(variant)
+               "all_three_ss_survey": SS_SURVEY_AGE_ADJUSTED, "all_three_ss_66plus": SS_SURVEY_66_PLUS,
+               "all_four": cola}.get(variant)
     pension_rate = {"ss_cola_pension_cpi": cpi, "all_three": cpi, "all_three_cpi_avg": CPI_ANNUAL_AVERAGE,
-                    "all_three_ss_survey": CPI_ANNUAL_AVERAGE, "all_four": CPI_ANNUAL_AVERAGE}.get(variant)
+                    "all_three_ss_survey": CPI_ANNUAL_AVERAGE, "all_three_ss_66plus": CPI_ANNUAL_AVERAGE,
+                    "all_four": CPI_ANNUAL_AVERAGE}.get(variant)
     if ss_rate is not None:
         regrow(SS, ss_rate)
     if pension_rate is not None:
         regrow(PENSIONS, pension_rate)
-    if variant in ("se_like_wages", "all_three", "all_three_cpi_avg", "all_three_ss_survey", "all_four"):
+    if variant in ("se_like_wages", "all_three", "all_three_cpi_avg", "all_three_ss_survey", "all_three_ss_66plus", "all_four"):
         regrow(SELF_EMPLOYMENT, wage)
     if variant == "wages_by_decile":
         x24 = np.asarray(sim.calculate("employment_income_before_lsr", period=2024).values, dtype=np.float64)

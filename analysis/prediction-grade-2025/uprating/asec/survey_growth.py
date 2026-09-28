@@ -86,6 +86,10 @@ def age_adjusted_per_recipient(col):
 
 
 out["social_security_all"]["age_adjusted_mean_growth_pct"] = age_adjusted_per_recipient("SS_VAL")
+AGE_BANDS_ALL = AGE_BANDS
+AGE_BANDS = [(66, 70), (70, 75), (75, 80), (80, 200)]
+out["social_security_all"]["age_adjusted_mean_growth_66_plus_pct"] = age_adjusted_per_recipient("SS_VAL")
+AGE_BANDS = AGE_BANDS_ALL
 for yr, d in (("2024", a), ("2025", b)):
     m65 = d.A_AGE >= 65
     out.setdefault("social_security_recipiency_65_plus_pct", {})[yr] = round(100 * float(d.w[m65 & (d.SS_VAL > 0)].sum() / d.w[m65].sum()), 2)
@@ -161,7 +165,7 @@ for k in ("social_security_all", "social_security_65_plus", "pensions_annuities_
     r = out[k]
     print(k, "mean", r["mean_growth_pct"], "median", r["median_growth_pct"], "recipients", r["recipients_growth_pct"], "total", r["total_growth_pct"], r["2024"], r["2025"])
 print("pop65", out["population_65_plus_millions"], "pop", out["population_millions"])
-print("SS age-adjusted per recipient", out["social_security_all"]["age_adjusted_mean_growth_pct"], "recipiency 65+", out["social_security_recipiency_65_plus_pct"])
+print("SS age-adjusted per recipient", out["social_security_all"]["age_adjusted_mean_growth_pct"], "66+", out["social_security_all"]["age_adjusted_mean_growth_66_plus_pct"], "recipiency 65+", out["social_security_recipiency_65_plus_pct"])
 print("self-employment", {k: v for k, v in out["self_employment_SEMP_VAL"].items() if k.endswith("pct")})
 print("noncitizen children", out["children_in_units_with_noncitizen"])
 for g, row in nl.items():

@@ -40,14 +40,18 @@ income. Results: [`results/survey_growth.json`](results/survey_growth.json),
 - **Population controls changed.** The weighted population 65 and over rises 6.0% between the files while the total
   rises 0.3%, so recipient counts are not usable. Within 65 and over, the share receiving Social Security rose from
   80.2% to 81.2%.
-- **Social Security per recipient:** mean +3.9%, median +4.0%; +3.45% holding the 2024 recipient age mix. The 2025
-  cost-of-living adjustment was 2.5%.
+- **Social Security per recipient:** mean +3.9%, median +4.0%. Holding the 2024 recipient age mix: +3.45% for all
+  recipients and +4.04% for recipients 66 and over (the all-ages figure is pulled down by small under-50 bands). The
+  2025 cost-of-living adjustment was 2.5%.
 - **Wages by wage level:** mean wage within each wage decile of earners 16 and over grew 4.1% to 5.3%, with no
   gradient. Among full-year, full-time workers the bottom three deciles grew 5.0% to 5.2% and deciles four to nine
   3.4% to 4.1%.
-- **Wages by family income:** ranking earners by their SPM unit's resources over its threshold, mean wages grew 6.6% in
-  the bottom decile (resources below about 1.2 times the threshold), 4.9% to 5.7% in deciles two to four, and 3.0% to
-  3.5% in deciles eight and nine. Each year's deciles are its own, so this compares distributions, not the same people.
+- **Wages by family income:** ranking earners by their SPM unit's resources over its threshold, mean wage growth by
+  decile was 6.6, 4.9, 5.7, 5.6, 4.3, 4.7, 6.1, 3.0, 3.5 and 5.3 percent (bottom decile: resources below about 1.2
+  times the threshold), against 4.8% for all earners. Household-bootstrap standard errors are 1.3 to 2.5 points per
+  decile, and the bottom decile's 1.8-point excess has a standard error of 2.1, so the pattern is not distinguishable
+  from sampling error. Each year's deciles are its own, the ranking uses resources that include wages, and the
+  pattern changes with other rankings, so treat it as a lead.
 - **Self-employment (SEMP_VAL):** mean over nonzero values, losses included, +14.6%; positive values only, mean +13.1%
   and median +8.7%.
 - **Pensions and annuities, 65 and over:** per recipient, mean +6.6%, median +3.7%. Retirement distributions: mean
@@ -88,6 +92,7 @@ before and after (`results/sources-meta-2025-<variant>.json`).
 | `all_three` | `ss_cola_pension_cpi` and `se_like_wages` |
 | `all_three_cpi_avg` | `all_three`, with pensions at CPI-U annual-average growth (2.63%, the official poverty threshold's growth) |
 | `all_three_ss_survey` | `all_three_cpi_avg`, with Social Security at the survey's age-adjusted per-recipient growth (3.45%) |
+| `all_three_ss_66plus` | `all_three_cpi_avg`, with Social Security at the survey's age-adjusted growth for recipients 66 and over (4.04%) |
 | `wages_by_family_decile` | wages grow by the survey's growth for the earner's 2024 decile of SPM resources over threshold |
 | `all_four` | `all_three_cpi_avg` and `wages_by_family_decile` |
 
@@ -105,6 +110,7 @@ Modeled change from 2024, percentage points ([`results/variant_comparison.json`]
 | `all_three` | +0.25 | +0.57 | +0.15 |
 | `all_three_cpi_avg` | +0.25 | +0.57 | +0.15 |
 | `all_three_ss_survey` | +0.20 | +0.56 | +0.05 |
+| `all_three_ss_66plus` | +0.17 | +0.53 | −0.02 |
 | `all_four` | +0.10 | +0.42 | +0.06 |
 
 ## Threshold and resource effects by variant
@@ -121,28 +127,33 @@ that band shows up in the threshold term. Results: [`results/variant_split.json`
 | Baseline | +1.40 | −0.54 | +0.27 | −0.79 |
 | `se_like_wages` | +1.23 | −0.76 | +0.32 | −0.91 |
 | `all_three_cpi_avg` | +1.16 | −0.59 | +0.38 | −0.23 |
+| `all_three_ss_66plus` | +1.13 | −0.59 | +0.41 | −0.43 |
+| `wages_by_family_decile` | +1.51 | −0.80 | +0.26 | −0.85 |
 | `all_four` | +1.36 | −0.93 | +0.35 | −0.29 |
 
 ## Reading
 
-- **Wages by income group.** Growing wages by the survey's growth in each wage decile changes nothing: wages grew at
-  about the same rate at every wage level. In the survey, mean wages grew faster for earners in families with
-  low resources relative to need; growing wages by decile of that ratio takes the child change from +0.86 to +0.71.
-- **Seniors.** Social Security and pensions grow per record at aggregate rates, which carry growth in the number and
-  mix of recipients that a static population does not have. Replacing those rates takes the senior change from −0.52
-  to between +0.05 and +0.15, depending on the Social Security rate (the survey's 3.45% or the 2.5% COLA), against
-  Census's +0.24. The remaining gap is on the threshold side: the model has fewer seniors just below the line in
-  every variant (threshold effect 0.26 to 0.39 against 0.71), partly offset by resource growth.
-- **Self-employment.** CBO projects aggregate business income to fall 5.8% in 2025; applied to every self-employed
-  record, that cuts near-line children's resources while the survey shows self-employment income rising. Growing it
-  with wages takes the child change from +0.86 to +0.47. Most of the child threshold gap in the baseline (1.40 against
-  1.09) comes from this: it falls to 1.23 in `se_like_wages` and 1.16 in `all_three_cpi_avg`.
-- **All four together.** +0.10 for all people, +0.42 for children and +0.06 for people 65 and over, against Census's
-  +0.07, −0.06 and +0.24: the all-people change within 0.03 points, the child miss halved, the senior miss cut from
-  0.76 to 0.18 points.
-- **What remains for children** (about 0.5 points) is not explained by these sources. The fall in the share of
-  children living with a noncitizen, worth about 0.2 points at 2024 rates, is one candidate that no uprating index
-  can reproduce.
+- **Three sources.** Social Security and pensions grow per record at aggregate rates, which carry growth in the number
+  and mix of recipients that a static population does not have, and self-employment falls with CBO's projection of
+  aggregate business income while the survey shows it rising. Changing all three (`all_three_cpi_avg`,
+  `all_three_ss_66plus`) takes the child miss from 0.92 to 0.59–0.63 points, about a third, and the senior miss from
+  0.76 to 0.09–0.26 points, depending on the Social Security rate. Social Security and pensions alone give +0.21 for
+  people 65 and over; self-employment alone gives +0.47 for children.
+- **Seniors.** At the survey's 4.04% for recipients 66 and over, the senior resource effect matches the survey
+  (−0.43 against −0.47) and the remaining gap is on the threshold side: the model has fewer seniors just below the
+  line in every variant (threshold effect 0.26 to 0.41 against 0.71). At the 2.5% COLA the senior change is closer to
+  Census only because resource growth is then too slow and offsets the threshold gap.
+- **Wages by income group.** Growing wages by wage decile changes nothing: wages grew at about the same rate at every
+  wage level. Growing them by decile of family resources over need moves the child change to +0.71 alone and to
+  +0.42 with the three source changes (`all_four`), but that schedule is within sampling error (see above), so it
+  shows the size a family-income gradient could have, not that there was one.
+- **The split is order-dependent.** The child threshold gap (1.40 against 1.09 in the baseline) shrinks to 1.13–1.23
+  when self-employment grows with wages and grows to 1.51 when wages grow by family resources. Read the totals first.
+- **All people.** The three source changes leave the all-people change 0.10 to 0.18 points above Census, about where
+  the registered forecast was: its close all-people result owed something to offsetting errors.
+- **What remains for children** (about 0.6 points with the three source changes) is not explained by these sources.
+  The fall in the share of children living with a noncitizen, worth about 0.2 points at 2024 rates, is one candidate
+  that no uprating index can reproduce; survey nonresponse could produce it too.
 
 The replacement rates are reference rates, not estimates of the right growth for each record.
 
@@ -150,7 +161,7 @@ The replacement rates are reference rates, not estimates of the right growth for
 
 ```bash
 uv venv --python 3.13 && VIRTUAL_ENV=.venv uv pip install "policyengine[us]==6.0.0"
-PY=.venv/bin/python ./run_uprating.sh uprating-runs   # eleven population runs, about 5-10 minutes and 50-60 GB each
+PY=.venv/bin/python ./run_uprating.sh uprating-runs   # twelve population runs, about 5-10 minutes and 50-60 GB each
 cd asec && ../.venv/bin/python survey_growth.py && ../.venv/bin/python wage_deciles.py   # needs pppub25.csv, pppub26.csv
 ```
 

@@ -19,7 +19,7 @@ CPI = 32649 / 31812
 FACTORS = {k: T24[k] * CPI / T25[k] for k in T25}
 CENSUS = {"all": (0.07, 0.80, -0.73), "under_18": (-0.06, 1.09, -1.15), "age_65_plus": (0.24, 0.71, -0.47)}
 VARIANTS = ["baseline", "ss_cola", "ss_cola_pension_cpi", "wages_by_decile", "se_like_wages", "all_three",
-            "wages_by_family_decile", "all_three_cpi_avg", "all_three_ss_survey", "all_four"]
+            "wages_by_family_decile", "all_three_cpi_avg", "all_three_ss_survey", "all_three_ss_66plus", "all_four"]
 
 a = np.load("sources-2024-baseline.npz")
 tenure = None
