@@ -6,7 +6,8 @@ CENSUS = {"all": 0.07, "under_18": -0.06, "age_65_plus": 0.24}
 REGISTERED = {"all": 0.22, "under_18": 0.86, "age_65_plus": -0.52}
 base24 = json.load(open("sources-meta-2024-baseline.json"))["spm_pct"]
 out = {"census_change_pp": CENSUS, "registered_change_pp": REGISTERED, "rate_2024_pct": base24, "variants": {}}
-for v in ("baseline", "ss_cola", "ss_cola_pension_cpi", "wages_by_decile", "se_like_wages", "all_three"):
+for v in ("baseline", "ss_cola", "ss_cola_pension_cpi", "wages_by_decile", "se_like_wages", "all_three",
+          "wages_by_family_decile", "all_three_cpi_avg", "all_three_ss_survey", "all_four"):
     f = Path(f"sources-meta-2025-{v}.json")
     if not f.exists():
         continue

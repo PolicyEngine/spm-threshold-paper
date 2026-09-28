@@ -30,6 +30,24 @@ for label, f in (("all_earners", lambda d: (d.WSAL_VAL > 0) & (d.A_AGE >= 16)),
     out[label] = {"decile_mean_2024": [round(v) for v in ma], "decile_mean_2025": [round(v) for v in mb],
                   "growth_pct": [round(100 * (y / x - 1), 2) for x, y in zip(ma, mb)]}
     print(label, out[label]["growth_pct"])
+# Earners ranked by their SPM unit's resources over threshold (family income relative to need), each year's own deciles
+def ratio_bins(d, nb=10):
+    m = (d.WSAL_VAL > 0) & (d.A_AGE >= 16)
+    r, x, w = (d.SPM_RESOURCES / d.SPM_POVTHRESHOLD)[m].to_numpy(float), d.WSAL_VAL[m].to_numpy(float), d.w[m].to_numpy()
+    o = np.argsort(r, kind="stable")
+    r, x, w = r[o], x[o], w[o]
+    c = np.cumsum(w) / w.sum()
+    idx = np.minimum((c * nb).astype(int), nb - 1)
+    return ([float((x[idx == k] * w[idx == k]).sum() / w[idx == k].sum()) for k in range(nb)],
+            [float(r[idx == k].max()) for k in range(nb)])
+
+
+(ma, ca), (mb, cb) = ratio_bins(a), ratio_bins(b)
+out["by_spm_ratio_decile"] = {"decile_mean_2024": [round(v) for v in ma], "decile_mean_2025": [round(v) for v in mb],
+                              "decile_upper_ratio_2024": [round(v, 2) for v in ca], "decile_upper_ratio_2025": [round(v, 2) for v in cb],
+                              "growth_pct": [round(100 * (y / x - 1), 2) for x, y in zip(ma, mb)]}
+print("by_spm_ratio_decile", out["by_spm_ratio_decile"]["growth_pct"])
+# Fixed bands are selected on the outcome (resources include wages), so treat them as descriptive only.
 for yr, d in (("2024", a), ("2025", b)):
     r = d.SPM_RESOURCES / d.SPM_POVTHRESHOLD
     e = (d.WSAL_VAL > 0) & (d.A_AGE >= 16)

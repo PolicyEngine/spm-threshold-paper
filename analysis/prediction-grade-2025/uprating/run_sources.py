@@ -8,6 +8,11 @@ on them is computed:
   wages_by_decile      wages grow by the survey's 2024->2025 growth of mean wages within each wage decile
   se_like_wages        self-employment income grows with the model's wage index instead of CBO business income
   all_three            ss_cola_pension_cpi and se_like_wages together
+  all_three_cpi_avg    all_three, with pensions at CPI-U annual-average growth (2.63%) instead of January over January
+  all_three_ss_survey  all_three_cpi_avg, with Social Security at the survey's age-adjusted per-recipient growth (3.45%)
+  wages_by_family_decile  wages grow by the survey's growth of mean wages within each decile of the earner's SPM
+                       unit's resources over threshold (needs sources-2024-baseline.npz in the working directory)
+  all_four             all_three_cpi_avg and wages_by_family_decile together
 
 usage: python run_sources.py <year> <variant>"""
 import json, resource, sys, time
@@ -26,6 +31,13 @@ PENSIONS = ["tax_exempt_public_pension_income", "tax_exempt_private_pension_inco
             "taxable_sep_distributions", "taxable_403b_distributions", "keogh_distributions", "tax_exempt_ira_distributions",
             "tax_exempt_401k_distributions", "tax_exempt_sep_distributions", "tax_exempt_403b_distributions"]
 SELF_EMPLOYMENT = ["self_employment_income_before_lsr", "sstb_self_employment_income_before_lsr"]
+# ASEC 2025 -> 2026, earners 16+ with wages, growth of mean wage within each decile of their SPM unit's
+# resources over threshold (asec/wage_deciles.py, "by_spm_ratio_decile")
+FAMILY_DECILE_GROWTH_PCT = [6.57, 4.88, 5.66, 5.59, 4.31, 4.73, 6.12, 3.04, 3.5, 5.28]
+# CPI-U annual-average growth, 2024 to 2025: the growth of the official poverty threshold (P60-290 Table 10)
+CPI_ANNUAL_AVERAGE = 32649 / 31812
+# ASEC 2025 -> 2026 Social Security per recipient, holding the 2024 recipient age mix (asec/survey_growth.py)
+SS_SURVEY_AGE_ADJUSTED = 1.0345
 # ASEC 2025 -> 2026, all earners 16+, growth of mean wage within each wage decile (asec/wage_deciles.json)
 WAGE_DECILE_GROWTH_PCT = [4.85, 4.62, 4.43, 5.11, 4.43, 4.61, 4.26, 4.12, 4.65, 5.31]
 
@@ -39,31 +51,48 @@ if year == 2025 and variant != "baseline":
             got = np.asarray(sim.calculate(v, period=2025).values, dtype=np.float64)
             assert np.allclose(got, x24 * factor), v
             overrides[v]["after_2025_total"] = float(sim.calculate(v, period=2025).sum())
-    cola = p.gov.ssa.uprating("2025-01-01") / p.gov.ssa.uprating("2024-01-01")
-    cpi = p.gov.bls.cpi.cpi_u("2025-01-01") / p.gov.bls.cpi.cpi_u("2024-01-01")
-    wage = p.calibration.gov.irs.soi.employment_income("2025-01-01") / p.calibration.gov.irs.soi.employment_income("2024-01-01")
-    if variant in ("ss_cola", "ss_cola_pension_cpi", "all_three"):
-        regrow(SS, cola)
-    if variant in ("ss_cola_pension_cpi", "all_three"):
-        regrow(PENSIONS, cpi)
-    if variant in ("se_like_wages", "all_three"):
-        regrow(SELF_EMPLOYMENT, wage)
-    if variant == "wages_by_decile":
+
+    def regrow_wages_by_decile(rank, growth_pct, label):
+        """Grow each earner's wages by the growth for their decile of `rank` among 2024 earners (person-weighted)."""
         v = "employment_income_before_lsr"
         s24 = sim.calculate(v, period=2024)
         x24, w = np.asarray(s24.values, dtype=np.float64), np.asarray(s24.weights, dtype=np.float64)
         pos = x24 > 0
-        o = np.argsort(x24[pos], kind="stable")
+        o = np.argsort(rank[pos], kind="stable")
         c = np.cumsum(w[pos][o]) / w[pos].sum()
         dec = np.zeros(pos.sum(), dtype=int)
         dec[o] = np.minimum((c * 10).astype(int), 9)
-        f = np.ones_like(x24) * (p.calibration.gov.irs.soi.employment_income("2025-01-01") / p.calibration.gov.irs.soi.employment_income("2024-01-01"))
-        f[pos] = 1 + np.asarray(WAGE_DECILE_GROWTH_PCT)[dec] / 100
+        f = np.ones_like(x24) * wage
+        f[pos] = 1 + np.asarray(growth_pct)[dec] / 100
         before = float(sim.calculate(v, period=2025).sum())
         sim.set_input(v, 2025, x24 * f)
         got = np.asarray(sim.calculate(v, period=2025).values, dtype=np.float64)
         assert np.allclose(got, x24 * f)
-        overrides[v] = {"decile_growth_pct": WAGE_DECILE_GROWTH_PCT, "before_2025_total": before, "after_2025_total": float(sim.calculate(v, period=2025).sum())}
+        overrides[v] = {"ranked_by": label, "decile_growth_pct": list(growth_pct), "before_2025_total": before,
+                        "after_2025_total": float(sim.calculate(v, period=2025).sum())}
+
+    cola = p.gov.ssa.uprating("2025-01-01") / p.gov.ssa.uprating("2024-01-01")
+    cpi = p.gov.bls.cpi.cpi_u("2025-01-01") / p.gov.bls.cpi.cpi_u("2024-01-01")  # January over January
+    wage = p.calibration.gov.irs.soi.employment_income("2025-01-01") / p.calibration.gov.irs.soi.employment_income("2024-01-01")
+    ss_rate = {"ss_cola": cola, "ss_cola_pension_cpi": cola, "all_three": cola, "all_three_cpi_avg": cola,
+               "all_three_ss_survey": SS_SURVEY_AGE_ADJUSTED, "all_four": cola}.get(variant)
+    pension_rate = {"ss_cola_pension_cpi": cpi, "all_three": cpi, "all_three_cpi_avg": CPI_ANNUAL_AVERAGE,
+                    "all_three_ss_survey": CPI_ANNUAL_AVERAGE, "all_four": CPI_ANNUAL_AVERAGE}.get(variant)
+    if ss_rate is not None:
+        regrow(SS, ss_rate)
+    if pension_rate is not None:
+        regrow(PENSIONS, pension_rate)
+    if variant in ("se_like_wages", "all_three", "all_three_cpi_avg", "all_three_ss_survey", "all_four"):
+        regrow(SELF_EMPLOYMENT, wage)
+    if variant == "wages_by_decile":
+        x24 = np.asarray(sim.calculate("employment_income_before_lsr", period=2024).values, dtype=np.float64)
+        regrow_wages_by_decile(x24, WAGE_DECILE_GROWTH_PCT, "2024 wage")
+    if variant in ("wages_by_family_decile", "all_four"):
+        base = np.load("sources-2024-baseline.npz")
+        ids = np.asarray(sim.calculate("person_id", period=2024).values)
+        assert (base["person_id"] == ids).all(), "2024 baseline arrays are not aligned with this simulation"
+        ratio = base["net_income"] / base["threshold"]
+        regrow_wages_by_decile(ratio, FAMILY_DECILE_GROWTH_PCT, "2024 SPM resources / threshold")
 
 PERSON_SOURCES = {
     "wages": ["employment_income"],
@@ -109,6 +138,7 @@ age = sim.calculate("age", period=year, map_to="person")
 cols["age"] = np.asarray(age.values)
 cols["weight"] = np.asarray(age.weights)
 cols["person_id"] = np.asarray(sim.calculate("person_id", period=year).values)
+cols["tenure"] = np.asarray(sim.calculate("spm_unit_tenure_type", period=year, map_to="person").values).astype(str)
 np.savez_compressed(f"sources-{year}-{variant}.npz", **cols)
 w, a = cols["weight"], cols["age"]
 groups = {"all": a >= 0, "under_18": a < 18, "age_18_64": (a >= 18) & (a < 65), "age_65_plus": a >= 65}

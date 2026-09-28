@@ -1,0 +1,578 @@
+{
+ "all": {
+  "people_millions": 80.84,
+  "median_growth_pct": 4.26,
+  "mean_growth_pct": 4.57,
+  "sum_of_contributions_pp": 4.574,
+  "sources": {
+   "wages": {
+    "share_of_2024_resources_pct": 78.17,
+    "own_growth_pct": 4.94,
+    "contribution_pp": 3.858,
+    "people_with_source_pct": 85.4
+   },
+   "self_employment": {
+    "share_of_2024_resources_pct": 9.72,
+    "own_growth_pct": 4.94,
+    "contribution_pp": 0.479,
+    "people_with_source_pct": 26.9
+   },
+   "pensions_retirement": {
+    "share_of_2024_resources_pct": 3.04,
+    "own_growth_pct": 2.63,
+    "contribution_pp": 0.08,
+    "people_with_source_pct": 11.0
+   },
+   "interest_dividends_gains": {
+    "share_of_2024_resources_pct": 2.13,
+    "own_growth_pct": 9.56,
+    "contribution_pp": 0.21,
+    "people_with_source_pct": 19.9
+   },
+   "rental": {
+    "share_of_2024_resources_pct": -0.43,
+    "own_growth_pct": 6.9,
+    "contribution_pp": -0.03,
+    "people_with_source_pct": 4.8
+   },
+   "social_security": {
+    "share_of_2024_resources_pct": 12.25,
+    "own_growth_pct": 3.45,
+    "contribution_pp": 0.422,
+    "people_with_source_pct": 16.9
+   },
+   "ssi": {
+    "share_of_2024_resources_pct": 2.24,
+    "own_growth_pct": 0.61,
+    "contribution_pp": 0.005,
+    "people_with_source_pct": 9.5
+   },
+   "unemployment": {
+    "share_of_2024_resources_pct": 0.44,
+    "own_growth_pct": 13.96,
+    "contribution_pp": 0.061,
+    "people_with_source_pct": 3.8
+   },
+   "snap": {
+    "share_of_2024_resources_pct": 7.26,
+    "own_growth_pct": -2.5,
+    "contribution_pp": -0.167,
+    "people_with_source_pct": 52.5
+   },
+   "housing_subsidy": {
+    "share_of_2024_resources_pct": 0.35,
+    "own_growth_pct": 2.58,
+    "contribution_pp": 0.009,
+    "people_with_source_pct": 2.1
+   },
+   "school_meals": {
+    "share_of_2024_resources_pct": 2.18,
+    "own_growth_pct": 6.89,
+    "contribution_pp": 0.152,
+    "people_with_source_pct": 47.4
+   },
+   "wic": {
+    "share_of_2024_resources_pct": 0.21,
+    "own_growth_pct": 1.05,
+    "contribution_pp": 0.002,
+    "people_with_source_pct": 9.9
+   },
+   "tanf": {
+    "share_of_2024_resources_pct": 0.41,
+    "own_growth_pct": -1.97,
+    "contribution_pp": -0.009,
+    "people_with_source_pct": 3.0
+   },
+   "payroll_tax": {
+    "share_of_2024_resources_pct": -7.75,
+    "own_growth_pct": 5.01,
+    "contribution_pp": -0.381,
+    "people_with_source_pct": 93.6
+   },
+   "federal_tax": {
+    "share_of_2024_resources_pct": 5.0,
+    "own_growth_pct": 7.55,
+    "contribution_pp": 0.39,
+    "people_with_source_pct": 87.9
+   },
+   "state_tax": {
+    "share_of_2024_resources_pct": -0.54,
+    "own_growth_pct": -1.1,
+    "contribution_pp": 0.017,
+    "people_with_source_pct": 65.9
+   },
+   "moop": {
+    "share_of_2024_resources_pct": -11.96,
+    "own_growth_pct": 3.29,
+    "contribution_pp": -0.406,
+    "people_with_source_pct": 93.5
+   },
+   "work_childcare": {
+    "share_of_2024_resources_pct": -5.11,
+    "own_growth_pct": 4.07,
+    "contribution_pp": -0.205,
+    "people_with_source_pct": 59.9
+   },
+   "child_support_paid": {
+    "share_of_2024_resources_pct": -0.08,
+    "own_growth_pct": 3.0,
+    "contribution_pp": -0.003,
+    "people_with_source_pct": 0.4
+   },
+   "other_and_residual": {
+    "contribution_pp": 0.09,
+    "share_of_2024_resources_pct": 2.65
+   }
+  },
+  "social_security_parts": {
+   "social_security_retirement": {
+    "own_growth_pct": 3.45,
+    "contribution_pp": 0.322
+   },
+   "social_security_disability": {
+    "own_growth_pct": 3.45,
+    "contribution_pp": 0.066
+   },
+   "social_security_survivors": {
+    "own_growth_pct": 3.45,
+    "contribution_pp": 0.024
+   },
+   "social_security_dependents": {
+    "own_growth_pct": 3.45,
+    "contribution_pp": 0.012
+   }
+  }
+ },
+ "under_18": {
+  "people_millions": 27.76,
+  "median_growth_pct": 3.85,
+  "mean_growth_pct": 4.09,
+  "sum_of_contributions_pp": 4.095,
+  "sources": {
+   "wages": {
+    "share_of_2024_resources_pct": 75.08,
+    "own_growth_pct": 4.94,
+    "contribution_pp": 3.705,
+    "people_with_source_pct": 91.3
+   },
+   "self_employment": {
+    "share_of_2024_resources_pct": 9.04,
+    "own_growth_pct": 4.94,
+    "contribution_pp": 0.446,
+    "people_with_source_pct": 25.6
+   },
+   "pensions_retirement": {
+    "share_of_2024_resources_pct": 0.88,
+    "own_growth_pct": 2.63,
+    "contribution_pp": 0.023,
+    "people_with_source_pct": 5.6
+   },
+   "interest_dividends_gains": {
+    "share_of_2024_resources_pct": 1.1,
+    "own_growth_pct": 7.65,
+    "contribution_pp": 0.086,
+    "people_with_source_pct": 15.3
+   },
+   "rental": {
+    "share_of_2024_resources_pct": -0.32,
+    "own_growth_pct": 6.9,
+    "contribution_pp": -0.022,
+    "people_with_source_pct": 4.1
+   },
+   "social_security": {
+    "share_of_2024_resources_pct": 2.65,
+    "own_growth_pct": 3.45,
+    "contribution_pp": 0.091,
+    "people_with_source_pct": 6.8
+   },
+   "ssi": {
+    "share_of_2024_resources_pct": 1.15,
+    "own_growth_pct": 1.01,
+    "contribution_pp": 0.013,
+    "people_with_source_pct": 6.3
+   },
+   "unemployment": {
+    "share_of_2024_resources_pct": 0.33,
+    "own_growth_pct": 13.96,
+    "contribution_pp": 0.046,
+    "people_with_source_pct": 4.1
+   },
+   "snap": {
+    "share_of_2024_resources_pct": 10.78,
+    "own_growth_pct": -2.43,
+    "contribution_pp": -0.243,
+    "people_with_source_pct": 66.9
+   },
+   "housing_subsidy": {
+    "share_of_2024_resources_pct": 0.35,
+    "own_growth_pct": 2.16,
+    "contribution_pp": 0.007,
+    "people_with_source_pct": 2.2
+   },
+   "school_meals": {
+    "share_of_2024_resources_pct": 3.78,
+    "own_growth_pct": 6.95,
+    "contribution_pp": 0.266,
+    "people_with_source_pct": 76.3
+   },
+   "wic": {
+    "share_of_2024_resources_pct": 0.47,
+    "own_growth_pct": 1.08,
+    "contribution_pp": 0.005,
+    "people_with_source_pct": 23.0
+   },
+   "tanf": {
+    "share_of_2024_resources_pct": 0.67,
+    "own_growth_pct": -1.74,
+    "contribution_pp": -0.013,
+    "people_with_source_pct": 4.8
+   },
+   "payroll_tax": {
+    "share_of_2024_resources_pct": -7.4,
+    "own_growth_pct": 5.06,
+    "contribution_pp": -0.368,
+    "people_with_source_pct": 99.2
+   },
+   "federal_tax": {
+    "share_of_2024_resources_pct": 11.89,
+    "own_growth_pct": 3.55,
+    "contribution_pp": 0.396,
+    "people_with_source_pct": 98.3
+   },
+   "state_tax": {
+    "share_of_2024_resources_pct": 0.19,
+    "own_growth_pct": 51.84,
+    "contribution_pp": 0.047,
+    "people_with_source_pct": 66.2
+   },
+   "moop": {
+    "share_of_2024_resources_pct": -8.17,
+    "own_growth_pct": 3.2,
+    "contribution_pp": -0.263,
+    "people_with_source_pct": 91.8
+   },
+   "work_childcare": {
+    "share_of_2024_resources_pct": -5.68,
+    "own_growth_pct": 4.43,
+    "contribution_pp": -0.252,
+    "people_with_source_pct": 68.5
+   },
+   "child_support_paid": {
+    "share_of_2024_resources_pct": -0.0,
+    "own_growth_pct": null,
+    "contribution_pp": 0.0,
+    "people_with_source_pct": 0.0
+   },
+   "other_and_residual": {
+    "contribution_pp": 0.125,
+    "share_of_2024_resources_pct": 3.46
+   }
+  },
+  "social_security_parts": {
+   "social_security_retirement": {
+    "own_growth_pct": 3.45,
+    "contribution_pp": 0.037
+   },
+   "social_security_disability": {
+    "own_growth_pct": 3.45,
+    "contribution_pp": 0.024
+   },
+   "social_security_survivors": {
+    "own_growth_pct": 3.45,
+    "contribution_pp": 0.019
+   },
+   "social_security_dependents": {
+    "own_growth_pct": 3.45,
+    "contribution_pp": 0.012
+   }
+  }
+ },
+ "age_18_64": {
+  "people_millions": 44.38,
+  "median_growth_pct": 4.77,
+  "mean_growth_pct": 4.93,
+  "sum_of_contributions_pp": 4.934,
+  "sources": {
+   "wages": {
+    "share_of_2024_resources_pct": 89.1,
+    "own_growth_pct": 4.94,
+    "contribution_pp": 4.397,
+    "people_with_source_pct": 90.0
+   },
+   "self_employment": {
+    "share_of_2024_resources_pct": 10.42,
+    "own_growth_pct": 4.94,
+    "contribution_pp": 0.514,
+    "people_with_source_pct": 28.2
+   },
+   "pensions_retirement": {
+    "share_of_2024_resources_pct": 2.41,
+    "own_growth_pct": 2.63,
+    "contribution_pp": 0.063,
+    "people_with_source_pct": 8.8
+   },
+   "interest_dividends_gains": {
+    "share_of_2024_resources_pct": 2.15,
+    "own_growth_pct": 9.47,
+    "contribution_pp": 0.202,
+    "people_with_source_pct": 20.0
+   },
+   "rental": {
+    "share_of_2024_resources_pct": -0.34,
+    "own_growth_pct": 6.9,
+    "contribution_pp": -0.023,
+    "people_with_source_pct": 4.9
+   },
+   "social_security": {
+    "share_of_2024_resources_pct": 7.25,
+    "own_growth_pct": 3.45,
+    "contribution_pp": 0.25,
+    "people_with_source_pct": 12.6
+   },
+   "ssi": {
+    "share_of_2024_resources_pct": 2.38,
+    "own_growth_pct": 0.46,
+    "contribution_pp": 0.01,
+    "people_with_source_pct": 9.9
+   },
+   "unemployment": {
+    "share_of_2024_resources_pct": 0.47,
+    "own_growth_pct": 13.96,
+    "contribution_pp": 0.065,
+    "people_with_source_pct": 3.9
+   },
+   "snap": {
+    "share_of_2024_resources_pct": 5.57,
+    "own_growth_pct": -2.75,
+    "contribution_pp": -0.143,
+    "people_with_source_pct": 44.2
+   },
+   "housing_subsidy": {
+    "share_of_2024_resources_pct": 0.38,
+    "own_growth_pct": 2.79,
+    "contribution_pp": 0.011,
+    "people_with_source_pct": 2.1
+   },
+   "school_meals": {
+    "share_of_2024_resources_pct": 1.53,
+    "own_growth_pct": 6.77,
+    "contribution_pp": 0.106,
+    "people_with_source_pct": 36.7
+   },
+   "wic": {
+    "share_of_2024_resources_pct": 0.09,
+    "own_growth_pct": 0.91,
+    "contribution_pp": 0.001,
+    "people_with_source_pct": 3.7
+   },
+   "tanf": {
+    "share_of_2024_resources_pct": 0.32,
+    "own_growth_pct": -2.25,
+    "contribution_pp": -0.008,
+    "people_with_source_pct": 2.4
+   },
+   "payroll_tax": {
+    "share_of_2024_resources_pct": -8.68,
+    "own_growth_pct": 5.02,
+    "contribution_pp": -0.429,
+    "people_with_source_pct": 97.1
+   },
+   "federal_tax": {
+    "share_of_2024_resources_pct": 2.22,
+    "own_growth_pct": 17.08,
+    "contribution_pp": 0.39,
+    "people_with_source_pct": 91.8
+   },
+   "state_tax": {
+    "share_of_2024_resources_pct": -1.02,
+    "own_growth_pct": 1.19,
+    "contribution_pp": -0.003,
+    "people_with_source_pct": 69.6
+   },
+   "moop": {
+    "share_of_2024_resources_pct": -11.21,
+    "own_growth_pct": 3.16,
+    "contribution_pp": -0.36,
+    "people_with_source_pct": 93.2
+   },
+   "work_childcare": {
+    "share_of_2024_resources_pct": -5.49,
+    "own_growth_pct": 3.83,
+    "contribution_pp": -0.207,
+    "people_with_source_pct": 62.9
+   },
+   "child_support_paid": {
+    "share_of_2024_resources_pct": -0.15,
+    "own_growth_pct": 3.0,
+    "contribution_pp": -0.005,
+    "people_with_source_pct": 0.7
+   },
+   "other_and_residual": {
+    "contribution_pp": 0.103,
+    "share_of_2024_resources_pct": 2.68
+   }
+  },
+  "social_security_parts": {
+   "social_security_retirement": {
+    "own_growth_pct": 3.45,
+    "contribution_pp": 0.129
+   },
+   "social_security_disability": {
+    "own_growth_pct": 3.45,
+    "contribution_pp": 0.087
+   },
+   "social_security_survivors": {
+    "own_growth_pct": 3.45,
+    "contribution_pp": 0.024
+   },
+   "social_security_dependents": {
+    "own_growth_pct": 3.45,
+    "contribution_pp": 0.01
+   }
+  }
+ },
+ "age_65_plus": {
+  "people_millions": 8.7,
+  "median_growth_pct": 3.31,
+  "mean_growth_pct": 4.29,
+  "sum_of_contributions_pp": 4.292,
+  "sources": {
+   "wages": {
+    "share_of_2024_resources_pct": 32.32,
+    "own_growth_pct": 4.94,
+    "contribution_pp": 1.595,
+    "people_with_source_pct": 43.2
+   },
+   "self_employment": {
+    "share_of_2024_resources_pct": 8.26,
+    "own_growth_pct": 4.94,
+    "contribution_pp": 0.408,
+    "people_with_source_pct": 24.2
+   },
+   "pensions_retirement": {
+    "share_of_2024_resources_pct": 13.15,
+    "own_growth_pct": 2.63,
+    "contribution_pp": 0.346,
+    "people_with_source_pct": 39.2
+   },
+   "interest_dividends_gains": {
+    "share_of_2024_resources_pct": 5.28,
+    "own_growth_pct": 12.39,
+    "contribution_pp": 0.647,
+    "people_with_source_pct": 33.9
+   },
+   "rental": {
+    "share_of_2024_resources_pct": -1.29,
+    "own_growth_pct": 6.9,
+    "contribution_pp": -0.089,
+    "people_with_source_pct": 7.0
+   },
+   "social_security": {
+    "share_of_2024_resources_pct": 68.35,
+    "own_growth_pct": 3.45,
+    "contribution_pp": 2.358,
+    "people_with_source_pct": 71.3
+   },
+   "ssi": {
+    "share_of_2024_resources_pct": 5.03,
+    "own_growth_pct": 0.65,
+    "contribution_pp": -0.045,
+    "people_with_source_pct": 17.1
+   },
+   "unemployment": {
+    "share_of_2024_resources_pct": 0.63,
+    "own_growth_pct": 13.96,
+    "contribution_pp": 0.088,
+    "people_with_source_pct": 2.3
+   },
+   "snap": {
+    "share_of_2024_resources_pct": 4.68,
+    "own_growth_pct": -1.14,
+    "contribution_pp": -0.048,
+    "people_with_source_pct": 48.6
+   },
+   "housing_subsidy": {
+    "share_of_2024_resources_pct": 0.24,
+    "own_growth_pct": 3.16,
+    "contribution_pp": 0.006,
+    "people_with_source_pct": 1.7
+   },
+   "school_meals": {
+    "share_of_2024_resources_pct": 0.34,
+    "own_growth_pct": 7.69,
+    "contribution_pp": 0.026,
+    "people_with_source_pct": 9.8
+   },
+   "wic": {
+    "share_of_2024_resources_pct": 0.01,
+    "own_growth_pct": 1.32,
+    "contribution_pp": 0.0,
+    "people_with_source_pct": 0.3
+   },
+   "tanf": {
+    "share_of_2024_resources_pct": 0.01,
+    "own_growth_pct": -6.51,
+    "contribution_pp": -0.001,
+    "people_with_source_pct": 0.3
+   },
+   "payroll_tax": {
+    "share_of_2024_resources_pct": -4.12,
+    "own_growth_pct": 4.63,
+    "contribution_pp": -0.179,
+    "people_with_source_pct": 57.9
+   },
+   "federal_tax": {
+    "share_of_2024_resources_pct": -2.81,
+    "own_growth_pct": -16.2,
+    "contribution_pp": 0.377,
+    "people_with_source_pct": 34.7
+   },
+   "state_tax": {
+    "share_of_2024_resources_pct": -0.45,
+    "own_growth_pct": -2.51,
+    "contribution_pp": 0.026,
+    "people_with_source_pct": 46.0
+   },
+   "moop": {
+    "share_of_2024_resources_pct": -27.92,
+    "own_growth_pct": 3.78,
+    "contribution_pp": -1.091,
+    "people_with_source_pct": 99.9
+   },
+   "work_childcare": {
+    "share_of_2024_resources_pct": -1.39,
+    "own_growth_pct": 3.45,
+    "contribution_pp": -0.046,
+    "people_with_source_pct": 17.6
+   },
+   "child_support_paid": {
+    "share_of_2024_resources_pct": -0.0,
+    "own_growth_pct": 3.0,
+    "contribution_pp": -0.0,
+    "people_with_source_pct": 0.0
+   },
+   "other_and_residual": {
+    "contribution_pp": -0.086,
+    "share_of_2024_resources_pct": -0.12
+   }
+  },
+  "social_security_parts": {
+   "social_security_retirement": {
+    "own_growth_pct": 3.45,
+    "contribution_pp": 2.213
+   },
+   "social_security_disability": {
+    "own_growth_pct": 3.45,
+    "contribution_pp": 0.09
+   },
+   "social_security_survivors": {
+    "own_growth_pct": 3.45,
+    "contribution_pp": 0.035
+   },
+   "social_security_dependents": {
+    "own_growth_pct": 3.45,
+    "contribution_pp": 0.02
+   }
+  }
+ }
+}

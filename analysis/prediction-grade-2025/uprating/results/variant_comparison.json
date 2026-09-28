@@ -123,6 +123,78 @@
     "under_18": 0.632,
     "age_65_plus": -0.092
    }
+  },
+  "wages_by_family_decile": {
+   "rate_2025_pct": {
+    "all": 13.112,
+    "under_18": 16.424,
+    "age_18_64": 12.547,
+    "age_65_plus": 10.83
+   },
+   "change_pp": {
+    "all": 0.094,
+    "under_18": 0.714,
+    "age_65_plus": -0.594
+   },
+   "miss_pp": {
+    "all": 0.024,
+    "under_18": 0.774,
+    "age_65_plus": -0.834
+   }
+  },
+  "all_three_cpi_avg": {
+   "rate_2025_pct": {
+    "all": 13.27,
+    "under_18": 16.282,
+    "age_18_64": 12.642,
+    "age_65_plus": 11.572
+   },
+   "change_pp": {
+    "all": 0.252,
+    "under_18": 0.572,
+    "age_65_plus": 0.148
+   },
+   "miss_pp": {
+    "all": 0.182,
+    "under_18": 0.632,
+    "age_65_plus": -0.092
+   }
+  },
+  "all_three_ss_survey": {
+   "rate_2025_pct": {
+    "all": 13.215,
+    "under_18": 16.266,
+    "age_18_64": 12.584,
+    "age_65_plus": 11.476
+   },
+   "change_pp": {
+    "all": 0.197,
+    "under_18": 0.556,
+    "age_65_plus": 0.052
+   },
+   "miss_pp": {
+    "all": 0.127,
+    "under_18": 0.616,
+    "age_65_plus": -0.188
+   }
+  },
+  "all_four": {
+   "rate_2025_pct": {
+    "all": 13.114,
+    "under_18": 16.134,
+    "age_18_64": 12.464,
+    "age_65_plus": 11.479
+   },
+   "change_pp": {
+    "all": 0.096,
+    "under_18": 0.424,
+    "age_65_plus": 0.055
+   },
+   "miss_pp": {
+    "all": 0.026,
+    "under_18": 0.484,
+    "age_65_plus": -0.185
+   }
   }
  }
 }

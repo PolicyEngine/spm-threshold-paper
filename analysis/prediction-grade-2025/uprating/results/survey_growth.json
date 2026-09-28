@@ -117,7 +117,8 @@
   "mean_growth_pct": 3.93,
   "median_growth_pct": 4.01,
   "recipients_growth_pct": 4.66,
-  "total_growth_pct": 8.77
+  "total_growth_pct": 8.77,
+  "age_adjusted_mean_growth_pct": 3.45
  },
  "social_security_65_plus": {
   "2024": {
@@ -198,6 +199,74 @@
  "population_millions": {
   "2024": 337.69,
   "2025": 338.55
+ },
+ "population_by_age_millions": {
+  "0-17": {
+   "2024": 72.98,
+   "2025": 72.08
+  },
+  "18-49": {
+   "2024": 142.37,
+   "2025": 141.97
+  },
+  "50-61": {
+   "2024": 48.18,
+   "2025": 46.59
+  },
+  "62-65": {
+   "2024": 16.56,
+   "2025": 17.01
+  },
+  "66-69": {
+   "2024": 15.23,
+   "2025": 15.56
+  },
+  "70-74": {
+   "2024": 16.2,
+   "2025": 17.16
+  },
+  "75-79": {
+   "2024": 12.48,
+   "2025": 13.37
+  },
+  "80-199": {
+   "2024": 13.69,
+   "2025": 14.82
+  }
+ },
+ "social_security_recipiency_65_plus_pct": {
+  "2024": 80.18,
+  "2025": 81.22
+ },
+ "self_employment_SEMP_VAL": {
+  "2024": {
+   "mean_nonzero_incl_losses": 41395,
+   "mean_positive": 43325,
+   "median_positive": 23000.0,
+   "recipients_nonzero_millions": 12.84,
+   "max": 1099999.0
+  },
+  "2025": {
+   "mean_nonzero_incl_losses": 47455,
+   "mean_positive": 48982,
+   "median_positive": 25000.0,
+   "recipients_nonzero_millions": 12.67,
+   "max": 1102999.0
+  },
+  "mean_nonzero_incl_losses_growth_pct": 14.64,
+  "mean_positive_growth_pct": 13.06,
+  "median_positive_growth_pct": 8.7
+ },
+ "children_in_units_with_noncitizen": {
+  "share_pct": {
+   "2024": 17.88,
+   "2025": 16.35
+  },
+  "spm_poverty_pct_2024": {
+   "with_noncitizen": 24.67,
+   "without": 10.88
+  },
+  "shift_share_pp": -0.211
  },
  "near_line_cross_section_unit_means": {
   "all": {
