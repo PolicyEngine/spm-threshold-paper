@@ -1,0 +1,111 @@
+{
+ "year": 2025,
+ "variant": "all_three",
+ "dataset": "hf://datasets/policyengine/populace-us/populace_us_2024.h5@populace-us-2024-spm-20260909",
+ "dataset_sha256": "6496cc4393d4d3c6574f76eca231de5898c803b9067645591fd5c4d3e65aee84",
+ "spm_pct": {
+  "all": 13.270302487956764,
+  "under_18": 16.282077815020354,
+  "age_18_64": 12.641840983747038,
+  "age_65_plus": 11.572346498639217
+ },
+ "overrides": {
+  "social_security_retirement": {
+   "factor": 1.0248741850243663,
+   "before_2025_total": 1214331133398.1157,
+   "after_2025_total": 1149034216525.1213
+  },
+  "social_security_disability": {
+   "factor": 1.0248741850243663,
+   "before_2025_total": 160849140240.05115,
+   "after_2025_total": 152199973783.98413
+  },
+  "social_security_survivors": {
+   "factor": 1.0248741850243663,
+   "before_2025_total": 176235401668.6003,
+   "after_2025_total": 166758885991.89862
+  },
+  "social_security_dependents": {
+   "factor": 1.0248741850243663,
+   "before_2025_total": 49907262052.51224,
+   "after_2025_total": 47223652842.71146
+  },
+  "tax_exempt_public_pension_income": {
+   "factor": 1.0299941251283111,
+   "before_2025_total": 0.0,
+   "after_2025_total": 0.0
+  },
+  "tax_exempt_private_pension_income": {
+   "factor": 1.0299941251283111,
+   "before_2025_total": 346190557591.6373,
+   "after_2025_total": 298468462849.18
+  },
+  "taxable_public_pension_income": {
+   "factor": 1.0299941251283111,
+   "before_2025_total": 0.0,
+   "after_2025_total": 0.0
+  },
+  "taxable_private_pension_income": {
+   "factor": 1.0299941251283111,
+   "before_2025_total": 1207845954220.8171,
+   "after_2025_total": 1041345332672.6672
+  },
+  "taxable_ira_distributions": {
+   "factor": 1.0299941251283111,
+   "before_2025_total": 584953797210.9543,
+   "after_2025_total": 504318374560.51184
+  },
+  "taxable_401k_distributions": {
+   "factor": 1.0299941251283111,
+   "before_2025_total": 73643936842.75113,
+   "after_2025_total": 63492178626.145935
+  },
+  "taxable_sep_distributions": {
+   "factor": 1.0299941251283111,
+   "before_2025_total": 388105164502.38324,
+   "after_2025_total": 334605169635.5653
+  },
+  "taxable_403b_distributions": {
+   "factor": 1.0299941251283111,
+   "before_2025_total": 4879529868.109671,
+   "after_2025_total": 4206890569.207072
+  },
+  "keogh_distributions": {
+   "factor": 1.0299941251283111,
+   "before_2025_total": 956472507.6696808,
+   "after_2025_total": 824623524.2233617
+  },
+  "tax_exempt_ira_distributions": {
+   "factor": 1.0299941251283111,
+   "before_2025_total": 21356868619.04499,
+   "after_2025_total": 18412841323.445763
+  },
+  "tax_exempt_401k_distributions": {
+   "factor": 1.0299941251283111,
+   "before_2025_total": 0.0,
+   "after_2025_total": 0.0
+  },
+  "tax_exempt_sep_distributions": {
+   "factor": 1.0299941251283111,
+   "before_2025_total": 0.0,
+   "after_2025_total": 0.0
+  },
+  "tax_exempt_403b_distributions": {
+   "factor": 1.0299941251283111,
+   "before_2025_total": 0.0,
+   "after_2025_total": 0.0
+  },
+  "self_employment_income_before_lsr": {
+   "factor": 1.0493505774183725,
+   "before_2025_total": 445930084796.5476,
+   "after_2025_total": 496548120283.7629
+  },
+  "sstb_self_employment_income_before_lsr": {
+   "factor": 1.0493505774183725,
+   "before_2025_total": 350080336765.7757,
+   "after_2025_total": 389818353236.498
+  }
+ },
+ "calc_seconds": 248.8,
+ "peak_rss_gb": 49.13
+}

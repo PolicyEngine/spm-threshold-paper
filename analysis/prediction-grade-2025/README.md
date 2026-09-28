@@ -94,6 +94,32 @@ second forecast.
 
 Results: [`results/raw_aging.json`](results/raw_aging.json).
 
+## Uprating by source
+
+The model carries each 2024 record to 2025 by multiplying its dollar amounts by the growth of a national total.
+[`uprating/`](uprating) traces near-line resource growth to each income source and reruns 2025 with other growth
+rates for the sources that stood out:
+
+| Source | Per-record growth in the model | Survey, 2024 to 2025 |
+| --- | ---: | ---: |
+| Wages | +4.9% | +4.8% per earner; +4.1% to +5.3% in every wage decile |
+| Social Security | +8.3% | +4.0% per recipient (median); COLA 2.5% |
+| Pensions and retirement distributions | +19.5% | +3.7% to +6.6% per recipient 65 and over |
+| Self-employment | −5.8% | +14.6% per recipient |
+
+| 2025 run | All people | Under 18 | 65 and over |
+| --- | ---: | ---: | ---: |
+| Census change | +0.07 | −0.06 | +0.24 |
+| Registered (baseline) | +0.22 | +0.86 | −0.52 |
+| Wages grown by the survey's growth in each wage decile | +0.24 | +0.85 | −0.52 |
+| Social Security at the COLA, pensions at CPI-U | +0.47 | +0.98 | +0.21 |
+| Self-employment grown with wages | +0.01 | +0.47 | −0.59 |
+| All three | +0.25 | +0.57 | +0.15 |
+
+Social Security and pension growth at aggregate rates accounts for nearly all of the miss for people 65 and over;
+self-employment falling with CBO's business-income projection accounts for about a third of the miss for children.
+Wage growth by wage level does not matter for 2025. Details: [`uprating/README.md`](uprating/README.md).
+
 ## Reproducing
 
 ```bash
