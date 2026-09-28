@@ -1,5 +1,5 @@
 #!/bin/bash
-# Twelve population runs, one process each (about 5-10 minutes and 50-60 GB of memory per run), then the summaries.
+# Twelve population runs, one process each (about 5-13 minutes and 50-60 GB of memory per run), then the summaries.
 # The 2024 baseline must run first: wages_by_family_decile and all_four read its arrays.
 # usage: PY=/path/to/python ./run_uprating.sh <output-dir>
 set -euo pipefail

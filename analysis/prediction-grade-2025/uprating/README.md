@@ -50,8 +50,8 @@ income. Results: [`results/survey_growth.json`](results/survey_growth.json),
   decile was 6.6, 4.9, 5.7, 5.6, 4.3, 4.7, 6.1, 3.0, 3.5 and 5.3 percent (bottom decile: resources below about 1.2
   times the threshold), against 4.8% for all earners. Household-bootstrap standard errors are 1.3 to 2.5 points per
   decile, and the bottom decile's 1.8-point excess has a standard error of 2.1, so the pattern is not distinguishable
-  from sampling error. Each year's deciles are its own, the ranking uses resources that include wages, and the
-  pattern changes with other rankings, so treat it as a lead.
+  from sampling error. Each year's deciles are its own, and the ranking uses resources that include wages, so treat
+  it as a lead.
 - **Self-employment (SEMP_VAL):** mean over nonzero values, losses included, +14.6%; positive values only, mean +13.1%
   and median +8.7%.
 - **Pensions and annuities, 65 and over:** per recipient, mean +6.6%, median +3.7%. Retirement distributions: mean
@@ -127,8 +127,8 @@ that band shows up in the threshold term. Results: [`results/variant_split.json`
 | Baseline | +1.40 | −0.54 | +0.27 | −0.79 |
 | `se_like_wages` | +1.23 | −0.76 | +0.32 | −0.91 |
 | `all_three_cpi_avg` | +1.16 | −0.59 | +0.38 | −0.23 |
-| `all_three_ss_66plus` | +1.13 | −0.59 | +0.41 | −0.43 |
-| `wages_by_family_decile` | +1.51 | −0.80 | +0.26 | −0.85 |
+| `all_three_ss_66plus` | +1.13 | −0.60 | +0.41 | −0.43 |
+| `wages_by_family_decile` | +1.52 | −0.80 | +0.26 | −0.85 |
 | `all_four` | +1.36 | −0.93 | +0.35 | −0.29 |
 
 ## Reading
@@ -148,7 +148,7 @@ that band shows up in the threshold term. Results: [`results/variant_split.json`
   +0.42 with the three source changes (`all_four`), but that schedule is within sampling error (see above), so it
   shows the size a family-income gradient could have, not that there was one.
 - **The split is order-dependent.** The child threshold gap (1.40 against 1.09 in the baseline) shrinks to 1.13–1.23
-  when self-employment grows with wages and grows to 1.51 when wages grow by family resources. Read the totals first.
+  when self-employment grows with wages and grows to 1.52 when wages grow by family resources. Read the totals first.
 - **All people.** The three source changes leave the all-people change 0.10 to 0.18 points above Census, about where
   the registered forecast was: its close all-people result owed something to offsetting errors.
 - **What remains for children** (about 0.6 points with the three source changes) is not explained by these sources.
@@ -161,7 +161,7 @@ The replacement rates are reference rates, not estimates of the right growth for
 
 ```bash
 uv venv --python 3.13 && VIRTUAL_ENV=.venv uv pip install "policyengine[us]==6.0.0"
-PY=.venv/bin/python ./run_uprating.sh uprating-runs   # twelve population runs, about 5-10 minutes and 50-60 GB each
+PY=.venv/bin/python ./run_uprating.sh uprating-runs   # twelve population runs, about 5-13 minutes and 50-60 GB each
 cd asec && ../.venv/bin/python survey_growth.py && ../.venv/bin/python wage_deciles.py   # needs pppub25.csv, pppub26.csv
 ```
 
