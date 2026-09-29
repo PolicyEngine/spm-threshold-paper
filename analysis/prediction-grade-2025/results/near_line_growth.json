@@ -1,0 +1,30 @@
+{
+ "all": {
+  "median_resource_growth_pct": 4.61,
+  "p25_resource_growth_pct": 3.12,
+  "p75_resource_growth_pct": 5.92,
+  "median_threshold_growth_pct": 5.24,
+  "weighted_people_millions": 80.84
+ },
+ "under_18": {
+  "median_resource_growth_pct": 3.74,
+  "p25_resource_growth_pct": 2.86,
+  "p75_resource_growth_pct": 5.2,
+  "median_threshold_growth_pct": 5.33,
+  "weighted_people_millions": 27.76
+ },
+ "age_18_64": {
+  "median_resource_growth_pct": 4.81,
+  "p25_resource_growth_pct": 3.2,
+  "p75_resource_growth_pct": 5.83,
+  "median_threshold_growth_pct": 5.25,
+  "weighted_people_millions": 44.38
+ },
+ "age_65_plus": {
+  "median_resource_growth_pct": 7.74,
+  "p25_resource_growth_pct": 4.95,
+  "p75_resource_growth_pct": 9.76,
+  "median_threshold_growth_pct": 4.46,
+  "weighted_people_millions": 8.7
+ }
+}

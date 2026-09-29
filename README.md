@@ -63,6 +63,14 @@ comparison on the qualified model and population release. The threshold-method
 results do not depend on them. The prediction's checksum and timestamp proof
 accompany the file; any subsequent estimate receives its own dated record.
 
+Census published the 2025 rates on September 15: 13.1 percent overall,
+13.4 percent for children, and 15.4 percent for people 65 and over. The
+[dated grade](data/predictions/2025-spm-poverty-rates-2026-09-11.grade-2026-09-17.json)
+records the comparison, and a rerun on the released runtime reproduced the
+registered changes, so the registration needs no amendment. The code that
+separates each miss into a threshold effect and a resource effect is in
+[`analysis/prediction-grade-2025`](analysis/prediction-grade-2025).
+
 ## License
 
 Code in this repository is released under the [MIT License](LICENSE). Original text and figures are released under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) with attribution to PolicyEngine. Third-party data and materials keep their own terms.

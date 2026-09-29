@@ -1,0 +1,577 @@
+{
+ "all_wage_earners": {
+  "p10": {
+   "2024": 12000.0,
+   "2025": 12000.0,
+   "growth_pct": 0.0
+  },
+  "p20": {
+   "2024": 24000.0,
+   "2025": 25000.0,
+   "growth_pct": 4.17
+  },
+  "p25": {
+   "2024": 30000.0,
+   "2025": 30000.0,
+   "growth_pct": 0.0
+  },
+  "p30": {
+   "2024": 33000.0,
+   "2025": 35000.0,
+   "growth_pct": 6.06
+  },
+  "p40": {
+   "2024": 42000.0,
+   "2025": 45000.0,
+   "growth_pct": 7.14
+  },
+  "p50": {
+   "2024": 51000.0,
+   "2025": 54080.0,
+   "growth_pct": 6.04
+  },
+  "p60": {
+   "2024": 62000.0,
+   "2025": 65000.0,
+   "growth_pct": 4.84
+  },
+  "p75": {
+   "2024": 87000.0,
+   "2025": 90000.0,
+   "growth_pct": 3.45
+  },
+  "p90": {
+   "2024": 141000.0,
+   "2025": 150000.0,
+   "growth_pct": 6.38
+  },
+  "workers_millions": {
+   "2024": 166.34,
+   "2025": 165.87
+  }
+ },
+ "full_year_full_time": {
+  "p10": {
+   "2024": 30000.0,
+   "2025": 30000.0,
+   "growth_pct": 0.0
+  },
+  "p20": {
+   "2024": 39000.0,
+   "2025": 40000.0,
+   "growth_pct": 2.56
+  },
+  "p25": {
+   "2024": 42000.0,
+   "2025": 45000.0,
+   "growth_pct": 7.14
+  },
+  "p30": {
+   "2024": 46002.0,
+   "2025": 50000.0,
+   "growth_pct": 8.69
+  },
+  "p40": {
+   "2024": 55000.0,
+   "2025": 57000.0,
+   "growth_pct": 3.64
+  },
+  "p50": {
+   "2024": 64000.0,
+   "2025": 65515.0,
+   "growth_pct": 2.37
+  },
+  "p60": {
+   "2024": 75000.0,
+   "2025": 79200.0,
+   "growth_pct": 5.6
+  },
+  "p75": {
+   "2024": 100000.0,
+   "2025": 102000.0,
+   "growth_pct": 2.0
+  },
+  "p90": {
+   "2024": 155000.0,
+   "2025": 161000.0,
+   "growth_pct": 3.87
+  },
+  "workers_millions": {
+   "2024": 117.96,
+   "2025": 119.07
+  }
+ },
+ "social_security_all": {
+  "2024": {
+   "mean": 20698.0,
+   "median": 19440.0,
+   "recipients_millions": 59.25,
+   "total_billions": 1226.3
+  },
+  "2025": {
+   "mean": 21511.0,
+   "median": 20220.0,
+   "recipients_millions": 62.01,
+   "total_billions": 1333.9
+  },
+  "mean_growth_pct": 3.93,
+  "median_growth_pct": 4.01,
+  "recipients_growth_pct": 4.66,
+  "total_growth_pct": 8.77,
+  "age_adjusted_mean_growth_pct": 3.45,
+  "age_adjusted_mean_growth_66_plus_pct": 4.04
+ },
+ "social_security_65_plus": {
+  "2024": {
+   "mean": 21425.0,
+   "median": 20160.0,
+   "recipients_millions": 49.3,
+   "total_billions": 1056.3
+  },
+  "2025": {
+   "mean": 22279.0,
+   "median": 21240.0,
+   "recipients_millions": 52.96,
+   "total_billions": 1179.9
+  },
+  "mean_growth_pct": 3.99,
+  "median_growth_pct": 5.36,
+  "recipients_growth_pct": 7.42,
+  "total_growth_pct": 11.7
+ },
+ "pensions_annuities_65_plus": {
+  "2024": {
+   "mean": 25456.0,
+   "median": 16200.0,
+   "recipients_millions": 17.83,
+   "total_billions": 453.9
+  },
+  "2025": {
+   "mean": 27141.0,
+   "median": 16800.0,
+   "recipients_millions": 18.46,
+   "total_billions": 501.1
+  },
+  "mean_growth_pct": 6.62,
+  "median_growth_pct": 3.7,
+  "recipients_growth_pct": 3.53,
+  "total_growth_pct": 10.4
+ },
+ "retirement_distributions_65_plus": {
+  "2024": {
+   "mean": 22603.0,
+   "median": 10000.0,
+   "recipients_millions": 10.97,
+   "total_billions": 247.9
+  },
+  "2025": {
+   "mean": 23671.0,
+   "median": 10000.0,
+   "recipients_millions": 11.69,
+   "total_billions": 276.8
+  },
+  "mean_growth_pct": 4.73,
+  "median_growth_pct": 0.0,
+  "recipients_growth_pct": 6.56,
+  "total_growth_pct": 11.66
+ },
+ "wages_all": {
+  "2024": {
+   "mean": 72399.0,
+   "median": 50002.0,
+   "recipients_millions": 166.75,
+   "total_billions": 12072.4
+  },
+  "2025": {
+   "mean": 75888.0,
+   "median": 54000.0,
+   "recipients_millions": 166.22,
+   "total_billions": 12613.9
+  },
+  "mean_growth_pct": 4.82,
+  "median_growth_pct": 8.0,
+  "recipients_growth_pct": -0.32,
+  "total_growth_pct": 4.49
+ },
+ "population_65_plus_millions": {
+  "2024": 61.49,
+  "2025": 65.21
+ },
+ "population_millions": {
+  "2024": 337.69,
+  "2025": 338.55
+ },
+ "population_by_age_millions": {
+  "0-17": {
+   "2024": 72.98,
+   "2025": 72.08
+  },
+  "18-49": {
+   "2024": 142.37,
+   "2025": 141.97
+  },
+  "50-61": {
+   "2024": 48.18,
+   "2025": 46.59
+  },
+  "62-65": {
+   "2024": 16.56,
+   "2025": 17.01
+  },
+  "66-69": {
+   "2024": 15.23,
+   "2025": 15.56
+  },
+  "70-74": {
+   "2024": 16.2,
+   "2025": 17.16
+  },
+  "75-79": {
+   "2024": 12.48,
+   "2025": 13.37
+  },
+  "80-199": {
+   "2024": 13.69,
+   "2025": 14.82
+  }
+ },
+ "social_security_recipiency_65_plus_pct": {
+  "2024": 80.18,
+  "2025": 81.22
+ },
+ "self_employment_SEMP_VAL": {
+  "2024": {
+   "mean_nonzero_incl_losses": 41395,
+   "mean_positive": 43325,
+   "median_positive": 23000.0,
+   "recipients_nonzero_millions": 12.84,
+   "max": 1099999.0
+  },
+  "2025": {
+   "mean_nonzero_incl_losses": 47455,
+   "mean_positive": 48982,
+   "median_positive": 25000.0,
+   "recipients_nonzero_millions": 12.67,
+   "max": 1102999.0
+  },
+  "mean_nonzero_incl_losses_growth_pct": 14.64,
+  "mean_positive_growth_pct": 13.06,
+  "median_positive_growth_pct": 8.7
+ },
+ "children_in_units_with_noncitizen": {
+  "share_pct": {
+   "2024": 17.88,
+   "2025": 16.35
+  },
+  "spm_poverty_pct_2024": {
+   "with_noncitizen": 24.67,
+   "without": 10.88
+  },
+  "shift_share_pp": -0.211
+ },
+ "near_line_cross_section_unit_means": {
+  "all": {
+   "people_millions": {
+    "2024": 69.63,
+    "2025": 68.64
+   },
+   "wages_se": {
+    "2024": 36755,
+    "2025": 38435,
+    "growth_pct": 4.57
+   },
+   "social_security": {
+    "2024": 6026,
+    "2025": 6749,
+    "growth_pct": 12.01
+   },
+   "pensions_distrib": {
+    "2024": 580,
+    "2025": 621,
+    "growth_pct": 7.03
+   },
+   "ssi": {
+    "2024": 844,
+    "2025": 793,
+    "growth_pct": -6.09
+   },
+   "unemployment": {
+    "2024": 123,
+    "2025": 149,
+    "growth_pct": 20.72
+   },
+   "snap": {
+    "2024": 1179,
+    "2025": 1106,
+    "growth_pct": -6.13
+   },
+   "housing": {
+    "2024": 866,
+    "2025": 763,
+    "growth_pct": -11.93
+   },
+   "school_lunch": {
+    "2024": 587,
+    "2025": 547,
+    "growth_pct": -6.82
+   },
+   "wic": {
+    "2024": 114,
+    "2025": 103,
+    "growth_pct": -10.25
+   },
+   "energy": {
+    "2024": 50,
+    "2025": 49,
+    "growth_pct": -1.68
+   },
+   "fed_tax_net": {
+    "2024": -1538,
+    "2025": -1433,
+    "growth_pct": -6.81
+   },
+   "eitc": {
+    "2024": 1598,
+    "2025": 1480,
+    "growth_pct": -7.36
+   },
+   "actc": {
+    "2024": 947,
+    "2025": 1009,
+    "growth_pct": 6.52
+   },
+   "state_tax": {
+    "2024": 362,
+    "2025": 392,
+    "growth_pct": 8.28
+   },
+   "fica": {
+    "2024": 2984,
+    "2025": 3108,
+    "growth_pct": 4.14
+   },
+   "moop": {
+    "2024": 3739,
+    "2025": 4048,
+    "growth_pct": 8.27
+   },
+   "work_childcare": {
+    "2024": 2262,
+    "2025": 2347,
+    "growth_pct": 3.75
+   },
+   "resources": {
+    "2024": 41579,
+    "2025": 43154,
+    "growth_pct": 3.79
+   },
+   "threshold": {
+    "2024": 36143,
+    "2025": 37461,
+    "growth_pct": 3.65
+   }
+  },
+  "under_18": {
+   "people_millions": {
+    "2024": 19.06,
+    "2025": 18.44
+   },
+   "wages_se": {
+    "2024": 45785,
+    "2025": 48539,
+    "growth_pct": 6.01
+   },
+   "social_security": {
+    "2024": 1808,
+    "2025": 2049,
+    "growth_pct": 13.35
+   },
+   "pensions_distrib": {
+    "2024": 106,
+    "2025": 191,
+    "growth_pct": 80.98
+   },
+   "ssi": {
+    "2024": 516,
+    "2025": 492,
+    "growth_pct": -4.55
+   },
+   "unemployment": {
+    "2024": 142,
+    "2025": 168,
+    "growth_pct": 18.46
+   },
+   "snap": {
+    "2024": 2025,
+    "2025": 1888,
+    "growth_pct": -6.78
+   },
+   "housing": {
+    "2024": 1363,
+    "2025": 1048,
+    "growth_pct": -23.07
+   },
+   "school_lunch": {
+    "2024": 1193,
+    "2025": 1129,
+    "growth_pct": -5.34
+   },
+   "wic": {
+    "2024": 250,
+    "2025": 225,
+    "growth_pct": -10.07
+   },
+   "energy": {
+    "2024": 62,
+    "2025": 59,
+    "growth_pct": -4.43
+   },
+   "fed_tax_net": {
+    "2024": -4226,
+    "2025": -4243,
+    "growth_pct": 0.4
+   },
+   "eitc": {
+    "2024": 2932,
+    "2025": 2749,
+    "growth_pct": -6.26
+   },
+   "actc": {
+    "2024": 2004,
+    "2025": 2186,
+    "growth_pct": 9.06
+   },
+   "state_tax": {
+    "2024": 230,
+    "2025": 249,
+    "growth_pct": 8.19
+   },
+   "fica": {
+    "2024": 3706,
+    "2025": 3928,
+    "growth_pct": 5.97
+   },
+   "moop": {
+    "2024": 3506,
+    "2025": 3889,
+    "growth_pct": 10.91
+   },
+   "work_childcare": {
+    "2024": 2924,
+    "2025": 3086,
+    "growth_pct": 5.55
+   },
+   "resources": {
+    "2024": 49504,
+    "2025": 51434,
+    "growth_pct": 3.9
+   },
+   "threshold": {
+    "2024": 42871,
+    "2025": 44522,
+    "growth_pct": 3.85
+   }
+  },
+  "age_65_plus": {
+   "people_millions": {
+    "2024": 12.87,
+    "2025": 13.76
+   },
+   "wages_se": {
+    "2024": 8572,
+    "2025": 8365,
+    "growth_pct": -2.42
+   },
+   "social_security": {
+    "2024": 19150,
+    "2025": 20631,
+    "growth_pct": 7.74
+   },
+   "pensions_distrib": {
+    "2024": 1837,
+    "2025": 1702,
+    "growth_pct": -7.36
+   },
+   "ssi": {
+    "2024": 822,
+    "2025": 936,
+    "growth_pct": 13.87
+   },
+   "unemployment": {
+    "2024": 51,
+    "2025": 41,
+    "growth_pct": -19.68
+   },
+   "snap": {
+    "2024": 521,
+    "2025": 478,
+    "growth_pct": -8.23
+   },
+   "housing": {
+    "2024": 600,
+    "2025": 697,
+    "growth_pct": 16.13
+   },
+   "school_lunch": {
+    "2024": 53,
+    "2025": 52,
+    "growth_pct": -1.29
+   },
+   "wic": {
+    "2024": 5,
+    "2025": 6,
+    "growth_pct": 29.92
+   },
+   "energy": {
+    "2024": 56,
+    "2025": 46,
+    "growth_pct": -18.22
+   },
+   "fed_tax_net": {
+    "2024": 250,
+    "2025": 291,
+    "growth_pct": 16.02
+   },
+   "eitc": {
+    "2024": 148,
+    "2025": 131,
+    "growth_pct": -11.38
+   },
+   "actc": {
+    "2024": 61,
+    "2025": 58,
+    "growth_pct": -3.93
+   },
+   "state_tax": {
+    "2024": 140,
+    "2025": 164,
+    "growth_pct": 17.47
+   },
+   "fica": {
+    "2024": 706,
+    "2025": 674,
+    "growth_pct": -4.51
+   },
+   "moop": {
+    "2024": 4445,
+    "2025": 4537,
+    "growth_pct": 2.07
+   },
+   "work_childcare": {
+    "2024": 514,
+    "2025": 515,
+    "growth_pct": 0.11
+   },
+   "resources": {
+    "2024": 27300,
+    "2025": 28582,
+    "growth_pct": 4.7
+   },
+   "threshold": {
+    "2024": 24096,
+    "2025": 25312,
+    "growth_pct": 5.05
+   }
+  }
+ }
+}

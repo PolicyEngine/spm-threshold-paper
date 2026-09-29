@@ -1,0 +1,25 @@
+{
+ "year": 2025,
+ "variant": "baseline",
+ "factors": null,
+ "dataset": "hf://datasets/policyengine/populace-us/populace_us_2024.h5@populace-us-2024-spm-20260909",
+ "dataset_sha256": "6496cc4393d4d3c6574f76eca231de5898c803b9067645591fd5c4d3e65aee84",
+ "load_seconds": 2.1,
+ "calc_seconds": 222.5,
+ "peak_rss_gb": 60.16,
+ "spm_pct": {
+  "all": 13.235361595074261,
+  "under_18": 16.566759396874076,
+  "under_6": 18.27341984600573,
+  "age_18_64": 12.677820014429747,
+  "age_65_plus": 10.902244809164884
+ },
+ "official_pct": {
+  "all": 13.235361595074261,
+  "under_18": 16.566759396874076,
+  "under_6": 18.27341984600573,
+  "age_18_64": 12.677820014429747,
+  "age_65_plus": 10.902244809164884
+ },
+ "median_threshold_2a2k_by_tenure": {}
+}

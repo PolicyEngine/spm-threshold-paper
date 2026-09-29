@@ -1,0 +1,100 @@
+{
+ "model": {
+  "all": {
+   "rate_2024": 13.018144,
+   "rate_2025": 13.235362,
+   "rate_2025_at_2024_thresholds": 12.531061,
+   "change": 0.217217,
+   "threshold_effect": 0.7043,
+   "resource_effect": -0.487083
+  },
+  "under_18": {
+   "rate_2024": 15.710121,
+   "rate_2025": 16.566759,
+   "rate_2025_at_2024_thresholds": 15.168197,
+   "change": 0.856639,
+   "threshold_effect": 1.398562,
+   "resource_effect": -0.541924
+  },
+  "age_18_64": {
+   "rate_2024": 12.479577,
+   "rate_2025": 12.67782,
+   "rate_2025_at_2024_thresholds": 12.104608,
+   "change": 0.198243,
+   "threshold_effect": 0.573212,
+   "resource_effect": -0.374968
+  },
+  "age_65_plus": {
+   "rate_2024": 11.423906,
+   "rate_2025": 10.902245,
+   "rate_2025_at_2024_thresholds": 10.634914,
+   "change": -0.521661,
+   "threshold_effect": 0.267331,
+   "resource_effect": -0.788993
+  },
+  "under_6": {
+   "rate_2024": 17.129847,
+   "rate_2025": 18.27342,
+   "rate_2025_at_2024_thresholds": 16.285037,
+   "change": 1.143573,
+   "threshold_effect": 1.988383,
+   "resource_effect": -0.844811
+  }
+ },
+ "census": {
+  "all": {
+   "rate_2024": 13.04,
+   "rate_2025": 13.11,
+   "rate_2025_at_2024_thresholds": 12.31,
+   "change": 0.07,
+   "threshold_effect": 0.8,
+   "resource_effect": -0.73
+  },
+  "under_18": {
+   "rate_2024": 13.46,
+   "rate_2025": 13.4,
+   "rate_2025_at_2024_thresholds": 12.31,
+   "change": -0.06,
+   "threshold_effect": 1.09,
+   "resource_effect": -1.15
+  },
+  "age_18_64": {
+   "rate_2024": 12.23,
+   "rate_2025": 12.28,
+   "rate_2025_at_2024_thresholds": 11.55,
+   "change": 0.05,
+   "threshold_effect": 0.73,
+   "resource_effect": -0.68
+  },
+  "age_65_plus": {
+   "rate_2024": 15.13,
+   "rate_2025": 15.37,
+   "rate_2025_at_2024_thresholds": 14.66,
+   "change": 0.24,
+   "threshold_effect": 0.71,
+   "resource_effect": -0.47
+  }
+ },
+ "model_minus_census": {
+  "all": {
+   "change": 0.15,
+   "threshold_effect": -0.1,
+   "resource_effect": 0.24
+  },
+  "under_18": {
+   "change": 0.92,
+   "threshold_effect": 0.31,
+   "resource_effect": 0.61
+  },
+  "age_18_64": {
+   "change": 0.15,
+   "threshold_effect": -0.16,
+   "resource_effect": 0.31
+  },
+  "age_65_plus": {
+   "change": -0.76,
+   "threshold_effect": -0.44,
+   "resource_effect": -0.32
+  }
+ }
+}

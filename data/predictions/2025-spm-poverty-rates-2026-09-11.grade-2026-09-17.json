@@ -1,0 +1,132 @@
+{
+  "format": "spm/poverty-rate-prediction-grade/v1",
+  "graded": "2026-09-17",
+  "grades": "data/predictions/2025-spm-poverty-rates-2026-09-11.json",
+  "prediction_sha256": "a1f6bd78dbdc5fa533d409101170401558bf010bf93647a26f097dd068801941",
+  "rule": "The registered file is never edited. The prediction post committed to grading against the published change for each group; the level miss is listed beside it.",
+  "resolution": {
+    "report": "Census Bureau, Poverty in the United States: 2025 (P60-290), released 2026-09-15 10:00 ET",
+    "table_4": {
+      "url": "https://www2.census.gov/programs-surveys/demo/tables/p60/290/table_4_spm_person.xlsx",
+      "sha256": "1ad73ba7a35e9d113d7eae0612b1ca23bc90eac2412fa215833c68a67b2620fe",
+      "use": "printed rates, 90 percent margins of error, printed changes, significance markers"
+    },
+    "table_5": {
+      "url": "https://www2.census.gov/programs-surveys/demo/tables/p60/290/table_5_spm_program_effect_rates.xlsx",
+      "sha256": "e8cc547cf980f277e9143389447223cc7139509922bd5ad924ee304c9b32ea7a",
+      "use": "rates to two decimals ('SPM rate for all people' rows, 2025 and 2024 panels)"
+    },
+    "retrieved": "2026-09-15",
+    "note": "Table 4 re-bases 2024 to Vintage 2025 population controls, so its 2024 child rate (13.5) differs from the 13.4 anchor in the registered file. No asterisk precedes the all-people, under-18 or 65-and-over changes in Table 4: none is statistically different from zero at the 90 percent level."
+  },
+  "groups": {
+    "all": {
+      "registered_modeled_change_pp": 0.22,
+      "registered_prediction_2025_percent": 13.2,
+      "census_printed": {
+        "rate_2024": 13.0,
+        "moe_2024": 0.3,
+        "rate_2025": 13.1,
+        "moe_2025": 0.3,
+        "change": 0.1
+      },
+      "census_change_statistically_different_from_zero_at_90pct": false,
+      "census_unrounded": {
+        "rate_2024": 13.04,
+        "rate_2025": 13.11,
+        "change": 0.07
+      },
+      "miss_in_change_pp": {
+        "printed": 0.1,
+        "unrounded": 0.15
+      },
+      "miss_in_level_pp": 0.1,
+      "direction_correct": true,
+      "legacy_model": {
+        "modeled_change_pp": -0.53,
+        "miss_in_change_pp_printed": -0.6,
+        "miss_in_change_pp_unrounded": -0.6
+      },
+      "shipping_runtime_rerun": {
+        "modeled_change_pp": 0.217217,
+        "difference_from_registered_pp": -4e-07
+      }
+    },
+    "under_18": {
+      "registered_modeled_change_pp": 0.86,
+      "registered_prediction_2025_percent": 14.3,
+      "census_printed": {
+        "rate_2024": 13.5,
+        "moe_2024": 0.5,
+        "rate_2025": 13.4,
+        "moe_2025": 0.6,
+        "change": -0.1
+      },
+      "census_change_statistically_different_from_zero_at_90pct": false,
+      "census_unrounded": {
+        "rate_2024": 13.46,
+        "rate_2025": 13.4,
+        "change": -0.06
+      },
+      "miss_in_change_pp": {
+        "printed": 1.0,
+        "unrounded": 0.92
+      },
+      "miss_in_level_pp": 0.9,
+      "direction_correct": false,
+      "legacy_model": {
+        "modeled_change_pp": -0.24,
+        "miss_in_change_pp_printed": -0.1,
+        "miss_in_change_pp_unrounded": -0.18
+      },
+      "shipping_runtime_rerun": {
+        "modeled_change_pp": 0.856639,
+        "difference_from_registered_pp": 4.9e-07
+      }
+    },
+    "age_65_plus": {
+      "registered_modeled_change_pp": -0.52,
+      "registered_prediction_2025_percent": 14.6,
+      "census_printed": {
+        "rate_2024": 15.1,
+        "moe_2024": 0.5,
+        "rate_2025": 15.4,
+        "moe_2025": 0.5,
+        "change": 0.2
+      },
+      "census_change_statistically_different_from_zero_at_90pct": false,
+      "census_unrounded": {
+        "rate_2024": 15.13,
+        "rate_2025": 15.37,
+        "change": 0.24
+      },
+      "miss_in_change_pp": {
+        "printed": -0.7,
+        "unrounded": -0.76
+      },
+      "miss_in_level_pp": -0.8,
+      "direction_correct": false,
+      "legacy_model": {
+        "modeled_change_pp": -1.24,
+        "miss_in_change_pp_printed": -1.4,
+        "miss_in_change_pp_unrounded": -1.48
+      },
+      "shipping_runtime_rerun": {
+        "modeled_change_pp": -0.521661,
+        "difference_from_registered_pp": 3.4e-07
+      }
+    }
+  },
+  "amendment_check": {
+    "rule_in_registered_file": "a dated amendment if the shipping-runtime rerun moves any modeled change by 0.05 pp or more",
+    "rerun_runtime": {
+      "policyengine-us": "2.2.1",
+      "policyengine-core": "3.32.5",
+      "spm-calculator": "1.0.0"
+    },
+    "rerun_dataset_sha256": "6496cc4393d4d3c6574f76eca231de5898c803b9067645591fd5c4d3e65aee84",
+    "largest_difference_pp": 4.9e-07,
+    "amendment_required": false
+  },
+  "diagnosis": "analysis/prediction-grade-2025/README.md"
+}

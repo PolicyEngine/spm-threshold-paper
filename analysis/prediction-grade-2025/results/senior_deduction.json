@@ -1,0 +1,148 @@
+{
+ "model_levels_pct": {
+  "2024": {
+   "all": 13.018144199226892,
+   "under_18": 15.710120885542652,
+   "age_65_plus": 11.423906146918569
+  },
+  "2025": {
+   "all": 13.235361595074261,
+   "under_18": 16.566759396874076,
+   "age_65_plus": 10.902244809164884
+  },
+  "2025_no_senior_deduction": {
+   "all": 13.237604289878854,
+   "under_18": 16.566759396874076,
+   "age_65_plus": 10.914713586152454
+  }
+ },
+ "modeled_change_pp": {
+  "all": 0.21721739584736888,
+  "under_18": 0.8566385113314237,
+  "age_65_plus": -0.5216613377536845
+ },
+ "senior_deduction_contribution_pp": {
+  "all": -0.0022426948045932704,
+  "under_18": 0.0,
+  "age_65_plus": -0.012468776987569541
+ },
+ "change_without_senior_deduction_pp": {
+  "all": 0.21946009065196215,
+  "under_18": 0.8566385113314237,
+  "age_65_plus": -0.509192560766115
+ },
+ "people_lifted_by_senior_deduction_thousands": {
+  "all": 7.697710648536682,
+  "under_18": 0.0,
+  "age_65_plus": 7.697710648536682
+ },
+ "people_pushed_in_by_removing_it_check_thousands": {
+  "all": 0.0,
+  "under_18": 0.0,
+  "age_65_plus": 0.0
+ },
+ "seniors_2025": {
+  "share_in_tax_unit_with_positive_senior_deduction_pct": 86.5940595186854,
+  "share_with_income_tax_cut_by_deduction_pct": 44.23877249947762,
+  "share_with_income_tax_cut_among_below_125pct_threshold_pct": 8.086502702330431,
+  "mean_income_tax_cut_usd_among_seniors": 500.9824513104025,
+  "mean_income_tax_cut_usd_among_seniors_below_125pct_threshold": 41.069089776238094
+ },
+ "anchored_2025_forecasts_pct": {
+  "all": {
+   "additive": 13.217217395847369,
+   "multiplicative": 13.216914646419687,
+   "level_anchored_threshold_scale": {
+    "k_solved_on_2024": 0.9993317723274231,
+    "check_2024": 12.991171028118787,
+    "forecast_2025": 13.229332696567015
+   },
+   "registered_2026_09_11": 13.2
+  },
+  "under_18": {
+   "additive": 14.256638511331424,
+   "multiplicative": 14.130672674989068,
+   "level_anchored_threshold_scale": {
+    "k_solved_on_2024": 0.9465242624282837,
+    "check_2024": 13.394578703361743,
+    "forecast_2025": 14.013074513739982
+   },
+   "registered_2026_09_11": 14.3
+  },
+  "age_65_plus": {
+   "additive": 14.578338662246315,
+   "multiplicative": 14.410473484395233,
+   "level_anchored_threshold_scale": {
+    "k_solved_on_2024": 1.211077332496643,
+    "check_2024": 15.077900968476074,
+    "forecast_2025": 14.507281944257386
+   },
+   "registered_2026_09_11": 14.6
+  },
+  "single_k_from_all_people": {
+   "k": 0.9993317723274231,
+   "2024_check": {
+    "all": 12.991171028118787,
+    "under_18": 15.642854365135547,
+    "age_65_plus": 11.395673342642782
+   },
+   "2025_forecast": {
+    "all": 13.229332696567015,
+    "under_18": 16.557985962928782,
+    "age_65_plus": 10.902244809164884
+   }
+  }
+ },
+ "meta": {
+  "2024_baseline": {
+   "year": 2024,
+   "variant": "baseline",
+   "dataset": "hf://datasets/policyengine/populace-us/populace_us_2024.h5@populace-us-2024-spm-20260909",
+   "dataset_sha256": "6496cc4393d4d3c6574f76eca231de5898c803b9067645591fd5c4d3e65aee84",
+   "reform": null,
+   "load_seconds": 2.6,
+   "calc_seconds": 247.4,
+   "peak_rss_gb": 46.36,
+   "rates_pct": {
+    "all": 13.018144199226892,
+    "under_18": 15.710120885542652,
+    "age_65_plus": 11.423906146918569
+   },
+   "weighted_people_millions": 340.077
+  },
+  "2025_baseline": {
+   "year": 2025,
+   "variant": "baseline",
+   "dataset": "hf://datasets/policyengine/populace-us/populace_us_2024.h5@populace-us-2024-spm-20260909",
+   "dataset_sha256": "6496cc4393d4d3c6574f76eca231de5898c803b9067645591fd5c4d3e65aee84",
+   "reform": null,
+   "load_seconds": 2.3,
+   "calc_seconds": 248.1,
+   "peak_rss_gb": 35.53,
+   "rates_pct": {
+    "all": 13.235361595074261,
+    "under_18": 16.566759396874076,
+    "age_65_plus": 10.902244809164884
+   },
+   "weighted_people_millions": 343.235
+  },
+  "2025_no_senior_deduction": {
+   "year": 2025,
+   "variant": "no_senior_deduction",
+   "dataset": "hf://datasets/policyengine/populace-us/populace_us_2024.h5@populace-us-2024-spm-20260909",
+   "dataset_sha256": "6496cc4393d4d3c6574f76eca231de5898c803b9067645591fd5c4d3e65aee84",
+   "reform": {
+    "gov.irs.deductions.senior_deduction.amount": 0
+   },
+   "load_seconds": 12.2,
+   "calc_seconds": 246.2,
+   "peak_rss_gb": 58.47,
+   "rates_pct": {
+    "all": 13.237604289878854,
+    "under_18": 16.566759396874076,
+    "age_65_plus": 10.914713586152454
+   },
+   "weighted_people_millions": 343.235
+  }
+ }
+}

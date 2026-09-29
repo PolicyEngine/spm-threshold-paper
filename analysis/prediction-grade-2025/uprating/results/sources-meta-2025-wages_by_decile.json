@@ -1,0 +1,32 @@
+{
+ "year": 2025,
+ "variant": "wages_by_decile",
+ "dataset": "hf://datasets/policyengine/populace-us/populace_us_2024.h5@populace-us-2024-spm-20260909",
+ "dataset_sha256": "6496cc4393d4d3c6574f76eca231de5898c803b9067645591fd5c4d3e65aee84",
+ "spm_pct": {
+  "all": 13.258690637923232,
+  "under_18": 16.56528338509121,
+  "age_18_64": 12.717611382588254,
+  "age_65_plus": 10.902244809164884
+ },
+ "overrides": {
+  "employment_income_before_lsr": {
+   "decile_growth_pct": [
+    4.85,
+    4.62,
+    4.43,
+    5.11,
+    4.43,
+    4.61,
+    4.26,
+    4.12,
+    4.65,
+    5.31
+   ],
+   "before_2025_total": 11370729680284.031,
+   "after_2025_total": 11357892583769.564
+  }
+ },
+ "calc_seconds": 251.3,
+ "peak_rss_gb": 40.09
+}

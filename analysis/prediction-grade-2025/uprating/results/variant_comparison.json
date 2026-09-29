@@ -1,0 +1,218 @@
+{
+ "census_change_pp": {
+  "all": 0.07,
+  "under_18": -0.06,
+  "age_65_plus": 0.24
+ },
+ "registered_change_pp": {
+  "all": 0.22,
+  "under_18": 0.86,
+  "age_65_plus": -0.52
+ },
+ "rate_2024_pct": {
+  "all": 13.018144199226892,
+  "under_18": 15.710120885542652,
+  "age_18_64": 12.479576548947371,
+  "age_65_plus": 11.423906146918569
+ },
+ "variants": {
+  "baseline": {
+   "rate_2025_pct": {
+    "all": 13.235,
+    "under_18": 16.567,
+    "age_18_64": 12.678,
+    "age_65_plus": 10.902
+   },
+   "change_pp": {
+    "all": 0.217,
+    "under_18": 0.857,
+    "age_65_plus": -0.522
+   },
+   "miss_pp": {
+    "all": 0.147,
+    "under_18": 0.917,
+    "age_65_plus": -0.762
+   }
+  },
+  "ss_cola": {
+   "rate_2025_pct": {
+    "all": 13.421,
+    "under_18": 16.642,
+    "age_18_64": 12.801,
+    "age_65_plus": 11.434
+   },
+   "change_pp": {
+    "all": 0.403,
+    "under_18": 0.932,
+    "age_65_plus": 0.01
+   },
+   "miss_pp": {
+    "all": 0.333,
+    "under_18": 0.992,
+    "age_65_plus": -0.23
+   }
+  },
+  "ss_cola_pension_cpi": {
+   "rate_2025_pct": {
+    "all": 13.492,
+    "under_18": 16.689,
+    "age_18_64": 12.841,
+    "age_65_plus": 11.638
+   },
+   "change_pp": {
+    "all": 0.474,
+    "under_18": 0.979,
+    "age_65_plus": 0.214
+   },
+   "miss_pp": {
+    "all": 0.404,
+    "under_18": 1.039,
+    "age_65_plus": -0.026
+   }
+  },
+  "wages_by_decile": {
+   "rate_2025_pct": {
+    "all": 13.259,
+    "under_18": 16.565,
+    "age_18_64": 12.718,
+    "age_65_plus": 10.902
+   },
+   "change_pp": {
+    "all": 0.241,
+    "under_18": 0.855,
+    "age_65_plus": -0.522
+   },
+   "miss_pp": {
+    "all": 0.171,
+    "under_18": 0.915,
+    "age_65_plus": -0.762
+   }
+  },
+  "se_like_wages": {
+   "rate_2025_pct": {
+    "all": 13.025,
+    "under_18": 16.183,
+    "age_18_64": 12.492,
+    "age_65_plus": 10.831
+   },
+   "change_pp": {
+    "all": 0.007,
+    "under_18": 0.472,
+    "age_65_plus": -0.593
+   },
+   "miss_pp": {
+    "all": -0.063,
+    "under_18": 0.532,
+    "age_65_plus": -0.833
+   }
+  },
+  "all_three": {
+   "rate_2025_pct": {
+    "all": 13.27,
+    "under_18": 16.282,
+    "age_18_64": 12.642,
+    "age_65_plus": 11.572
+   },
+   "change_pp": {
+    "all": 0.252,
+    "under_18": 0.572,
+    "age_65_plus": 0.148
+   },
+   "miss_pp": {
+    "all": 0.182,
+    "under_18": 0.632,
+    "age_65_plus": -0.092
+   }
+  },
+  "wages_by_family_decile": {
+   "rate_2025_pct": {
+    "all": 13.112,
+    "under_18": 16.424,
+    "age_18_64": 12.547,
+    "age_65_plus": 10.83
+   },
+   "change_pp": {
+    "all": 0.094,
+    "under_18": 0.714,
+    "age_65_plus": -0.594
+   },
+   "miss_pp": {
+    "all": 0.024,
+    "under_18": 0.774,
+    "age_65_plus": -0.834
+   }
+  },
+  "all_three_cpi_avg": {
+   "rate_2025_pct": {
+    "all": 13.27,
+    "under_18": 16.282,
+    "age_18_64": 12.642,
+    "age_65_plus": 11.572
+   },
+   "change_pp": {
+    "all": 0.252,
+    "under_18": 0.572,
+    "age_65_plus": 0.148
+   },
+   "miss_pp": {
+    "all": 0.182,
+    "under_18": 0.632,
+    "age_65_plus": -0.092
+   }
+  },
+  "all_three_ss_survey": {
+   "rate_2025_pct": {
+    "all": 13.215,
+    "under_18": 16.266,
+    "age_18_64": 12.584,
+    "age_65_plus": 11.476
+   },
+   "change_pp": {
+    "all": 0.197,
+    "under_18": 0.556,
+    "age_65_plus": 0.052
+   },
+   "miss_pp": {
+    "all": 0.127,
+    "under_18": 0.616,
+    "age_65_plus": -0.188
+   }
+  },
+  "all_three_ss_66plus": {
+   "rate_2025_pct": {
+    "all": 13.191,
+    "under_18": 16.243,
+    "age_18_64": 12.576,
+    "age_65_plus": 11.4
+   },
+   "change_pp": {
+    "all": 0.173,
+    "under_18": 0.533,
+    "age_65_plus": -0.024
+   },
+   "miss_pp": {
+    "all": 0.103,
+    "under_18": 0.593,
+    "age_65_plus": -0.264
+   }
+  },
+  "all_four": {
+   "rate_2025_pct": {
+    "all": 13.114,
+    "under_18": 16.134,
+    "age_18_64": 12.464,
+    "age_65_plus": 11.479
+   },
+   "change_pp": {
+    "all": 0.096,
+    "under_18": 0.424,
+    "age_65_plus": 0.055
+   },
+   "miss_pp": {
+    "all": 0.026,
+    "under_18": 0.484,
+    "age_65_plus": -0.185
+   }
+  }
+ }
+}

@@ -1,0 +1,263 @@
+{
+ "census": {
+  "all": {
+   "change": 0.07,
+   "threshold": 0.8,
+   "resources": -0.73
+  },
+  "under_18": {
+   "change": -0.06,
+   "threshold": 1.09,
+   "resources": -1.15
+  },
+  "age_65_plus": {
+   "change": 0.24,
+   "threshold": 0.71,
+   "resources": -0.47
+  }
+ },
+ "variants": {
+  "baseline": {
+   "all": {
+    "change": 0.217,
+    "threshold": 0.704,
+    "resources": -0.487
+   },
+   "under_18": {
+    "change": 0.857,
+    "threshold": 1.399,
+    "resources": -0.542
+   },
+   "age_18_64": {
+    "change": 0.198,
+    "threshold": 0.573,
+    "resources": -0.375
+   },
+   "age_65_plus": {
+    "change": -0.522,
+    "threshold": 0.267,
+    "resources": -0.789
+   }
+  },
+  "ss_cola": {
+   "all": {
+    "change": 0.403,
+    "threshold": 0.722,
+    "resources": -0.319
+   },
+   "under_18": {
+    "change": 0.932,
+    "threshold": 1.337,
+    "resources": -0.405
+   },
+   "age_18_64": {
+    "change": 0.322,
+    "threshold": 0.614,
+    "resources": -0.292
+   },
+   "age_65_plus": {
+    "change": 0.01,
+    "threshold": 0.308,
+    "resources": -0.299
+   }
+  },
+  "ss_cola_pension_cpi": {
+   "all": {
+    "change": 0.474,
+    "threshold": 0.749,
+    "resources": -0.274
+   },
+   "under_18": {
+    "change": 0.979,
+    "threshold": 1.369,
+    "resources": -0.39
+   },
+   "age_18_64": {
+    "change": 0.362,
+    "threshold": 0.626,
+    "resources": -0.264
+   },
+   "age_65_plus": {
+    "change": 0.214,
+    "threshold": 0.378,
+    "resources": -0.164
+   }
+  },
+  "wages_by_decile": {
+   "all": {
+    "change": 0.241,
+    "threshold": 0.697,
+    "resources": -0.457
+   },
+   "under_18": {
+    "change": 0.855,
+    "threshold": 1.38,
+    "resources": -0.524
+   },
+   "age_18_64": {
+    "change": 0.238,
+    "threshold": 0.569,
+    "resources": -0.331
+   },
+   "age_65_plus": {
+    "change": -0.522,
+    "threshold": 0.267,
+    "resources": -0.789
+   }
+  },
+  "se_like_wages": {
+   "all": {
+    "change": 0.007,
+    "threshold": 0.71,
+    "resources": -0.703
+   },
+   "under_18": {
+    "change": 0.472,
+    "threshold": 1.231,
+    "resources": -0.758
+   },
+   "age_18_64": {
+    "change": 0.012,
+    "threshold": 0.631,
+    "resources": -0.619
+   },
+   "age_65_plus": {
+    "change": -0.593,
+    "threshold": 0.32,
+    "resources": -0.913
+   }
+  },
+  "all_three": {
+   "all": {
+    "change": 0.252,
+    "threshold": 0.71,
+    "resources": -0.458
+   },
+   "under_18": {
+    "change": 0.572,
+    "threshold": 1.164,
+    "resources": -0.592
+   },
+   "age_18_64": {
+    "change": 0.162,
+    "threshold": 0.636,
+    "resources": -0.474
+   },
+   "age_65_plus": {
+    "change": 0.148,
+    "threshold": 0.383,
+    "resources": -0.235
+   }
+  },
+  "wages_by_family_decile": {
+   "all": {
+    "change": 0.094,
+    "threshold": 0.753,
+    "resources": -0.658
+   },
+   "under_18": {
+    "change": 0.714,
+    "threshold": 1.515,
+    "resources": -0.801
+   },
+   "age_18_64": {
+    "change": 0.067,
+    "threshold": 0.612,
+    "resources": -0.545
+   },
+   "age_65_plus": {
+    "change": -0.594,
+    "threshold": 0.26,
+    "resources": -0.854
+   }
+  },
+  "all_three_cpi_avg": {
+   "all": {
+    "change": 0.252,
+    "threshold": 0.71,
+    "resources": -0.458
+   },
+   "under_18": {
+    "change": 0.572,
+    "threshold": 1.164,
+    "resources": -0.592
+   },
+   "age_18_64": {
+    "change": 0.162,
+    "threshold": 0.636,
+    "resources": -0.474
+   },
+   "age_65_plus": {
+    "change": 0.148,
+    "threshold": 0.383,
+    "resources": -0.235
+   }
+  },
+  "all_three_ss_survey": {
+   "all": {
+    "change": 0.197,
+    "threshold": 0.679,
+    "resources": -0.482
+   },
+   "under_18": {
+    "change": 0.556,
+    "threshold": 1.148,
+    "resources": -0.592
+   },
+   "age_18_64": {
+    "change": 0.104,
+    "threshold": 0.588,
+    "resources": -0.484
+   },
+   "age_65_plus": {
+    "change": 0.052,
+    "threshold": 0.392,
+    "resources": -0.34
+   }
+  },
+  "all_three_ss_66plus": {
+   "all": {
+    "change": 0.173,
+    "threshold": 0.677,
+    "resources": -0.504
+   },
+   "under_18": {
+    "change": 0.533,
+    "threshold": 1.129,
+    "resources": -0.595
+   },
+   "age_18_64": {
+    "change": 0.097,
+    "threshold": 0.587,
+    "resources": -0.491
+   },
+   "age_65_plus": {
+    "change": -0.024,
+    "threshold": 0.409,
+    "resources": -0.433
+   }
+  },
+  "all_four": {
+   "all": {
+    "change": 0.096,
+    "threshold": 0.742,
+    "resources": -0.646
+   },
+   "under_18": {
+    "change": 0.424,
+    "threshold": 1.357,
+    "resources": -0.932
+   },
+   "age_18_64": {
+    "change": -0.016,
+    "threshold": 0.629,
+    "resources": -0.645
+   },
+   "age_65_plus": {
+    "change": 0.055,
+    "threshold": 0.346,
+    "resources": -0.291
+   }
+  }
+ }
+}
