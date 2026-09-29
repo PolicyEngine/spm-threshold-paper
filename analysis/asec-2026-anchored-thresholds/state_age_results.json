@@ -1,0 +1,607 @@
+{
+ "method": "2026 CPS ASEC public-use person file; person weight MARSUPWT/100 (= PWWGT0, the replicate base weight); anchoring scales SPM_POVTHRESHOLD by tenure so the national 2A2K base = corrected 2024 BLS value x (32,649/31,812); SEs from the 160 ASEC replicate weights, variance = 4/160 x sum of squared replicate deviations",
+ "by_age": {
+  "all": {
+   "published": 13.11,
+   "published_se": 0.19,
+   "anchored": 12.31,
+   "anchored_se": 0.18,
+   "effect_pp": 0.8,
+   "effect_se": 0.05,
+   "n_persons": 134729,
+   "weighted_persons_thousands": 338555.0
+  },
+  "age_0_3": {
+   "published": 14.13,
+   "published_se": 0.57,
+   "anchored": 12.9,
+   "anchored_se": 0.56,
+   "effect_pp": 1.23,
+   "effect_se": 0.2,
+   "n_persons": 5611,
+   "weighted_persons_thousands": 14671.0
+  },
+  "age_0_4": {
+   "published": 13.94,
+   "published_se": 0.55,
+   "anchored": 12.66,
+   "anchored_se": 0.53,
+   "effect_pp": 1.28,
+   "effect_se": 0.19,
+   "n_persons": 7259,
+   "weighted_persons_thousands": 18482.0
+  },
+  "under_6": {
+   "published": 14.15,
+   "published_se": 0.52,
+   "anchored": 12.94,
+   "anchored_se": 0.51,
+   "effect_pp": 1.2,
+   "effect_se": 0.17,
+   "n_persons": 8881,
+   "weighted_persons_thousands": 22154.0
+  },
+  "under_18": {
+   "published": 13.39,
+   "published_se": 0.34,
+   "anchored": 12.31,
+   "anchored_se": 0.32,
+   "effect_pp": 1.09,
+   "effect_se": 0.11,
+   "n_persons": 31444,
+   "weighted_persons_thousands": 72083.0
+  },
+  "age_6_17": {
+   "published": 13.06,
+   "published_se": 0.39,
+   "anchored": 12.02,
+   "anchored_se": 0.36,
+   "effect_pp": 1.03,
+   "effect_se": 0.12,
+   "n_persons": 22563,
+   "weighted_persons_thousands": 49929.0
+  },
+  "age_18_64": {
+   "published": 12.28,
+   "published_se": 0.2,
+   "anchored": 11.55,
+   "anchored_se": 0.19,
+   "effect_pp": 0.73,
+   "effect_se": 0.05,
+   "n_persons": 77083,
+   "weighted_persons_thousands": 201265.0
+  },
+  "age_65_plus": {
+   "published": 15.38,
+   "published_se": 0.32,
+   "anchored": 14.66,
+   "anchored_se": 0.32,
+   "effect_pp": 0.72,
+   "effect_se": 0.06,
+   "n_persons": 26202,
+   "weighted_persons_thousands": 65208.0
+  },
+  "age_75_plus": {
+   "published": 16.57,
+   "published_se": 0.47,
+   "anchored": 15.82,
+   "anchored_se": 0.47,
+   "effect_pp": 0.75,
+   "effect_se": 0.1,
+   "n_persons": 11182,
+   "weighted_persons_thousands": 28184.0
+  }
+ },
+ "by_state": {
+  "AL": {
+   "published": 15.75,
+   "published_se": 1.14,
+   "anchored": 14.04,
+   "anchored_se": 1.19,
+   "effect_pp": 1.71,
+   "effect_se": 0.52,
+   "n_persons": 2334,
+   "weighted_persons_thousands": 5079.0
+  },
+  "AK": {
+   "published": 10.37,
+   "published_se": 1.22,
+   "anchored": 10.02,
+   "anchored_se": 1.18,
+   "effect_pp": 0.35,
+   "effect_se": 0.34,
+   "n_persons": 1648,
+   "weighted_persons_thousands": 708.0
+  },
+  "AZ": {
+   "published": 14.78,
+   "published_se": 1.62,
+   "anchored": 13.41,
+   "anchored_se": 1.47,
+   "effect_pp": 1.36,
+   "effect_se": 0.51,
+   "n_persons": 2279,
+   "weighted_persons_thousands": 7666.0
+  },
+  "AR": {
+   "published": 12.67,
+   "published_se": 1.42,
+   "anchored": 11.87,
+   "anchored_se": 1.4,
+   "effect_pp": 0.8,
+   "effect_se": 0.33,
+   "n_persons": 2196,
+   "weighted_persons_thousands": 3073.0
+  },
+  "CA": {
+   "published": 17.29,
+   "published_se": 0.66,
+   "anchored": 16.22,
+   "anchored_se": 0.63,
+   "effect_pp": 1.08,
+   "effect_se": 0.2,
+   "n_persons": 13025,
+   "weighted_persons_thousands": 38913.0
+  },
+  "CO": {
+   "published": 11.36,
+   "published_se": 2.17,
+   "anchored": 10.9,
+   "anchored_se": 2.26,
+   "effect_pp": 0.46,
+   "effect_se": 0.29,
+   "n_persons": 1665,
+   "weighted_persons_thousands": 5950.0
+  },
+  "CT": {
+   "published": 10.56,
+   "published_se": 1.32,
+   "anchored": 9.75,
+   "anchored_se": 1.27,
+   "effect_pp": 0.81,
+   "effect_se": 0.31,
+   "n_persons": 1376,
+   "weighted_persons_thousands": 3651.0
+  },
+  "DE": {
+   "published": 7.51,
+   "published_se": 1.15,
+   "anchored": 6.14,
+   "anchored_se": 0.98,
+   "effect_pp": 1.37,
+   "effect_se": 0.72,
+   "n_persons": 1471,
+   "weighted_persons_thousands": 1066.0
+  },
+  "DC": {
+   "published": 16.76,
+   "published_se": 1.4,
+   "anchored": 15.65,
+   "anchored_se": 1.43,
+   "effect_pp": 1.12,
+   "effect_se": 0.46,
+   "n_persons": 1919,
+   "weighted_persons_thousands": 691.0
+  },
+  "FL": {
+   "published": 17.56,
+   "published_se": 0.91,
+   "anchored": 16.55,
+   "anchored_se": 0.89,
+   "effect_pp": 1.01,
+   "effect_se": 0.17,
+   "n_persons": 6342,
+   "weighted_persons_thousands": 23261.0
+  },
+  "GA": {
+   "published": 13.85,
+   "published_se": 1.11,
+   "anchored": 13.11,
+   "anchored_se": 1.04,
+   "effect_pp": 0.74,
+   "effect_se": 0.27,
+   "n_persons": 2881,
+   "weighted_persons_thousands": 11164.0
+  },
+  "HI": {
+   "published": 12.5,
+   "published_se": 1.29,
+   "anchored": 11.36,
+   "anchored_se": 1.2,
+   "effect_pp": 1.14,
+   "effect_se": 0.43,
+   "n_persons": 2427,
+   "weighted_persons_thousands": 1388.0
+  },
+  "ID": {
+   "published": 9.47,
+   "published_se": 0.9,
+   "anchored": 8.89,
+   "anchored_se": 0.85,
+   "effect_pp": 0.58,
+   "effect_se": 0.3,
+   "n_persons": 2366,
+   "weighted_persons_thousands": 1995.0
+  },
+  "IL": {
+   "published": 11.38,
+   "published_se": 1.03,
+   "anchored": 10.78,
+   "anchored_se": 1.01,
+   "effect_pp": 0.61,
+   "effect_se": 0.25,
+   "n_persons": 3297,
+   "weighted_persons_thousands": 12607.0
+  },
+  "IN": {
+   "published": 11.78,
+   "published_se": 1.29,
+   "anchored": 10.4,
+   "anchored_se": 1.28,
+   "effect_pp": 1.38,
+   "effect_se": 0.67,
+   "n_persons": 2024,
+   "weighted_persons_thousands": 6893.0
+  },
+  "IA": {
+   "published": 9.55,
+   "published_se": 1.11,
+   "anchored": 8.48,
+   "anchored_se": 1.09,
+   "effect_pp": 1.07,
+   "effect_se": 0.47,
+   "n_persons": 1634,
+   "weighted_persons_thousands": 3240.0
+  },
+  "KS": {
+   "published": 7.53,
+   "published_se": 1.12,
+   "anchored": 7.45,
+   "anchored_se": 1.11,
+   "effect_pp": 0.08,
+   "effect_se": 0.08,
+   "n_persons": 1678,
+   "weighted_persons_thousands": 2909.0
+  },
+  "KY": {
+   "published": 10.63,
+   "published_se": 1.29,
+   "anchored": 10.0,
+   "anchored_se": 1.26,
+   "effect_pp": 0.63,
+   "effect_se": 0.32,
+   "n_persons": 1461,
+   "weighted_persons_thousands": 4550.0
+  },
+  "LA": {
+   "published": 17.85,
+   "published_se": 1.01,
+   "anchored": 16.72,
+   "anchored_se": 0.92,
+   "effect_pp": 1.13,
+   "effect_se": 0.37,
+   "n_persons": 2869,
+   "weighted_persons_thousands": 4545.0
+  },
+  "ME": {
+   "published": 5.76,
+   "published_se": 1.12,
+   "anchored": 5.69,
+   "anchored_se": 1.13,
+   "effect_pp": 0.07,
+   "effect_se": 0.07,
+   "n_persons": 1061,
+   "weighted_persons_thousands": 1408.0
+  },
+  "MD": {
+   "published": 10.51,
+   "published_se": 1.46,
+   "anchored": 9.96,
+   "anchored_se": 1.38,
+   "effect_pp": 0.55,
+   "effect_se": 0.32,
+   "n_persons": 1724,
+   "weighted_persons_thousands": 6188.0
+  },
+  "MA": {
+   "published": 13.26,
+   "published_se": 1.08,
+   "anchored": 12.43,
+   "anchored_se": 1.04,
+   "effect_pp": 0.83,
+   "effect_se": 0.27,
+   "n_persons": 2732,
+   "weighted_persons_thousands": 7032.0
+  },
+  "MI": {
+   "published": 10.86,
+   "published_se": 1.04,
+   "anchored": 10.42,
+   "anchored_se": 1.03,
+   "effect_pp": 0.44,
+   "effect_se": 0.22,
+   "n_persons": 2517,
+   "weighted_persons_thousands": 10006.0
+  },
+  "MN": {
+   "published": 7.78,
+   "published_se": 1.4,
+   "anchored": 7.63,
+   "anchored_se": 1.42,
+   "effect_pp": 0.15,
+   "effect_se": 0.1,
+   "n_persons": 1694,
+   "weighted_persons_thousands": 5772.0
+  },
+  "MS": {
+   "published": 18.26,
+   "published_se": 1.77,
+   "anchored": 17.56,
+   "anchored_se": 1.73,
+   "effect_pp": 0.7,
+   "effect_se": 0.27,
+   "n_persons": 2446,
+   "weighted_persons_thousands": 2914.0
+  },
+  "MO": {
+   "published": 9.08,
+   "published_se": 1.12,
+   "anchored": 8.11,
+   "anchored_se": 1.08,
+   "effect_pp": 0.97,
+   "effect_se": 0.3,
+   "n_persons": 2010,
+   "weighted_persons_thousands": 6308.0
+  },
+  "MT": {
+   "published": 9.68,
+   "published_se": 1.69,
+   "anchored": 8.21,
+   "anchored_se": 1.3,
+   "effect_pp": 1.47,
+   "effect_se": 0.59,
+   "n_persons": 2006,
+   "weighted_persons_thousands": 1123.0
+  },
+  "NE": {
+   "published": 5.47,
+   "published_se": 0.96,
+   "anchored": 5.47,
+   "anchored_se": 0.96,
+   "effect_pp": 0.0,
+   "effect_se": 0.0,
+   "n_persons": 1885,
+   "weighted_persons_thousands": 2011.0
+  },
+  "NV": {
+   "published": 15.7,
+   "published_se": 1.52,
+   "anchored": 14.49,
+   "anchored_se": 1.51,
+   "effect_pp": 1.21,
+   "effect_se": 0.43,
+   "n_persons": 2116,
+   "weighted_persons_thousands": 3335.0
+  },
+  "NH": {
+   "published": 7.09,
+   "published_se": 1.17,
+   "anchored": 6.09,
+   "anchored_se": 0.99,
+   "effect_pp": 1.0,
+   "effect_se": 0.53,
+   "n_persons": 1608,
+   "weighted_persons_thousands": 1407.0
+  },
+  "NJ": {
+   "published": 11.53,
+   "published_se": 1.07,
+   "anchored": 10.95,
+   "anchored_se": 1.03,
+   "effect_pp": 0.58,
+   "effect_se": 0.23,
+   "n_persons": 2868,
+   "weighted_persons_thousands": 9488.0
+  },
+  "NM": {
+   "published": 14.95,
+   "published_se": 1.36,
+   "anchored": 14.25,
+   "anchored_se": 1.22,
+   "effect_pp": 0.7,
+   "effect_se": 0.46,
+   "n_persons": 3251,
+   "weighted_persons_thousands": 2103.0
+  },
+  "NY": {
+   "published": 16.42,
+   "published_se": 1.06,
+   "anchored": 14.92,
+   "anchored_se": 1.03,
+   "effect_pp": 1.5,
+   "effect_se": 0.37,
+   "n_persons": 5036,
+   "weighted_persons_thousands": 19683.0
+  },
+  "NC": {
+   "published": 11.69,
+   "published_se": 1.12,
+   "anchored": 11.23,
+   "anchored_se": 1.05,
+   "effect_pp": 0.46,
+   "effect_se": 0.22,
+   "n_persons": 3035,
+   "weighted_persons_thousands": 11050.0
+  },
+  "ND": {
+   "published": 8.86,
+   "published_se": 1.12,
+   "anchored": 8.57,
+   "anchored_se": 1.17,
+   "effect_pp": 0.29,
+   "effect_se": 0.17,
+   "n_persons": 1980,
+   "weighted_persons_thousands": 780.0
+  },
+  "OH": {
+   "published": 10.05,
+   "published_se": 1.24,
+   "anchored": 9.56,
+   "anchored_se": 1.24,
+   "effect_pp": 0.48,
+   "effect_se": 0.33,
+   "n_persons": 2952,
+   "weighted_persons_thousands": 11974.0
+  },
+  "OK": {
+   "published": 11.96,
+   "published_se": 1.35,
+   "anchored": 11.36,
+   "anchored_se": 1.32,
+   "effect_pp": 0.6,
+   "effect_se": 0.33,
+   "n_persons": 2090,
+   "weighted_persons_thousands": 4070.0
+  },
+  "OR": {
+   "published": 9.93,
+   "published_se": 1.02,
+   "anchored": 9.52,
+   "anchored_se": 0.98,
+   "effect_pp": 0.41,
+   "effect_se": 0.19,
+   "n_persons": 2241,
+   "weighted_persons_thousands": 4234.0
+  },
+  "PA": {
+   "published": 9.83,
+   "published_se": 0.9,
+   "anchored": 9.53,
+   "anchored_se": 0.89,
+   "effect_pp": 0.31,
+   "effect_se": 0.15,
+   "n_persons": 3367,
+   "weighted_persons_thousands": 12893.0
+  },
+  "RI": {
+   "published": 11.34,
+   "published_se": 1.45,
+   "anchored": 10.47,
+   "anchored_se": 1.38,
+   "effect_pp": 0.87,
+   "effect_se": 0.47,
+   "n_persons": 1196,
+   "weighted_persons_thousands": 1110.0
+  },
+  "SC": {
+   "published": 11.07,
+   "published_se": 1.29,
+   "anchored": 10.27,
+   "anchored_se": 1.22,
+   "effect_pp": 0.8,
+   "effect_se": 0.34,
+   "n_persons": 2302,
+   "weighted_persons_thousands": 5592.0
+  },
+  "SD": {
+   "published": 8.78,
+   "published_se": 1.25,
+   "anchored": 8.39,
+   "anchored_se": 1.15,
+   "effect_pp": 0.39,
+   "effect_se": 0.33,
+   "n_persons": 1455,
+   "weighted_persons_thousands": 913.0
+  },
+  "TN": {
+   "published": 12.41,
+   "published_se": 1.13,
+   "anchored": 11.66,
+   "anchored_se": 1.09,
+   "effect_pp": 0.75,
+   "effect_se": 0.27,
+   "n_persons": 2368,
+   "weighted_persons_thousands": 7196.0
+  },
+  "TX": {
+   "published": 15.27,
+   "published_se": 0.74,
+   "anchored": 14.25,
+   "anchored_se": 0.71,
+   "effect_pp": 1.02,
+   "effect_se": 0.22,
+   "n_persons": 8575,
+   "weighted_persons_thousands": 31542.0
+  },
+  "UT": {
+   "published": 10.35,
+   "published_se": 1.04,
+   "anchored": 10.03,
+   "anchored_se": 1.04,
+   "effect_pp": 0.31,
+   "effect_se": 0.13,
+   "n_persons": 2469,
+   "weighted_persons_thousands": 3510.0
+  },
+  "VT": {
+   "published": 9.08,
+   "published_se": 1.14,
+   "anchored": 8.76,
+   "anchored_se": 1.11,
+   "effect_pp": 0.32,
+   "effect_se": 0.2,
+   "n_persons": 1544,
+   "weighted_persons_thousands": 633.0
+  },
+  "VA": {
+   "published": 10.85,
+   "published_se": 1.19,
+   "anchored": 10.6,
+   "anchored_se": 1.17,
+   "effect_pp": 0.24,
+   "effect_se": 0.12,
+   "n_persons": 2380,
+   "weighted_persons_thousands": 8726.0
+  },
+  "WA": {
+   "published": 9.85,
+   "published_se": 0.96,
+   "anchored": 9.71,
+   "anchored_se": 0.94,
+   "effect_pp": 0.14,
+   "effect_se": 0.13,
+   "n_persons": 2752,
+   "weighted_persons_thousands": 7975.0
+  },
+  "WV": {
+   "published": 12.23,
+   "published_se": 1.35,
+   "anchored": 11.15,
+   "anchored_se": 1.19,
+   "effect_pp": 1.08,
+   "effect_se": 0.4,
+   "n_persons": 2547,
+   "weighted_persons_thousands": 1737.0
+  },
+  "WI": {
+   "published": 7.81,
+   "published_se": 1.07,
+   "anchored": 7.6,
+   "anchored_se": 1.12,
+   "effect_pp": 0.21,
+   "effect_se": 0.17,
+   "n_persons": 1754,
+   "weighted_persons_thousands": 5923.0
+  },
+  "WY": {
+   "published": 9.5,
+   "published_se": 1.08,
+   "anchored": 9.07,
+   "anchored_se": 1.07,
+   "effect_pp": 0.43,
+   "effect_se": 0.27,
+   "n_persons": 1876,
+   "weighted_persons_thousands": 568.0
+  }
+ }
+}
