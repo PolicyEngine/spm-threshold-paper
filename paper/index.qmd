@@ -314,7 +314,8 @@ of the five recipients nearest it in predicted value. Households report
 their LIHEAP amounts, and Census assigns broadband subsidy values from Federal
 Communications Commission data for 2021 onward [@spmtechnical].
 
-We value school lunches as Census does. For reference years from 2018,
+We value school lunches as Census does, since BLS uses the values it
+receives from Census staff [@blsspmhome]. For reference years from 2018,
 when the public files include Census's values, each imputed participant
 receives the value Census assigns a participating CPS ASEC household in
 its cell. Cells match on state, SNAP receipt, income group, and number
@@ -323,9 +324,9 @@ aged 5–18. The income groups split at 150 percent of the official poverty line
 widen cells with fewer than five donors step by step to the nation.
 Census applies its pandemic-year methods in those values, and BLS says
 it follows them [@blsspmhome; @spmtechnical]. For earlier years, we use the traditional formula and value each lunch at USDA's
-reimbursement and donated-food rate over 179 school days. We use the free rate below 150
-percent of the poverty line and otherwise the free or reduced-price rate
-with equal probability.
+reimbursement and donated-food rate over 179 school days. Like BLS, we
+use the free rate below 150 percent of the poverty line and otherwise
+the free or reduced-price rate with equal probability.
 
 Each WIC participant receives twelve months of USDA's national average
 monthly food cost. Following Census, we count as participants every
