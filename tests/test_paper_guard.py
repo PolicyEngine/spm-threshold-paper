@@ -4,6 +4,7 @@ import hashlib
 import json
 import math
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -178,6 +179,88 @@ ROLLING_PROSE_MUTATIONS = (
         DISCUSSION_HEADING,
         "Support narrows: 31 areas carry thin-donor warnings in projected years.",
         "rolling thin-donor warnings cover 31",
+    ),
+)
+
+
+INKIND_HEADING = "# Imputing in-kind benefits {#sec-inkind}\n"
+PROJECTION_HEADING = "# Projecting thresholds {#sec-projection}\n"
+INKIND_NAMES = (
+    "ce_inkind_bls_components_2019_2025.json",
+    "ce_inkind_replication_2019_2025.json",
+    "provenance.json",
+)
+
+# Each case drifts one in-kind figure where the paper states it. The lift
+# range also appears in the abstract and the discussion, so the first case
+# fails only because the pin reads the in-kind section itself.
+INKIND_PROSE_MUTATIONS = (
+    ("lift range", "section", r"1\.1(\s+)to(\s+)3\.8", r"1.2\1to\g<2>3.8", "in-kind lift range"),
+    ("abstract lift range", "abstract", r"1\.1(\s+)to(\s+)3\.8", r"1.1\1to\g<2>3.9", "abstract in-kind lift range"),
+    (
+        "swapped stage changes",
+        "section",
+        r"\+0\.06(.*?)\+0\.91",
+        r"+0.91\1+0.06",
+        "stage changes in tenure order",
+    ),
+    (
+        "rental assistance share of the difference",
+        "section",
+        r"\\\$169",
+        r"\\$196",
+        "difference in rises by benefit",
+    ),
+    (
+        "BLS imputed renter points",
+        "section",
+        r"0\.62(\s+)of(\s+)the",
+        r"0.66\1of\2the",
+        "BLS 2024-2025 renter split",
+    ),
+    (
+        "written-definition lower bound",
+        "section",
+        r"1\.51(\s+)percent(\s+)below",
+        r"1.52\1percent\2below",
+        "written-definition range with benefits",
+    ),
+    ("implicate count", "section", r"We draw five implicates", "We draw four implicates", "implicate, matching-neighbor"),
+    (
+        "abstract stage changes",
+        "abstract",
+        r"less(\s+)than(\s+)one(\s+)point",
+        r"less\1than\2half\3a point",
+        "abstract stage changes under one point per tenure",
+    ),
+    (
+        "abstract rental assistance share",
+        "abstract",
+        r"about(\s+)two-thirds",
+        r"about\1three-quarters",
+        "abstract rental assistance share of the difference",
+    ),
+    ("identity tolerance", "section", r"0\.00001", "0.000001", "BLS identity tolerance"),
+    (
+        "evaluation BLS renter growth",
+        "evaluation",
+        r"renter(\s+)growth(\s+)of(\s+)6\.33",
+        r"renter\1growth\2of\g<3>6.38",
+        "evaluation section's BLS growth rates for 2024-2025",
+    ),
+    (
+        "evaluation renter points",
+        "evaluation",
+        r"supply 0\.62 points",
+        "supply 0.72 points",
+        "evaluation section cites BLS's imputed renter points",
+    ),
+    (
+        "appendix commit",
+        "appendix",
+        r"`4778dfab2d109515b6a14e63da63011dd7feb884`",
+        "`4778dfab2d109515b6a14e63da63011dd7feb885`",
+        "appendix names the recorded calculator commits",
     ),
 )
 
@@ -596,6 +679,150 @@ class PaperGuardTests(unittest.TestCase):
         result = self.run_guard()
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("preserved commitment/proof bytes changed", result.stdout)
+
+    def refresh_inkind_manifest(self):
+        lines = [
+            f"{hashlib.sha256((self.repo / 'data/inkind' / name).read_bytes()).hexdigest()}  data/inkind/{name}"
+            for name in INKIND_NAMES
+        ]
+        (self.repo / "data/inkind/SHA256SUMS").write_text("\n".join(lines) + "\n")
+
+    def test_inkind_corruption_fails_before_generators_without_repair(self):
+        (self.repo / "data/inkind/ce_inkind_replication_2019_2025.json").write_text(
+            "invalid in-kind JSON\n"
+        )
+        (self.repo / "scripts/build_inkind_tables.py").write_text(
+            "from pathlib import Path\nPath('GENERATOR_RAN').write_text('wrong')\n"
+        )
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("in-kind input validation", result.stdout)
+        self.assertIn("hash of data/inkind/ce_inkind_replication_2019_2025.json", result.stdout)
+        self.assertIn("generators were not run", result.stdout)
+        self.assertFalse((self.repo / "GENERATOR_RAN").exists())
+
+    def test_inkind_manifest_must_cover_exactly_the_receipts(self):
+        (self.repo / "data/inkind/extra.json").write_text("{}\n")
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("manifest coverage", result.stdout)
+        self.assertIn("generators were not run", result.stdout)
+
+    def reseal_inkind(self, name, receipt):
+        """Write an edited receipt and update every hash that records it, so
+        only the semantic checks can reject the edit."""
+        path = self.repo / "data/inkind" / name
+        path.write_text(json.dumps(receipt))
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        provenance_path = self.repo / "data/inkind/provenance.json"
+        provenance = json.loads(provenance_path.read_text())
+        provenance["artifacts"][f"data/inkind/{name}"]["sha256"] = digest
+        provenance_path.write_text(json.dumps(provenance))
+        self.refresh_inkind_manifest()
+        return digest
+
+    def reseal_inkind_replication(self, replication):
+        """Reseal an edited replication receipt and repoint the component
+        receipt at it."""
+        digest = self.reseal_inkind(INKIND_NAMES[1], replication)
+        components = json.loads((self.repo / "data/inkind" / INKIND_NAMES[0]).read_text())
+        components["inputs"]["replication_receipt"]["sha256"] = digest
+        self.reseal_inkind(INKIND_NAMES[0], components)
+
+    def inkind_replication(self):
+        return json.loads((self.repo / "data/inkind" / INKIND_NAMES[1]).read_text())
+
+    def test_resealed_inkind_receipts_must_agree_with_their_sources(self):
+        replication = self.inkind_replication()
+        replication["results"]["2025"]["without_in_kind"]["renter"] += 1
+        with self.subTest(stage="component receipt still names the old replication"):
+            self.reseal_inkind(INKIND_NAMES[1], replication)
+            result = self.run_guard()
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("component receipt derives from the recorded replication receipt", result.stdout)
+            self.assertIn("generators were not run", result.stdout)
+        with self.subTest(stage="both receipts resealed"):
+            self.reseal_inkind_replication(replication)
+            result = self.run_guard()
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("out-of-pocket threshold 2025 renter", result.stdout)
+            self.assertIn("generators were not run", result.stdout)
+
+    def test_internally_consistent_inkind_edit_fails_the_cross_receipt_check(self):
+        """Shift one threshold with its implicates and lift, so the replication
+        receipt agrees with itself; the component receipt still disagrees."""
+        replication = self.inkind_replication()
+        record = replication["results"]["2025"]
+        for draw in record["with_in_kind_by_implicate"]:
+            draw["renter"] += 5
+        record["with_in_kind"]["renter"] += 5
+        record["in_kind_lift_percent"]["renter"] = 100 * (
+            record["with_in_kind"]["renter"] / record["without_in_kind"]["renter"] - 1
+        )
+        self.reseal_inkind_replication(replication)
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("package run with 2025 renter", result.stdout)
+        self.assertNotIn("implicate mean", result.stdout)
+        self.assertNotIn("in-kind lift 2025", result.stdout)
+        self.assertIn("generators were not run", result.stdout)
+
+    def test_inkind_table_drift_is_detected_without_repair(self):
+        table = self.repo / "paper/tables/inkind_growth.md"
+        table.write_text(table.read_text() + "| unreviewed | row | row | row |\n")
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("generated output drifted: paper/tables/inkind_growth.md", result.stdout)
+
+    def test_inkind_tables_must_be_included_in_article(self):
+        article = self.repo / "paper/index.qmd"
+        article.write_text(
+            article.read_text().replace("{{< include tables/inkind_amounts.md >}}", "")
+        )
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("article tables never included", result.stdout)
+        self.assertIn("inkind_amounts.md", result.stdout)
+
+    def mutate_article(self, where, pattern, replacement):
+        article = self.repo / "paper/index.qmd"
+        text = article.read_text()
+        bounds = {
+            "section": (text.index(INKIND_HEADING), text.index(PROJECTION_HEADING)),
+            "abstract": (0, text.index("# Introduction")),
+            "evaluation": (
+                text.index("## Evaluation against published thresholds"),
+                text.index("## Validation of the price comparator"),
+            ),
+            "appendix": (text.index("# Appendix B: reproducibility"), len(text)),
+        }
+        start, end = bounds[where]
+        body, count = re.subn(pattern, replacement, text[start:end], count=1, flags=re.S)
+        self.assertEqual(count, 1, f"fixture pattern missing: {pattern}")
+        article.write_text(text[:start] + body + text[end:])
+
+    def test_inkind_prose_figures_drift_from_the_receipts(self):
+        for name, where, pattern, replacement, label in INKIND_PROSE_MUTATIONS:
+            with self.subTest(name=name):
+                self.install_article()
+                self.mutate_article(where, pattern, replacement)
+                result = self.run_guard()
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(f"in-kind prose: {label}", result.stdout)
+        self.install_article()
+
+    def test_inkind_pins_reject_a_figure_borrowed_from_another_section(self):
+        cases = (
+            ("rental assistance share", (("\\$169 of the difference", "\\$196 of the difference"),),
+             "difference in rises by benefit", "Rental assistance supplies \\$169 of the difference."),
+            ("renter split", (("supplied 0.62 of the 6.33", "supplied 0.66 of the 6.33"),),
+             "BLS 2024-2025 renter split", "BLS's imputed benefits supplied 0.62 of the 6.33 points."),
+        )
+        for name, edits, label, decoy in cases:
+            with self.subTest(name=name):
+                self.assert_article_mutation_fails(
+                    name, edits, f"in-kind prose: {label}", DISCUSSION_HEADING, decoy
+                )
 
     def edit_article(self, edits, host=None, decoy=None):
         """Apply exact single-occurrence prose edits, optionally restating the

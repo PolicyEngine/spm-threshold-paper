@@ -9,7 +9,10 @@ push to master and every pull request. It fails when:
 (b) any QMD ``{{< include tables/... >}}`` names a table outside that
     allowlist;
 (c) ``data/SHA256SUMS`` does not list exactly the artifacts present in
-    ``data/`` or any listed hash mismatches (an emptied manifest fails);
+    ``data/`` or any listed hash mismatches (an emptied manifest fails),
+    or ``data/inkind`` fails ``inkind_inputs.load_inkind``: its own
+    manifest, provenance, and the receipts' agreement with each other and
+    with the out-of-pocket replication in ``data/current``;
 (d) a figure quoted in the prose no longer matches the artifact it
     derives from. Literals are matched at numeric-token boundaries
     (so ``41,036.34`` does not match ``141,036.34``), spelled-out
@@ -53,6 +56,13 @@ from rolling_inputs import (
     load_rolling_forecast,
 )
 from verify_commitments import verify_commitments
+from inkind_inputs import (
+    BLS_IDENTITY_TOLERANCE_DOLLARS,
+    INKIND_FILES,
+    YEARS,
+    inkind_figures,
+    load_inkind,
+)
 
 REPO = Path(__file__).resolve().parent.parent
 DATA = REPO / "data"
@@ -79,6 +89,9 @@ EXPECTED_TABLES = {
     "current_projection.md",
     "rolling_projection.md",
     "rolling_validation.md",
+    "inkind_growth.md",
+    "inkind_amounts.md",
+    "inkind_levels.md",
 }
 ARCHIVED_TABLES = {
     "correction.md",
@@ -87,7 +100,12 @@ ARCHIVED_TABLES = {
     "evaluation_levels.md",
 }
 ARTICLE_TABLES = EXPECTED_TABLES - ARCHIVED_TABLES
-GENERATORS = ("build_tables.py", "evaluate_nowcast_2025.py", "build_current_tables.py")
+GENERATORS = (
+    "build_tables.py",
+    "evaluate_nowcast_2025.py",
+    "build_current_tables.py",
+    "build_inkind_tables.py",
+)
 
 failures: list[str] = []
 
@@ -252,6 +270,10 @@ try:
     rolling_forecast = load_rolling_forecast(DATA / "current")
 except (OSError, KeyError, TypeError, ValueError) as error:
     failures.append(f"rolling input validation: {error}")
+try:
+    inkind = inkind_figures(load_inkind(DATA / "inkind", DATA / "current"))
+except (OSError, KeyError, TypeError, ValueError, AttributeError, IndexError) as error:
+    failures.append(f"in-kind input validation: {error!r}")
 if failures:
     print("PAPER INPUT CHECK FAILED (generators were not run):")
     for failure in failures:
@@ -1058,11 +1080,244 @@ check(
     ),
 )
 
+# In-kind benefits: every figure the section, abstract, evaluation and
+# discussion quote re-derives from data/inkind through inkind_figures, and
+# each is pinned inside the section that states it.
+INKIND_TEXT = section(
+    "# Imputing in-kind benefits {#sec-inkind}", "# Projecting thresholds {#sec-projection}"
+)
+ABSTRACT = " ".join(QMD.split("# Introduction", 1)[0].split())
+EVALUATION_TEXT = section(
+    "## Evaluation against published thresholds {#sec-evaluation}",
+    "## Validation of the price comparator",
+)
+DISCUSSION_TEXT = section("# Discussion {#sec-discussion}", "# Appendix A: replication benchmark")
+APPENDIX_B_TEXT = section("# Appendix B: reproducibility", "# References")
+inkind_method = json.loads((DATA / "inkind" / "ce_inkind_replication_2019_2025.json").read_text())[
+    "in_kind_methodology"
+]
+inkind_provenance = json.loads((DATA / "inkind" / "provenance.json").read_text())
+
+
+def signed(value: float, digits: int = 2) -> str:
+    """A signed figure as the prose writes it, with a typographic minus."""
+    return f"{value:+.{digits}f}".replace("-", "−")
+
+
+def dollars(value: float) -> str:
+    return f"\\${value:,.0f}"
+
+
+package_run = inkind["runs"]["package"]
+written_run = inkind["runs"]["package_bls_definition"]
+written_index_run = inkind["runs"]["fcsuti_bls_definition"]
+lift_low, lift_high = inkind["in_kind_lift_range"]
+lift_literal = f"{lift_low:.1f} to {lift_high:.1f}"
+gap_low, gap_high = package_run["gap_range"]["with_in_kind"]
+written_without = written_run["gap_range"]["without_in_kind"]
+written_with = written_run["gap_range"]["with_in_kind"]
+internet_low, internet_high = inkind["bls_internet_range"]
+bls_total = inkind["amounts"]["bls"]["imputed_total"]
+our_total = inkind["amounts"]["package"]["imputed_total"]
+rise_low, rise_high = inkind["imputed_total_rise_implicate_range"]
+rise_gap = {
+    name: inkind["pooled_rise"]["bls"][name] - inkind["pooled_rise"]["package"][name]
+    for name in inkind["pooled_rise"]["bls"]
+}
+other_gap = sum(value for name, value in rise_gap.items() if name not in ("rental_assistance", "nslp"))
+rent_growth = inkind["rental_assistance_per_renter_growth"]
+our_rent_growth = sorted((rent_growth["package"], rent_growth["fcsuti"]))
+bls_growth = [inkind["bls"][t]["growth"] for t in TENURES]
+stage_changes = [package_run["growth"][t]["stage_change"] for t in TENURES]
+stage_sds = [package_run["growth"][t]["stage_change_sd"] for t in TENURES]
+deflator = list(inkind["deflator_points"].values())
+written_index_gaps = [written_index_run["growth"][t]["less_bls"] for t in TENURES]
+bls_shares = [inkind["bls"][t]["imputed_share_beyond_cpi_u"] for t in TENURES]
+our_shares = [package_run["growth"][t]["imputed_share_beyond_cpi_u"] for t in TENURES]
+renter = package_run["growth"]["renter"]
+recent = inkind["bls_2024_2025"]["renter"]
+rent_2024, rent_2025 = inkind["bls_rental_assistance_per_renter_2024_2025"]
+inkind_pins = (
+    ("in-kind lift range", has_number(lift_literal, text=INKIND_TEXT)),
+    ("abstract in-kind lift range", has_number(lift_literal, text=ABSTRACT)),
+    ("discussion in-kind lift range", has_number(lift_literal, text=DISCUSSION_TEXT)),
+    (
+        "replication with benefits exceeds BLS in every cell",
+        package_run["cells_above_bls_with_stage"] == len(YEARS) * len(TENURES)
+        and has_number("for every tenure in every year", text=INKIND_TEXT)
+        and has_number(f"{gap_low:.2f} to {gap_high:.2f} percent", text=INKIND_TEXT),
+    ),
+    (
+        "BLS home internet range",
+        has_number(f"{dollars(internet_low)} to {dollars(internet_high)} per unit", text=INKIND_TEXT),
+    ),
+    (
+        "written-definition out-of-pocket range",
+        written_without[1] < 0
+        and has_number(f"trails BLS by {-written_without[1]:.2f} to {-written_without[0]:.2f}", text=INKIND_TEXT),
+    ),
+    (
+        "written-definition range with benefits",
+        written_with[0] < 0 < written_with[1]
+        and has_number(
+            f"{-written_with[0]:.2f} percent below and {written_with[1]:.2f} percent above", text=INKIND_TEXT
+        ),
+    ),
+    (
+        "written-definition mean absolute deviation",
+        has_number(
+            f"{written_run['mean_absolute_gap']['without_in_kind']:.2f} to "
+            f"{written_run['mean_absolute_gap']['with_in_kind']:.2f} percent",
+            text=INKIND_TEXT,
+        ),
+    ),
+    (
+        "BLS and replication imputed totals",
+        has_ordered(
+            [f"{dollars(bls_total[0])} to {dollars(bls_total[1])}", f"{dollars(our_total[0])} to {dollars(our_total[1])}"],
+            window=120,
+            text=INKIND_TEXT,
+        )
+        and bls_total[2] > rise_high,
+    ),
+    ("implicate rise range", has_number(f"{dollars(rise_low)} to {dollars(rise_high)}", text=INKIND_TEXT)),
+    (
+        "difference in rises by benefit",
+        rise_gap["rental_assistance"] > rise_gap["nslp"] > 0 > other_gap
+        and has_ordered(
+            [dollars(rise_gap["rental_assistance"]), dollars(rise_gap["nslp"]), dollars(-other_gap)],
+            window=120,
+            text=INKIND_TEXT,
+        ),
+    ),
+    (
+        "rental assistance per renter growth",
+        has_number(
+            f"rose {rent_growth['bls']:.0f} percent in BLS's band and {our_rent_growth[0]:.0f} to "
+            f"{our_rent_growth[1]:.0f} percent in ours",
+            text=INKIND_TEXT,
+        ),
+    ),
+    (
+        "price and BLS threshold growth",
+        has_ordered(
+            [
+                f"{inkind['cpi_u_growth']:.2f} percent",
+                f"{inkind['fcsuti_price_growth']:.2f} percent",
+                f"{min(bls_growth):.2f} to {max(bls_growth):.2f}",
+            ],
+            window=120,
+            text=INKIND_TEXT,
+        ),
+    ),
+    (
+        "stage changes in tenure order, within about one implicate SD",
+        has_ordered([signed(change) for change in stage_changes], window=120, text=INKIND_TEXT)
+        and all(abs(change) <= 1.1 * sd for change, sd in zip(stage_changes, stage_sds)),
+    ),
+    (
+        "discussion stage-change range",
+        has_number(f"{signed(min(stage_changes))} to {signed(max(stage_changes))} points", text=DISCUSSION_TEXT),
+    ),
+    (
+        "deflator effect exceeds the stage in every tenure",
+        has_number(f"{min(deflator):.1f} to {max(deflator):.1f} points", text=INKIND_TEXT)
+        and all(d > abs(c) for d, c in zip(deflator, stage_changes)),
+    ),
+    (
+        "written definitions with BLS's index come within 0.8 points",
+        max(abs(g) for g in written_index_gaps) < 0.8 and has_number("within 0.8 points", text=INKIND_TEXT),
+    ),
+    (
+        "imputed shares of growth beyond CPI-U",
+        has_ordered([f"{x:.1f}" for x in bls_shares], window=40, text=INKIND_TEXT)
+        and has_ordered([f"{x:.1f}" for x in our_shares], window=40, text=INKIND_TEXT),
+    ),
+    (
+        "renter shortfall with imputed terms removed",
+        has_number(
+            f"from {-renter['less_bls']:.2f} to {-renter['less_bls_without_imputed_terms']:.2f} points",
+            text=INKIND_TEXT,
+        )
+        and renter["less_bls"] < renter["less_bls_without_imputed_terms"] < 0,
+    ),
+    (
+        "BLS 2024-2025 renter split",
+        has_ordered(
+            [f"{recent['imputed_points']:.2f}", f"{recent['growth']:.2f}", f"{recent['rental_assistance_points']:.2f}"],
+            window=120,
+            text=INKIND_TEXT,
+        )
+        and has_number(f"{dollars(rent_2024)} to {dollars(rent_2025)}", text=INKIND_TEXT),
+    ),
+    (
+        "replication 2024-2025 renter growth with and without benefits",
+        has_ordered(
+            [f"{recent['replication_with_stage']:.2f} percent", f"{recent['replication_without_stage']:.2f} percent"],
+            window=60,
+            text=INKIND_TEXT,
+        ),
+    ),
+    (
+        "evaluation section cites BLS's imputed renter points and our change",
+        has_number(f"{recent['imputed_points']:.2f} points", text=EVALUATION_TEXT)
+        and has_number(
+            f"{signed(recent['replication_with_stage'] - recent['replication_without_stage'])} points",
+            text=EVALUATION_TEXT,
+        ),
+    ),
+    (
+        "abstract stage changes under one point per tenure",
+        max(abs(change) for change in stage_changes) < 1
+        and "growth by less than one point per tenure" in ABSTRACT,
+    ),
+    (
+        "abstract rental assistance share of the difference",
+        abs(rise_gap["rental_assistance"] / sum(rise_gap.values()) - 2 / 3) < 0.05
+        and "rental assistance accounts for about two-thirds of the difference" in ABSTRACT,
+    ),
+    (
+        "BLS identity tolerance",
+        has_number(
+            f"within \\${BLS_IDENTITY_TOLERANCE_DOLLARS:.5f} in every year from {YEARS[0]} to {YEARS[-1]}",
+            text=INKIND_TEXT,
+        ),
+    ),
+    (
+        "evaluation section's BLS growth rates for 2024-2025",
+        has_ordered(
+            [
+                f"renter growth of {inkind['bls_2024_2025']['renter']['growth']:.2f} percent",
+                f"{inkind['bls_2024_2025'][TENURES[0]]['growth']:.2f}",
+                f"{inkind['bls_2024_2025'][TENURES[1]]['growth']:.2f} percent",
+            ],
+            window=80,
+            text=EVALUATION_TEXT,
+        ),
+    ),
+    (
+        "implicate, matching-neighbor and cell-donor counts",
+        has_number(f"We draw {count_word(inkind_method['implicates'])} implicates", text=INKIND_TEXT)
+        and has_number(f"one of the {count_word(inkind_method['pmm_neighbors'])} recipients", text=INKIND_TEXT)
+        and has_number(f"fewer than {count_word(inkind_method['min_cell_donors'])} donors", text=INKIND_TEXT)
+        and inkind_method["parameter_draws"] is True,
+    ),
+    (
+        "appendix names the recorded calculator commits",
+        all(
+            f"`{record['calculator_commit']}`" in APPENDIX_B_TEXT
+            for record in inkind_provenance["artifacts"].values()
+        ),
+    ),
+)
+for label, ok in inkind_pins:
+    check(f"in-kind prose: {label}", ok)
+
 if failures:
     print("PAPER DRIFT CHECK FAILED:")
     for f in failures:
         print(f"  - {f}")
     sys.exit(1)
 print(
-    f"paper drift check passed ({len(EXPECTED_TABLES)} tables, {len(listed)} frozen + {len(current_listed)} retrospective + {len(ROLLING_FILES)} rolling artifacts, prose pins OK)"
+    f"paper drift check passed ({len(EXPECTED_TABLES)} tables, {len(listed)} frozen + {len(current_listed)} retrospective + {len(ROLLING_FILES)} rolling + {len(INKIND_FILES)} in-kind artifacts, prose pins OK)"
 )

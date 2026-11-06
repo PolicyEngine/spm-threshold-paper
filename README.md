@@ -10,7 +10,8 @@ for family composition and local housing costs. We reconstruct national
 thresholds from public Consumer Expenditure (CE) Survey data and compare four
 projection rules. We evaluate retrospective projections and a pre-committed
 2025 nowcast, then project thresholds through 2035 by advancing the CE and
-American Community Survey (ACS) windows. We specify prices, real spending,
+American Community Survey (ACS) windows. We also impute the five in-kind
+benefits BLS adds to CE spending. We specify prices, real spending,
 and rents for the future scenarios and evaluate prospective accuracy for
 2025 only.
 
@@ -50,6 +51,14 @@ at commit `78bae15f76152c6076dd909a09f6b63dc2ec8c34`, with content digest
 The 2019–2025 retrospective experiment uses a separate implementation:
 version 0.5.0 at commit
 `0d7fa0d77b0a88064ab7b9fe70557309b5f7901f`.
+
+The in-kind benefit experiment uses two receipts from spm-calculator, which
+we keep in [`data/inkind`](data/inkind) with their provenance and checksums:
+the imputation at commit `4778dfab2d109515b6a14e63da63011dd7feb884` and the
+comparison with BLS's components at commit
+`8b6766cbfcb7cc3b79451b3b5822425a2cc6590d`. The guard recomputes every in-kind estimate in the tables and text and
+checks that the out-of-pocket run reproduces the retrospective replication
+artifact.
 
 ## Separate 2025 poverty-rate prediction
 
