@@ -1,5 +1,6 @@
 """Mutation tests run the real guard in independent temporary Git clones."""
 
+import ast
 import hashlib
 import importlib.util
 import json
@@ -574,6 +575,778 @@ ABSTRACT_TIE_LABELS = (
     "abstract evaluation amended MAE 1.17",
     "abstract evaluation replication MAE 0.75",
     "abstract evaluation CPI-U MAE 2.58",
+    "current projection prose cpi_u",
+    "current projection prose fcsuti_cpi",
+    "current projection prose replication_ratio",
+    "current projection prose blend",
+)
+
+# Sentences as the body states them, for decoys to restate under the
+# discussion heading. Each carries every literal a whole-paper search would
+# look for, so only a tie that reads the right section can still fail.
+PINNED_BLOB = (
+    "https://github.com/PolicyEngine/spm-threshold-paper/blob/"
+    "20bfbe1abcb83b4f9f60fbe54789144321ff62b0/"
+)
+SENSITIVITY_SENTENCE = (
+    "We obtain a maximum threshold change of 1.74 percent when we include "
+    "tenure codes 5 and 6 as renters."
+)
+BENCHMARK_CPI_U = (
+    "CPI-U adjustment has a mean absolute error of 2.23 percent and understates "
+    "threshold growth in four of five years, with a signed mean error of "
+    "−1.9 percent."
+)
+BENCHMARK_COMPOSITE = (
+    "Composite-price adjustment reduces the mean absolute error to 1.57 percent, "
+    "removing about thirty percent of the CPI-U error in this sample."
+)
+BENCHMARK_REPLICATION = (
+    "The replication ratio scores 0.41 percent, with a signed mean of +0.1 "
+    "percent and annual signed means ranging from +0.5 to −0.3 percent."
+)
+BENCHMARK_BLEND = (
+    "The equal blend scores 0.76 percent; its annual signed means range from "
+    "−0.1 to −1.4 percent."
+)
+NOWCAST_LINK = (
+    f"The [forecast record]({PINNED_BLOB}docs/forecast-record.md) links the "
+    "August 7 archived page, tags, and timestamp proof that document both "
+    "forecasts before BLS’s August 24 publication."
+)
+NOWCAST_NOTE = (
+    "The superseded blend had a mean absolute error of 0.98 percent, compared "
+    "with 1.17 percent for the committed blend."
+)
+NOWCAST_AMOUNTS = (
+    "We committed to an equal blend that projected \\$41,036.34 for owners with "
+    "mortgages, \\$34,135.99 for owners without mortgages, and \\$40,755.98 for "
+    "renters."
+)
+NOWCAST_GROWTH = (
+    "Replicated threshold growth ranged from 4.4 to 6.0 percent by tenure, "
+    "against 3.2 percent composite-price growth. Their blend projected 3.8 to "
+    "4.6 percent growth, compared with 2.6 percent realized CPI-U growth."
+)
+EVALUATION_LEVELS = (
+    "BLS published the 2025 thresholds on August 24, 2026: \\$41,323 for owners "
+    "with mortgages, \\$34,326 for owners without, and \\$41,701 for renters. "
+    "The linked workbook carries full-precision values and standard errors of "
+    "\\$327, \\$560, and \\$393. BLS reports growth of 4.40 to 6.33 percent by "
+    "tenure over the corrected 2024 base."
+)
+EVALUATION_BLEND = (
+    "The committed blend understates the three thresholds by 0.69, 0.55, and "
+    "2.27 percent, giving a mean absolute error of 1.17 percent. The signed mean "
+    "error also equals −1.17 percent. The owner differences fall within one "
+    "published BLS standard error; the renter difference reaches about 2.4 "
+    "standard errors."
+)
+EVALUATION_RULES = (
+    "CPI-U adjustment understates all three thresholds by 1.70 to 3.47 percent, "
+    "for a mean absolute error of 2.58 percent. The replication ratio alone "
+    "scores 0.75 percent and has errors on both sides of zero; composite-price "
+    "adjustment scores 2.02 percent."
+)
+EVALUATION_RENTERS = (
+    "BLS reports renter growth of 6.33 percent against 5.33 and 4.40 percent for "
+    "the two owner tenures. The blend projects renter growth of 3.92 percent, "
+    "and replication alone 4.62 percent."
+)
+COMPARATOR_GAPS = (
+    "The fixed-base composite differs from the BLS index by at most 0.7 "
+    "percentage point in each year from 2020 through 2025, with a mean absolute "
+    "gap of 0.4 point and no consistent sign."
+)
+COMPARATOR_CPI_U = (
+    "For 2025, the BLS threshold page reports CPI-U growth of 2.70 percent, "
+    "compared with 2.63 percent implied by the eleven-month annual average in "
+    "the pinned CPI observations."
+)
+APPENDIX_A_RANGES = (
+    "The replication used for the 2025 nowcast has mean absolute deviations "
+    "across tenures of 1.5 to 2.1 percent per year against revised 2019–2024 "
+    "thresholds, and 1.0 to 1.6 percent against the preceding published series "
+    "with its corresponding anchor share. Published BLS sampling standard errors "
+    "span 0.7 to 2.1 percent of the revised threshold levels in those years."
+)
+APPENDIX_B_LINKS = (
+    f"The [data provenance]({PINNED_BLOB}data/PROVENANCE.md) and [forecast "
+    f"record]({PINNED_BLOB}docs/forecast-record.md) identify each experiment’s "
+    "inputs and evidence. The [experiment replay "
+    f"guide]({PINNED_BLOB}docs/reproducing-experiments.md) provides commands "
+    "and source-file requirements for raw-data replication."
+)
+BLS_GROWTH_TIE = "BLS-stated 2025 growth 4.40-6.33 and per-tenure 5.33/4.40/6.33"
+INKIND_BLS_GROWTH_TIE = "in-kind prose: evaluation section's BLS growth rates for 2024-2025"
+GAP_TIE = "composite within 0.7pp of BLS FCSUti, mean gap 0.4"
+
+# Each case drifts figures in the one body section that states them: (name,
+# section, pattern, replacement, failing ties, decoy). The section names a
+# mutate_article slice, and the pattern edits its first match there. With the
+# decoy restated under the discussion heading, the failing ties are the only
+# lines the guard reports.
+SECTION_PROSE_MUTATIONS = (
+    (
+        "tenure-sensitivity maximum",
+        "sensitivity",
+        r"1\.74(\s+)percent",
+        r"1.75\1percent",
+        ("current tenure-sensitivity prose",),
+        SENSITIVITY_SENTENCE,
+    ),
+    (
+        "appendix forecast record link",
+        "appendix",
+        r"blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0(/docs/forecast-record\.md)",
+        r"blob/main\1",
+        ("manuscript links fixed supporting document: docs/forecast-record.md",),
+        APPENDIX_B_LINKS,
+    ),
+    (
+        "appendix data provenance links",
+        "appendix",
+        r"blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0(/data/PROVENANCE\.md)(.*?)"
+        r"blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0(/data/PROVENANCE\.md)",
+        r"blob/main\1\2blob/main\3",
+        ("manuscript links fixed supporting document: data/PROVENANCE.md",),
+        APPENDIX_B_LINKS,
+    ),
+    (
+        "appendix replay guide link",
+        "appendix",
+        r"blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0(/docs/reproducing-experiments\.md)",
+        r"blob/main\1",
+        ("manuscript links fixed supporting document: docs/reproducing-experiments.md",),
+        APPENDIX_B_LINKS,
+    ),
+    (
+        "nowcast forecast record link",
+        "nowcast",
+        r"blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0(/docs/forecast-record\.md)",
+        r"blob/main\1",
+        ("nowcast section links to the fixed forecast registration record",),
+        NOWCAST_LINK,
+    ),
+    (
+        "committed owner-with-mortgage amount",
+        "nowcast",
+        r"41,036\.34",
+        "41,036.43",
+        (
+            "nowcast literal 41,036.34",
+            "committed estimate states the amended triple in tenure order",
+        ),
+        NOWCAST_AMOUNTS,
+    ),
+    (
+        "committed owner-without-mortgage amount",
+        "nowcast",
+        r"34,135\.99",
+        "34,135.98",
+        (
+            "nowcast literal 34,135.99",
+            "committed estimate states the amended triple in tenure order",
+        ),
+        NOWCAST_AMOUNTS,
+    ),
+    (
+        "committed renter amount",
+        "nowcast",
+        r"40,755\.98",
+        "40,755.89",
+        (
+            "nowcast literal 40,755.98",
+            "committed estimate states the amended triple in tenure order",
+        ),
+        NOWCAST_AMOUNTS,
+    ),
+    (
+        "swapped committed owner amounts",
+        "nowcast",
+        r"41,036\.34(.*?)34,135\.99",
+        r"34,135.99\g<1>41,036.34",
+        ("committed estimate states the amended triple in tenure order",),
+        NOWCAST_AMOUNTS,
+    ),
+    (
+        "replicated growth range",
+        "nowcast",
+        r"4\.4(\s+)to(\s+)6\.0",
+        r"4.4\1to\g<2>6.1",
+        ("replication growth 4.4 to 6.0",),
+        NOWCAST_GROWTH,
+    ),
+    (
+        "composite-price growth",
+        "nowcast",
+        r"3\.2(\s+)percent",
+        r"3.3\1percent",
+        ("price growth 3.2",),
+        NOWCAST_GROWTH,
+    ),
+    (
+        "projected blend growth range",
+        "nowcast",
+        r"3\.8(\s+)to(\s+)4\.6",
+        r"3.8\1to\g<2>4.7",
+        ("blend growth 3.8 to 4.6",),
+        NOWCAST_GROWTH,
+    ),
+    (
+        "realized CPI-U growth",
+        "nowcast",
+        r"2\.6(\s+)percent(\s+)realized",
+        r"2.7\1percent\2realized",
+        ("realized CPI-U 2025 growth 2.6",),
+        NOWCAST_GROWTH,
+    ),
+    (
+        "swapped composite-price and realized CPI-U growth",
+        "nowcast",
+        r"3\.2(\s+)percent(\s+)composite-price(.*?)2\.6(\s+)percent",
+        r"2.6\1percent\2composite-price\g<3>3.2\4percent",
+        ("price growth 3.2", "realized CPI-U 2025 growth 2.6"),
+        NOWCAST_GROWTH,
+    ),
+    (
+        "superseded blend error",
+        "nowcast",
+        r"0\.98(\s+)percent",
+        r"0.99\1percent",
+        ("forecast record evaluation original MAE 0.98",),
+        NOWCAST_NOTE,
+    ),
+    (
+        "committed blend error in the nowcast note",
+        "nowcast",
+        r"1\.17(\s+)percent(\s+)for(\s+)the",
+        r"1.18\1percent\2for\3the",
+        ("nowcast evaluation amended MAE 1.17",),
+        NOWCAST_NOTE,
+    ),
+    (
+        "CPI-U benchmark error",
+        "benchmark",
+        r"2\.23(\s+)percent",
+        r"2.32\1percent",
+        ("backtest prose literal 2.23",),
+        BENCHMARK_CPI_U,
+    ),
+    (
+        "composite benchmark error",
+        "benchmark",
+        r"1\.57(\s+)percent",
+        r"1.58\1percent",
+        ("backtest prose literal 1.57",),
+        BENCHMARK_COMPOSITE,
+    ),
+    (
+        "replication benchmark error",
+        "benchmark",
+        r"0\.41(\s+)percent",
+        r"0.42\1percent",
+        ("backtest prose literal 0.41",),
+        BENCHMARK_REPLICATION,
+    ),
+    (
+        "blend benchmark error",
+        "benchmark",
+        r"0\.76(\s+)percent",
+        r"0.67\1percent",
+        ("backtest prose literal 0.76",),
+        BENCHMARK_BLEND,
+    ),
+    (
+        "swapped CPI-U and composite benchmark errors",
+        "benchmark",
+        r"2\.23(\s+)percent(.*?)1\.57(\s+)percent",
+        r"1.57\1percent\g<2>2.23\3percent",
+        ("backtest prose literal 2.23", "backtest prose literal 1.57"),
+        BENCHMARK_CPI_U + " " + BENCHMARK_COMPOSITE,
+    ),
+    (
+        "CPI-U signed benchmark error",
+        "benchmark",
+        r"−1\.9(\s+)percent",
+        r"−2.9\1percent",
+        ("signed CPI-U bias -1.9",),
+        BENCHMARK_CPI_U,
+    ),
+    (
+        "CPI-U signed benchmark error sign",
+        "benchmark",
+        r"−1\.9",
+        "+1.9",
+        ("signed CPI-U bias -1.9",),
+        BENCHMARK_CPI_U,
+    ),
+    (
+        "CPI-U understated years",
+        "benchmark",
+        r"in(\s+)four(\s+)of(\s+)five",
+        r"in\1three\2of\3five",
+        ("CPI-U understated four of five years",),
+        BENCHMARK_CPI_U,
+    ),
+    (
+        "share of CPI-U error the composite removes",
+        "benchmark",
+        r"about(\s+)thirty(\s+)percent",
+        r"about\1forty\2percent",
+        ("composite removes ~thirty percent of CPI-U error",),
+        BENCHMARK_COMPOSITE,
+    ),
+    (
+        "replication signed benchmark mean",
+        "benchmark",
+        r"\+0\.1(\s+)percent",
+        r"+0.2\1percent",
+        ("replication signed mean +0.1",),
+        BENCHMARK_REPLICATION,
+    ),
+    (
+        "replication annual signed range",
+        "benchmark",
+        r"\+0\.5(\s+)to(\s+)−0\.3",
+        r"+0.5\1to\2−0.4",
+        ("replication annual signed range +0.5 to −0.3",),
+        BENCHMARK_REPLICATION,
+    ),
+    (
+        "blend annual signed range",
+        "benchmark",
+        r"−0\.1(\s+)to(\s+)−1\.4",
+        r"−0.1\1to\2−1.5",
+        ("blend annual signed range −0.1 to −1.4",),
+        BENCHMARK_BLEND,
+    ),
+    (
+        "swapped annual signed ranges",
+        "benchmark",
+        r"\+0\.5(\s+)to(\s+)−0\.3(.*?)−0\.1(\s+)to(\s+)−1\.4",
+        r"−0.1\1to\2−1.4\g<3>+0.5\4to\5−0.3",
+        (
+            "replication annual signed range +0.5 to −0.3",
+            "blend annual signed range −0.1 to −1.4",
+        ),
+        BENCHMARK_REPLICATION + " " + BENCHMARK_BLEND,
+    ),
+    (
+        "benchmark standard-error floor",
+        "appendix A",
+        r"span(\s+)0\.7",
+        r"span\g<1>0.8",
+        ("SE range 0.7 to 2.1 percent",),
+        APPENDIX_A_RANGES,
+    ),
+    (
+        "benchmark standard-error ceiling",
+        "appendix A",
+        r"0\.7(\s+)to(\s+)2\.1",
+        r"0.7\1to\g<2>2.2",
+        ("SE range 0.7 to 2.1 percent",),
+        APPENDIX_A_RANGES,
+    ),
+    (
+        "replication fidelity against revised thresholds",
+        "appendix A",
+        r"1\.5(\s+)to(\s+)2\.1",
+        r"1.5\1to\g<2>2.2",
+        ("replication fidelity 1.5 to 2.1 vs corrected",),
+        APPENDIX_A_RANGES,
+    ),
+    (
+        "replication fidelity against the published series",
+        "appendix A",
+        r"1\.0(\s+)to(\s+)1\.6",
+        r"0.9\1to\g<2>1.6",
+        ("replication fidelity 1.0 to 1.6 vs published",),
+        APPENDIX_A_RANGES,
+    ),
+    (
+        "swapped replication fidelity ranges",
+        "appendix A",
+        r"1\.5(\s+)to(\s+)2\.1(.*?)1\.0(\s+)to(\s+)1\.6",
+        r"1.0\1to\g<2>1.6\g<3>1.5\4to\g<5>2.1",
+        (
+            "replication fidelity 1.5 to 2.1 vs corrected",
+            "replication fidelity 1.0 to 1.6 vs published",
+        ),
+        APPENDIX_A_RANGES,
+    ),
+    (
+        "committed blend evaluation error",
+        "evaluation",
+        r"error(\s+)of(\s+)1\.17",
+        r"error\1of\g<2>1.18",
+        ("evaluation amended MAE 1.17",),
+        EVALUATION_BLEND,
+    ),
+    (
+        "CPI-U evaluation error",
+        "evaluation",
+        r"error(\s+)of(\s+)2\.58",
+        r"error\1of\g<2>2.59",
+        ("evaluation CPI-U MAE 2.58",),
+        EVALUATION_RULES,
+    ),
+    (
+        "replication evaluation error",
+        "evaluation",
+        r"scores(\s+)0\.75",
+        r"scores\g<1>0.74",
+        ("evaluation replication MAE 0.75",),
+        EVALUATION_RULES,
+    ),
+    (
+        "composite evaluation error",
+        "evaluation",
+        r"scores(\s+)2\.02",
+        r"scores\g<1>2.03",
+        ("evaluation composite MAE 2.02",),
+        EVALUATION_RULES,
+    ),
+    (
+        "swapped replication and composite evaluation errors",
+        "evaluation",
+        r"scores(\s+)0\.75(.*?)scores(\s+)2\.02",
+        r"scores\g<1>2.02\g<2>scores\g<3>0.75",
+        ("evaluation replication MAE 0.75", "evaluation composite MAE 2.02"),
+        EVALUATION_RULES,
+    ),
+    (
+        "owner-with-mortgage miss",
+        "evaluation",
+        r"by(\s+)0\.69,",
+        r"by\g<1>0.96,",
+        ("evaluation per-tenure misses 0.69, 0.55, 2.27 in order",),
+        EVALUATION_BLEND,
+    ),
+    (
+        "owner-without-mortgage miss",
+        "evaluation",
+        r"0\.69,(\s+)0\.55",
+        r"0.69,\g<1>0.56",
+        ("evaluation per-tenure misses 0.69, 0.55, 2.27 in order",),
+        EVALUATION_BLEND,
+    ),
+    (
+        "renter miss",
+        "evaluation",
+        r"and(\s+)2\.27",
+        r"and\g<1>2.28",
+        ("evaluation per-tenure misses 0.69, 0.55, 2.27 in order",),
+        EVALUATION_BLEND,
+    ),
+    (
+        "swapped owner misses",
+        "evaluation",
+        r"0\.69,(\s+)0\.55",
+        r"0.55,\g<1>0.69",
+        ("evaluation per-tenure misses 0.69, 0.55, 2.27 in order",),
+        EVALUATION_BLEND,
+    ),
+    (
+        "signed evaluation mean",
+        "evaluation",
+        r"−1\.17",
+        "−1.18",
+        ("evaluation signed mean −1.17",),
+        EVALUATION_BLEND,
+    ),
+    (
+        "CPI-U understatement range",
+        "evaluation",
+        r"1\.70(\s+)to(\s+)3\.47",
+        r"1.70\1to\g<2>3.48",
+        ("CPI-U 2025 understated every tenure by 1.70 to 3.47 percent",),
+        EVALUATION_RULES,
+    ),
+    (
+        "BLS owner-with-mortgage threshold",
+        "evaluation",
+        r"41,323",
+        "41,332",
+        ("BLS 2025 literal 41,323", "BLS 2025 triple in tenure order"),
+        EVALUATION_LEVELS,
+    ),
+    (
+        "BLS owner-without-mortgage threshold",
+        "evaluation",
+        r"34,326",
+        "34,362",
+        ("BLS 2025 literal 34,326", "BLS 2025 triple in tenure order"),
+        EVALUATION_LEVELS,
+    ),
+    (
+        "BLS renter threshold",
+        "evaluation",
+        r"41,701",
+        "41,710",
+        ("BLS 2025 literal 41,701", "BLS 2025 triple in tenure order"),
+        EVALUATION_LEVELS,
+    ),
+    (
+        "BLS growth range floor",
+        "evaluation",
+        r"growth(\s+)of(\s+)4\.40(\s+)to",
+        r"growth\1of\g<2>4.41\3to",
+        (BLS_GROWTH_TIE,),
+        EVALUATION_LEVELS,
+    ),
+    (
+        "BLS growth range ceiling",
+        "evaluation",
+        r"4\.40(\s+)to(\s+)6\.33",
+        r"4.40\1to\g<2>6.34",
+        (BLS_GROWTH_TIE,),
+        EVALUATION_LEVELS,
+    ),
+    (
+        "BLS renter growth",
+        "evaluation",
+        r"renter(\s+)growth(\s+)of(\s+)6\.33",
+        r"renter\1growth\2of\g<3>6.38",
+        (BLS_GROWTH_TIE, INKIND_BLS_GROWTH_TIE),
+        EVALUATION_RENTERS,
+    ),
+    (
+        "BLS owner-with-mortgage growth",
+        "evaluation",
+        r"against(\s+)5\.33",
+        r"against\g<1>5.34",
+        (BLS_GROWTH_TIE, INKIND_BLS_GROWTH_TIE),
+        EVALUATION_RENTERS,
+    ),
+    (
+        "BLS owner-without-mortgage growth",
+        "evaluation",
+        r"and(\s+)4\.40(\s+)percent",
+        r"and\g<1>4.41\2percent",
+        (BLS_GROWTH_TIE, INKIND_BLS_GROWTH_TIE),
+        EVALUATION_RENTERS,
+    ),
+    (
+        "projected renter growth",
+        "evaluation",
+        r"growth(\s+)of(\s+)3\.92",
+        r"growth\1of\g<2>3.93",
+        ("nowcast renter growth 3.92",),
+        EVALUATION_RENTERS,
+    ),
+    (
+        "replication renter growth",
+        "evaluation",
+        r"alone(\s+)4\.62",
+        r"alone\g<1>4.63",
+        ("replication renter growth 4.62",),
+        EVALUATION_RENTERS,
+    ),
+    (
+        "swapped projected and replication renter growth",
+        "evaluation",
+        r"3\.92(\s+)percent,(\s+)and(\s+)replication(\s+)alone(\s+)4\.62",
+        r"4.62\1percent,\2and\3replication\4alone\g<5>3.92",
+        ("nowcast renter growth 3.92", "replication renter growth 4.62"),
+        EVALUATION_RENTERS,
+    ),
+    (
+        "renter miss in standard errors",
+        "evaluation",
+        r"about(\s+)2\.4(\s+)standard",
+        r"about\g<1>2.5\2standard",
+        ("owner misses within one SE; renter about 2.4 SE",),
+        EVALUATION_BLEND,
+    ),
+    (
+        "owner misses in standard errors",
+        "evaluation",
+        r"within(\s+)one(\s+)published",
+        r"within\1two\2published",
+        ("owner misses within one SE; renter about 2.4 SE",),
+        EVALUATION_BLEND,
+    ),
+    (
+        "owner-with-mortgage standard error",
+        "evaluation",
+        r"\\\$327",
+        r"\\$372",
+        ("2025 SE literal 327", "2025 SE triple in tenure order"),
+        EVALUATION_LEVELS,
+    ),
+    (
+        "owner-without-mortgage standard error",
+        "evaluation",
+        r"\\\$560",
+        r"\\$506",
+        ("2025 SE literal 560", "2025 SE triple in tenure order"),
+        EVALUATION_LEVELS,
+    ),
+    (
+        "renter standard error",
+        "evaluation",
+        r"\\\$393",
+        r"\\$339",
+        ("2025 SE literal 393", "2025 SE triple in tenure order"),
+        EVALUATION_LEVELS,
+    ),
+    (
+        "swapped owner standard errors",
+        "evaluation",
+        r"\\\$327,(\s+)\\\$560",
+        r"\\$560,\1\\$327",
+        ("2025 SE triple in tenure order",),
+        EVALUATION_LEVELS,
+    ),
+    (
+        "largest comparator gap",
+        "comparator",
+        r"most(\s+)0\.7(\s+)percentage",
+        r"most\g<1>0.8\2percentage",
+        (GAP_TIE,),
+        COMPARATOR_GAPS,
+    ),
+    (
+        "mean comparator gap",
+        "comparator",
+        r"gap(\s+)of(\s+)0\.4(\s+)point",
+        r"gap\1of\g<2>0.5\3point",
+        (GAP_TIE,),
+        COMPARATOR_GAPS,
+    ),
+    (
+        "BLS-page CPI-U growth",
+        "comparator",
+        r"2\.70(\s+)percent",
+        r"2.71\1percent",
+        ("BLS page 2025 CPI-U growth 2.70 quoted",),
+        COMPARATOR_CPI_U,
+    ),
+    (
+        "eleven-month CPI-U growth",
+        "comparator",
+        r"2\.63(\s+)percent",
+        r"2.64\1percent",
+        ("eleven-month CPI-U growth 2.63 quoted",),
+        COMPARATOR_CPI_U,
+    ),
+    (
+        "swapped CPI-U growth figures",
+        "comparator",
+        r"2\.70(\s+)percent(.*?)2\.63(\s+)percent",
+        r"2.63\1percent\g<2>2.70\3percent",
+        (
+            "BLS page 2025 CPI-U growth 2.70 quoted",
+            "eleven-month CPI-U growth 2.63 quoted",
+        ),
+        COMPARATOR_CPI_U,
+    ),
+)
+
+# Each case renames or repeats a heading that bounds a section slice:
+# (name, edits, ties that must fail). The slice comes back empty, so the
+# guard reports the heading and fails the section's ties instead of
+# searching anywhere else.
+SECTION_MARKER_CASES = (
+    (
+        "renamed sensitivity heading",
+        (
+            (
+                "## Replicated levels and sample sensitivities\n",
+                "## Replicated levels and sensitivities\n",
+            ),
+        ),
+        (
+            "paper section heading not unique: '## Replicated levels and sample sensitivities'",
+            "current tenure-sensitivity prose",
+        ),
+    ),
+    (
+        "renamed benchmark heading",
+        (("## Five-year benchmark for the 2025 nowcast\n", "## Five-year benchmark\n"),),
+        (
+            "paper section heading not unique: '## Five-year benchmark for the 2025 nowcast'",
+            "backtest prose literal 2.23",
+            "signed CPI-U bias -1.9",
+        ),
+    ),
+    (
+        "renamed nowcast heading",
+        (
+            (
+                "# Pre-committed 2025 validation {#sec-nowcast}\n",
+                "# Pre-registered 2025 validation {#sec-nowcast}\n",
+            ),
+        ),
+        (
+            "paper section heading not unique: '# Pre-committed 2025 validation'",
+            "paper section heading not unique: '## Five-year benchmark for the 2025 nowcast'",
+            "nowcast section links to the fixed forecast registration record",
+            "nowcast literal 41,036.34",
+            "price growth 3.2",
+            "backtest prose literal 2.23",
+        ),
+    ),
+    (
+        "repeated evaluation heading",
+        (
+            (
+                DISCUSSION_HEADING,
+                "## Evaluation against published thresholds {#sec-evaluation}\n\n"
+                + DISCUSSION_HEADING,
+            ),
+        ),
+        (
+            "paper section heading not unique: "
+            "'## Evaluation against published thresholds {#sec-evaluation}'",
+            "paper section heading not unique: '# Pre-committed 2025 validation'",
+            "evaluation amended MAE 1.17",
+            "2025 SE triple in tenure order",
+            "nowcast literal 41,036.34",
+        ),
+    ),
+    (
+        "repeated comparator heading",
+        ((DISCUSSION_HEADING, "## Validation of the price comparator\n\n" + DISCUSSION_HEADING),),
+        (
+            "paper section heading not unique: '## Validation of the price comparator'",
+            "paper section heading not unique: "
+            "'## Evaluation against published thresholds {#sec-evaluation}'",
+            GAP_TIE,
+            "BLS page 2025 CPI-U growth 2.70 quoted",
+            "evaluation amended MAE 1.17",
+        ),
+    ),
+    (
+        "renamed appendix A heading",
+        (
+            (
+                "# Appendix A: replication benchmark {.unnumbered}\n",
+                "# Appendix A: benchmark {.unnumbered}\n",
+            ),
+        ),
+        (
+            "paper section heading not unique: '# Appendix A: replication benchmark {.unnumbered}'",
+            "SE range 0.7 to 2.1 percent",
+            "replication fidelity 1.5 to 2.1 vs corrected",
+        ),
+    ),
+    (
+        "renamed appendix B heading",
+        (
+            (
+                "# Appendix B: reproducibility {.unnumbered}\n",
+                "# Appendix B: replication {.unnumbered}\n",
+            ),
+        ),
+        (
+            "paper section heading not unique: '# Appendix A: replication benchmark {.unnumbered}'",
+            "paper section heading not unique: '# Appendix B: reproducibility'",
+            "manuscript links fixed supporting document: docs/forecast-record.md",
+            "SE range 0.7 to 2.1 percent",
+        ),
+    ),
 )
 
 
@@ -1249,6 +2022,26 @@ class PaperGuardTests(unittest.TestCase):
             ),
             "discussion": (text.index(DISCUSSION_HEADING), text.index("# Appendix A: replication benchmark")),
             "appendix": (text.index("# Appendix B: reproducibility"), len(text)),
+            "sensitivity": (
+                text.index("## Replicated levels and sample sensitivities"),
+                text.index(INKIND_HEADING),
+            ),
+            "benchmark": (
+                text.index("## Five-year benchmark for the 2025 nowcast"),
+                text.index("# Pre-committed 2025 validation"),
+            ),
+            "nowcast": (
+                text.index("# Pre-committed 2025 validation"),
+                text.index("## Evaluation against published thresholds"),
+            ),
+            "comparator": (
+                text.index("## Validation of the price comparator"),
+                text.index("# Conditional forecasts beyond available microdata"),
+            ),
+            "appendix A": (
+                text.index("# Appendix A: replication benchmark"),
+                text.index("# Appendix B: reproducibility"),
+            ),
         }
         start, end = bounds[where]
         body, count = re.subn(pattern, replacement, text[start:end], count=1, flags=re.S)
@@ -1319,6 +2112,15 @@ class PaperGuardTests(unittest.TestCase):
         else:
             self.fail(f"unknown decoy host: {host}")
         path.write_text(prose[:at] + insert + prose[at:])
+
+    def run_section_mutation(self, where, pattern, replacement, decoy=None):
+        """Drift a figure in one section, optionally restate the original
+        wording under the discussion heading, and run the guard."""
+        self.install_article()
+        self.mutate_article(where, pattern, replacement)
+        if decoy is not None:
+            self.edit_article((), DISCUSSION_HEADING, decoy)
+        return self.run_guard()
 
     def run_abstract_mutation(self, pattern, replacement, decoy=None, host="discussion"):
         self.install_article()
@@ -1451,6 +2253,41 @@ class PaperGuardTests(unittest.TestCase):
                     *ABSTRACT_TIE_LABELS,
                     "in-kind prose: abstract in-kind lift range",
                 ):
+                    self.assertIn(label, failures)
+        self.install_article()
+
+    def test_section_figures_drift_alone(self):
+        """A figure changed in the section that states it fails its tie, even
+        where the paper states the same numeral in another section."""
+        for name, where, pattern, replacement, labels, _ in SECTION_PROSE_MUTATIONS:
+            with self.subTest(name=name):
+                result = self.run_section_mutation(where, pattern, replacement)
+                self.assertNotEqual(result.returncode, 0)
+                for label in labels:
+                    self.assertIn(label, failure_lines(result.stdout))
+        self.install_article()
+
+    def test_section_pins_reject_a_figure_restated_elsewhere(self):
+        """With the original wording restated under the discussion heading,
+        only the ties that read the changed section fail."""
+        for name, where, pattern, replacement, labels, decoy in SECTION_PROSE_MUTATIONS:
+            with self.subTest(name=name):
+                result = self.run_section_mutation(where, pattern, replacement, decoy)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertEqual(sorted(failure_lines(result.stdout)), sorted(labels))
+        self.install_article()
+
+    def test_section_slices_fail_closed_without_unique_markers(self):
+        """A renamed or repeated heading empties the slices it bounds, so
+        their ties fail instead of reading the whole paper."""
+        for name, edits, labels in SECTION_MARKER_CASES:
+            with self.subTest(case=name):
+                self.install_article()
+                self.edit_article(edits)
+                result = self.run_guard()
+                self.assertNotEqual(result.returncode, 0)
+                failures = failure_lines(result.stdout)
+                for label in labels:
                     self.assertIn(label, failures)
         self.install_article()
 
@@ -1606,6 +2443,33 @@ class PaperGuardTests(unittest.TestCase):
             "rolling thin-donor warnings cover 0",
         ):
             self.assertIn(expected, result.stdout)
+
+
+class GuardSourceTests(unittest.TestCase):
+    def test_no_tie_reads_the_whole_paper(self):
+        """Every has_number and has_ordered call names the text it reads, none
+        reads QMD, and no tie tests a literal's membership in QMD."""
+        tree = ast.parse((REPO / "scripts/check_paper.py").read_text())
+        offenders = []
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+                if node.func.id not in ("has_number", "has_ordered"):
+                    continue
+                texts = [keyword.value for keyword in node.keywords if keyword.arg == "text"]
+                if node.func.id == "has_number" and len(node.args) > 1:
+                    texts.append(node.args[1])
+                if not texts or any(
+                    isinstance(text, ast.Name) and text.id == "QMD" for text in texts
+                ):
+                    offenders.append(f"line {node.lineno}: {ast.unparse(node)}")
+            elif isinstance(node, ast.Compare) and any(
+                isinstance(operator, (ast.In, ast.NotIn))
+                and isinstance(right, ast.Name)
+                and right.id == "QMD"
+                for operator, right in zip(node.ops, node.comparators)
+            ):
+                offenders.append(f"line {node.lineno}: {ast.unparse(node)}")
+        self.assertEqual(offenders, [])
 
 
 if __name__ == "__main__":
