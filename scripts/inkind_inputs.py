@@ -21,7 +21,15 @@ the in-kind tables and prose report from the receipts' thresholds and band
 means, and ``uncertainty_figures`` recomputes every standard error the prose
 reports from the stored replicate thresholds. Each checks its results against
 the values the receipts record and raises ``ValueError`` on any
-inconsistency. The module uses the standard library only.
+inconsistency.
+
+Those checks test consistency. A receipt someone edits and reseals, updating
+every hash that records it, can keep every relationship they test: reflecting
+a year's replicate thresholds around the full-sample estimate leaves each
+squared deviation, and so each standard error, unchanged. ``check_receipt_pins``
+therefore compares each receipt with the SHA-256 and calculator commit that
+``RECEIPT_PINS`` records here, outside ``data/inkind``. Replacing a receipt
+takes an edit to ``RECEIPT_PINS``. The module uses the standard library only.
 """
 
 from __future__ import annotations
@@ -71,6 +79,25 @@ UNCERTAINTY_RUNS = ("package", "fcsuti")
 # BLS's published threshold standard errors, as the paper records them.
 BLS_SERIES = "bls-corrected-2026-07-17"
 BLS_REVISED_SEGMENT = "revised_2019_2024"
+# Each receipt's SHA-256 and the spm-calculator commit that holds the same
+# bytes. We checked each digest against ``git show <commit>:<calculator
+# path>`` in PolicyEngine/spm-calculator when we copied the receipt here.
+RECEIPT_PINS = {
+    REPLICATION: (
+        "22e62cee945028faf063df553d41ed3e64a26d1f82e4dd4ef82aa1da830b3dcb",
+        "4778dfab2d109515b6a14e63da63011dd7feb884",
+    ),
+    COMPONENTS: (
+        "04597e4958aa90dfc0b76825b99cfcc2cb9d6d4d653e17095753938896628630",
+        "8b6766cbfcb7cc3b79451b3b5822425a2cc6590d",
+    ),
+    UNCERTAINTY: (
+        "657f1a964bdcc39a294d368d81a060daff585eb4546ada84c0f1747ed3ac2f99",
+        "7d8e3c8309492b4d760e8eb2131a94dbf78b95b1",
+    ),
+}
+# The growth window whose standard errors the section reports.
+GROWTH_WINDOW = ("2022", "2025")
 
 
 def _require(condition: bool, label: str) -> None:
@@ -236,14 +263,27 @@ def load_inkind(data_dir: Path, current_dir: Path) -> dict:
 
 
 def _check_uncertainty_receipt(uncertainty: dict, replication: dict, components: dict, manifest: dict) -> None:
-    """The replicate receipt derives from the other two and starts from their
-    full-sample thresholds. Runs after every other check, so an edit to the
-    replication or component receipt fails where those checks catch it."""
+    """Check that the replicate receipt names the other two receipts' hashes,
+    reads the replication's raw CE, CPS ASEC and CPI files with its seed, and
+    starts from both receipts' full-sample thresholds. These checks test
+    consistency, not authenticity: ``check_receipt_pins`` covers a receipt
+    resealed with altered replicates. Runs after every other check, so an
+    edit to the replication or component receipt fails where those checks
+    catch it."""
     for name, key in ((REPLICATION, "replication_receipt"), (COMPONENTS, "components_receipt")):
         _require(
             uncertainty["inputs"][key]["sha256"] == manifest[f"data/inkind/{name}"],
             f"uncertainty receipt derives from the recorded {key.replace('_', ' ')}",
         )
+    inputs = uncertainty["inputs"]
+    _require(
+        inputs["ce_bundles"] == replication["ce_bundles"]
+        and inputs["cps_asec_files"] == replication["cps_asec_files"]
+        and inputs["cpi"] == replication["cpi_input"]
+        and {key: components["inputs"]["cpi"][key] for key in ("path", "sha256")} == replication["cpi_input"]
+        and inputs["imputation_seed"] == replication["in_kind_methodology"]["seed"],
+        "uncertainty receipt reads the replication receipt's raw inputs and seed",
+    )
     method = uncertainty["method"]
     implicates = replication["in_kind_methodology"]["implicates"]
     _require(
@@ -579,8 +619,8 @@ def uncertainty_figures(inputs: dict, published_se: dict[str, dict[str, float]])
     """Recompute, from the stored replicate thresholds, every standard error
     the prose reports, and check each against the receipt."""
     uncertainty, components = inputs["uncertainty"], inputs["components"]
-    first, last = "2022", "2025"
-    figures: dict = {"runs": {}}
+    first, last = GROWTH_WINDOW
+    figures: dict = {"runs": {}, "growth_window": GROWTH_WINDOW}
     for run in UNCERTAINTY_RUNS:
         entry = uncertainty["runs"][run]
         ratios: dict = {"with_in_kind": {t: [] for t in TENURES}, "without_in_kind": {t: [] for t in TENURES}}
@@ -638,3 +678,17 @@ def uncertainty_figures(inputs: dict, published_se: dict[str, dict[str, float]])
         quarter: record["share_keeping_pattern"] for quarter, record in patterns.items()
     }
     return figures
+
+
+def check_receipt_pins(data_dir: Path) -> None:
+    """Each receipt's bytes and calculator commit match ``RECEIPT_PINS``.
+    The guard runs this after every consistency check, so an edit those
+    checks catch fails with their label first."""
+    provenance = json.loads((data_dir / PROVENANCE).read_text())
+    _require(set(RECEIPT_PINS) == set(INKIND_FILES) - {PROVENANCE}, "pins cover exactly the three receipts")
+    for name, (digest, commit) in RECEIPT_PINS.items():
+        _require(_sha256(data_dir / name) == digest, f"{name} matches the SHA-256 pinned in inkind_inputs.py")
+        _require(
+            provenance["artifacts"][f"data/inkind/{name}"]["calculator_commit"] == commit,
+            f"{name} comes from the calculator commit pinned in inkind_inputs.py",
+        )

@@ -12,7 +12,9 @@ push to master and every pull request. It fails when:
     ``data/`` or any listed hash mismatches (an emptied manifest fails),
     or ``data/inkind`` fails ``inkind_inputs.load_inkind``: its own
     manifest, provenance, and the receipts' agreement with each other and
-    with the out-of-pocket replication in ``data/current``;
+    with the out-of-pocket replication in ``data/current``; or a receipt
+    differs from the SHA-256 and calculator commit that
+    ``inkind_inputs.RECEIPT_PINS`` records outside ``data/inkind``;
 (d) a figure quoted in the prose no longer matches the artifact it
     derives from. Literals are matched at numeric-token boundaries
     (so ``41,036.34`` does not match ``141,036.34``), spelled-out
@@ -25,7 +27,9 @@ push to master and every pull request. It fails when:
     and the thin-donor support count — are pinned inside a
     whitespace-normalized slice of that section, so the same numeral
     occurring elsewhere in the paper cannot satisfy them and line
-    rewrapping cannot split a multi-word literal.
+    rewrapping cannot split a multi-word literal;
+(e) the README miscounts the in-kind receipts or omits a calculator
+    commit that their provenance records.
 
 Scope, stated honestly: the guard covers artifact hashes, generated
 tables, and the figures registered below. Numbers quoted from
@@ -62,6 +66,7 @@ from inkind_inputs import (
     INKIND_FILES,
     REPLICATES,
     YEARS,
+    check_receipt_pins,
     inkind_figures,
     load_inkind,
     published_standard_errors,
@@ -278,6 +283,9 @@ try:
     inkind_inputs = load_inkind(DATA / "inkind", DATA / "current")
     inkind = inkind_figures(inkind_inputs)
     inkind_se = uncertainty_figures(inkind_inputs, published_standard_errors(DATA))
+    # Last, so a resealed edit that a consistency check catches fails with
+    # that check's label; only edits that pass every one reach the pins.
+    check_receipt_pins(DATA / "inkind")
 except (OSError, KeyError, TypeError, ValueError, AttributeError, IndexError, ZeroDivisionError) as error:
     failures.append(f"in-kind input validation: {error!r}")
 if failures:
@@ -1105,6 +1113,11 @@ UNCERTAINTY_TEXT = section(
     "## Uncertainty and limitations {#sec-inkind-uncertainty}", "# Projecting thresholds {#sec-projection}"
 )
 APPENDIX_B_TEXT = section("# Appendix B: reproducibility", "# References")
+GROWTH_FIRST, GROWTH_LAST = inkind_se["growth_window"]
+GROWTH_TEXT = section(
+    f"## Threshold growth, {GROWTH_FIRST}–{GROWTH_LAST}", "## Uncertainty and limitations {#sec-inkind-uncertainty}"
+)
+README_TEXT = " ".join((REPO / "README.md").read_text().split())
 inkind_method = json.loads((DATA / "inkind" / "ce_inkind_replication_2019_2025.json").read_text())[
     "in_kind_methodology"
 ]
@@ -1233,6 +1246,22 @@ INKIND_METHOD_CONSTANTS = (
     "twelve times the difference",  # 12.0 * benefit in the rental stage
 )
 replication_receipt = json.loads((DATA / "inkind" / "ce_inkind_replication_2019_2025.json").read_text())
+
+
+def previous_quarter(quarter: str) -> str:
+    year, number = int(quarter[:4]), int(quarter[-1])
+    return f"{year - 1}Q4" if number == 1 else f"{year}Q{number - 1}"
+
+
+# Each quarter in which most paired units' blank replicate weights change,
+# with the quarter before it, and the thresholds whose 20-quarter windows
+# hold both quarters of at least one such pair.
+half_sample_pairs = [(previous_quarter(q), q) for q in sorted(inkind_se["half_sample_changes"])]
+half_sample_years = sorted(
+    int(year)
+    for year, row in current_ce["results"].items()
+    if any(before in row["quarters"] and after in row["quarters"] for before, after in half_sample_pairs)
+)
 inkind_pins = (
     ("in-kind lift range", has_number(lift_literal, text=INKIND_TEXT)),
     ("abstract in-kind lift range", has_number(lift_literal, text=ABSTRACT)),
@@ -1322,7 +1351,7 @@ inkind_pins = (
                 "each within one standard error of zero",
             ],
             window=40,
-            text=INKIND_TEXT,
+            text=GROWTH_TEXT,
         )
         and all(
             package_se["stage_change"][t]["standard_errors_from_zero"] < 1 for t in TENURES
@@ -1342,7 +1371,8 @@ inkind_pins = (
         "standard errors of the stage change",
         has_number(f"the CE's {REPLICATES} replicate weights", text=UNCERTAINTY_TEXT)
         and has_number(
-            f"standard errors of {stage_ses[0]:.2f} points for owners with mortgages, "
+            f"For the benefits' change to {GROWTH_FIRST}–{GROWTH_LAST} growth, we estimate standard errors of "
+            f"{stage_ses[0]:.2f} points for owners with mortgages, "
             f"{stage_ses[1]:.2f} for owners without mortgages, and {stage_ses[2]:.2f} for renters",
             text=UNCERTAINTY_TEXT,
         ),
@@ -1364,10 +1394,14 @@ inkind_pins = (
     ),
     (
         "half-sample pattern changes",
-        set(inkind_se["half_sample_changes"]) == {"2015Q2", "2017Q1"}
+        bool(half_sample_years)
+        and half_sample_years == list(range(half_sample_years[0], half_sample_years[-1] + 1))
         and all(share < 0.5 for share in inkind_se["half_sample_changes"].values())
+        and re.findall(r"\b(\d{4}Q[1-4]) and (\d{4}Q[1-4])\b", UNCERTAINTY_TEXT) == half_sample_pairs
         and has_ordered(
-            ["For most units", "2015Q1 and 2015Q2", "2016Q4 and 2017Q1", "2019–2021 thresholds"],
+            ["For most units"]
+            + [f"{before} and {after}" for before, after in half_sample_pairs]
+            + [f"Replicates for the {half_sample_years[0]}–{half_sample_years[-1]} thresholds"],
             window=200,
             text=UNCERTAINTY_TEXT,
         ),
@@ -1492,6 +1526,24 @@ inkind_pins = (
         "appendix names the recorded calculator commits",
         all(
             f"`{record['calculator_commit']}`" in APPENDIX_B_TEXT
+            for record in inkind_provenance["artifacts"].values()
+        ),
+    ),
+    (
+        "appendix counts the receipts",
+        has_number(
+            f"we keep {count_word(len(inkind_provenance['artifacts']))} receipts from spm-calculator",
+            text=APPENDIX_B_TEXT,
+        ),
+    ),
+    (
+        "README counts the receipts and names the commits",
+        has_number(
+            f"uses {count_word(len(inkind_provenance['artifacts']))} receipts from spm-calculator",
+            text=README_TEXT,
+        )
+        and all(
+            f"`{record['calculator_commit']}`" in README_TEXT
             for record in inkind_provenance["artifacts"].values()
         ),
     ),

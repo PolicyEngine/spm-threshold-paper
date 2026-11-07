@@ -7,11 +7,14 @@ threshold identity. A seeded generator draws the bands, which keeps CI
 deterministic without a property-testing dependency.
 """
 
+import hashlib
 import importlib.util
 import json
 import math
 import random
+import shutil
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -313,6 +316,27 @@ class ReplicateVarianceProperties(unittest.TestCase):
             self.assertTrue(0 <= combined["df"] <= INKIND.COMPLETE_DATA_DF)
             self.assertTrue(math.isclose(combined["standard_error"] ** 2, total, rel_tol=1e-12))
 
+    def test_reflecting_replicates_around_the_full_sample_keeps_every_variance(self):
+        """Replicates mirrored around the full-sample estimate keep every
+        squared deviation, so no variance check can tell them from the
+        originals. The receipt pins exist for this case."""
+        for _ in range(DRAWS):
+            series = random_implicates(self.rng)
+            mirrored = [[values[0]] + [2 * values[0] - x for x in values[1:]] for values in series]
+            self.assertNotEqual(mirrored, series)
+            for values, mirror in zip(series, mirrored):
+                self.assertTrue(
+                    math.isclose(
+                        INKIND._replicate_variance(mirror[0], mirror[1:]),
+                        INKIND._replicate_variance(values[0], values[1:]),
+                        rel_tol=1e-9,
+                        abs_tol=1e-12,
+                    )
+                )
+            original, reflected = INKIND._rubin(series), INKIND._rubin(mirrored)
+            for key in ("estimate", "within_variance", "between_variance", "total_variance", "df"):
+                self.assertTrue(math.isclose(reflected[key], original[key], rel_tol=1e-9, abs_tol=1e-12), key)
+
     def test_identical_implicates_leave_only_sampling_variance(self):
         for _ in range(200):
             first = random_implicates(self.rng, implicates=1)[0]
@@ -348,6 +372,40 @@ class UncertaintyReceiptTests(unittest.TestCase):
         years["2022"]["replicates"]["with_in_kind"]["owner_with_mortgage"][3][11] += 25
         with self.assertRaisesRegex(ValueError, "fcsuti 2022 owner_with_mortgage"):
             INKIND.uncertainty_figures(inputs, self.published)
+
+    def test_committed_receipts_match_their_pins(self):
+        INKIND.check_receipt_pins(REPO / "data/inkind")
+        self.assertEqual(set(INKIND.RECEIPT_PINS), set(INKIND.INKIND_FILES) - {INKIND.PROVENANCE})
+
+    def test_reflected_receipt_passes_every_consistency_check_but_not_the_pins(self):
+        """Mirror the 2019 replicates, reseal the receipt with every hash that
+        records it, and only check_receipt_pins rejects the copy."""
+        with tempfile.TemporaryDirectory(prefix="inkind-pins-") as temp:
+            data = Path(temp)
+            for name in (*INKIND.INKIND_FILES, "SHA256SUMS"):
+                shutil.copyfile(REPO / "data/inkind" / name, data / name)
+            uncertainty = json.loads((data / INKIND.UNCERTAINTY).read_text())
+            for run in uncertainty["runs"].values():
+                replicates = run["years"]["2019"]["replicates"]
+                series = list(replicates["without_in_kind"].values())
+                series += [draw for draws in replicates["with_in_kind"].values() for draw in draws]
+                for values in series:
+                    values[1:] = [2 * values[0] - value for value in values[1:]]
+            (data / INKIND.UNCERTAINTY).write_text(json.dumps(uncertainty))
+            digest = hashlib.sha256((data / INKIND.UNCERTAINTY).read_bytes()).hexdigest()
+            provenance = json.loads((data / INKIND.PROVENANCE).read_text())
+            provenance["artifacts"][f"data/inkind/{INKIND.UNCERTAINTY}"]["sha256"] = digest
+            (data / INKIND.PROVENANCE).write_text(json.dumps(provenance))
+            (data / "SHA256SUMS").write_text(
+                "".join(
+                    f"{hashlib.sha256((data / name).read_bytes()).hexdigest()}  data/inkind/{name}\n"
+                    for name in INKIND.INKIND_FILES
+                )
+            )
+            inputs = INKIND.load_inkind(data, REPO / "data/current")
+            INKIND.uncertainty_figures(inputs, self.published)
+            with self.assertRaisesRegex(ValueError, f"{INKIND.UNCERTAINTY} matches the SHA-256 pinned"):
+                INKIND.check_receipt_pins(data)
 
     def test_growth_replicates_pair_the_same_replicate_weight(self):
         """Pairing replicate r of 2022 with replicate r + 1 of 2025 changes

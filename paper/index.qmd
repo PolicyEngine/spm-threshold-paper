@@ -270,9 +270,11 @@ benefits (@sec-inkind), and percentile conventions can also affect the
 estimates. We estimate the replication's standard errors with the CE's
 replicate weights (@sec-inkind-uncertainty). They run 0.85 to 1.35 times
 BLS's published ones for owners with mortgages, 1.01 to 1.95 times for
-owners without mortgages, and 0.66 to 1.02 times for renters. BLS's
-thresholds and ours draw on the same CE interviews, so neither set of
-standard errors measures the sampling error in the gap between them.
+owners without mortgages, and 0.66 to 1.02 times for renters. We cannot
+tell whether BLS computes its standard errors as we do, because its
+threshold workbooks do not describe the method. We use many of the same
+CE interviews as BLS, so neither set of standard errors measures the
+sampling error in the gap between our thresholds and BLS's.
 
 # Imputing in-kind benefits {#sec-inkind}
 
@@ -479,7 +481,9 @@ We estimate sampling uncertainty by balanced repeated replication with
 the CE's 44 replicate weights [@blscese; @spmcalculator2026se]. Under
 each replicate weight, we rerun the whole threshold estimator with and
 without the imputed benefits, from the expenditure-deflation weights to
-the percentile band, and hold each implicate's imputed amounts fixed. We
+the percentile band, and hold each implicate's imputed amounts fixed.
+When we deflate with BLS's FCSUti index instead, we apply its published
+values in every replicate, so the price factors do not vary. We
 combine the replicate variance with the variance across implicates by
 Rubin's rules [@rubin1987]. For the benefits' change to 2022–2025
 growth, we estimate standard errors of 0.74 points for owners with
@@ -487,10 +491,16 @@ mortgages, 2.54 for owners without mortgages, and 1.01 for renters.
 Under either price index, every change lies within three-quarters of a
 standard error of zero.
 
-The spread across implicates supplies 17 to 46 percent of each change's
-variance. Because we draw fresh model parameters for each implicate,
-that spread includes part of the models' estimation uncertainty. We draw
-them from covariances that ignore both surveys' strata and clusters. For
+We estimate that the spread across implicates accounts for 17 to 46
+percent of each change's variance under Rubin's rules. Because we draw
+fresh model parameters for each implicate, that spread includes part of
+the models' estimation uncertainty. We estimate the parameter
+covariances without accounting for either survey's strata or clusters.
+Since we fix each implicate's imputed amounts, the replicate variance
+leaves out sampling variation in the rental model's fit and in the CPS
+ASEC donor samples. BLS imputes missing CE income five times, and we
+use the mean of the five as each unit's income, so our standard errors
+also leave out the spread across them. For
 most units interviewed in both 2015Q1 and 2015Q2, or in both 2016Q4 and
 2017Q1, BLS leaves a different set of replicate weights blank in the two
 quarters. Replicates for the 2019–2021 thresholds, whose windows span at

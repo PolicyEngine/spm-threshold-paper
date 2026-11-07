@@ -321,6 +321,36 @@ INKIND_PROSE_MUTATIONS = (
         r"2016Q3\1and\g<2>2016Q4",
         "half-sample pattern changes",
     ),
+    (
+        "half-sample thresholds",
+        "section",
+        r"Replicates(\s+)for(\s+)the(\s+)2019–2021",
+        r"Replicates\1for\2the\g<3>2019–2022",
+        "half-sample pattern changes",
+    ),
+    (
+        "stage-change standard error period",
+        "section",
+        r"change(\s+)to(\s+)2022–2025(\s+)growth",
+        r"change\1to\g<2>2021–2025\3growth",
+        "standard errors of the stage change",
+    ),
+    (
+        "stage changes moved out of the growth section",
+        "section",
+        r"(We estimate that the imputed benefits\s+change the replication's growth by .*?"
+        r"each within one standard error of zero) \(@sec-inkind-uncertainty\)\."
+        r"(.*?## Uncertainty and limitations \{#sec-inkind-uncertainty\}\n\n)",
+        r"\2\1. ",
+        "stage changes in tenure order, each within one standard error",
+    ),
+    (
+        "appendix receipt count",
+        "appendix",
+        r"we(\s+)keep(\s+)three(\s+)receipts",
+        r"we\1keep\2two\3receipts",
+        "appendix counts the receipts",
+    ),
     # Labels, directions and the displayed formula: each figure stays put
     # while the words that give it meaning change.
     (
@@ -415,6 +445,18 @@ INKIND_PROSE_MUTATIONS = (
         "BLS's imputed benefits rise faster than ours",
     ),
 )
+
+
+def reflect_replicates(uncertainty, year):
+    """Mirror each of one year's replicate thresholds around its full-sample
+    value, with and without the benefits, in both runs. Every squared
+    deviation, and so every standard error, stays the same."""
+    for run in uncertainty["runs"].values():
+        replicates = run["years"][year]["replicates"]
+        series = list(replicates["without_in_kind"].values())
+        series += [draw for draws in replicates["with_in_kind"].values() for draw in draws]
+        for values in series:
+            values[1:] = [2 * values[0] - value for value in values[1:]]
 
 
 def excluded_diagnostic(path):
@@ -945,6 +987,64 @@ class PaperGuardTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("spm_calculator/ce_inkind.py differs across receipts", result.stdout)
         self.assertIn("generators were not run", result.stdout)
+
+    def test_uncertainty_receipt_must_read_the_replication_inputs(self):
+        def zero_bundle(uncertainty):
+            uncertainty["inputs"]["ce_bundles"]["intrvw24.zip"]["sha256"] = "0" * 64
+
+        self.assert_resealed_uncertainty_fails(
+            zero_bundle, "uncertainty receipt reads the replication receipt's raw inputs and seed"
+        )
+
+    def test_uncertainty_receipt_must_use_the_replication_seed(self):
+        def change_seed(uncertainty):
+            uncertainty["inputs"]["imputation_seed"] += 1
+
+        self.assert_resealed_uncertainty_fails(
+            change_seed, "uncertainty receipt reads the replication receipt's raw inputs and seed"
+        )
+
+    def test_reflected_replicates_fail_only_the_pinned_digest(self):
+        """A resealed receipt whose 2019 replicates mirror the committed ones
+        passes every consistency check; the digest pinned outside data/inkind
+        rejects it, and no generator runs."""
+        uncertainty = self.inkind_uncertainty()
+        reflect_replicates(uncertainty, "2019")
+        self.reseal_inkind(INKIND_NAMES[2], uncertainty)
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(f"{INKIND_NAMES[2]} matches the SHA-256 pinned in inkind_inputs.py", result.stdout)
+        self.assertEqual(result.stdout.count("in-kind input validation"), 1, result.stdout)
+        self.assertIn("generators were not run", result.stdout)
+
+    def test_provenance_must_name_the_pinned_calculator_commit(self):
+        provenance_path = self.repo / "data/inkind/provenance.json"
+        provenance = json.loads(provenance_path.read_text())
+        provenance["artifacts"][f"data/inkind/{INKIND_NAMES[2]}"]["calculator_commit"] = "1" * 40
+        provenance_path.write_text(json.dumps(provenance))
+        self.refresh_inkind_manifest()
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(
+            f"{INKIND_NAMES[2]} comes from the calculator commit pinned in inkind_inputs.py", result.stdout
+        )
+        self.assertIn("generators were not run", result.stdout)
+
+    def test_readme_counts_the_receipts_and_names_their_commits(self):
+        readme = self.repo / "README.md"
+        original = readme.read_text()
+        cases = (
+            ("receipt count", "uses three receipts", "uses two receipts"),
+            ("commit", "`7d8e3c8309492b4d760e8eb2131a94dbf78b95b1`", "`7d8e3c8`"),
+        )
+        for name, old, new in cases:
+            with self.subTest(name=name):
+                self.assertEqual(original.count(old), 1, f"ambiguous README edit: {old!r}")
+                readme.write_text(original.replace(old, new))
+                result = self.run_guard()
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("in-kind prose: README counts the receipts and names the commits", result.stdout)
+        readme.write_text(original)
 
     def inkind_replication(self):
         return json.loads((self.repo / "data/inkind" / INKIND_NAMES[1]).read_text())

@@ -60,7 +60,9 @@ comparison with BLS's components at commit
 errors at commit `7d8e3c8309492b4d760e8eb2131a94dbf78b95b1`. The guard
 recomputes every in-kind estimate and standard error in the tables and text
 and checks that the out-of-pocket run reproduces the retrospective
-replication artifact.
+replication artifact. It also checks each receipt against the SHA-256 and
+calculator commit that `scripts/inkind_inputs.py` pins, so replacing a receipt
+takes a matching edit there.
 
 ## Separate 2025 poverty-rate prediction
 
