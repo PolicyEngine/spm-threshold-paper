@@ -27,7 +27,10 @@ push to master and every pull request. It fails when:
     and the thin-donor support count — are pinned inside a
     whitespace-normalized slice of that section, so the same numeral
     occurring elsewhere in the paper cannot satisfy them and line
-    rewrapping cannot split a multi-word literal;
+    rewrapping cannot split a multi-word literal. The guard reads each
+    error rate the abstract quotes from the abstract alone, beside the
+    rule it scores, so a copy in the body cannot rescue a drifted
+    abstract figure and a swap between rules fails;
 (e) the README miscounts the in-kind receipts or omits a calculator
     commit that their provenance records.
 
@@ -732,9 +735,35 @@ check(
     has_number("2.63") and abs(realized_2025 - 0.0263) < 0.0005,
 )
 
+# Figures in the abstract also appear in the body or its tables, so their
+# abstract ties read only the abstract, where a copy elsewhere cannot rescue a
+# drifted figure. Each tie holds a figure beside the rule it scores, so a swap
+# between rules fails too. Both markers must occur exactly once; otherwise the
+# slice comes back empty and every abstract tie fails.
+ABSTRACT = section("abstract: |", "# Introduction")
+
 # Current retrospective results in the abstract are a separate experiment.
-for rule, value in current_ce["projection_evaluation"]["summary_2020_2025"].items():
+ABSTRACT_RETROSPECTIVE_RULES = {
+    "cpi_u": "with the Consumer Price Index",
+    "fcsuti_cpi": "with a composite price index",
+    "replication_ratio": "with replicated consumption growth",
+    "blend": "with an equal blend",
+}
+retrospective = current_ce["projection_evaluation"]["summary_2020_2025"]
+check(
+    "abstract names the retrospective rules and their count",
+    set(retrospective) == set(ABSTRACT_RETROSPECTIVE_RULES)
+    and has_number(
+        f"compare {count_word(len(retrospective))} projection rules", text=ABSTRACT
+    ),
+)
+for rule, value in retrospective.items():
     check(f"current projection prose {rule}", has_number(f"{value:.2f}"))
+    rule_phrase = ABSTRACT_RETROSPECTIVE_RULES.get(rule, "<unnamed rule>")
+    check(
+        f"abstract current projection {rule} {value:.2f}",
+        has_number(f"{value:.2f} percent {rule_phrase}", text=ABSTRACT),
+    )
 
 # (e) The September evaluation, re-derived from data/evaluation_2025.json.
 ev = json.loads((DATA / "evaluation_2025.json").read_text())
@@ -744,13 +773,36 @@ original = R["Original nowcast (pre-repair blend)"]
 repl = R["CE replication growth ratio alone"]
 comp = R["FCSUti-composite CPI aging alone"]
 cpiu = R["All-Items CPI-U aging (status quo)"]
-for label, value, literal in [
-    ("evaluation amended MAE 1.17", amended["mae"], "1.17"),
-    ("evaluation replication MAE 0.75", repl["mae"], "0.75"),
-    ("evaluation composite MAE 2.02", comp["mae"], "2.02"),
-    ("evaluation CPI-U MAE 2.58", cpiu["mae"], "2.58"),
+# The abstract quotes three of these errors, and the body restates each.
+for label, value, literal, abstract_phrase in [
+    (
+        "evaluation amended MAE 1.17",
+        amended["mae"],
+        "1.17",
+        "blend yields a mean absolute error of {} percent",
+    ),
+    (
+        "evaluation replication MAE 0.75",
+        repl["mae"],
+        "0.75",
+        "{} percent for consumption growth alone",
+    ),
+    ("evaluation composite MAE 2.02", comp["mae"], "2.02", None),
+    (
+        "evaluation CPI-U MAE 2.58",
+        cpiu["mae"],
+        "2.58",
+        "{} percent for CPI-U adjustment",
+    ),
 ]:
-    check(label, has_number(literal) and f"{value:.2%}".rstrip("%") == literal)
+    rounds_to_literal = f"{value:.2%}".rstrip("%") == literal
+    check(label, has_number(literal) and rounds_to_literal)
+    if abstract_phrase is not None:
+        check(
+            f"abstract {label}",
+            rounds_to_literal
+            and has_number(abstract_phrase.format(literal), text=ABSTRACT),
+        )
 check(
     "forecast record evaluation original MAE 0.98",
     has_number("0.98", text=record_text)
@@ -1108,7 +1160,6 @@ check(
 INKIND_TEXT = section(
     "# Imputing in-kind benefits {#sec-inkind}", "# Projecting thresholds {#sec-projection}"
 )
-ABSTRACT = " ".join(QMD.split("# Introduction", 1)[0].split())
 EVALUATION_TEXT = section(
     "## Evaluation against published thresholds {#sec-evaluation}",
     "## Validation of the price comparator",
