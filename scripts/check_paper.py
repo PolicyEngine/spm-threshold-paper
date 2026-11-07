@@ -21,19 +21,24 @@ push to master and every pull request. It fails when:
     counts at word boundaries (so ``seven`` does not match inside
     ``sevens``), and the three tenure amounts are matched as ordered
     triples in the sentences that state them, so a swap between
-    tenures fails. Figures that belong to one section — the
-    conditional-forecast rates, the relative-index stabilization
-    year, the area menus, the retrospective validation area count
-    and the thin-donor support count — are pinned inside a
-    whitespace-normalized slice of that section, so the same numeral
-    occurring elsewhere in the paper cannot satisfy them and line
-    rewrapping cannot split a multi-word literal. The guard reads each
-    error rate the abstract quotes from the front matter's ``abstract: |``
-    block alone, as Quarto and pandoc read it, beside the rule it scores,
-    and every rate the abstract gives in that rule's wording must equal
-    the registered value. A copy in other metadata, in a comment, in the
-    body or inside the abstract cannot rescue a drifted figure, and a swap
-    between rules fails;
+    tenures fails. Every registered figure is pinned inside the section
+    that states it, a slice between two headings that must each occur
+    exactly once, so the same numeral occurring elsewhere in the paper
+    cannot satisfy it, and a renamed or repeated heading fails every
+    figure in that section instead of widening the search. A figure
+    that two sections state is pinned in each. Where a figure could
+    trade places with a neighbor, the guard holds it beside the words
+    that say what it measures, reading those phrases from
+    whitespace-normalized text so line rewrapping cannot split them.
+    Figures the guard once searched the whole paper for keep their
+    literal as that search matched it, line breaks included, so the
+    guard still rejects every paper it rejected then. The guard reads
+    each error rate the abstract quotes from the front matter's
+    ``abstract: |`` block alone, as Quarto and pandoc read it, beside
+    the rule it scores, and every rate the abstract gives in that
+    rule's wording must equal the registered value. A copy in other
+    metadata, in a comment, in the body or inside the abstract cannot
+    rescue a drifted figure, and a swap between rules fails;
 (e) the README miscounts the in-kind receipts or omits a calculator
     commit that their provenance records.
 
@@ -140,17 +145,40 @@ def bounded(literal: str) -> str:
     return r"\b" + pattern + r"\b"
 
 
-def has_number(literal: str, text: str = QMD, min_count: int = 1) -> bool:
+def has_number(literal: str, text: str, min_count: int = 1) -> bool:
     """Literal present at numeric-token boundaries: no digit, comma-digit,
-    or dot-digit continuation on either side."""
+    or dot-digit continuation on either side. The caller names the text,
+    so no tie can fall back to searching the whole paper."""
     return len(re.findall(bounded(literal), text)) >= min_count
 
 
-def has_ordered(literals: list[str], window: int = 400, text: str = QMD) -> bool:
+def has_ordered(literals: list[str], window: int = 400, *, text: str) -> bool:
     """The literals appear in this order, each at a token boundary, within
     one window of text."""
     joiner = rf"[\s\S]{{0,{window}}}"
     return re.search(joiner.join(bounded(x) for x in literals), text) is not None
+
+
+def normalized(text: str) -> str:
+    """Each run of whitespace collapsed to one space, so a rewrapped line
+    cannot split a multi-word phrase."""
+    return " ".join(text.split())
+
+
+def section_source(start: str, end: str | None = None, text: str = QMD) -> str:
+    """The paper's text between two headings that must each occur exactly
+    once, as written. A missing, duplicated or reordered heading yields an
+    empty slice and records a failure, so every pin inside it fails rather
+    than silently widening to the whole document."""
+    if text.count(start) != 1 or (end is not None and text.count(end) != 1):
+        failures.append(f"paper section heading not unique: {start!r}")
+        return ""
+    first = text.index(start) + len(start)
+    last = len(text) if end is None else text.index(end)
+    if last <= first:
+        failures.append(f"paper sections out of order: {start!r} before {end!r}")
+        return ""
+    return text[first:last]
 
 
 def section(start: str, end: str | None = None, text: str = QMD) -> str:
@@ -160,15 +188,21 @@ def section(start: str, end: str | None = None, text: str = QMD) -> str:
     split a multi-word literal. A missing, duplicated or reordered heading
     yields an empty slice, so every pin inside it fails rather than
     silently widening to the whole document."""
-    if text.count(start) != 1 or (end is not None and text.count(end) != 1):
-        failures.append(f"paper section heading not unique: {start!r}")
-        return ""
-    first = text.index(start) + len(start)
-    last = len(text) if end is None else text.index(end)
-    if last <= first:
-        failures.append(f"paper sections out of order: {start!r} before {end!r}")
-        return ""
-    return " ".join(text[first:last].split())
+    return normalized(section_source(start, end, text))
+
+
+def stated(literal: str, source: str, *phrases: str) -> bool:
+    """A figure the guard once searched the whole paper for, now searched
+    for in the source of the section that states it.
+
+    The literal must appear as the whole-paper search matched it, line
+    breaks included, so the tie still fails on every paper the whole-paper
+    search rejected. Each phrase holds the figure beside the words that say
+    what it measures; the guard reads phrases from the whitespace-normalized
+    source, so rewrapping a line cannot split one."""
+    return has_number(literal, text=source) and all(
+        has_number(phrase, text=normalized(source)) for phrase in phrases
+    )
 
 
 def front_matter_block(key: str, text: str = QMD) -> str:
@@ -358,9 +392,16 @@ max_tenure_sensitivity = max(
         "include_5_6_as_renter_sensitivity"
     ].values()
 )
+SENSITIVITY_SOURCE = section_source(
+    "## Replicated levels and sample sensitivities", "# Imputing in-kind benefits {#sec-inkind}"
+)
 check(
     "current tenure-sensitivity prose",
-    has_number(f"{max_tenure_sensitivity:.2f} percent"),
+    stated(
+        f"{max_tenure_sensitivity:.2f} percent",
+        SENSITIVITY_SOURCE,
+        f"{max_tenure_sensitivity:.2f} percent when we include tenure codes 5 and 6 as renters",
+    ),
 )
 if failures:
     print("PAPER INPUT CHECK FAILED (generators were not run):")
@@ -419,7 +460,33 @@ check(
     ARTICLE_TABLES <= includes,
 )
 
-# (d) Load-bearing prose figures re-derive from the artifacts.
+# (d) Load-bearing prose figures re-derive from the artifacts. Each figure is
+# read from the section that states it, between two headings that must each
+# occur exactly once, so a copy elsewhere in the paper cannot satisfy it and a
+# renamed or repeated heading fails every figure in that section. The guard
+# keeps the source text of sections whose figures it once searched the whole
+# paper for, since stated() matches those literals as that search did.
+NOWCAST_SOURCE = section_source(
+    "# Pre-committed 2025 validation", "## Evaluation against published thresholds"
+)
+BENCHMARK_SOURCE = section_source(
+    "## Five-year benchmark for the 2025 nowcast", "# Pre-committed 2025 validation"
+)
+EVALUATION_SOURCE = section_source(
+    "## Evaluation against published thresholds {#sec-evaluation}",
+    "## Validation of the price comparator",
+)
+EVALUATION_TEXT = normalized(EVALUATION_SOURCE)
+COMPARATOR_SOURCE = section_source(
+    "## Validation of the price comparator",
+    "# Conditional forecasts beyond available microdata {#sec-rolling}",
+)
+APPENDIX_A_SOURCE = section_source(
+    "# Appendix A: replication benchmark {.unnumbered}",
+    "# Appendix B: reproducibility {.unnumbered}",
+)
+APPENDIX_B_TEXT = section("# Appendix B: reproducibility", "# References")
+
 nowcast = json.loads((DATA / "nowcast_2025.json").read_text())
 AMENDED = {t: f"{nowcast['values'][t]:,.2f}" for t in TENURES}
 check("forecast registration record exists", FORECAST_RECORD.is_file())
@@ -446,18 +513,18 @@ for supporting_path in (
         and local_path.is_file()
         and pinned.stdout == local_path.read_bytes(),
     )
+    # Appendix B links every supporting document; the nowcast section links
+    # the forecast record again beside the pre-commitment claim.
     check(
         f"manuscript links fixed supporting document: {supporting_path}",
-        SUPPORTING_URL_BASE + supporting_path in QMD,
+        f"]({SUPPORTING_URL_BASE}{supporting_path})" in APPENDIX_B_TEXT,
     )
 check(
     "nowcast section links to the fixed forecast registration record",
-    FORECAST_RECORD_URL in QMD.split("# Pre-committed 2025 validation", 1)[-1].split(
-        "## Evaluation against published thresholds", 1
-    )[0],
+    f"]({FORECAST_RECORD_URL})" in NOWCAST_SOURCE,
 )
 for t, literal in AMENDED.items():
-    check(f"nowcast literal {literal}", has_number(literal))
+    check(f"nowcast literal {literal}", stated(literal, NOWCAST_SOURCE))
 # The committed estimate remains in the manuscript, in tenure order.
 check(
     "committed estimate states the amended triple in tenure order",
@@ -471,6 +538,7 @@ check(
             "renters",
         ],
         window=120,
+        text=NOWCAST_SOURCE,
     ),
 )
 ORIGINAL = {
@@ -538,8 +606,15 @@ check(
 backtest = (TABLES / "backtest.md").read_text()
 for literal in ("2.23%", "1.57%", "0.41%", "**0.76%**"):
     check(f"backtest table literal {literal}", literal in backtest)
-for literal in ("2.23", "1.57", "0.41", "0.76"):
-    check(f"backtest prose literal {literal}", has_number(literal))
+# The benchmark section states each rule's error beside the rule, so a swap
+# between rules fails.
+for literal, phrase in (
+    ("2.23", "CPI-U adjustment has a mean absolute error of 2.23 percent"),
+    ("1.57", "reduces the mean absolute error to 1.57 percent"),
+    ("0.41", "replication ratio scores 0.41 percent"),
+    ("0.76", "equal blend scores 0.76 percent"),
+):
+    check(f"backtest prose literal {literal}", stated(literal, BENCHMARK_SOURCE, phrase))
 
 # Recompute all four backtest rules (mirrors build_tables.py).
 cpi = json.loads((DATA / "bls_cpi_series.json").read_text())
@@ -640,16 +715,20 @@ def mae(rule: str) -> float:
 signed_mean = sum(signed_by_rule["cpi_u"]) / len(signed_by_rule["cpi_u"])
 check(
     "signed CPI-U bias -1.9",
-    has_number("1.9 percent") and abs(signed_mean - (-0.019)) < 0.002,
+    stated("1.9 percent", BENCHMARK_SOURCE, "signed mean error of −1.9 percent")
+    and abs(signed_mean - (-0.019)) < 0.002,
 )
 cpiu_low_years = sum(1 for m in annual_signed["cpi_u"] if m < 0)
 check(
     "CPI-U understated four of five years",
-    "four of five" in QMD and cpiu_low_years == 4,
+    stated(
+        "four of five", BENCHMARK_SOURCE, "understates threshold growth in four of five years"
+    )
+    and cpiu_low_years == 4,
 )
 check(
     "composite removes ~thirty percent of CPI-U error",
-    "thirty percent" in QMD
+    stated("thirty percent", BENCHMARK_SOURCE, "removing about thirty percent of the CPI-U error")
     and abs((1 - mae("fcsuti_cpi") / mae("cpi_u")) - 0.30) < 0.02,
 )
 rep_signed = sum(signed_by_rule["replication_ratio"]) / len(
@@ -657,17 +736,20 @@ rep_signed = sum(signed_by_rule["replication_ratio"]) / len(
 )
 check(
     "replication signed mean +0.1",
-    has_number("+0.1") and abs(rep_signed - 0.001) < 0.001,
+    stated("+0.1", BENCHMARK_SOURCE, "signed mean of +0.1 percent")
+    and abs(rep_signed - 0.001) < 0.001,
 )
 check(
     "replication annual signed range +0.5 to −0.3",
-    "+0.5 to −0.3" in QMD
+    stated(
+        "+0.5 to −0.3", BENCHMARK_SOURCE, "annual signed means ranging from +0.5 to −0.3 percent"
+    )
     and abs(max(annual_signed["replication_ratio"]) - 0.005) < 0.001
     and abs(min(annual_signed["replication_ratio"]) - (-0.003)) < 0.001,
 )
 check(
     "blend annual signed range −0.1 to −1.4",
-    "−0.1 to −1.4" in QMD
+    stated("−0.1 to −1.4", BENCHMARK_SOURCE, "annual signed means range from −0.1 to −1.4 percent")
     and abs(max(annual_signed["blend"]) - (-0.001)) < 0.001
     and abs(min(annual_signed["blend"]) - (-0.014)) < 0.001,
 )
@@ -680,8 +762,8 @@ se_ratio = [
 ]
 check(
     "SE range 0.7 to 2.1 percent",
-    has_number("0.7")
-    and has_number("2.1")
+    stated("0.7", APPENDIX_A_SOURCE, "standard errors span 0.7 to 2.1 percent")
+    and stated("2.1", APPENDIX_A_SOURCE)
     and abs(min(se_ratio) - 0.007) < 0.001
     and abs(max(se_ratio) - 0.021) < 0.001,
 )
@@ -704,13 +786,15 @@ for year in range(2019, 2025):
         out.append(sum(abs(v) for v in row[key].values()) / 3)
 check(
     "replication fidelity 1.5 to 2.1 vs corrected",
-    has_number("1.5 to 2.1")
+    stated("1.5 to 2.1", APPENDIX_A_SOURCE, "1.5 to 2.1 percent per year against revised")
     and abs(min(mad_corrected) - 0.015) < 0.001
     and abs(max(mad_corrected) - 0.021) < 0.001,
 )
 check(
     "replication fidelity 1.0 to 1.6 vs published",
-    has_number("1.0 to 1.6")
+    stated(
+        "1.0 to 1.6", APPENDIX_A_SOURCE, "1.0 to 1.6 percent against the preceding published series"
+    )
     and abs(min(mad_published) - 0.010) < 0.001
     and abs(max(mad_published) - 0.016) < 0.001,
 )
@@ -721,27 +805,31 @@ blend_growth = [nowcast["components"][t]["blend_ratio"] - 1 for t in TENURES]
 price_growth = nowcast["components"]["renter"]["price_ratio"] - 1
 check(
     "replication growth 4.4 to 6.0",
-    has_number("4.4 to 6.0")
+    stated("4.4 to 6.0", NOWCAST_SOURCE, "threshold growth ranged from 4.4 to 6.0 percent")
     and abs(min(rep_growth) - 0.044) < 0.001
     and abs(max(rep_growth) - 0.060) < 0.001,
 )
 check(
-    "price growth 3.2", has_number("3.2 percent") and abs(price_growth - 0.032) < 0.001
+    "price growth 3.2",
+    stated("3.2 percent", NOWCAST_SOURCE, "against 3.2 percent composite-price growth")
+    and abs(price_growth - 0.032) < 0.001,
 )
 check(
     "blend growth 3.8 to 4.6",
-    has_number("3.8 to 4.6")
+    stated("3.8 to 4.6", NOWCAST_SOURCE, "blend projected 3.8 to 4.6 percent growth")
     and abs(min(blend_growth) - 0.038) < 0.001
     and abs(max(blend_growth) - 0.046) < 0.001,
 )
 realized_2025 = cpi["CUUR0000SA0"]["2025"] / cpi["CUUR0000SA0"]["2024"] - 1
 check(
     "realized CPI-U 2025 growth 2.6",
-    has_number("2.6 percent") and abs(realized_2025 - 0.026) < 0.002,
+    stated("2.6 percent", NOWCAST_SOURCE, "2.6 percent realized CPI-U growth")
+    and abs(realized_2025 - 0.026) < 0.002,
 )
 check(
     "eleven-month CPI-U growth 2.63 quoted",
-    has_number("2.63") and abs(realized_2025 - 0.0263) < 0.0005,
+    stated("2.63", COMPARATOR_SOURCE, "2.63 percent implied by the eleven-month annual average")
+    and abs(realized_2025 - 0.0263) < 0.0005,
 )
 
 # Figures in the abstract also appear in the body or its tables, so their
@@ -769,7 +857,7 @@ check(
     == {count_word(len(retrospective))},
 )
 for rule, value in retrospective.items():
-    check(f"current projection prose {rule}", has_number(f"{value:.2f}"))
+    check(f"current projection prose {rule}", has_number(f"{value:.2f}", text=ABSTRACT))
     rule_phrase = ABSTRACT_RETROSPECTIVE_RULES.get(rule, "<unnamed rule>")
     check(
         f"abstract current projection {rule} {value:.2f}",
@@ -784,45 +872,72 @@ original = R["Original nowcast (pre-repair blend)"]
 repl = R["CE replication growth ratio alone"]
 comp = R["FCSUti-composite CPI aging alone"]
 cpiu = R["All-Items CPI-U aging (status quo)"]
-# The abstract quotes three of these errors, and the body restates each.
-for label, value, literal, abstract_phrase in [
+# The evaluation section states all four errors, each beside its rule, and the
+# abstract quotes three of them.
+for label, value, literal, evaluation_phrase, abstract_phrase in [
     (
         "evaluation amended MAE 1.17",
         amended["mae"],
         "1.17",
+        "giving a mean absolute error of {} percent",
         "blend yields a mean absolute error of {} percent",
     ),
     (
         "evaluation replication MAE 0.75",
         repl["mae"],
         "0.75",
+        "ratio alone scores {} percent",
         "{} percent for consumption growth alone",
     ),
-    ("evaluation composite MAE 2.02", comp["mae"], "2.02", None),
+    (
+        "evaluation composite MAE 2.02",
+        comp["mae"],
+        "2.02",
+        "composite-price adjustment scores {} percent",
+        None,
+    ),
     (
         "evaluation CPI-U MAE 2.58",
         cpiu["mae"],
         "2.58",
+        "for a mean absolute error of {} percent",
         "{} percent for CPI-U adjustment",
     ),
 ]:
     rounds_to_literal = f"{value:.2%}".rstrip("%") == literal
-    check(label, has_number(literal) and rounds_to_literal)
+    check(
+        label,
+        stated(literal, EVALUATION_SOURCE, evaluation_phrase.format(literal))
+        and rounds_to_literal,
+    )
     if abstract_phrase is not None:
         check(
             f"abstract {label}",
             rounds_to_literal
             and set(stated_values(abstract_phrase, ABSTRACT)) == {literal},
         )
+# The nowcast section's note compares the superseded blend's error with the
+# committed blend's.
+check(
+    "nowcast evaluation amended MAE 1.17",
+    f"{amended['mae']:.2%}".rstrip("%") == "1.17"
+    and stated("1.17", NOWCAST_SOURCE, "compared with 1.17 percent for the committed blend"),
+)
 check(
     "forecast record evaluation original MAE 0.98",
     has_number("0.98", text=record_text)
-    and has_number("0.98")
+    and stated(
+        "0.98", NOWCAST_SOURCE, "superseded blend had a mean absolute error of 0.98 percent"
+    )
     and f"{original['mae']:.2%}".rstrip("%") == "0.98",
 )
 check(
     "evaluation per-tenure misses 0.69, 0.55, 2.27 in order",
-    has_ordered(["0.69", "0.55", "2.27"], window=20)
+    has_ordered(["0.69", "0.55", "2.27"], window=20, text=EVALUATION_SOURCE)
+    and has_number(
+        "blend understates the three thresholds by 0.69, 0.55, and 2.27 percent",
+        text=EVALUATION_TEXT,
+    )
     and abs(amended["errors"]["owner_with_mortgage"] - (-0.0069)) < 0.0001
     and abs(amended["errors"]["owner_without_mortgage"] - (-0.0055)) < 0.0001
     and abs(amended["errors"]["renter"] - (-0.0227)) < 0.0001,
@@ -830,13 +945,18 @@ check(
 ev_signed = sum(amended["errors"].values()) / 3
 check(
     "evaluation signed mean −1.17",
-    "−1.17" in QMD and abs(ev_signed - (-0.0117)) < 0.00005,
+    stated("−1.17", EVALUATION_SOURCE, "signed mean error also equals −1.17 percent")
+    and abs(ev_signed - (-0.0117)) < 0.00005,
 )
 cpiu_errs = [abs(v) for v in cpiu["errors"].values()]
 cpiu_error_range = f"{min(cpiu_errs):.2%} to {max(cpiu_errs):.2%}".replace("%", "")
 check(
     f"CPI-U 2025 understated every tenure by {cpiu_error_range} percent",
-    has_number(f"{cpiu_error_range} percent")
+    stated(
+        f"{cpiu_error_range} percent",
+        EVALUATION_SOURCE,
+        f"CPI-U adjustment understates all three thresholds by {cpiu_error_range} percent",
+    )
     and all(v < 0 for v in cpiu["errors"].values()),
 )
 check(
@@ -856,22 +976,25 @@ for literal, value in [
 ]:
     check(
         f"BLS 2025 literal {literal}",
-        has_number(literal) and f"{round(value):,}" == literal,
+        stated(literal, EVALUATION_SOURCE) and f"{round(value):,}" == literal,
     )
 check(
     "BLS 2025 triple in tenure order",
     has_ordered(
         ["41,323", "owners with", "34,326", "owners without", "41,701", "renters"],
         window=80,
+        text=EVALUATION_SOURCE,
     ),
 )
 g = actual["bls_stated_growth_pct_2025_over_2024"]
 check(
     "BLS-stated 2025 growth 4.40-6.33 and per-tenure 5.33/4.40/6.33",
-    has_number("4.40 to 6.33")
-    and has_number("6.33")
-    and has_number("5.33")
-    and has_number("4.40")
+    stated("4.40 to 6.33", EVALUATION_SOURCE, "growth of 4.40 to 6.33 percent by tenure")
+    and stated(
+        "6.33", EVALUATION_SOURCE, "renter growth of 6.33 percent against 5.33 and 4.40 percent"
+    )
+    and stated("5.33", EVALUATION_SOURCE)
+    and stated("4.40", EVALUATION_SOURCE)
     and abs(min(g.values()) - 4.402) < 0.001
     and abs(max(g.values()) - 6.325) < 0.001
     and abs(g["owner_with_mortgage"] - 5.332) < 0.001,
@@ -881,11 +1004,12 @@ now_growth_renter = (
 ) * 100
 check(
     "nowcast renter growth 3.92",
-    has_number("3.92") and abs(now_growth_renter - 3.92) < 0.005,
+    stated("3.92", EVALUATION_SOURCE, "blend projects renter growth of 3.92 percent")
+    and abs(now_growth_renter - 3.92) < 0.005,
 )
 check(
     "replication renter growth 4.62",
-    has_number("4.62")
+    stated("4.62", EVALUATION_SOURCE, "replication alone 4.62 percent")
     and abs((nowcast["components"]["renter"]["replication_ratio"] - 1) * 100 - 4.62)
     < 0.005,
 )
@@ -893,7 +1017,12 @@ se25 = actual["standard_errors"]
 miss_se = {t: (amended["values"][t] - actual["values"][t]) / se25[t] for t in TENURES}
 check(
     "owner misses within one SE; renter about 2.4 SE",
-    "2.4 standard errors" in QMD
+    stated(
+        "2.4 standard errors",
+        EVALUATION_SOURCE,
+        "owner differences fall within one published BLS standard error",
+        "renter difference reaches about 2.4 standard errors",
+    )
     and abs(miss_se["owner_with_mortgage"]) < 1
     and abs(miss_se["owner_without_mortgage"]) < 1
     and abs(abs(miss_se["renter"]) - 2.4) < 0.05,
@@ -905,20 +1034,25 @@ for literal, key in (
 ):
     check(
         f"2025 SE literal {literal}",
-        has_number(literal) and f"{round(se25[key])}" == literal,
+        stated(literal, EVALUATION_SOURCE) and f"{round(se25[key])}" == literal,
     )
+check(
+    "2025 SE triple in tenure order",
+    has_number("standard errors of \\$327, \\$560, and \\$393", text=EVALUATION_TEXT),
+)
 gaps = ev["composite_vs_bls_fcsuti_gap_pp"]
 check(
     "composite within 0.7pp of BLS FCSUti, mean gap 0.4",
-    "0.7 percentage point" in QMD
+    stated("0.7 percentage point", COMPARATOR_SOURCE, "at most 0.7 percentage point")
     and max(abs(v) for v in gaps.values()) < 0.7
-    and "0.4 point" in QMD
+    and stated("0.4 point", COMPARATOR_SOURCE, "mean absolute gap of 0.4 point")
     and abs(sum(abs(v) for v in gaps.values()) / len(gaps) - 0.4) < 0.05,
 )
 bls_cpiu_2025 = actual["bls_chart4_annual_average_inflation_pct"]["2025"]["cpi_u"]
 check(
     "BLS page 2025 CPI-U growth 2.70 quoted",
-    has_number("2.70 percent") and abs(bls_cpiu_2025 - 2.70) < 0.005,
+    stated("2.70 percent", COMPARATOR_SOURCE, "reports CPI-U growth of 2.70 percent")
+    and abs(bls_cpiu_2025 - 2.70) < 0.005,
 )
 
 # (f) The conditional-forecast section, pinned inside its own two
@@ -1167,13 +1301,10 @@ check(
 
 # In-kind benefits: every figure the section, abstract, evaluation and
 # discussion quote re-derives from data/inkind through inkind_figures, and
-# each is pinned inside the section that states it.
+# each is pinned inside the section that states it. EVALUATION_TEXT and
+# APPENDIX_B_TEXT come from (d).
 INKIND_TEXT = section(
     "# Imputing in-kind benefits {#sec-inkind}", "# Projecting thresholds {#sec-projection}"
-)
-EVALUATION_TEXT = section(
-    "## Evaluation against published thresholds {#sec-evaluation}",
-    "## Validation of the price comparator",
 )
 DISCUSSION_TEXT = section("# Discussion {#sec-discussion}", "# Appendix A: replication benchmark")
 REPLICATION_TEXT = section(
@@ -1182,7 +1313,6 @@ REPLICATION_TEXT = section(
 UNCERTAINTY_TEXT = section(
     "## Uncertainty and limitations {#sec-inkind-uncertainty}", "# Projecting thresholds {#sec-projection}"
 )
-APPENDIX_B_TEXT = section("# Appendix B: reproducibility", "# References")
 GROWTH_FIRST, GROWTH_LAST = inkind_se["growth_window"]
 GROWTH_TEXT = section(
     f"## Threshold growth, {GROWTH_FIRST}–{GROWTH_LAST}", "## Uncertainty and limitations {#sec-inkind-uncertainty}"

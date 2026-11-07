@@ -470,7 +470,7 @@ ABSTRACT_PROSE_MUTATIONS = (
         "2020-2025 CPI-U error",
         r"2\.29(\s+)percent",
         r"2.30\1percent",
-        ("abstract current projection cpi_u 2.29",),
+        ("abstract current projection cpi_u 2.29", "current projection prose cpi_u"),
         "We obtain 2.29 percent with the Consumer Price Index.",
     ),
     (
@@ -484,21 +484,27 @@ ABSTRACT_PROSE_MUTATIONS = (
         "2020-2025 composite error",
         r"1\.65(\s+)percent",
         r"1.66\1percent",
-        ("abstract current projection fcsuti_cpi 1.65",),
+        (
+            "abstract current projection fcsuti_cpi 1.65",
+            "current projection prose fcsuti_cpi",
+        ),
         "We obtain 1.65 percent with a composite price index.",
     ),
     (
         "2020-2025 replication error",
         r"0\.51(\s+)percent",
         r"0.52\1percent",
-        ("abstract current projection replication_ratio 0.51",),
+        (
+            "abstract current projection replication_ratio 0.51",
+            "current projection prose replication_ratio",
+        ),
         "We obtain 0.51 percent with replicated consumption growth.",
     ),
     (
         "2020-2025 blend error",
         r"0\.90(\s+)percent",
         r"0.91\1percent",
-        ("abstract current projection blend 0.90",),
+        ("abstract current projection blend 0.90", "current projection prose blend"),
         "We obtain 0.90 percent with an equal blend.",
     ),
     (
