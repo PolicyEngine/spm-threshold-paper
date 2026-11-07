@@ -1377,10 +1377,44 @@ class PaperGuardTests(unittest.TestCase):
                 )
         self.install_article()
 
-    def test_abstract_block_fails_closed_without_one_literal_key(self):
-        """A folded, repeated or relocated `abstract: |` key empties the
-        abstract slice, so every abstract tie fails instead of reading other
-        text."""
+    def test_abstract_ties_skip_a_comment_after_the_block(self):
+        """YAML ends the abstract's block at a line indented less than the
+        block, a comment included, so a comment that keeps wording the
+        abstract dropped cannot satisfy that wording's tie."""
+        cases = (
+            (
+                "CPI-U rule renamed",
+                r"with(\s+)the(\s+)Consumer(\s+)Price(\s+)Index",
+                r"with\1the\2CPI-U\3price\4index",
+                "2.29 percent with the Consumer Price Index",
+                ["abstract current projection cpi_u 2.29"],
+            ),
+            (
+                "stage-change bound changed",
+                r"less(\s+)than(\s+)one(\s+)point",
+                r"less\1than\2half\3a point",
+                "growth by less than one point per tenure",
+                ["in-kind prose: abstract stage changes under one point per tenure"],
+            ),
+        )
+        for name, pattern, replacement, comment, labels in cases:
+            with self.subTest(case=name):
+                self.install_article()
+                self.mutate_article("abstract", pattern, replacement)
+                path = self.repo / "paper/index.qmd"
+                prose = path.read_text()
+                span = PAPER_TEXT.block_scalar_span(prose, "abstract")
+                self.assertIsNotNone(span, "fixture has no abstract block")
+                path.write_text(f"{prose[: span[1]]} # {comment}\n{prose[span[1] :]}")
+                result = self.run_guard()
+                self.assertEqual(sorted(failure_lines(result.stdout)), sorted(labels))
+        self.install_article()
+
+    def test_abstract_block_fails_closed_unless_one_key_sets_the_abstract(self):
+        """A folded, repeated or relocated `abstract: |` key, or a metadata
+        block in the body that sets the abstract, empties the abstract slice,
+        so every abstract tie fails instead of reading text that the paper
+        does not render as its abstract."""
         prose = (self.repo / "paper/index.qmd").read_text()
         span = PAPER_TEXT.block_scalar_span(prose, "abstract")
         self.assertIsNotNone(span, "fixture has no abstract block")
@@ -1393,6 +1427,11 @@ class PaperGuardTests(unittest.TestCase):
                 "abstract key only in the body",
                 ((key, "summary: |\n"), ("\n# Introduction\n", f"\n{key}{block}\n# Introduction\n")),
             ),
+            ("quoted abstract key repeated", ((block, f'{block}"abstract": |\n{block}'),)),
+            (
+                "body metadata block sets the abstract",
+                ((DISCUSSION_HEADING, f"---\n{key}{block}---\n\n{DISCUSSION_HEADING}"),),
+            ),
         )
         for name, edits in cases:
             with self.subTest(case=name):
@@ -1402,7 +1441,7 @@ class PaperGuardTests(unittest.TestCase):
                 self.assertNotEqual(result.returncode, 0)
                 failures = failure_lines(result.stdout)
                 for label in (
-                    "paper front matter lacks exactly one abstract: | block",
+                    "paper must set abstract only in one abstract: | block of its front matter",
                     *ABSTRACT_TIE_LABELS,
                     "in-kind prose: abstract in-kind lift range",
                 ):
