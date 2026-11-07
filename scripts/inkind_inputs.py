@@ -1,6 +1,6 @@
 """Validated inputs and derived figures for the in-kind benefit section.
 
-``data/inkind/`` holds two receipts from PolicyEngine/spm-calculator, their
+``data/inkind/`` holds three receipts from PolicyEngine/spm-calculator, their
 provenance record and a checksum manifest:
 
 - ``ce_inkind_replication_2019_2025.json`` replicates 2019-2025 thresholds
@@ -10,14 +10,18 @@ provenance record and a checksum manifest:
   component means from its published threshold shares and compares them with
   the replication's, under the CE summary definitions and under the shelter
   and food definitions in Garner and Munoz (2021).
+- ``ce_replicate_uncertainty_2019_2025.json`` reruns both price-index runs
+  under each of the CE's 44 replicate weights and stores every replicate's
+  thresholds, for each implicate.
 
 ``load_inkind`` checks the bytes, the provenance, and the receipts' agreement
 with each other and with the out-of-pocket replication in ``data/current``.
 ``inkind_figures`` recomputes every growth rate, gap, share and dollar change
 the in-kind tables and prose report from the receipts' thresholds and band
-means, and checks each against the value the receipt records. Both raise
-``ValueError`` on any inconsistency. The module uses the standard library
-only.
+means, and ``uncertainty_figures`` recomputes every standard error the prose
+reports from the stored replicate thresholds. Each checks its results against
+the values the receipts record and raises ``ValueError`` on any
+inconsistency. The module uses the standard library only.
 """
 
 from __future__ import annotations
@@ -27,14 +31,15 @@ import json
 import math
 import re
 from pathlib import Path
-from statistics import mean, stdev
+from statistics import mean, stdev, variance
 
 TENURES = ("owner_with_mortgage", "owner_without_mortgage", "renter")
 YEARS = tuple(str(year) for year in range(2019, 2026))
 REPLICATION = "ce_inkind_replication_2019_2025.json"
 COMPONENTS = "ce_inkind_bls_components_2019_2025.json"
+UNCERTAINTY = "ce_replicate_uncertainty_2019_2025.json"
 PROVENANCE = "provenance.json"
-INKIND_FILES = (COMPONENTS, REPLICATION, PROVENANCE)
+INKIND_FILES = (COMPONENTS, REPLICATION, UNCERTAINTY, PROVENANCE)
 CLASSIFICATION = "current_retrospective_research"
 # Run name -> (deflator, BLS's written shelter and food definitions applied).
 RUNS = {
@@ -53,6 +58,19 @@ SHARED_IMPUTED = ("nslp", "wic", "broadband")
 SHELTER_UTILITY_IMPUTED = ("liheap", "rental_assistance")
 # The paper states this bound for BLS's share identities, in dollars.
 BLS_IDENTITY_TOLERANCE_DOLLARS = 1e-5
+# The CE's balanced repeated replication: 44 replicate weights, standard BRR
+# (Fay's coefficient 0) through 2024 CE data, and the 43 strata as the
+# complete-data degrees of freedom. The windows for 2019-2025 end in 2025Q1,
+# so every file they read carries standard BRR weights.
+REPLICATES = 44
+STANDARD_BRR = 0.0
+COMPLETE_DATA_DF = 43
+# The receipt reruns the two out-of-pocket price indexes, not the written
+# definitions.
+UNCERTAINTY_RUNS = ("package", "fcsuti")
+# BLS's published threshold standard errors, as the paper records them.
+BLS_SERIES = "bls-corrected-2026-07-17"
+BLS_REVISED_SEGMENT = "revised_2019_2024"
 
 
 def _require(condition: bool, label: str) -> None:
@@ -106,6 +124,7 @@ def load_inkind(data_dir: Path, current_dir: Path) -> dict:
 
     replication = json.loads((data_dir / REPLICATION).read_text())
     components = json.loads((data_dir / COMPONENTS).read_text())
+    uncertainty = json.loads((data_dir / UNCERTAINTY).read_text())
     provenance = json.loads((data_dir / PROVENANCE).read_text())
     current_bytes = (current_dir / "ce_replication_2019_2025.json").read_bytes()
     current = json.loads(current_bytes)
@@ -114,6 +133,7 @@ def load_inkind(data_dir: Path, current_dir: Path) -> dict:
         provenance["classification"]
         == replication["classification"]
         == components["classification"]
+        == uncertainty["classification"]
         == CLASSIFICATION,
         "receipts must be retrospective research",
     )
@@ -124,14 +144,20 @@ def load_inkind(data_dir: Path, current_dir: Path) -> dict:
     )
     _require(
         set(provenance["artifacts"]) == expected - {f"data/inkind/{PROVENANCE}"},
-        "provenance covers exactly the two receipts",
+        "provenance covers exactly the three receipts",
     )
-    for name, receipt in ((REPLICATION, replication), (COMPONENTS, components)):
+    receipts = {REPLICATION: replication, COMPONENTS: components, UNCERTAINTY: uncertainty}
+    fingerprints: dict[str, str] = {}
+    for name, receipt in receipts.items():
         record = provenance["artifacts"][f"data/inkind/{name}"]
         _require(record["sha256"] == manifest[f"data/inkind/{name}"], f"provenance hash {name}")
         _require(record["code_sha256"] == receipt["code_sha256"], f"code fingerprints {name}")
         _require(record["generated_at_git_head"] == receipt["git_head"], f"git head {name}")
         _require(re.fullmatch(r"[0-9a-f]{40}", record["calculator_commit"]) is not None, f"commit {name}")
+        # A source file two receipts both fingerprint must carry one hash, so
+        # the receipts come from the same imputation and threshold code.
+        for path, digest in receipt["code_sha256"].items():
+            _require(fingerprints.setdefault(path, digest) == digest, f"{path} differs across receipts")
     _require(
         components["inputs"]["replication_receipt"]["sha256"]
         == manifest[f"data/inkind/{REPLICATION}"],
@@ -200,7 +226,64 @@ def load_inkind(data_dir: Path, current_dir: Path) -> dict:
                         entry[stage]["gap_percent"][tenure],
                         f"{run} {stage} gap {label}",
                     )
-    return {"replication": replication, "components": components, "provenance": provenance}
+    _check_uncertainty_receipt(uncertainty, replication, components, manifest)
+    return {
+        "replication": replication,
+        "components": components,
+        "uncertainty": uncertainty,
+        "provenance": provenance,
+    }
+
+
+def _check_uncertainty_receipt(uncertainty: dict, replication: dict, components: dict, manifest: dict) -> None:
+    """The replicate receipt derives from the other two and starts from their
+    full-sample thresholds. Runs after every other check, so an edit to the
+    replication or component receipt fails where those checks catch it."""
+    for name, key in ((REPLICATION, "replication_receipt"), (COMPONENTS, "components_receipt")):
+        _require(
+            uncertainty["inputs"][key]["sha256"] == manifest[f"data/inkind/{name}"],
+            f"uncertainty receipt derives from the recorded {key.replace('_', ' ')}",
+        )
+    method = uncertainty["method"]
+    implicates = replication["in_kind_methodology"]["implicates"]
+    _require(
+        uncertainty["complete"] is True
+        and uncertainty["replicates_run"] == method["replicates"] == REPLICATES
+        and method["fay_coefficient"] == STANDARD_BRR
+        and method["complete_data_df"] == COMPLETE_DATA_DF
+        and uncertainty["inputs"]["implicates"] == implicates,
+        "uncertainty receipt runs standard BRR over every replicate and implicate",
+    )
+    full_sample = {
+        "package": lambda year: (
+            replication["results"][year]["with_in_kind_by_implicate"],
+            replication["results"][year]["without_in_kind"],
+        ),
+        "fcsuti": lambda year: (
+            components["runs"]["fcsuti"]["years"][year]["with_in_kind"]["thresholds_by_implicate"],
+            components["runs"]["fcsuti"]["years"][year]["without_in_kind"]["thresholds"],
+        ),
+    }
+    for run in UNCERTAINTY_RUNS:
+        _require(set(uncertainty["runs"][run]["years"]) == set(YEARS), f"uncertainty years {run}")
+        for year in YEARS:
+            entry = uncertainty["runs"][run]["years"][year]
+            replicates = entry["replicates"]
+            by_implicate, without = full_sample[run](year)
+            published = components["bls"]["years"][year]["published_thresholds"]
+            for tenure in TENURES:
+                label = f"{run} {year} {tenure}"
+                draws = replicates["with_in_kind"][tenure]
+                _require(
+                    len(draws) == implicates
+                    and all(len(draw) == 1 + REPLICATES for draw in draws)
+                    and len(replicates["without_in_kind"][tenure]) == 1 + REPLICATES,
+                    f"replicate counts {label}",
+                )
+                for index, (draw, full) in enumerate(zip(draws, by_implicate, strict=True)):
+                    _close(draw[0], full[tenure], f"full-sample threshold with benefits, implicate {index}, {label}")
+                _close(replicates["without_in_kind"][tenure][0], without[tenure], f"full-sample threshold without benefits {label}")
+                _close(entry["bls"]["thresholds"][tenure], published[tenure], f"BLS threshold in the uncertainty receipt {label}")
 
 
 def _imputed_terms(band: dict, components: tuple[str, ...]) -> dict[str, float]:
@@ -433,4 +516,125 @@ def inkind_figures(inputs: dict) -> dict:
         bls_years["2024"]["band"]["by_tenure"]["renter"]["rental_assistance"],
         bls_years["2025"]["band"]["by_tenure"]["renter"]["rental_assistance"],
     )
+    return figures
+
+
+def published_standard_errors(data_dir: Path) -> dict[str, dict[str, float]]:
+    """BLS's published threshold standard errors for 2019-2025 from the
+    paper's own records: the revised 2019-2024 series and the 2025 workbook.
+    The paper's checksum manifest covers both files."""
+    series = json.loads((data_dir / "threshold_series.json").read_text())
+    revised = series["series"][BLS_SERIES]["segments"][BLS_REVISED_SEGMENT]["years"]
+    out = {
+        year: {tenure: revised[year][tenure]["standard_error"] for tenure in TENURES}
+        for year in YEARS
+        if year in revised
+    }
+    out["2025"] = {
+        tenure: json.loads((data_dir / "bls_2025_thresholds.json").read_text())["standard_errors"][tenure]
+        for tenure in TENURES
+    }
+    _require(set(out) == set(YEARS), "BLS standard errors for every year")
+    return out
+
+
+def _replicate_variance(full: float, replicates: list[float]) -> float:
+    """Standard BRR: squared deviations of the 44 replicate estimates from
+    the full-sample estimate, summed and divided by 44 (BLS, "Standard Errors
+    in the Consumer Expenditure Surveys")."""
+    _require(len(replicates) == REPLICATES, f"{REPLICATES} replicates")
+    return sum((value - full) ** 2 for value in replicates) / (REPLICATES * (1 - STANDARD_BRR) ** 2)
+
+
+def _rubin(series: list[list[float]]) -> dict[str, float]:
+    """Rubin's rules over implicates, each given as [full sample, replicates
+    1-44]: T = U + (1 + 1/M) B, with Barnard and Rubin's degrees of freedom on
+    the CE's 43 complete-data degrees of freedom."""
+    m = len(series)
+    _require(m >= 2, "at least two implicates")
+    estimates = [values[0] for values in series]
+    within = mean(_replicate_variance(values[0], values[1:]) for values in series)
+    between = variance(estimates)
+    total = within + (1 + 1 / m) * between
+    fraction = (1 + 1 / m) * between / total if total > 0 else 0.0
+    observed = COMPLETE_DATA_DF * (COMPLETE_DATA_DF + 1) * (1 - fraction) / (COMPLETE_DATA_DF + 3)
+    df = 1 / (fraction**2 / (m - 1) + 1 / observed) if observed > 0 else 0.0
+    return {
+        "estimate": mean(estimates),
+        "within_variance": within,
+        "between_variance": between,
+        "total_variance": total,
+        "standard_error": math.sqrt(total),
+        "fraction_missing_information": fraction,
+        "df": df,
+    }
+
+
+def _check_combined(recomputed: dict[str, float], recorded: dict, label: str) -> None:
+    for key in ("estimate", "within_variance", "between_variance", "standard_error", "fraction_missing_information", "df"):
+        _close(recomputed[key], recorded[key], f"{key.replace('_', ' ')} {label}")
+
+
+def uncertainty_figures(inputs: dict, published_se: dict[str, dict[str, float]]) -> dict:
+    """Recompute, from the stored replicate thresholds, every standard error
+    the prose reports, and check each against the receipt."""
+    uncertainty, components = inputs["uncertainty"], inputs["components"]
+    first, last = "2022", "2025"
+    figures: dict = {"runs": {}}
+    for run in UNCERTAINTY_RUNS:
+        entry = uncertainty["runs"][run]
+        ratios: dict = {"with_in_kind": {t: [] for t in TENURES}, "without_in_kind": {t: [] for t in TENURES}}
+        for year in YEARS:
+            record = entry["years"][year]
+            replicates = record["replicates"]
+            for tenure in TENURES:
+                label = f"{run} {year} {tenure}"
+                _close(record["bls"]["standard_errors"][tenure], published_se[year][tenure], f"BLS standard error {label}")
+                with_stage = _rubin(replicates["with_in_kind"][tenure])
+                _check_combined(with_stage, record["with_in_kind"][tenure], f"level with benefits {label}")
+                without = replicates["without_in_kind"][tenure]
+                without_se = math.sqrt(_replicate_variance(without[0], without[1:]))
+                _close(without[0], record["without_in_kind"][tenure]["estimate"], f"level without benefits {label}")
+                _close(without_se, record["without_in_kind"][tenure]["standard_error"], f"standard error without benefits {label}")
+                for stage, se in (("with_in_kind", with_stage["standard_error"]), ("without_in_kind", without_se)):
+                    ratio = se / published_se[year][tenure]
+                    _close(ratio, record["ratio_to_bls_standard_error"][stage][tenure], f"ratio to BLS {stage} {label}")
+                    ratios[stage][tenure].append(ratio)
+        start, end = entry["years"][first]["replicates"], entry["years"][last]["replicates"]
+        growth = entry["growth"][f"{first}-{last}"]["stage_change_points"]
+        stage_change = {}
+        for tenure in TENURES:
+            label = f"{run} {first}-{last} {tenure}"
+            # Replicate r of each window shares one replicate weight, so the
+            # growth replicates pair them index by index.
+            without_growth = [
+                _growth(a, b) for a, b in zip(start["without_in_kind"][tenure], end["without_in_kind"][tenure], strict=True)
+            ]
+            changes = [
+                [_growth(a, b) - w for a, b, w in zip(early, late, without_growth, strict=True)]
+                for early, late in zip(start["with_in_kind"][tenure], end["with_in_kind"][tenure], strict=True)
+            ]
+            combined = _rubin(changes)
+            _check_combined(combined, growth[tenure], f"stage change {label}")
+            # The prose states the change in growth of the mean thresholds,
+            # as the component receipt records it.
+            change = components["runs"][run]["growth_2022_2025"]["by_tenure"][tenure]["stage_change_points"]
+            _close(change, growth[tenure]["from_mean_thresholds"], f"stage change of mean thresholds {label}")
+            stage_change[tenure] = {
+                "change": change,
+                "standard_error": combined["standard_error"],
+                "standard_errors_from_zero": abs(change) / combined["standard_error"],
+                "implicate_variance_share": combined["fraction_missing_information"],
+            }
+        figures["runs"][run] = {
+            "level_ratio_range": {
+                stage: {tenure: (min(values), max(values)) for tenure, values in by_tenure.items()}
+                for stage, by_tenure in ratios.items()
+            },
+            "stage_change": stage_change,
+        }
+    patterns = uncertainty["checks"]["half_sample_patterns"]["quarters_with_changes"]
+    figures["half_sample_changes"] = {
+        quarter: record["share_keeping_pattern"] for quarter, record in patterns.items()
+    }
     return figures

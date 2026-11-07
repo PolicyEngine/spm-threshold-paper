@@ -59,9 +59,12 @@ from verify_commitments import verify_commitments
 from inkind_inputs import (
     BLS_IDENTITY_TOLERANCE_DOLLARS,
     INKIND_FILES,
+    REPLICATES,
     YEARS,
     inkind_figures,
     load_inkind,
+    published_standard_errors,
+    uncertainty_figures,
 )
 
 REPO = Path(__file__).resolve().parent.parent
@@ -271,8 +274,10 @@ try:
 except (OSError, KeyError, TypeError, ValueError) as error:
     failures.append(f"rolling input validation: {error}")
 try:
-    inkind = inkind_figures(load_inkind(DATA / "inkind", DATA / "current"))
-except (OSError, KeyError, TypeError, ValueError, AttributeError, IndexError) as error:
+    inkind_inputs = load_inkind(DATA / "inkind", DATA / "current")
+    inkind = inkind_figures(inkind_inputs)
+    inkind_se = uncertainty_figures(inkind_inputs, published_standard_errors(DATA))
+except (OSError, KeyError, TypeError, ValueError, AttributeError, IndexError, ZeroDivisionError) as error:
     failures.append(f"in-kind input validation: {error!r}")
 if failures:
     print("PAPER INPUT CHECK FAILED (generators were not run):")
@@ -1092,6 +1097,12 @@ EVALUATION_TEXT = section(
     "## Validation of the price comparator",
 )
 DISCUSSION_TEXT = section("# Discussion {#sec-discussion}", "# Appendix A: replication benchmark")
+REPLICATION_TEXT = section(
+    "# Replication from public consumption data {#sec-replication}", "# Imputing in-kind benefits {#sec-inkind}"
+)
+UNCERTAINTY_TEXT = section(
+    "## Uncertainty and limitations {#sec-inkind-uncertainty}", "# Projecting thresholds {#sec-projection}"
+)
 APPENDIX_B_TEXT = section("# Appendix B: reproducibility", "# References")
 inkind_method = json.loads((DATA / "inkind" / "ce_inkind_replication_2019_2025.json").read_text())[
     "in_kind_methodology"
@@ -1129,12 +1140,20 @@ rent_growth = inkind["rental_assistance_per_renter_growth"]
 our_rent_growth = sorted((rent_growth["package"], rent_growth["fcsuti"]))
 bls_growth = [inkind["bls"][t]["growth"] for t in TENURES]
 stage_changes = [package_run["growth"][t]["stage_change"] for t in TENURES]
-stage_sds = [package_run["growth"][t]["stage_change_sd"] for t in TENURES]
 deflator = list(inkind["deflator_points"].values())
 written_index_gaps = [written_index_run["growth"][t]["less_bls"] for t in TENURES]
 bls_shares = [inkind["bls"][t]["imputed_share_beyond_cpi_u"] for t in TENURES]
 our_shares = [package_run["growth"][t]["imputed_share_beyond_cpi_u"] for t in TENURES]
 renter = package_run["growth"]["renter"]
+package_se = inkind_se["runs"]["package"]
+level_ratios = package_se["level_ratio_range"]["without_in_kind"]
+stage_ses = [package_se["stage_change"][t]["standard_error"] for t in TENURES]
+stage_ratios = [
+    run["stage_change"][t]["standard_errors_from_zero"] for run in inkind_se["runs"].values() for t in TENURES
+]
+implicate_shares = [
+    run["stage_change"][t]["implicate_variance_share"] for run in inkind_se["runs"].values() for t in TENURES
+]
 recent = inkind["bls_2024_2025"]["renter"]
 rent_2024, rent_2025 = inkind["bls_rental_assistance_per_renter_2024_2025"]
 inkind_pins = (
@@ -1211,9 +1230,59 @@ inkind_pins = (
         ),
     ),
     (
-        "stage changes in tenure order, within about one implicate SD",
-        has_ordered([signed(change) for change in stage_changes], window=120, text=INKIND_TEXT)
-        and all(abs(change) <= 1.1 * sd for change, sd in zip(stage_changes, stage_sds)),
+        "stage changes in tenure order, each within one standard error",
+        has_ordered(
+            [*(signed(change) for change in stage_changes), "each within one standard error of zero"],
+            window=120,
+            text=INKIND_TEXT,
+        )
+        and all(
+            package_se["stage_change"][t]["standard_errors_from_zero"] < 1 for t in TENURES
+        ),
+    ),
+    (
+        "replication standard errors relative to BLS's, by tenure",
+        has_number(
+            f"They run {level_ratios[TENURES[0]][0]:.2f} to {level_ratios[TENURES[0]][1]:.2f} times "
+            f"BLS's published ones for owners with mortgages, {level_ratios[TENURES[1]][0]:.2f} to "
+            f"{level_ratios[TENURES[1]][1]:.2f} times for owners without mortgages, and "
+            f"{level_ratios[TENURES[2]][0]:.2f} to {level_ratios[TENURES[2]][1]:.2f} times for renters",
+            text=REPLICATION_TEXT,
+        ),
+    ),
+    (
+        "standard errors of the stage change",
+        has_number(f"the CE's {REPLICATES} replicate weights", text=UNCERTAINTY_TEXT)
+        and has_number(
+            f"standard errors of {stage_ses[0]:.2f} points for owners with mortgages, "
+            f"{stage_ses[1]:.2f} for owners without mortgages, and {stage_ses[2]:.2f} for renters",
+            text=UNCERTAINTY_TEXT,
+        ),
+    ),
+    (
+        "every stage change within three-quarters of a standard error",
+        0.5 < max(stage_ratios) < 0.75
+        and has_number(
+            "Under either price index, every change lies within three-quarters of a standard error of zero",
+            text=UNCERTAINTY_TEXT,
+        ),
+    ),
+    (
+        "implicate share of the stage change's variance",
+        has_number(
+            f"{100 * min(implicate_shares):.0f} to {100 * max(implicate_shares):.0f} percent of each change's variance",
+            text=UNCERTAINTY_TEXT,
+        ),
+    ),
+    (
+        "half-sample pattern changes",
+        set(inkind_se["half_sample_changes"]) == {"2015Q2", "2017Q1"}
+        and all(share < 0.5 for share in inkind_se["half_sample_changes"].values())
+        and has_ordered(
+            ["For most units", "2015Q1 and 2015Q2", "2016Q4 and 2017Q1", "2019–2021 thresholds"],
+            window=200,
+            text=UNCERTAINTY_TEXT,
+        ),
     ),
     (
         "discussion stage-change range",

@@ -52,13 +52,15 @@ The 2019–2025 retrospective experiment uses a separate implementation:
 version 0.5.0 at commit
 `0d7fa0d77b0a88064ab7b9fe70557309b5f7901f`.
 
-The in-kind benefit experiment uses two receipts from spm-calculator, which
+The in-kind benefit experiment uses three receipts from spm-calculator, which
 we keep in [`data/inkind`](data/inkind) with their provenance and checksums:
-the imputation at commit `4778dfab2d109515b6a14e63da63011dd7feb884` and the
+the imputation at commit `4778dfab2d109515b6a14e63da63011dd7feb884`, the
 comparison with BLS's components at commit
-`8b6766cbfcb7cc3b79451b3b5822425a2cc6590d`. The guard recomputes every in-kind estimate in the tables and text and
-checks that the out-of-pocket run reproduces the retrospective replication
-artifact.
+`8b6766cbfcb7cc3b79451b3b5822425a2cc6590d`, and the replicate-weight standard
+errors at commit `7d8e3c8309492b4d760e8eb2131a94dbf78b95b1`. The guard
+recomputes every in-kind estimate and standard error in the tables and text
+and checks that the out-of-pocket run reproduces the retrospective
+replication artifact.
 
 ## Separate 2025 poverty-rate prediction
 

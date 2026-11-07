@@ -268,10 +268,12 @@ weighted shares, including repeated interviews.
 We test sensitivity to youth and tenure treatment. Annual price
 adjustment, the food allocation, omitted home internet and in-kind
 benefits (@sec-inkind), and percentile conventions can also affect the
-estimates. We have not estimated the replication’s sampling
-uncertainty. Published BLS standard errors provide scale for the level
-differences, but they do not account for replication error or covariance
-from shared survey inputs.
+estimates. We estimate the replication's standard errors with the CE's
+replicate weights (@sec-inkind-uncertainty). They run 0.85 to 1.35 times
+BLS's published ones for owners with mortgages, 1.01 to 1.95 times for
+owners without mortgages, and 0.66 to 1.02 times for renters. BLS's
+thresholds and ours draw on the same CE interviews, so neither set of
+standard errors measures the sampling error in the gap between them.
 
 # Imputing in-kind benefits {#sec-inkind}
 
@@ -420,8 +422,8 @@ From 2022 to 2025, CPI-U rose 10.01 percent, BLS's
 FCSUti price index 14.19 percent, and BLS's thresholds 20.63 to 22.15
 percent (@tbl-inkind-growth). The imputed benefits change the
 replication's growth by +0.06 points for owners with mortgages, +0.91
-for owners without mortgages, and −0.62 for renters, each within about
-one between-implicate standard deviation of zero. When we deflate with
+for owners without mortgages, and −0.62 for renters, each within one
+standard error of zero (@sec-inkind-uncertainty). When we deflate with
 BLS's FCSUti index instead of the replication's composite CPI, growth
 rises by 0.9 to 2.0 points, more in every tenure than the benefits move
 it. Under the
@@ -455,11 +457,31 @@ rental assistance per renter rose from \$940 to \$1,243 between those
 thresholds. Our imputed benefits leave the replication's renter growth
 almost unchanged, at 4.84 percent against 4.85 percent without them.
 
-## Uncertainty and limitations
+## Uncertainty and limitations {#sec-inkind-uncertainty}
 
-The standard deviations in @tbl-inkind-growth measure imputation
-uncertainty across implicates; we have not estimated sampling
-uncertainty. Our models share one covariate set across programs and
+We estimate sampling uncertainty by balanced repeated replication with
+the CE's 44 replicate weights [@blscese; @spmcalculator2026se]. Under
+each replicate weight, we rerun the whole threshold estimator with and
+without the imputed benefits, from the expenditure-deflation weights to
+the percentile band, and hold each implicate's imputed amounts fixed. We
+combine the replicate variance with the variance across implicates by
+Rubin's rules [@rubin1987]. For the benefits' change to 2022–2025
+growth, we estimate standard errors of 0.74 points for owners with
+mortgages, 2.54 for owners without mortgages, and 1.01 for renters.
+Under either price index, every change lies within three-quarters of a
+standard error of zero.
+
+The spread across implicates supplies 17 to 46 percent of each change's
+variance. Because we draw fresh model parameters for each implicate,
+that spread includes part of the models' estimation uncertainty. We draw
+them from covariances that ignore both surveys' strata and clusters. For
+most units interviewed in both 2015Q1 and 2015Q2, or in both 2016Q4 and
+2017Q1, BLS leaves a different set of replicate weights blank in the two
+quarters. Replicates for the 2019–2021 thresholds, whose windows span at
+least one of those pairs, can then miss part of the correlation between
+a unit's interviews.
+
+Our models share one covariate set across programs and
 years, and the CE and CPS ASEC measure income differently. We take
 reported rents as exact in the rental model. Our school lunch donors report free
 or reduced-price lunches, while Census also values some paid lunches
@@ -944,15 +966,17 @@ digest is:
 3d86d5c4c0423480e6b69b75d222ffa4a7a2639e4094df5ba2504af01be17173
 ```
 
-For the in-kind experiment in @sec-inkind, we keep two receipts from
+For the in-kind experiment in @sec-inkind, we keep three receipts from
 spm-calculator, with their provenance and checksums, in the paper
 repository's `data/inkind` folder: the imputation at commit
-`4778dfab2d109515b6a14e63da63011dd7feb884` and the comparison with BLS's
-components at commit `8b6766cbfcb7cc3b79451b3b5822425a2cc6590d`.
-Before each render, we check that the out-of-pocket run reproduces the
-retrospective replication artifact exactly, and we recompute every
-in-kind estimate in the tables and text from the receipts' thresholds
-and band means.
+`4778dfab2d109515b6a14e63da63011dd7feb884`, the comparison with BLS's
+components at commit `8b6766cbfcb7cc3b79451b3b5822425a2cc6590d`, and the
+replicate-weight standard errors at commit
+`7d8e3c8309492b4d760e8eb2131a94dbf78b95b1`. Before each render, we
+check that the out-of-pocket run reproduces the retrospective
+replication artifact exactly. We then recompute every in-kind estimate
+in the tables and text from the receipts' thresholds, band means, and
+replicate thresholds.
 
 The input manifests record exact source and release identities. The
 [data

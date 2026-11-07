@@ -188,8 +188,10 @@ PROJECTION_HEADING = "# Projecting thresholds {#sec-projection}\n"
 INKIND_NAMES = (
     "ce_inkind_bls_components_2019_2025.json",
     "ce_inkind_replication_2019_2025.json",
+    "ce_replicate_uncertainty_2019_2025.json",
     "provenance.json",
 )
+REPLICATION_HEADING = "# Replication from public consumption data {#sec-replication}\n"
 
 # Each case drifts one in-kind figure where the paper states it. The lift
 # range also appears in the abstract and the discussion, so the first case
@@ -261,6 +263,63 @@ INKIND_PROSE_MUTATIONS = (
         r"`4778dfab2d109515b6a14e63da63011dd7feb884`",
         "`4778dfab2d109515b6a14e63da63011dd7feb885`",
         "appendix names the recorded calculator commits",
+    ),
+    (
+        "appendix standard-error commit",
+        "appendix",
+        r"`7d8e3c8309492b4d760e8eb2131a94dbf78b95b1`",
+        "`7d8e3c8309492b4d760e8eb2131a94dbf78b95b2`",
+        "appendix names the recorded calculator commits",
+    ),
+    (
+        "replication standard-error ratios",
+        "replication",
+        r"0\.66(\s+)to(\s+)1\.02",
+        r"0.67\1to\g<2>1.02",
+        "replication standard errors relative to BLS's",
+    ),
+    (
+        "swapped replication standard-error ratios",
+        "replication",
+        r"0\.85(\s+)to(\s+)1\.35(.*?)1\.01(\s+)to(\s+)1\.95",
+        r"1.01\1to\g<2>1.95\g<3>0.85\g<4>to\g<5>1.35",
+        "replication standard errors relative to BLS's",
+    ),
+    (
+        "stage change within one standard error",
+        "section",
+        r"each(\s+)within(\s+)one(\s+)standard(\s+)error",
+        r"each\1within\2half\3a\4standard error",
+        "stage changes in tenure order, each within one standard error",
+    ),
+    (
+        "stage-change standard error",
+        "section",
+        r"2\.54(\s+)for",
+        r"2.45\1for",
+        "standard errors of the stage change",
+    ),
+    ("replicate count", "section", r"CE's(\s+)44(\s+)replicate", r"CE's\g<1>40\2replicate", "standard errors of the stage change"),
+    (
+        "three-quarters bound",
+        "section",
+        r"three-quarters(\s+)of(\s+)a",
+        r"half\1of\2a",
+        "every stage change within three-quarters of a standard error",
+    ),
+    (
+        "implicate variance share",
+        "section",
+        r"17(\s+)to(\s+)46(\s+)percent",
+        r"17\1to\g<2>45\3percent",
+        "implicate share of the stage change's variance",
+    ),
+    (
+        "half-sample quarters",
+        "section",
+        r"2016Q4(\s+)and(\s+)2017Q1",
+        r"2016Q3\1and\g<2>2016Q4",
+        "half-sample pattern changes",
     ),
 )
 
@@ -722,12 +781,77 @@ class PaperGuardTests(unittest.TestCase):
         return digest
 
     def reseal_inkind_replication(self, replication):
-        """Reseal an edited replication receipt and repoint the component
-        receipt at it."""
+        """Reseal an edited replication receipt and repoint the component and
+        uncertainty receipts at it."""
         digest = self.reseal_inkind(INKIND_NAMES[1], replication)
         components = json.loads((self.repo / "data/inkind" / INKIND_NAMES[0]).read_text())
         components["inputs"]["replication_receipt"]["sha256"] = digest
-        self.reseal_inkind(INKIND_NAMES[0], components)
+        components_digest = self.reseal_inkind(INKIND_NAMES[0], components)
+        uncertainty = self.inkind_uncertainty()
+        uncertainty["inputs"]["replication_receipt"]["sha256"] = digest
+        uncertainty["inputs"]["components_receipt"]["sha256"] = components_digest
+        self.reseal_inkind(INKIND_NAMES[2], uncertainty)
+
+    def inkind_uncertainty(self):
+        return json.loads((self.repo / "data/inkind" / INKIND_NAMES[2]).read_text())
+
+    def assert_resealed_uncertainty_fails(self, edit, expected):
+        """Edit the uncertainty receipt, update every hash that records it,
+        and expect the semantic check named ``expected`` to reject it."""
+        uncertainty = self.inkind_uncertainty()
+        edit(uncertainty)
+        self.reseal_inkind(INKIND_NAMES[2], uncertainty)
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(expected, result.stdout)
+        self.assertIn("generators were not run", result.stdout)
+
+    def test_resealed_uncertainty_receipt_must_match_its_replicates(self):
+        def move_one_replicate(uncertainty):
+            uncertainty["runs"]["package"]["years"]["2025"]["replicates"]["with_in_kind"]["renter"][0][7] += 40
+
+        self.assert_resealed_uncertainty_fails(
+            move_one_replicate, "within variance level with benefits package 2025 renter"
+        )
+
+    def test_uncertainty_receipt_must_name_the_recorded_receipts(self):
+        def repoint(uncertainty):
+            uncertainty["inputs"]["replication_receipt"]["sha256"] = "0" * 64
+
+        self.assert_resealed_uncertainty_fails(
+            repoint, "uncertainty receipt derives from the recorded replication receipt"
+        )
+
+    def test_uncertainty_receipt_must_start_from_the_replication(self):
+        def shift_full_sample(uncertainty):
+            uncertainty["runs"]["package"]["years"]["2023"]["replicates"]["without_in_kind"]["renter"][0] += 1
+
+        self.assert_resealed_uncertainty_fails(
+            shift_full_sample, "full-sample threshold without benefits package 2023 renter"
+        )
+
+    def test_uncertainty_receipt_must_carry_bls_published_standard_errors(self):
+        def shift_bls_se(uncertainty):
+            uncertainty["runs"]["fcsuti"]["years"]["2024"]["bls"]["standard_errors"]["renter"] += 1
+
+        self.assert_resealed_uncertainty_fails(shift_bls_se, "BLS standard error fcsuti 2024 renter")
+
+    def test_receipts_must_share_code_fingerprints(self):
+        def change_fingerprint(uncertainty):
+            uncertainty["code_sha256"]["spm_calculator/ce_inkind.py"] = "0" * 64
+
+        uncertainty = self.inkind_uncertainty()
+        change_fingerprint(uncertainty)
+        self.reseal_inkind(INKIND_NAMES[2], uncertainty)
+        provenance_path = self.repo / "data/inkind/provenance.json"
+        provenance = json.loads(provenance_path.read_text())
+        provenance["artifacts"][f"data/inkind/{INKIND_NAMES[2]}"]["code_sha256"] = uncertainty["code_sha256"]
+        provenance_path.write_text(json.dumps(provenance))
+        self.refresh_inkind_manifest()
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("spm_calculator/ce_inkind.py differs across receipts", result.stdout)
+        self.assertIn("generators were not run", result.stdout)
 
     def inkind_replication(self):
         return json.loads((self.repo / "data/inkind" / INKIND_NAMES[1]).read_text())
@@ -789,6 +913,7 @@ class PaperGuardTests(unittest.TestCase):
         text = article.read_text()
         bounds = {
             "section": (text.index(INKIND_HEADING), text.index(PROJECTION_HEADING)),
+            "replication": (text.index(REPLICATION_HEADING), text.index(INKIND_HEADING)),
             "abstract": (0, text.index("# Introduction")),
             "evaluation": (
                 text.index("## Evaluation against published thresholds"),

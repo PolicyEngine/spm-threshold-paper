@@ -8,6 +8,7 @@ deterministic without a property-testing dependency.
 """
 
 import importlib.util
+import json
 import math
 import random
 import sys
@@ -204,6 +205,146 @@ class GrowthAndToleranceProperties(unittest.TestCase):
         INKIND._close(4.85, 4.85 + 5e-7, "points within 1e-6")
         with self.assertRaises(ValueError):
             INKIND._close(35000.0, 35000.01, "a cent")
+
+
+def random_implicates(rng, implicates=None):
+    """Implicates of [full sample, 44 replicates] around a common level."""
+    count = implicates or rng.randint(2, 8)
+    level = rng.uniform(-50, 50000)
+    spread = 10 ** rng.uniform(-3, 3)
+    return [
+        [value := level + rng.gauss(0, spread)]
+        + [value + rng.gauss(0, spread * rng.uniform(0.1, 3)) for _ in range(INKIND.REPLICATES)]
+        for _ in range(count)
+    ]
+
+
+def direct_rubin(series):
+    """Rubin's rules written out from the definitions, as a differential
+    reference for inkind_inputs._rubin."""
+    m, r = len(series), INKIND.REPLICATES
+    thetas = [values[0] for values in series]
+    theta_bar = sum(thetas) / m
+    within = sum(sum((x - values[0]) ** 2 for x in values[1:]) / r for values in series) / m
+    between = sum((t - theta_bar) ** 2 for t in thetas) / (m - 1)
+    total = within + (1 + 1 / m) * between
+    lam = (1 + 1 / m) * between / total
+    nu_com = INKIND.COMPLETE_DATA_DF
+    nu_obs = nu_com * (nu_com + 1) * (1 - lam) / (nu_com + 3)
+    nu_m = (m - 1) / lam**2 if lam > 0 else math.inf
+    return theta_bar, within, between, total, lam, 1 / (1 / nu_m + 1 / nu_obs)
+
+
+class ReplicateVarianceProperties(unittest.TestCase):
+    """Standard BRR and Rubin's rules, as the paper recomputes the receipt's
+    standard errors from its stored replicate thresholds."""
+
+    def setUp(self):
+        self.rng = random.Random(20261107)
+
+    def test_replicate_variance_is_a_nonnegative_mean_square(self):
+        for _ in range(DRAWS):
+            full = self.rng.uniform(-1000, 1000)
+            replicates = [full + self.rng.gauss(0, 10) for _ in range(INKIND.REPLICATES)]
+            value = INKIND._replicate_variance(full, replicates)
+            self.assertGreaterEqual(value, 0)
+            shift = self.rng.uniform(-1e4, 1e4)
+            self.assertTrue(
+                math.isclose(
+                    INKIND._replicate_variance(full + shift, [x + shift for x in replicates]),
+                    value,
+                    rel_tol=1e-6,
+                    abs_tol=1e-9,
+                )
+            )
+            shuffled = replicates[:]
+            self.rng.shuffle(shuffled)
+            self.assertTrue(math.isclose(INKIND._replicate_variance(full, shuffled), value, rel_tol=1e-12))
+        self.assertEqual(INKIND._replicate_variance(5.0, [5.0] * INKIND.REPLICATES), 0.0)
+
+    def test_replicate_variance_requires_every_replicate(self):
+        with self.assertRaises(ValueError):
+            INKIND._replicate_variance(1.0, [1.0] * (INKIND.REPLICATES - 1))
+
+    def test_rubin_matches_the_definitions(self):
+        for _ in range(DRAWS):
+            series = random_implicates(self.rng)
+            combined = INKIND._rubin(series)
+            theta_bar, within, between, total, lam, df = direct_rubin(series)
+            for key, expected in (
+                ("estimate", theta_bar),
+                ("within_variance", within),
+                ("between_variance", between),
+                ("total_variance", total),
+                ("fraction_missing_information", lam),
+                ("df", df),
+            ):
+                self.assertTrue(
+                    math.isclose(combined[key], expected, rel_tol=1e-9, abs_tol=1e-12),
+                    f"{key}: {combined[key]!r} != {expected!r}",
+                )
+
+    def test_rubin_bounds(self):
+        for _ in range(DRAWS):
+            series = random_implicates(self.rng)
+            m = len(series)
+            combined = INKIND._rubin(series)
+            total = combined["total_variance"]
+            self.assertGreaterEqual(total, combined["within_variance"] * (1 - 1e-12))
+            self.assertGreaterEqual(total, (1 + 1 / m) * combined["between_variance"] * (1 - 1e-12))
+            self.assertTrue(0 <= combined["fraction_missing_information"] <= 1)
+            self.assertTrue(0 <= combined["df"] <= INKIND.COMPLETE_DATA_DF)
+            self.assertTrue(math.isclose(combined["standard_error"] ** 2, total, rel_tol=1e-12))
+
+    def test_identical_implicates_leave_only_sampling_variance(self):
+        for _ in range(200):
+            first = random_implicates(self.rng, implicates=1)[0]
+            combined = INKIND._rubin([first[:] for _ in range(5)])
+            self.assertEqual(combined["between_variance"], 0)
+            self.assertEqual(combined["fraction_missing_information"], 0)
+            nu = INKIND.COMPLETE_DATA_DF
+            self.assertTrue(math.isclose(combined["df"], nu * (nu + 1) / (nu + 3), rel_tol=1e-12))
+
+
+class UncertaintyReceiptTests(unittest.TestCase):
+    """The committed receipt, recomputed in memory."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.inputs = INKIND.load_inkind(REPO / "data/inkind", REPO / "data/current")
+        cls.published = INKIND.published_standard_errors(REPO / "data")
+
+    def fresh_inputs(self):
+        return {**self.inputs, "uncertainty": json.loads(json.dumps(self.inputs["uncertainty"]))}
+
+    def test_committed_receipt_recomputes(self):
+        figures = INKIND.uncertainty_figures(self.inputs, self.published)
+        for run in INKIND.UNCERTAINTY_RUNS:
+            for tenure in TENURES:
+                stage = figures["runs"][run]["stage_change"][tenure]
+                self.assertGreater(stage["standard_error"], 0)
+                self.assertTrue(0 < stage["implicate_variance_share"] < 1)
+
+    def test_one_moved_replicate_fails(self):
+        inputs = self.fresh_inputs()
+        years = inputs["uncertainty"]["runs"]["fcsuti"]["years"]
+        years["2022"]["replicates"]["with_in_kind"]["owner_with_mortgage"][3][11] += 25
+        with self.assertRaisesRegex(ValueError, "fcsuti 2022 owner_with_mortgage"):
+            INKIND.uncertainty_figures(inputs, self.published)
+
+    def test_growth_replicates_pair_the_same_replicate_weight(self):
+        """Pairing replicate r of 2022 with replicate r + 1 of 2025 changes
+        the growth standard error, so the recorded value pins the pairing."""
+        inputs = self.fresh_inputs()
+        years = inputs["uncertainty"]["runs"]["package"]["years"]
+        for draws in years["2025"]["replicates"]["with_in_kind"]["renter"]:
+            draws[1:] = draws[2:] + draws[1:2]
+        unshifted = years["2025"]["replicates"]["without_in_kind"]["renter"]
+        unshifted[1:] = unshifted[2:] + unshifted[1:2]
+        # Rotating a window's replicates keeps its own variance, so only the
+        # growth pairing changes.
+        with self.assertRaisesRegex(ValueError, "stage change package 2022-2025 renter"):
+            INKIND.uncertainty_figures(inputs, self.published)
 
 
 if __name__ == "__main__":

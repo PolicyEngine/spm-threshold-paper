@@ -36,6 +36,27 @@
       "generated_at_git_head": "5514c6996bfd71e13adcf4dc720fa47c06814e55",
       "pull_request": "https://github.com/PolicyEngine/spm-calculator/pull/55",
       "sha256": "22e62cee945028faf063df553d41ed3e64a26d1f82e4dd4ef82aa1da830b3dcb"
+    },
+    "data/inkind/ce_replicate_uncertainty_2019_2025.json": {
+      "calculator_commit": "7d8e3c8309492b4d760e8eb2131a94dbf78b95b1",
+      "calculator_path": "spm_calculator/data/current/ce_replicate_uncertainty_2019_2025.json",
+      "code_sha256": {
+        "scripts/estimate_ce_replicate_uncertainty.py": "743667482af0f505e4e5c85fad8a601f650713c76bd80a8eaa0a6345e58de20c",
+        "scripts/replicate_ce_inkind.py": "dd46d305b6cf4d2b62a55bfd063b93498728663ae00df245a0a332bb3ae33ae9",
+        "spm_calculator/ce_bls_shares.py": "1434cbf2f527edc82a2c06fb7faa9f0b97079603969faa896d43addf7551dd43",
+        "spm_calculator/ce_decomposition.py": "39be6fc2ceef0764cbf1133a1f4ea39c67a4de6a4e781357f717a7a82d0e00c0",
+        "spm_calculator/ce_inkind.py": "c23e6f26ef32328ef0952d90edca9b382e7fa6e5e029d530a7a0beb9e1d10724",
+        "spm_calculator/ce_inkind_stage.py": "9543b1ce76b6ce1974d1dcfc11e4840202633666da2684201836668f52210986",
+        "spm_calculator/ce_replicates.py": "e4c49f836a4ebf3684dcc60d5b04741c84337249ac7076d3b34c4a42bcc543b6",
+        "spm_calculator/ce_threshold.py": "4efbe2b03f6b1f4eb2911ab0f79f5151bd655cc1e5addf42f5c4540ace1f852f",
+        "spm_calculator/cps_asec.py": "ac4a1ae3b28d34fa3dfbbe5879c88d0274a0e6e46423694bb48808d4f7cf2cc8",
+        "spm_calculator/equivalence_scale.py": "95c797adca4811b0a2c4202e8471f6cd46fcd259bf46b34da74588ab08b41326",
+        "spm_calculator/fcsuti_cpi.py": "cf8fbe9103846d83a280bcd4f13b9ddd91e8baa94e2668b9ef288c7cc980a5fc",
+        "spm_calculator/published_thresholds.py": "bbed3fb2c1658e86172917148f986383c86ba673be1055d9688e8a53600ae2ba"
+      },
+      "generated_at_git_head": "df2d004d9b223f68846df91f98b6a3e9b049c8d0",
+      "pull_request": "https://github.com/PolicyEngine/spm-calculator/pull/57",
+      "sha256": "657f1a964bdcc39a294d368d81a060daff585eb4546ada84c0f1747ed3ac2f99"
     }
   },
   "calculator_repository": "https://github.com/PolicyEngine/spm-calculator",
