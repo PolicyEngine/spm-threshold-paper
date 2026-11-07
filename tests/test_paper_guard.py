@@ -446,6 +446,96 @@ INKIND_PROSE_MUTATIONS = (
     ),
 )
 
+# Each case drifts figures in the abstract alone: (name, pattern, replacement,
+# failing ties, decoy). The body or a generated table states every one of these
+# figures too. The decoy restates the original wording under another heading,
+# so a tie that read the whole document would still pass.
+ABSTRACT_PROSE_MUTATIONS = (
+    (
+        "2020-2025 CPI-U error",
+        r"2\.29(\s+)percent",
+        r"2.30\1percent",
+        ("abstract current projection cpi_u 2.29",),
+        "We obtain 2.29 percent with the Consumer Price Index.",
+    ),
+    (
+        "2020-2025 composite error",
+        r"1\.65(\s+)percent",
+        r"1.66\1percent",
+        ("abstract current projection fcsuti_cpi 1.65",),
+        "We obtain 1.65 percent with a composite price index.",
+    ),
+    (
+        "2020-2025 replication error",
+        r"0\.51(\s+)percent",
+        r"0.52\1percent",
+        ("abstract current projection replication_ratio 0.51",),
+        "We obtain 0.51 percent with replicated consumption growth.",
+    ),
+    (
+        "2020-2025 blend error",
+        r"0\.90(\s+)percent",
+        r"0.91\1percent",
+        ("abstract current projection blend 0.90",),
+        "We obtain 0.90 percent with an equal blend.",
+    ),
+    (
+        "2025 blend error",
+        r"1\.17(\s+)percent",
+        r"1.18\1percent",
+        ("abstract evaluation amended MAE 1.17",),
+        "The blend yields a mean absolute error of 1.17 percent.",
+    ),
+    (
+        "2025 CPI-U error",
+        r"2\.58(\s+)percent",
+        r"2.59\1percent",
+        ("abstract evaluation CPI-U MAE 2.58",),
+        "We obtain 2.58 percent for CPI-U adjustment.",
+    ),
+    (
+        "2025 replication error",
+        r"0\.75(\s+)percent",
+        r"0.74\1percent",
+        ("abstract evaluation replication MAE 0.75",),
+        "We obtain 0.75 percent for consumption growth alone.",
+    ),
+    (
+        "rule count",
+        r"compare(\s+)four(\s+)projection",
+        r"compare\1five\2projection",
+        ("abstract names the retrospective rules and their count",),
+        "We compare four projection rules.",
+    ),
+    (
+        "swapped 2020-2025 errors",
+        r"2\.29(.*?)1\.65",
+        r"1.65\g<1>2.29",
+        (
+            "abstract current projection cpi_u 2.29",
+            "abstract current projection fcsuti_cpi 1.65",
+        ),
+        "We obtain 2.29 percent with the Consumer Price Index and 1.65 percent "
+        "with a composite price index.",
+    ),
+    (
+        "swapped 2025 errors",
+        r"1\.17(.*?)0\.75",
+        r"0.75\g<1>1.17",
+        (
+            "abstract evaluation amended MAE 1.17",
+            "abstract evaluation replication MAE 0.75",
+        ),
+        "The blend yields a mean absolute error of 1.17 percent, and we obtain "
+        "0.75 percent for consumption growth alone.",
+    ),
+)
+
+
+def failure_lines(stdout):
+    """The labels the guard lists as failures, one per line."""
+    return [line[4:] for line in stdout.splitlines() if line.startswith("  - ")]
+
 
 def reflect_replicates(uncertainty, year):
     """Mirror each of one year's replicate thresholds around its full-sample
@@ -1164,6 +1254,61 @@ class PaperGuardTests(unittest.TestCase):
         result = self.run_guard()
         self.assertNotEqual(result.returncode, 0, label)
         self.assertIn(expected, result.stdout)
+
+    def run_abstract_mutation(self, pattern, replacement, decoy=None):
+        self.install_article()
+        self.mutate_article("abstract", pattern, replacement)
+        if decoy is not None:
+            self.edit_article((), DISCUSSION_HEADING, decoy)
+        return self.run_guard()
+
+    def test_abstract_figures_drift_alone(self):
+        """The body restates 1.17, 2.58 and 0.75, so only a tie that reads the
+        abstract can catch a change made there alone."""
+        for name, pattern, replacement, labels, _ in ABSTRACT_PROSE_MUTATIONS:
+            with self.subTest(name=name):
+                result = self.run_abstract_mutation(pattern, replacement)
+                self.assertNotEqual(result.returncode, 0)
+                for label in labels:
+                    self.assertIn(label, failure_lines(result.stdout))
+        self.install_article()
+
+    def test_abstract_pins_reject_a_figure_restated_in_the_body(self):
+        """With the original wording restated in the body, only the abstract's
+        own ties fail."""
+        for name, pattern, replacement, labels, decoy in ABSTRACT_PROSE_MUTATIONS:
+            with self.subTest(name=name):
+                result = self.run_abstract_mutation(pattern, replacement, decoy)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertEqual(sorted(failure_lines(result.stdout)), sorted(labels))
+        self.install_article()
+
+    def test_abstract_slice_fails_closed_without_unique_markers(self):
+        """A renamed, repeated or restyled marker empties the abstract slice,
+        so every abstract tie fails instead of reading the whole paper."""
+        cases = (
+            ("renamed introduction", (("# Introduction\n", "# Background\n"),)),
+            (
+                "repeated introduction",
+                ((DISCUSSION_HEADING, "# Introduction\n\n" + DISCUSSION_HEADING),),
+            ),
+            ("folded abstract", (("abstract: |\n", "abstract: >\n"),)),
+        )
+        for name, edits in cases:
+            with self.subTest(case=name):
+                self.install_article()
+                self.edit_article(edits)
+                result = self.run_guard()
+                self.assertNotEqual(result.returncode, 0)
+                failures = failure_lines(result.stdout)
+                for label in (
+                    "paper section heading not unique: 'abstract: |'",
+                    "abstract evaluation amended MAE 1.17",
+                    "abstract current projection cpi_u 2.29",
+                    "in-kind prose: abstract in-kind lift range",
+                ):
+                    self.assertIn(label, failures)
+        self.install_article()
 
     def test_rolling_prose_figures_drift_from_the_sealed_forecast(self):
         for label, edits, _, _, expected in ROLLING_PROSE_MUTATIONS:
