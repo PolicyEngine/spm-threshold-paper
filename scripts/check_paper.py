@@ -38,6 +38,7 @@ passing under several of these attacks.
 
 from __future__ import annotations
 
+import ast
 import hashlib
 import json
 import math
@@ -1156,6 +1157,82 @@ implicate_shares = [
 ]
 recent = inkind["bls_2024_2025"]["renter"]
 rent_2024, rent_2025 = inkind["bls_rental_assistance_per_renter_2024_2025"]
+
+# The section displays the share formula. We evaluate the formula as
+# printed against BLS's receipt, so a changed operator or subscript fails
+# even when every quoted share stays put.
+SHARE_FORMULA_SYMBOLS = {"I_{2022}": "i22", "I_{2025}": "i25", "B_{2022}": "b22", "B_{2025}": "b25", "\\pi": "pi"}
+
+
+def evaluate_formula(node: ast.AST, names: dict[str, float]) -> float:
+    """Arithmetic over the formula's symbols, and nothing else."""
+    if isinstance(node, ast.Expression):
+        return evaluate_formula(node.body, names)
+    if isinstance(node, ast.Name) and node.id in names:
+        return names[node.id]
+    if isinstance(node, ast.Constant) and type(node.value) in (int, float):
+        return float(node.value)
+    if isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.USub):
+        return -evaluate_formula(node.operand, names)
+    if isinstance(node, ast.BinOp) and isinstance(node.op, (ast.Add, ast.Sub, ast.Mult, ast.Div)):
+        left, right = evaluate_formula(node.left, names), evaluate_formula(node.right, names)
+        return {ast.Add: left + right, ast.Sub: left - right, ast.Mult: left * right}.get(
+            type(node.op), left / right if right else math.nan
+        )
+    raise ValueError(f"unexpected term in the share formula: {ast.dump(node)}")
+
+
+def displayed_shares() -> list[float] | None:
+    """BLS's imputed shares beyond CPI-U, in percent, from the formula the
+    section prints."""
+    match = re.search(r"We compute each share as \$([^$]+)\$", INKIND_TEXT)
+    if match is None:
+        return None
+    expression = match.group(1)
+    for symbol, name in SHARE_FORMULA_SYMBOLS.items():
+        expression = expression.replace(symbol, f" {name} ")
+    expression = re.sub(r"\b(pi)\s+(\w)", r"\1*\2", expression)
+    try:
+        tree = ast.parse(expression, mode="eval")
+    except SyntaxError:
+        return None
+    components = inkind_inputs["components"]
+    bls_years = components["bls"]["years"]
+    shares = []
+    for tenure in TENURES:
+        dollars_by_year = components["bls"]["growth_2022_2025"]["by_tenure"][tenure]["imputed_term_dollars"]
+        names = {
+            "i22": dollars_by_year["2022"],
+            "i25": dollars_by_year["2025"],
+            "b22": bls_years["2022"]["published_thresholds"][tenure],
+            "b25": bls_years["2025"]["published_thresholds"][tenure],
+            "pi": components["inputs"]["cpi"]["cpi_u_ratio_2022_2025"],
+        }
+        try:
+            shares.append(100 * evaluate_formula(tree, names))
+        except ValueError:
+            return None
+    return shares
+
+
+# Method constants the section quotes from the calculator's code rather
+# than from a receipt. We read each from spm_calculator/ce_inkind.py at
+# this fingerprint (calculator commit 4778dfa); a receipt rebuilt from
+# changed code fails the pin until someone rereads them.
+INKIND_METHOD_SOURCE = (
+    "spm_calculator/ce_inkind.py",
+    "c23e6f26ef32328ef0952d90edca9b382e7fa6e5e029d530a7a0beb9e1d10724",
+)
+INKIND_METHOD_CONSTANTS = (
+    "over 179 school days",  # NSLP_SCHOOL_DAYS
+    "free rate below 150 percent of the poverty line",  # FREE_LUNCH_POVERTY_RATIO
+    "split the income groups at 150 percent of the official poverty line",  # the same ratio, for cells
+    "twelve months of USDA's national average monthly food cost",  # 12.0 * cost in the WIC stage
+    "includes a woman aged 15 or older",  # n_women_15_plus in _wic_participants
+    "midpoint of its three-month reference period",  # 1.5 months in _wic_ebt_complete
+    "twelve times the difference",  # 12.0 * benefit in the rental stage
+)
+replication_receipt = json.loads((DATA / "inkind" / "ce_inkind_replication_2019_2025.json").read_text())
 inkind_pins = (
     ("in-kind lift range", has_number(lift_literal, text=INKIND_TEXT)),
     ("abstract in-kind lift range", has_number(lift_literal, text=ABSTRACT)),
@@ -1163,8 +1240,12 @@ inkind_pins = (
     (
         "replication with benefits exceeds BLS in every cell",
         package_run["cells_above_bls_with_stage"] == len(YEARS) * len(TENURES)
-        and has_number("for every tenure in every year", text=INKIND_TEXT)
-        and has_number(f"{gap_low:.2f} to {gap_high:.2f} percent", text=INKIND_TEXT),
+        and gap_low > 0
+        and has_number(
+            f"thresholds that exceed BLS's for every tenure in every year, by {gap_low:.2f} to "
+            f"{gap_high:.2f} percent",
+            text=INKIND_TEXT,
+        ),
     ),
     (
         "BLS home internet range",
@@ -1184,8 +1265,9 @@ inkind_pins = (
     ),
     (
         "written-definition mean absolute deviation",
-        has_number(
-            f"{written_run['mean_absolute_gap']['without_in_kind']:.2f} to "
+        written_run["mean_absolute_gap"]["with_in_kind"] < written_run["mean_absolute_gap"]["without_in_kind"]
+        and has_number(
+            f"mean absolute deviation falls from {written_run['mean_absolute_gap']['without_in_kind']:.2f} to "
             f"{written_run['mean_absolute_gap']['with_in_kind']:.2f} percent",
             text=INKIND_TEXT,
         ),
@@ -1197,7 +1279,8 @@ inkind_pins = (
             window=120,
             text=INKIND_TEXT,
         )
-        and bls_total[2] > rise_high,
+        and bls_total[2] > rise_high
+        and has_number("BLS's rise exceeds the rise in each of our implicates", text=INKIND_TEXT),
     ),
     ("implicate rise range", has_number(f"{dollars(rise_low)} to {dollars(rise_high)}", text=INKIND_TEXT)),
     (
@@ -1232,8 +1315,13 @@ inkind_pins = (
     (
         "stage changes in tenure order, each within one standard error",
         has_ordered(
-            [*(signed(change) for change in stage_changes), "each within one standard error of zero"],
-            window=120,
+            [
+                f"{signed(stage_changes[0])} points for owners with mortgages",
+                f"{signed(stage_changes[1])} for owners without mortgages",
+                f"{signed(stage_changes[2])} for renters",
+                "each within one standard error of zero",
+            ],
+            window=40,
             text=INKIND_TEXT,
         )
         and all(
@@ -1289,8 +1377,18 @@ inkind_pins = (
         has_number(f"{signed(min(stage_changes))} to {signed(max(stage_changes))} points", text=DISCUSSION_TEXT),
     ),
     (
+        "BLS's imputed benefits rise faster than ours",
+        bls_total[2] > our_total[2]
+        and has_number("while BLS's imputed benefits rise faster than ours", text=DISCUSSION_TEXT)
+        and "BLS's imputed benefits grow faster than ours over those years" in ABSTRACT,
+    ),
+    (
         "deflator effect exceeds the stage in every tenure",
-        has_number(f"{min(deflator):.1f} to {max(deflator):.1f} points", text=INKIND_TEXT)
+        has_number(
+            f"growth rises by {min(deflator):.1f} to {max(deflator):.1f} points, more in every tenure than "
+            "the benefits move it",
+            text=INKIND_TEXT,
+        )
         and all(d > abs(c) for d, c in zip(deflator, stage_changes)),
     ),
     (
@@ -1299,13 +1397,27 @@ inkind_pins = (
     ),
     (
         "imputed shares of growth beyond CPI-U",
-        has_ordered([f"{x:.1f}" for x in bls_shares], window=40, text=INKIND_TEXT)
-        and has_ordered([f"{x:.1f}" for x in our_shares], window=40, text=INKIND_TEXT),
+        has_ordered(
+            [
+                f"{bls_shares[0]:.1f} percent of BLS's threshold growth beyond CPI-U for owners with "
+                f"mortgages, against {our_shares[0]:.1f} percent of ours",
+                f"{bls_shares[1]:.1f} against {our_shares[1]:.1f} percent for owners without mortgages",
+                f"{bls_shares[2]:.1f} against {our_shares[2]:.1f} percent for renters",
+            ],
+            window=40,
+            text=INKIND_TEXT,
+        ),
+    ),
+    (
+        "displayed share formula reproduces BLS's shares",
+        (shares := displayed_shares()) is not None
+        and all(math.isclose(a, b, rel_tol=1e-9) for a, b in zip(shares, bls_shares, strict=True)),
     ),
     (
         "renter shortfall with imputed terms removed",
         has_number(
-            f"from {-renter['less_bls']:.2f} to {-renter['less_bls_without_imputed_terms']:.2f} points",
+            f"renter shortfall narrows from {-renter['less_bls']:.2f} to "
+            f"{-renter['less_bls_without_imputed_terms']:.2f} points",
             text=INKIND_TEXT,
         )
         and renter["less_bls"] < renter["less_bls_without_imputed_terms"] < 0,
@@ -1370,6 +1482,11 @@ inkind_pins = (
         and has_number(f"one of the {count_word(inkind_method['pmm_neighbors'])} recipients", text=INKIND_TEXT)
         and has_number(f"fewer than {count_word(inkind_method['min_cell_donors'])} donors", text=INKIND_TEXT)
         and inkind_method["parameter_draws"] is True,
+    ),
+    (
+        "method constants read from fingerprinted calculator code",
+        replication_receipt["code_sha256"].get(INKIND_METHOD_SOURCE[0]) == INKIND_METHOD_SOURCE[1]
+        and all(has_number(constant, text=INKIND_TEXT) for constant in INKIND_METHOD_CONSTANTS),
     ),
     (
         "appendix names the recorded calculator commits",

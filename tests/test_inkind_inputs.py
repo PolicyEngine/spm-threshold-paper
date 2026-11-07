@@ -34,8 +34,12 @@ def load_inkind_module():
 
 INKIND = load_inkind_module()
 TENURES = INKIND.TENURES
-SHARED = INKIND.SHARED_IMPUTED
-SHELTER_UTILITY = INKIND.SHELTER_UTILITY_IMPUTED
+# The classification the paper states ("We add every benefit to FCSUti and
+# add LIHEAP and rental assistance to shelter and utilities as well"),
+# declared here rather than read from the module, so that a
+# misclassified benefit cannot pass the properties below.
+SHARED = ("nslp", "wic", "broadband")
+SHELTER_UTILITY = ("liheap", "rental_assistance")
 ALL_IMPUTED = SHARED + SHELTER_UTILITY
 
 
@@ -116,6 +120,19 @@ class ImputedTermProperties(unittest.TestCase):
             terms = INKIND._imputed_terms(random_band(rng), ())
             self.assertEqual(set(terms), set(TENURES))
             self.assertTrue(all(value == 0 for value in terms.values()))
+
+    def test_module_classifies_the_benefits_as_the_paper_states(self):
+        self.assertEqual(set(INKIND.SHARED_IMPUTED), set(SHARED))
+        self.assertEqual(set(INKIND.SHELTER_UTILITY_IMPUTED), set(SHELTER_UTILITY))
+
+    def test_broadband_alone_adds_the_same_dollars_to_every_tenure(self):
+        rng = random.Random(8)
+        for _ in range(DRAWS):
+            band = random_band(rng)
+            terms = INKIND._imputed_terms(band, ("broadband",))
+            expected = 0.82 * 1.2 * band["pooled"]["broadband"]
+            for tenure in TENURES:
+                self.assertClose(terms[tenure], expected, tenure)
 
     def test_shared_benefits_add_the_same_dollars_to_every_tenure(self):
         rng = random.Random(3)

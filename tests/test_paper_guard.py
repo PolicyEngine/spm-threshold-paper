@@ -321,6 +321,99 @@ INKIND_PROSE_MUTATIONS = (
         r"2016Q3\1and\g<2>2016Q4",
         "half-sample pattern changes",
     ),
+    # Labels, directions and the displayed formula: each figure stays put
+    # while the words that give it meaning change.
+    (
+        "swapped stage-change tenure labels",
+        "section",
+        r"\+0\.06(\s+)points(\s+)for(\s+)owners(\s+)with(\s+)mortgages,(\s+)\+0\.91(\s+)for(\s+)owners(\s+)without",
+        r"+0.06\1points\2for\3owners\4without\5mortgages,\6+0.91\7for\8owners\9with",
+        "stage changes in tenure order",
+    ),
+    (
+        "level comparison direction",
+        "section",
+        r"thresholds(\s+)that(\s+)exceed",
+        r"thresholds\1that\2fall below",
+        "replication with benefits exceeds BLS in every cell",
+    ),
+    (
+        "BLS rise comparison direction",
+        "section",
+        r"BLS's(\s+)rise(\s+)exceeds",
+        r"BLS's\1rise\2trails",
+        "BLS and replication imputed totals",
+    ),
+    (
+        "mean absolute deviation direction",
+        "section",
+        r"deviation(\s+)falls(\s+)from",
+        r"deviation\1rises\2from",
+        "written-definition mean absolute deviation",
+    ),
+    (
+        "deflator direction",
+        "section",
+        r"growth(\s+)rises(\s+)by(\s+)0\.9",
+        r"growth\1falls\2by\g<3>0.9",
+        "deflator effect exceeds the stage in every tenure",
+    ),
+    (
+        "renter shortfall direction",
+        "section",
+        r"shortfall(\s+)narrows",
+        r"shortfall\1widens",
+        "renter shortfall with imputed terms removed",
+    ),
+    (
+        "swapped share tenures",
+        "section",
+        r"7\.6(\s+)against(\s+)2\.8(.*?)12\.9(\s+)against(\s+)2\.0",
+        r"12.9\1against\g<2>2.0\g<3>7.6\4against\g<5>2.8",
+        "imputed shares of growth beyond CPI-U",
+    ),
+    (
+        "swapped BLS and replication shares",
+        "section",
+        r"4\.9(\s+)percent(\s+)of(\s+)BLS's(.*?)2\.2(\s+)percent(\s+)of(\s+)ours",
+        r"2.2\1percent\2of\3BLS's\g<4>4.9\5percent\6of\7ours",
+        "imputed shares of growth beyond CPI-U",
+    ),
+    (
+        "share formula operator",
+        "section",
+        r"I_\{2025\}-\\pi",
+        r"I_{2025}+\\pi",
+        "displayed share formula reproduces BLS's shares",
+    ),
+    (
+        "share formula year",
+        "section",
+        r"\(I_\{2025\}",
+        r"(I_{2022}",
+        "displayed share formula reproduces BLS's shares",
+    ),
+    (
+        "school days",
+        "section",
+        r"179(\s+)school",
+        r"180\1school",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "WIC mother's minimum age",
+        "section",
+        r"woman(\s+)aged(\s+)15(\s+)or",
+        r"woman\1aged\g<2>18\3or",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "discussion comparison direction",
+        "discussion",
+        r"rise(\s+)faster(\s+)than(\s+)ours",
+        r"rise\1more\2slowly\3than ours",
+        "BLS's imputed benefits rise faster than ours",
+    ),
 )
 
 
@@ -919,6 +1012,7 @@ class PaperGuardTests(unittest.TestCase):
                 text.index("## Evaluation against published thresholds"),
                 text.index("## Validation of the price comparator"),
             ),
+            "discussion": (text.index(DISCUSSION_HEADING), text.index("# Appendix A: replication benchmark")),
             "appendix": (text.index("# Appendix B: reproducibility"), len(text)),
         }
         start, end = bounds[where]
