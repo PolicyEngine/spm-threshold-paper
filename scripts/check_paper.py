@@ -29,10 +29,11 @@ push to master and every pull request. It fails when:
     occurring elsewhere in the paper cannot satisfy them and line
     rewrapping cannot split a multi-word literal. The guard reads each
     error rate the abstract quotes from the front matter's ``abstract: |``
-    block alone, beside the rule it scores, and every rate the abstract
-    gives in that rule's wording must equal the registered value. A copy
-    in other metadata, in the body or inside the abstract cannot rescue a
-    drifted figure, and a swap between rules fails;
+    block alone, as pandoc reads it, beside the rule it scores, and every
+    rate the abstract gives in that rule's wording must equal the
+    registered value. A copy in other metadata, in a comment, in the body
+    or inside the abstract cannot rescue a drifted figure, and a swap
+    between rules fails;
 (e) the README miscounts the in-kind receipts or omits a calculator
     commit that their provenance records.
 
@@ -180,12 +181,13 @@ def section(start: str, end: str | None = None, text: str = QMD) -> str:
 
 def front_matter_block(key: str, text: str = QMD) -> str:
     """Whitespace-normalized text of the front matter's one ``key: |``
-    literal block. Pins read from it see neither other metadata fields nor
-    body text. A missing, repeated or restyled key yields an empty slice, so
-    every pin inside it fails instead of reading other text."""
+    literal block, read as pandoc reads it. Pins that read it see no other
+    metadata field, comment or body text. When ``block_scalar_span`` finds
+    no such block, or finds another line that sets the key, the slice is
+    empty, so every pin inside it fails instead of reading other text."""
     span = block_scalar_span(text, key)
     if span is None:
-        failures.append(f"paper front matter lacks exactly one {key}: | block")
+        failures.append(f"paper must set {key} only in one {key}: | block of its front matter")
         return ""
     return " ".join(text[span[0] : span[1]].split())
 
@@ -751,9 +753,10 @@ check(
 )
 
 # Figures in the abstract also appear in the body or its tables, so their
-# abstract ties read only the indented lines under the front matter's
-# `abstract: |` key. Other metadata fields and body text fall outside that
-# block, so a copy there cannot rescue a drifted figure. Each tie collects
+# abstract ties read only the front matter's `abstract: |` block, as pandoc
+# reads it. Other metadata fields, comments and body text fall outside that
+# block, so a copy there cannot rescue a drifted figure, and a metadata block
+# in the body that sets the abstract fails every tie. Each tie collects
 # every rate the abstract gives in its rule's wording and requires them all to
 # equal the registered value, so a swap between rules fails, and so does a
 # changed rate that leaves a correct copy elsewhere in the abstract.
