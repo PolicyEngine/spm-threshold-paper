@@ -28,9 +28,11 @@ push to master and every pull request. It fails when:
     whitespace-normalized slice of that section, so the same numeral
     occurring elsewhere in the paper cannot satisfy them and line
     rewrapping cannot split a multi-word literal. The guard reads each
-    error rate the abstract quotes from the abstract alone, beside the
-    rule it scores, so a copy in the body cannot rescue a drifted
-    abstract figure and a swap between rules fails;
+    error rate the abstract quotes from the front matter's ``abstract: |``
+    block alone, beside the rule it scores, and every rate the abstract
+    gives in that rule's wording must equal the registered value. A copy
+    in other metadata, in the body or inside the abstract cannot rescue a
+    drifted figure, and a swap between rules fails;
 (e) the README miscounts the in-kind receipts or omits a calculator
     commit that their provenance records.
 
@@ -75,6 +77,7 @@ from inkind_inputs import (
     published_standard_errors,
     uncertainty_figures,
 )
+from paper_text import block_scalar_span, stated_values
 
 REPO = Path(__file__).resolve().parent.parent
 DATA = REPO / "data"
@@ -165,6 +168,18 @@ def section(start: str, end: str | None = None, text: str = QMD) -> str:
         failures.append(f"paper sections out of order: {start!r} before {end!r}")
         return ""
     return " ".join(text[first:last].split())
+
+
+def front_matter_block(key: str, text: str = QMD) -> str:
+    """Whitespace-normalized text of the front matter's one ``key: |``
+    literal block. Pins read from it see neither other metadata fields nor
+    body text. A missing, repeated or restyled key yields an empty slice, so
+    every pin inside it fails instead of reading other text."""
+    span = block_scalar_span(text, key)
+    if span is None:
+        failures.append(f"paper front matter lacks exactly one {key}: | block")
+        return ""
+    return " ".join(text[span[0] : span[1]].split())
 
 
 COUNT_WORDS = (
@@ -728,11 +743,13 @@ check(
 )
 
 # Figures in the abstract also appear in the body or its tables, so their
-# abstract ties read only the abstract, where a copy elsewhere cannot rescue a
-# drifted figure. Each tie holds a figure beside the rule it scores, so a swap
-# between rules fails too. Both markers must occur exactly once; otherwise the
-# slice comes back empty and every abstract tie fails.
-ABSTRACT = section("abstract: |", "# Introduction")
+# abstract ties read only the indented lines under the front matter's
+# `abstract: |` key. Other metadata fields and body text fall outside that
+# block, so a copy there cannot rescue a drifted figure. Each tie collects
+# every rate the abstract gives in its rule's wording and requires them all to
+# equal the registered value, so a swap between rules fails, and so does a
+# changed rate that leaves a correct copy elsewhere in the abstract.
+ABSTRACT = front_matter_block("abstract")
 
 # Current retrospective results in the abstract are a separate experiment.
 ABSTRACT_RETROSPECTIVE_RULES = {
@@ -745,16 +762,15 @@ retrospective = current_ce["projection_evaluation"]["summary_2020_2025"]
 check(
     "abstract names the retrospective rules and their count",
     set(retrospective) == set(ABSTRACT_RETROSPECTIVE_RULES)
-    and has_number(
-        f"compare {count_word(len(retrospective))} projection rules", text=ABSTRACT
-    ),
+    and set(stated_values("compare {} projection rules", ABSTRACT, r"\S+"))
+    == {count_word(len(retrospective))},
 )
 for rule, value in retrospective.items():
     check(f"current projection prose {rule}", has_number(f"{value:.2f}"))
     rule_phrase = ABSTRACT_RETROSPECTIVE_RULES.get(rule, "<unnamed rule>")
     check(
         f"abstract current projection {rule} {value:.2f}",
-        has_number(f"{value:.2f} percent {rule_phrase}", text=ABSTRACT),
+        set(stated_values(f"{{}} percent {rule_phrase}", ABSTRACT)) == {f"{value:.2f}"},
     )
 
 # (e) The September evaluation, re-derived from data/evaluation_2025.json.
@@ -793,7 +809,7 @@ for label, value, literal, abstract_phrase in [
         check(
             f"abstract {label}",
             rounds_to_literal
-            and has_number(abstract_phrase.format(literal), text=ABSTRACT),
+            and set(stated_values(abstract_phrase, ABSTRACT)) == {literal},
         )
 check(
     "forecast record evaluation original MAE 0.98",
