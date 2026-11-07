@@ -21,21 +21,21 @@ push to master and every pull request. It fails when:
     counts at word boundaries (so ``seven`` does not match inside
     ``sevens``), and the three tenure amounts are matched as ordered
     triples in the sentences that state them, so a swap between
-    tenures fails. Every registered figure is pinned inside the section
-    that states it, a slice between two headings that must each occur
-    exactly once, so the same numeral occurring elsewhere in the paper
-    cannot satisfy it, and a renamed or repeated heading fails every
+    tenures fails. The guard pins every registered figure inside the
+    section that states it: a slice between two headings that must each
+    occur exactly once. The same numeral elsewhere in the paper cannot
+    satisfy the pin, and a renamed or repeated heading fails every
     figure in that section instead of widening the search. A figure
-    that two sections state is pinned in each. Where a figure could
-    trade places with a neighbor, the guard holds it beside the words
-    that say what it measures, reading those phrases from
-    whitespace-normalized text so line rewrapping cannot split them.
-    Figures the guard once searched the whole paper for keep their
-    literal as that search matched it, line breaks included, so the
-    guard still rejects every paper it rejected then. The guard reads
-    each error rate the abstract quotes from the front matter's
-    ``abstract: |`` block alone, as Quarto and pandoc read it, beside
-    the rule it scores, and every rate the abstract gives in that
+    that two sections state gets a pin in each. Most pins also hold the
+    figure beside the words that say what it measures, so a swap
+    between neighbors fails; the guard reads those phrases from
+    whitespace-normalized text, so rewrapping a line cannot split them.
+    Pins built with ``stated()`` match their figure in the section's
+    source text as written, line breaks included, so each fails
+    wherever a search of the whole paper for its figure would fail. The
+    guard reads each error rate the abstract quotes from the front
+    matter's ``abstract: |`` block alone, as Quarto and pandoc read it,
+    beside the rule it scores, and every rate the abstract gives in that
     rule's wording must equal the registered value. A copy in other
     metadata, in a comment, in the body or inside the abstract cannot
     rescue a drifted figure, and a swap between rules fails;
@@ -200,14 +200,13 @@ def section(start: str, end: str | None = None, text: str = QMD) -> str:
 
 
 def stated(literal: str, source: str, *phrases: str) -> bool:
-    """A figure the guard once searched the whole paper for, now searched
-    for in the source of the section that states it.
+    """The literal appears in a section's source text, and each phrase in
+    that text with its whitespace normalized.
 
-    The literal must appear as the whole-paper search matched it, line
-    breaks included, so the tie still fails on every paper the whole-paper
-    search rejected. Each phrase holds the figure beside the words that say
-    what it measures; the guard reads phrases from the whitespace-normalized
-    source, so rewrapping a line cannot split one."""
+    The literal matches the source as written, line breaks included, so the
+    tie fails wherever a search of the whole paper for the literal would
+    fail. Each phrase holds the figure beside the words that say what it
+    measures, and rewrapping a line cannot split a phrase."""
     return has_number(literal, text=source) and all(
         has_number(phrase, text=normalized(source)) for phrase in phrases
     )
@@ -468,12 +467,12 @@ check(
     ARTICLE_TABLES <= includes,
 )
 
-# (d) Load-bearing prose figures re-derive from the artifacts. Each figure is
-# read from the section that states it, between two headings that must each
-# occur exactly once, so a copy elsewhere in the paper cannot satisfy it and a
-# renamed or repeated heading fails every figure in that section. The guard
-# keeps the source text of sections whose figures it once searched the whole
-# paper for, since stated() matches those literals as that search did.
+# (d) Load-bearing prose figures re-derive from the artifacts. The guard reads
+# each figure from the section that states it, between two headings that must
+# each occur exactly once, so a copy elsewhere in the paper cannot satisfy it
+# and a renamed or repeated heading fails every figure in that section. The
+# *_SOURCE slices keep line breaks for stated(); the *_TEXT slices normalize
+# whitespace.
 NOWCAST_SOURCE = section_source(
     "# Pre-committed 2025 validation", "## Evaluation against published thresholds"
 )
