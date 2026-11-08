@@ -56,8 +56,8 @@ The in-kind benefit experiment uses three receipts from spm-calculator, which
 we keep in [`data/inkind`](data/inkind) with their provenance and checksums:
 the imputation at commit `4778dfab2d109515b6a14e63da63011dd7feb884`, the
 comparison with BLS's components at commit
-`8b6766cbfcb7cc3b79451b3b5822425a2cc6590d`, and the replicate-weight standard
-errors at commit `7d8e3c8309492b4d760e8eb2131a94dbf78b95b1`. The guard
+`8f632e31b4e48bbc735161d24665a8182dc0d9d6`, and the replicate-weight standard
+errors at commit `a581c113dd4319fc0f6f9ebd6db5c3697f4a94fa`. The guard
 recomputes every in-kind estimate and standard error in the tables and text
 and checks that the out-of-pocket run reproduces the retrospective
 replication artifact. It also checks each receipt against the SHA-256 and

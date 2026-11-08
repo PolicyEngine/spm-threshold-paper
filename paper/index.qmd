@@ -370,25 +370,27 @@ We estimate that the imputed benefits raise the replicated thresholds
 by 1.1 to 3.8 percent. With them, we estimate thresholds that exceed
 BLS's for every tenure in every year, by 0.26 to 3.53 percent
 (@tbl-inkind-levels). We omit home internet, which averages \$547 to
-\$878 per unit in BLS's band, and read the CE's shelter and food
-summaries. Those summaries include rent and meals received as pay,
-along with other lodging such as vacation homes and lodging on
-out-of-town trips [@ceglossary]. Garner and Munoz [-@garner2021]
-restrict shelter to the primary residence and leave out rent and meals
-received as pay. When we follow their written definitions and remove
-those amounts, along with the vacation-home mortgage principal we add
-to shelter, the out-of-pocket replication trails BLS by 1.21 to 4.22
-percent. When we also add the imputed benefits, we estimate thresholds
-between 1.51 percent below and 1.44 percent above BLS's, and the mean
-absolute deviation falls from 3.03 to 0.73 percent.
+\$878 per unit in BLS's band, and read the CE's shelter, utilities, and
+food summaries. Those summaries include rent and meals received as pay,
+other lodging such as vacation homes and lodging on out-of-town trips
+[@ceglossary], and utilities for vacation homes [@cepumd]. Garner and
+Munoz [-@garner2021] restrict shelter to the primary residence and leave
+out rent and meals received as pay. They count owners' utilities for the
+primary residence only, and renters' utilities for any property but a
+rented vacation home. When we follow their written definitions and
+remove those amounts, along with the vacation-home mortgage principal
+we add to shelter, the out-of-pocket replication trails BLS by 1.98 to
+4.20 percent. When we also add the imputed benefits, we estimate
+thresholds between 1.71 percent below and 1.47 percent above BLS's, and
+the mean absolute deviation falls from 3.14 to 0.72 percent.
 
 ::: {#tbl-inkind-levels}
 {{< include tables/inkind_levels.md >}}
 
 We report the signed deviation of the replication with imputed in-kind
 benefits from each published national threshold. In each cell, we give
-the deviation with the CE summaries first, then with the shelter and
-food definitions of @garner2021.
+the deviation with the CE summaries first, then with the shelter,
+utilities, and food definitions of @garner2021.
 :::
 
 ## BLS's imputed amounts
@@ -453,8 +455,7 @@ We report national threshold growth from 2022 to 2025. Each replication
 row reports growth without imputed benefits, and the row below it
 reports growth with them, followed by the between-implicate standard
 deviation of the change in points. In the final two rows, we apply the
-shelter and food definitions of @garner2021 but keep utilities for
-every property.
+shelter, utilities, and food definitions of @garner2021.
 :::
 
 If we hold each year's band as it stands, we estimate that imputed
@@ -518,9 +519,9 @@ them. We value WIC at USDA's national average food cost, while
 Census uses state averages [@spmtechnical]. BLS adds broadband subsidies
 from the 2023 thresholds [@bls2025thresholds], and we impute them from
 reference year 2021, so they also enter our 2022 thresholds. In the
-written-definition runs, we follow @garner2021 but keep utilities for
-every property, since the FMLI files have no summary of utilities by
-property.
+written-definition runs, we follow @garner2021 but keep spending under
+two codes for other fuels in vacation homes, which the FMLI summaries of
+vacation-home utilities leave out [@cepumd].
 BLS's current code may differ from that paper.
 
 # Projecting thresholds {#sec-projection}
@@ -997,9 +998,9 @@ For the in-kind experiment in @sec-inkind, we keep three receipts from
 spm-calculator, with their provenance and checksums, in the paper
 repository's `data/inkind` folder: the imputation at commit
 `4778dfab2d109515b6a14e63da63011dd7feb884`, the comparison with BLS's
-components at commit `8b6766cbfcb7cc3b79451b3b5822425a2cc6590d`, and the
+components at commit `8f632e31b4e48bbc735161d24665a8182dc0d9d6`, and the
 replicate-weight standard errors at commit
-`7d8e3c8309492b4d760e8eb2131a94dbf78b95b1`. Before each render, we
+`a581c113dd4319fc0f6f9ebd6db5c3697f4a94fa`. Before each render, we
 check that the out-of-pocket run reproduces the retrospective
 replication artifact exactly. We then recompute every in-kind estimate
 in the tables and text from the receipts' thresholds, band means, and

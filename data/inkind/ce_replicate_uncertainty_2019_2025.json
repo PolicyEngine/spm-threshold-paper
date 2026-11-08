@@ -35,7 +35,7 @@
   "code_sha256": {
     "scripts/estimate_ce_replicate_uncertainty.py": "743667482af0f505e4e5c85fad8a601f650713c76bd80a8eaa0a6345e58de20c",
     "scripts/replicate_ce_inkind.py": "dd46d305b6cf4d2b62a55bfd063b93498728663ae00df245a0a332bb3ae33ae9",
-    "spm_calculator/ce_bls_shares.py": "1434cbf2f527edc82a2c06fb7faa9f0b97079603969faa896d43addf7551dd43",
+    "spm_calculator/ce_bls_shares.py": "c6ef2d751feb5b97ead6e4ed74bb03bae6d584d96783033c031d88980b13accf",
     "spm_calculator/ce_decomposition.py": "39be6fc2ceef0764cbf1133a1f4ea39c67a4de6a4e781357f717a7a82d0e00c0",
     "spm_calculator/ce_inkind.py": "c23e6f26ef32328ef0952d90edca9b382e7fa6e5e029d530a7a0beb9e1d10724",
     "spm_calculator/ce_inkind_stage.py": "9543b1ce76b6ce1974d1dcfc11e4840202633666da2684201836668f52210986",
@@ -48,8 +48,8 @@
   },
   "complete": true,
   "generated_by": "scripts/estimate_ce_replicate_uncertainty.py",
-  "generated_on": "2026-11-06",
-  "git_head": "df2d004d9b223f68846df91f98b6a3e9b049c8d0",
+  "generated_on": "2026-11-08",
+  "git_head": "6273b3c039205f5fafd53c1a47da358dc3c0f686",
   "inputs": {
     "ce_bundles": {
       "intrvw14.zip": {
@@ -99,7 +99,7 @@
     },
     "components_receipt": {
       "path": "spm_calculator/data/current/ce_inkind_bls_components_2019_2025.json",
-      "sha256": "04597e4958aa90dfc0b76825b99cfcc2cb9d6d4d653e17095753938896628630"
+      "sha256": "4a08c13e94abb567607a6a1f8e4fba45a049b345ec10f054dae503383f3557be"
     },
     "cpi": {
       "path": "spm_calculator/data/bls/cpi_annual.json",
@@ -5899,7 +5899,7 @@
     "python": "3.13.13",
     "scipy": "1.18.1"
   },
-  "runtime_seconds": 377,
+  "runtime_seconds": 260,
   "schema_version": 1,
   "targets": [2019, 2020, 2021, 2022, 2023, 2024, 2025]
 }

@@ -49,7 +49,7 @@ UNCERTAINTY = "ce_replicate_uncertainty_2019_2025.json"
 PROVENANCE = "provenance.json"
 INKIND_FILES = (COMPONENTS, REPLICATION, UNCERTAINTY, PROVENANCE)
 CLASSIFICATION = "current_retrospective_research"
-# Run name -> (deflator, BLS's written shelter and food definitions applied).
+# Run name -> (deflator, BLS's written shelter, utilities and food definitions applied).
 RUNS = {
     "package": ("package", False),
     "fcsuti": ("fcsuti", False),
@@ -88,12 +88,12 @@ RECEIPT_PINS = {
         "4778dfab2d109515b6a14e63da63011dd7feb884",
     ),
     COMPONENTS: (
-        "04597e4958aa90dfc0b76825b99cfcc2cb9d6d4d653e17095753938896628630",
-        "8b6766cbfcb7cc3b79451b3b5822425a2cc6590d",
+        "4a08c13e94abb567607a6a1f8e4fba45a049b345ec10f054dae503383f3557be",
+        "8f632e31b4e48bbc735161d24665a8182dc0d9d6",
     ),
     UNCERTAINTY: (
-        "657f1a964bdcc39a294d368d81a060daff585eb4546ada84c0f1747ed3ac2f99",
-        "7d8e3c8309492b4d760e8eb2131a94dbf78b95b1",
+        "50a67fab352df9d385ccdc1c70c49794f4e2fc0a7addf013fde27fcfd04af3d2",
+        "a581c113dd4319fc0f6f9ebd6db5c3697f4a94fa",
     ),
 }
 # The growth window whose standard errors the section reports.

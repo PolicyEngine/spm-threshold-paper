@@ -223,9 +223,23 @@ INKIND_PROSE_MUTATIONS = (
     (
         "written-definition lower bound",
         "section",
-        r"1\.51(\s+)percent(\s+)below",
-        r"1.52\1percent\2below",
+        r"1\.71(\s+)percent(\s+)below",
+        r"1.72\1percent\2below",
         "written-definition range with benefits",
+    ),
+    (
+        "vacation-home utilities",
+        "section",
+        r"and(\s+)utilities(\s+)for(\s+)vacation(\s+)homes",
+        r"and\1fuels\2for\3vacation\4homes",
+        "written-definition runs drop vacation-home utilities",
+    ),
+    (
+        "kept vacation-home fuel codes",
+        "section",
+        r"under(\s+)two(\s+)codes",
+        r"under\1three\2codes",
+        "written-definition runs keep the vacation-home fuel codes",
     ),
     ("implicate count", "section", r"We draw five implicates", "We draw four implicates", "implicate, matching-neighbor"),
     (
@@ -267,8 +281,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "appendix standard-error commit",
         "appendix",
-        r"`7d8e3c8309492b4d760e8eb2131a94dbf78b95b1`",
-        "`7d8e3c8309492b4d760e8eb2131a94dbf78b95b2`",
+        r"`a581c113dd4319fc0f6f9ebd6db5c3697f4a94fa`",
+        "`a581c113dd4319fc0f6f9ebd6db5c3697f4a94fb`",
         "appendix names the recorded calculator commits",
     ),
     (
@@ -927,6 +941,26 @@ class PaperGuardTests(unittest.TestCase):
         uncertainty["inputs"]["components_receipt"]["sha256"] = components_digest
         self.reseal_inkind(INKIND_NAMES[2], uncertainty)
 
+    def reseal_and_repin_components(self, edit):
+        """Edit the components receipt, reseal it and the uncertainty receipt
+        that records it, and pin both new digests in the copy's
+        inkind_inputs.py, so only the drift checks can reject the edit."""
+        inkind = self.repo / "data/inkind"
+        pins = self.repo / "scripts/inkind_inputs.py"
+        names = (INKIND_NAMES[0], INKIND_NAMES[2])
+        before = {name: hashlib.sha256((inkind / name).read_bytes()).hexdigest() for name in names}
+        components = json.loads((inkind / INKIND_NAMES[0]).read_text())
+        edit(components)
+        digest = self.reseal_inkind(INKIND_NAMES[0], components)
+        uncertainty = self.inkind_uncertainty()
+        uncertainty["inputs"]["components_receipt"]["sha256"] = digest
+        self.reseal_inkind(INKIND_NAMES[2], uncertainty)
+        text = pins.read_text()
+        for name in names:
+            self.assertEqual(text.count(before[name]), 1, f"{name} digest not pinned once")
+            text = text.replace(before[name], hashlib.sha256((inkind / name).read_bytes()).hexdigest())
+        pins.write_text(text)
+
     def inkind_uncertainty(self):
         return json.loads((self.repo / "data/inkind" / INKIND_NAMES[2]).read_text())
 
@@ -1004,6 +1038,38 @@ class PaperGuardTests(unittest.TestCase):
             change_seed, "uncertainty receipt reads the replication receipt's raw inputs and seed"
         )
 
+    def test_resealed_and_repinned_components_reach_the_drift_checks(self):
+        """Control for the two tests below: a resealed, repinned components
+        receipt with unchanged content passes the whole guard."""
+        self.reseal_and_repin_components(lambda components: None)
+        result = self.run_guard()
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_definition_runs_must_drop_vacation_home_utilities(self):
+        def keep_2022_vacation_utilities(components):
+            components["definition_check"]["2022"]["units_with_amount_removed"]["vacation_utilities"] = 0
+
+        self.reseal_and_repin_components(keep_2022_vacation_utilities)
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("in-kind prose: written-definition runs drop vacation-home utilities", result.stdout)
+        self.assertNotIn("generators were not run", result.stdout)
+
+    def test_paper_counts_the_vacation_fuel_codes_the_calculator_keeps(self):
+        def name_a_third_code(components):
+            limitations = components["limitations"]
+            matches = [i for i, text in enumerate(limitations) if "250913 and 250914" in text]
+            self.assertEqual(len(matches), 1, limitations)
+            limitations[matches[0]] = limitations[matches[0]].replace(
+                "250913 and 250914", "250912, 250913 and 250914"
+            )
+
+        self.reseal_and_repin_components(name_a_third_code)
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("in-kind prose: written-definition runs keep the vacation-home fuel codes", result.stdout)
+        self.assertNotIn("generators were not run", result.stdout)
+
     def test_reflected_replicates_fail_only_the_pinned_digest(self):
         """A resealed receipt whose 2019 replicates mirror the committed ones
         passes every consistency check; the digest pinned outside data/inkind
@@ -1035,7 +1101,7 @@ class PaperGuardTests(unittest.TestCase):
         original = readme.read_text()
         cases = (
             ("receipt count", "uses three receipts", "uses two receipts"),
-            ("commit", "`7d8e3c8309492b4d760e8eb2131a94dbf78b95b1`", "`7d8e3c8`"),
+            ("commit", "`a581c113dd4319fc0f6f9ebd6db5c3697f4a94fa`", "`a581c11`"),
         )
         for name, old, new in cases:
             with self.subTest(name=name):

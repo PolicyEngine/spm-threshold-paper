@@ -7,5 +7,5 @@
 | With imputed benefits | 21.21% (0.36) | 19.70% (1.03) | 19.75% (0.62) |
 | Replication, FCSUti index | 22.08% | 20.81% | 21.48% |
 | With imputed benefits | 22.12% (0.45) | 21.68% (0.98) | 20.85% (0.47) |
-| Written definitions, FCSUti index | 21.59% | 21.29% | 21.43% |
-| With imputed benefits | 21.63% (0.24) | 20.28% (1.20) | 21.36% (0.34) |
+| Written definitions, FCSUti index | 21.44% | 20.94% | 21.46% |
+| With imputed benefits | 21.53% (0.26) | 21.09% (1.52) | 21.43% (0.39) |

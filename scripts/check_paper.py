@@ -1262,6 +1262,18 @@ half_sample_years = sorted(
     for year, row in current_ce["results"].items()
     if any(before in row["quarters"] and after in row["quarters"] for before, after in half_sample_pairs)
 )
+# The written-definition runs' removal counts, and the vacation-home fuel
+# codes the calculator's stated limitation keeps, behind the paper's
+# account of what those runs drop and keep.
+definition_check = inkind_inputs["components"]["definition_check"]
+kept_vacation_fuel_codes = sorted(
+    {
+        code
+        for limitation in inkind_inputs["components"]["limitations"]
+        if "vacation" in limitation and "fuel" in limitation
+        for code in re.findall(r"\b\d{6}\b", limitation)
+    }
+)
 inkind_pins = (
     ("in-kind lift range", has_number(lift_literal, text=INKIND_TEXT)),
     ("abstract in-kind lift range", has_number(lift_literal, text=ABSTRACT)),
@@ -1290,6 +1302,24 @@ inkind_pins = (
         written_with[0] < 0 < written_with[1]
         and has_number(
             f"{-written_with[0]:.2f} percent below and {written_with[1]:.2f} percent above", text=INKIND_TEXT
+        ),
+    ),
+    (
+        "written-definition runs drop vacation-home utilities",
+        sorted(definition_check) == list(YEARS)
+        and all(
+            year_check["units_with_amount_removed"]["vacation_utilities"] > 0
+            and not any(year_check["units_with_negative_amount"].values())
+            for year_check in definition_check.values()
+        )
+        and "utilities for vacation homes [@cepumd]" in INKIND_TEXT
+        and "They count owners' utilities for the primary residence only" in INKIND_TEXT,
+    ),
+    (
+        "written-definition runs keep the vacation-home fuel codes the FMLI summaries omit",
+        has_number(
+            f"keep spending under {count_word(len(kept_vacation_fuel_codes))} codes for other fuels in vacation homes",
+            text=UNCERTAINTY_TEXT,
         ),
     ),
     (
