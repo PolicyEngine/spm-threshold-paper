@@ -37,10 +37,10 @@ def block_scalar_span(text: str, key: str) -> tuple[int, int] | None:
 
     Lines end at line feeds. The front matter opens with a ``---`` line and
     text on the next line, and closes at the next ``---`` or ``...`` line.
-    The block takes its indentation from its first line with text and ends at
-    the next line with less, such as another field or a trailing comment.
-    Lines of whitespace alone stay inside it. Indented keys belong to other
-    mappings and do not count.
+    The block takes its indentation from the spaces that lead its first line
+    with text and ends at the next line with fewer, such as another field or
+    a trailing comment. Lines of whitespace alone stay inside it. Indented
+    keys belong to other mappings and do not count.
 
     It returns None, so every tie that reads the block fails, when
 
@@ -52,8 +52,8 @@ def block_scalar_span(text: str, key: str) -> tuple[int, int] | None:
       in flow style such as ``{key: value}``, since pandoc lets a later
       metadata block, even inside a list item or block quote, replace the
       front matter's value;
-    - a tab falls in the indentation of a line in the block, since Quarto
-      rejects tab indentation that pandoc accepts, or a carriage return
+    - a tab falls within the block's indentation on one of its lines, where
+      Quarto and pandoc read the line differently, or a carriage return
       stands alone in the front matter, since pandoc drops it;
     - the block holds no text.
     """
@@ -82,11 +82,11 @@ def block_scalar_span(text: str, key: str) -> tuple[int, int] | None:
     while last < len(header):
         line = header[last][1]
         if line.strip():
-            leading = line[: len(line) - len(line.lstrip(" \t"))]
-            if "\t" in leading:
+            spaces = len(line) - len(line.lstrip(" "))
+            indent = spaces if indent is None else indent
+            if "\t" in line[: max(indent, 1)]:
                 return None
-            indent = len(leading) if indent is None else indent
-            if len(leading) < max(indent, 1):
+            if spaces < max(indent, 1):
                 break
         last += 1
     block = header[first:last]

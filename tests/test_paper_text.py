@@ -235,17 +235,28 @@ class BlockScalarSpanTests(unittest.TestCase):
                     "First line of the abstract, then its second line. A second paragraph.",
                 )
 
-    def test_a_tab_in_a_lines_indentation_fails_closed(self):
+    def test_a_tab_within_the_indentation_fails_closed(self):
+        """Quarto rejects a tab within the block's indentation, or ends the
+        block there, where pandoc reads the line as text."""
         for lines in (
             ABSTRACT_LINES + "\tTabbed text.\n",
             ABSTRACT_LINES + " \tTabbed text.\n",
-            ABSTRACT_LINES + "  \tTabbed text.\n",
+            ABSTRACT_LINES + "\t# A comment.\n",
+            FOUR_SPACE_LINES + "  \tTabbed text.\n",
             "\tTabbed first line.\n" + ABSTRACT_LINES,
         ):
             with self.subTest(lines=lines):
                 self.assertIsNone(block_scalar_span(with_lines(lines), "abstract"))
-        inner = "  First line,\twith a tab inside it.\n"
-        self.assertEqual(block_lines(with_lines(inner)), inner)
+
+    def test_a_tab_after_the_indentation_is_text(self):
+        for lines in (
+            "  First line,\twith a tab inside it.\n",
+            ABSTRACT_LINES + "  \tTabbed text.\n",
+            "  \tTabbed first line,\n  then its second line.\n",
+            "  First line,\n    \ta deeper tabbed line.\n",
+        ):
+            with self.subTest(lines=lines):
+                self.assertEqual(block_lines(with_lines(lines)), lines)
 
     def test_dots_also_close_the_front_matter(self):
         text = PAPER.replace(CLOSE, "...\n# Introduction")
@@ -621,6 +632,10 @@ EDGE_CASES = {
         "  First,\n  \tafter a tab 9.99,\n  third.\n"
     ),
     "tab-indented first line": with_lines("\tFirst 9.99.\n  second.\n"),
+    "tab after the first line's indentation": with_lines("  \tFirst 9.99,\n  second.\n"),
+    "tab after a deeper line's indentation": with_lines("  First,\n    \tdeeper 9.99,\n  third.\n"),
+    "tab within a 4-space block's indentation": with_lines(FOUR_SPACE_LINES + "  \tTabbed 9.99.\n"),
+    "tab, then a hash, after the block": with_lines(ABSTRACT_LINES + "\t# 9.99 percent\n"),
     "tab line inside the block": with_lines("  First,\n\t\n  second 9.99.\n"),
     "line indented less than the first": with_lines("    Four 1.11,\n  two 9.99.\n"),
     "line indented more than the first": with_lines("  First,\n    deeper 9.99,\n  third.\n"),
