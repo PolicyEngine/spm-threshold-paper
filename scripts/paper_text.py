@@ -2,8 +2,9 @@
 
 The guard reads the abstract through ``block_scalar_span``, and the mutation
 tests place their edits with the same function, so both work on the same text.
-Wherever pandoc is installed, ``tests/test_paper_text.py`` checks that the
-parser reads the words pandoc renders as the abstract, or fails closed.
+Wherever pandoc or Quarto is installed, ``tests/test_paper_text.py`` checks
+that the parser reads the words that tool renders as the abstract, or fails
+closed.
 """
 
 from __future__ import annotations
@@ -33,7 +34,7 @@ def _key_matchers(key: str):
 
 def block_scalar_span(text: str, key: str) -> tuple[int, int] | None:
     """Character span of the literal block under the front matter's one
-    top-level ``key: |`` line, read as pandoc reads it, or None.
+    top-level ``key: |`` line, read as Quarto and pandoc read it, or None.
 
     Lines end at line feeds. The front matter opens with a ``---`` line and
     text on the next line, and closes at the next ``---`` or ``...`` line.
