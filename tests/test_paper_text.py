@@ -6,11 +6,14 @@ seeded property tests build random front matter and rate statements, then check
 that the abstract's words round-trip, that text outside the block never changes
 what the guard reads, that a second key or a key after the front matter makes
 the parser fail closed, and that each value reads as its whole numeric token.
-Wherever pandoc is installed, a differential test checks that the parser reads
-the words pandoc renders as the abstract, or fails closed. CI installs no
-pandoc, so it skips that test.
+Wherever pandoc or Quarto is installed, differential tests check that the
+parser reads the words that tool renders as the abstract, or fails closed.
+Quarto renders the paper and reads the front matter itself before pandoc does,
+so the two can disagree. CI installs neither, so it skips those tests.
 """
 
+import concurrent.futures
+import html.parser
 import importlib.util
 import random
 import shutil
@@ -708,6 +711,7 @@ class PandocAgreementTests(unittest.TestCase):
             [PANDOC, "--from=markdown", "--to=plain", f"--template={self.template}"],
             input=text.encode(),
             capture_output=True,
+            check=False,
         )
         return None if result.returncode else words(result.stdout.decode())
 
@@ -743,6 +747,127 @@ class PandocAgreementTests(unittest.TestCase):
             add_decoys(rng, fields, body)
             agreed += self.agrees(render(fields, terminator, body))
         self.assertEqual(agreed, self.ROUNDS)
+
+
+QUARTO = shutil.which("quarto")
+
+
+class QuartoAbstract(html.parser.HTMLParser):
+    """Collects the text of the first ``<div class="abstract">`` on a page
+    that Quarto renders, less the block title Quarto sets above it."""
+
+    VOID = frozenset(
+        ("area", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "wbr")
+    )
+
+    def __init__(self):
+        super().__init__()
+        self.found = False
+        self.depth = 0
+        self.title_depth = None
+        self.parts = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag in self.VOID or (self.found and not self.depth):
+            return
+        classes = (dict(attrs).get("class") or "").split()
+        if self.depth:
+            self.depth += 1
+            if self.title_depth is None and "block-title" in classes:
+                self.title_depth = self.depth
+        elif tag == "div" and "abstract" in classes:
+            self.found = True
+            self.depth = 1
+
+    def handle_endtag(self, tag):
+        if tag in self.VOID or not self.depth:
+            return
+        if self.depth == self.title_depth:
+            self.title_depth = None
+        self.depth -= 1
+
+    def handle_data(self, data):
+        if self.depth and self.title_depth is None:
+            self.parts.append(data)
+
+
+def renderable(fields):
+    """Edit a random document's fields into ones Quarto accepts: it rejects a
+    line holding only a tab and a list under ``notes``."""
+    for field in fields:
+        field[:] = ["" if line == "\t" else line for line in field]
+        if field[0] == "notes:":
+            field[0] = "remarks:"
+
+
+@unittest.skipUnless(QUARTO, "quarto is not installed")
+class QuartoAgreementTests(unittest.TestCase):
+    """Wherever the parser reads an abstract, the page Quarto renders shows
+    the same words as its abstract, or Quarto rejects the document, which
+    then cannot render at all."""
+
+    ROUNDS = 12
+    JOBS = 4
+
+    def rendered(self, text):
+        """The words of the abstract on the page Quarto renders, "" when the
+        page has none, or None when Quarto rejects the document."""
+        with tempfile.TemporaryDirectory() as directory:
+            folder = Path(directory)
+            (folder / "doc.qmd").write_bytes(text.encode())
+            result = subprocess.run(
+                [QUARTO, "render", "doc.qmd", "--to", "html"],
+                cwd=folder,
+                capture_output=True,
+                check=False,
+                timeout=600,
+            )
+            page = folder / "doc.html"
+            if result.returncode or not page.exists():
+                return None
+            reader = QuartoAbstract()
+            reader.feed(page.read_text())
+        return words(" ".join(reader.parts))
+
+    def compare(self, documents):
+        """The parser's words and Quarto's for each document the parser
+        reads an abstract from, rendering JOBS documents at a time."""
+        parsed = {}
+        for name, text in documents.items():
+            span = block_scalar_span(text, "abstract")
+            if span is not None:
+                parsed[name] = words(text[span[0] : span[1]])
+        with concurrent.futures.ThreadPoolExecutor(self.JOBS) as pool:
+            rendered = pool.map(lambda name: self.rendered(documents[name]), parsed)
+            return {name: (ours, theirs) for (name, ours), theirs in zip(parsed.items(), rendered)}
+
+    def test_quarto_renders_the_fixture(self):
+        self.assertEqual(self.rendered(PAPER), words(ABSTRACT_LINES))
+
+    def test_edge_cases(self):
+        for name, (ours, theirs) in self.compare(EDGE_CASES).items():
+            with self.subTest(case=name):
+                if theirs is not None:
+                    self.assertEqual(ours, theirs)
+
+    def test_random_documents(self):
+        """Random documents with decoys outside the abstract, edited into
+        ones Quarto accepts and closed with ``---``, all parse, render and
+        agree."""
+        rng = random.Random(20261116)
+        documents = {}
+        for round_number in range(self.ROUNDS):
+            value = random_number(rng)
+            statement = f"we obtain {value} percent with the Consumer Price Index"
+            fields, _, body, _ = random_document(rng, statement)
+            add_decoys(rng, fields, body)
+            renderable(fields)
+            documents[round_number] = render(fields, "---", body)
+        compared = self.compare(documents)
+        self.assertEqual(len(compared), self.ROUNDS)
+        for round_number, (ours, theirs) in compared.items():
+            with self.subTest(round=round_number):
+                self.assertEqual(ours, theirs)
 
 
 if __name__ == "__main__":
