@@ -447,8 +447,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "WIC mother's minimum age",
         "section",
-        r"woman(\s+)aged(\s+)15(\s+)or",
-        r"woman\1aged\g<2>18\3or",
+        r"and(\s+)a(\s+)woman(\s+)aged(\s+)15(\s+)or",
+        r"and\1a\2woman\3aged\g<4>18\5or",
         "method constants read from fingerprinted calculator code",
     ),
     (
@@ -457,6 +457,197 @@ INKIND_PROSE_MUTATIONS = (
         r"rise(\s+)faster(\s+)than(\s+)ours",
         r"rise\1more\2slowly\3than ours",
         "BLS's imputed benefits rise faster than ours",
+    ),
+    # Round 2: the verb or label beside each figure, and the method facts
+    # the section quotes, each changed while every figure stays put.
+    (
+        "lift direction",
+        "section",
+        r"imputed(\s+)benefits(\s+)raise(\s+)the(\s+)replicated",
+        r"imputed\1benefits\2lower\3the\4replicated",
+        "in-kind lift range",
+    ),
+    (
+        "abstract lift direction",
+        "abstract",
+        r"they(\s+)raise(\s+)replicated",
+        r"they\1lower\2replicated",
+        "abstract in-kind lift range",
+    ),
+    (
+        "discussion lift direction",
+        "discussion",
+        r"benefits(\s+)raises(\s+)our(\s+)levels",
+        r"benefits\1lowers\2our\3levels",
+        "discussion in-kind lift range",
+    ),
+    (
+        "swapped stages in the 2024-2025 renter growth",
+        "section",
+        r"With(\s+)our(\s+)imputed(\s+)benefits,(\s+)we(\s+)estimate(\s+)renter(\s+)growth(.*?)without(\s+)them",
+        r"Without\1our\2imputed\3benefits,\4we\5estimate\6renter\7growth\8with\9them",
+        "replication 2024-2025 renter growth with and without benefits",
+    ),
+    (
+        "swapped benefits in the difference",
+        "section",
+        r"Rental(\s+)assistance(\s+)supplies(.*?)and(\s+)school(\s+)lunch",
+        r"School\1lunch\2supplies\3and\4rental\5assistance",
+        "difference in rises by benefit",
+    ),
+    (
+        "swapped owners of the imputed totals",
+        "section",
+        r"BLS's(\s+)imputed(\s+)benefits(\s+)rose(\s+)from(.*?)and(\s+)ours(\s+)from",
+        r"our\1imputed\2benefits\3rose\4from\5and\6BLS's\7from",
+        "BLS and replication imputed totals",
+    ),
+    (
+        "implicate rise price index",
+        "section",
+        r"under(\s+)either(\s+)price(\s+)index",
+        r"under\1the\2composite CPI",
+        "implicate rise range",
+    ),
+    (
+        "swapped price series",
+        "section",
+        r"CPI-U(\s+)rose(\s+)10\.01(\s+)percent,(\s+)BLS's(\s+)FCSUti(\s+)price(\s+)index(\s+)14\.19",
+        r"BLS's FCSUti price index\1rose\g<2>10.01\3percent,\4CPI-U\g<8>14.19",
+        "price and BLS threshold growth",
+    ),
+    (
+        "growth caption window",
+        "section",
+        r"national(\s+)threshold(\s+)growth(\s+)from(\s+)2022",
+        r"national\1threshold\2growth\3from\g<4>2021",
+        "growth table caption names the growth window",
+    ),
+    (
+        "written-definition stage without benefits",
+        "section",
+        r"the(\s+)out-of-pocket(\s+)replication(\s+)trails",
+        r"the\1replication\2with benefits\3trails",
+        "written-definition out-of-pocket range",
+    ),
+    (
+        "written-definition stage with benefits",
+        "section",
+        r"When(\s+)we(\s+)also(\s+)add(\s+)the(\s+)imputed(\s+)benefits",
+        r"When\1we\2also\3remove\4the\5imputed\6benefits",
+        "written-definition range with benefits",
+    ),
+    (
+        "share formula deflator",
+        "section",
+        r"denotes(\s+)CPI-U's(\s+)growth",
+        r"denotes\1the FCSUti index's\2growth",
+        "displayed share formula reproduces BLS's shares",
+    ),
+    (
+        "BLS 2024-2025 renter split source",
+        "section",
+        r"of(\s+)them(\s+)from(\s+)rental(\s+)assistance",
+        r"of\1them\2from\3school\4lunch",
+        "BLS 2024-2025 renter split",
+    ),
+    (
+        "owner of the 2024-2025 rental assistance per renter",
+        "section",
+        r"BLS's(\s+)rental(\s+)assistance(\s+)per(\s+)renter(\s+)rose(\s+)from",
+        r"Our\1rental\2assistance\3per\4renter\5rose\6from",
+        "BLS 2024-2025 renter split",
+    ),
+    (
+        "renters' utilities rule",
+        "section",
+        r"renters'(\s+)utilities(\s+)for(\s+)any(\s+)property(\s+)but(\s+)a(\s+)rented(\s+)vacation(\s+)home",
+        r"renters'\1utilities\2for\3the primary residence only",
+        "written definitions read from fingerprinted calculator code",
+    ),
+    (
+        "kept fuel codes' reason",
+        "section",
+        r"vacation-home(\s+)utilities(\s+)leave(\s+)out",
+        r"vacation-home\1utilities\2include",
+        "written-definition runs keep the vacation-home fuel codes",
+    ),
+    (
+        "WIC universe year",
+        "section",
+        r"For(\s+)the(\s+)2025(\s+)thresholds,(\s+)as(\s+)BLS(\s+)does",
+        r"For\1the\g<2>2024\3thresholds,\4as\5BLS\6does",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "WIC universe rule",
+        "section",
+        r"but(\s+)no(\s+)woman(\s+)aged(\s+)15",
+        r"but\1no\2woman\3aged\g<4>18",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "WIC infant age",
+        "section",
+        r"child(\s+)aged(\s+)0(\s+)or(\s+)1(\s+)and",
+        r"child\1aged\g<2>0\3to\g<4>2\5and",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "WIC pregnant woman",
+        "section",
+        r"we(\s+)count(\s+)one(\s+)pregnant(\s+)woman",
+        r"we\1count\2two\3pregnant\4women",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "income imputations",
+        "section",
+        r"income(\s+)five(\s+)times",
+        r"income\1three\2times",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "amounts caption band",
+        "section",
+        r"consumer(\s+)unit(\s+)in(\s+)the(\s+)47th–53rd",
+        r"consumer\1unit\2in\3the\g<4>45th–55th",
+        "percentile band read from fingerprinted calculator code",
+    ),
+    (
+        "Census school lunch first year",
+        "section",
+        r"include(\s+)from(\s+)reference(\s+)year(\s+)2018",
+        r"include\1from\2reference\3year\g<4>2019",
+        "Census school lunch values from their first reference year",
+    ),
+    (
+        "internet row years",
+        "section",
+        r'through(\s+)2024(\s+)and(\s+)"Total',
+        r'through\g<1>2023\2and\3"Total',
+        "BLS internet row by threshold year",
+    ),
+    (
+        "program count",
+        "section",
+        r"For(\s+)all(\s+)four(\s+)programs",
+        r"For\1all\2five\3programs",
+        "programs the participation models cover",
+    ),
+    (
+        "benefit count",
+        "section",
+        r"with(\s+)the(\s+)five(\s+)benefits",
+        r"with\1the\2four\3benefits",
+        "programs the participation models cover",
+    ),
+    (
+        "amounts caption implicate count",
+        "section",
+        r"across(\s+)five(\s+)implicates",
+        r"across\1four\2implicates",
+        "implicate, matching-neighbor and cell-donor counts",
     ),
 )
 
@@ -1055,6 +1246,26 @@ class PaperGuardTests(unittest.TestCase):
         self.assertIn("in-kind prose: written-definition runs drop vacation-home utilities", result.stdout)
         self.assertNotIn("generators were not run", result.stdout)
 
+    def test_definition_runs_must_leave_no_utilities_below_zero(self):
+        def push_2022_utilities_below_zero(components):
+            components["definition_check"]["2022"]["units_with_utilities_below_zero"]["after"] = 57
+
+        self.reseal_and_repin_components(push_2022_utilities_below_zero)
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("in-kind prose: written-definition runs drop vacation-home utilities", result.stdout)
+        self.assertNotIn("generators were not run", result.stdout)
+
+    def test_paper_names_the_internet_row_each_year_uses(self):
+        def read_2024_from_the_total_row(components):
+            components["bls"]["years"]["2024"]["checks"]["internet_row"] = "internet_total_row"
+
+        self.reseal_and_repin_components(read_2024_from_the_total_row)
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("in-kind prose: BLS internet row by threshold year", result.stdout)
+        self.assertNotIn("generators were not run", result.stdout)
+
     def test_paper_counts_the_vacation_fuel_codes_the_calculator_keeps(self):
         def name_a_third_code(components):
             limitations = components["limitations"]
@@ -1111,6 +1322,34 @@ class PaperGuardTests(unittest.TestCase):
                 self.assertNotEqual(result.returncode, 0)
                 self.assertIn("in-kind prose: README counts the receipts and names the commits", result.stdout)
         readme.write_text(original)
+
+    def test_bibliography_cites_the_recorded_calculator_commits(self):
+        bib = self.repo / "bibliography/references.bib"
+        original = bib.read_text()
+        components, stale_components = "8f632e31b4e48bbc735161d24665a8182dc0d9d6", "8b6766cbfcb7cc3b79451b3b5822425a2cc6590d"
+        uncertainty, stale_uncertainty = "a581c113dd4319fc0f6f9ebd6db5c3697f4a94fa", "7d8e3c8309492b4d760e8eb2131a94dbf78b95b1"
+        cases = (
+            ("stale components commit", original.replace(components, stale_components)),
+            ("stale standard-error commit", original.replace(uncertainty, stale_uncertainty)),
+            (
+                "stale components link",
+                original.replace(f"blob/{components}/", f"blob/{stale_components}/"),
+            ),
+            (
+                "swapped entries",
+                original.replace(components, "<swap>").replace(uncertainty, components).replace("<swap>", uncertainty),
+            ),
+        )
+        self.assertEqual(original.count(components), 2)
+        self.assertEqual(original.count(uncertainty), 2)
+        for name, edited in cases:
+            with self.subTest(name=name):
+                self.assertNotEqual(edited, original)
+                bib.write_text(edited)
+                result = self.run_guard()
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("in-kind prose: bibliography cites the recorded calculator commits", result.stdout)
+        bib.write_text(original)
 
     def inkind_replication(self):
         return json.loads((self.repo / "data/inkind" / INKIND_NAMES[1]).read_text())

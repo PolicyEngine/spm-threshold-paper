@@ -311,7 +311,10 @@ under 5, children aged 5–18, members 65 and older, and earners, along
 with the reference person's age, sex, race, Hispanic origin, and
 education. We add state or region indicators where the CE identifies
 them. The school lunch model covers households with a member
-aged 5–18, and the WIC model the CPS ASEC WIC universe.
+aged 5–18, and the WIC model the CPS ASEC WIC universe. For the 2025
+thresholds, as BLS does, we also let the WIC model assign participation
+to CE units that have a child under 5 but no woman aged 15 or older
+[@blsspmhome].
 
 We assign LIHEAP and broadband amounts by predictive mean matching. We
 run a weighted regression of log amounts on the covariates among CPS
@@ -337,11 +340,10 @@ free or reduced-price rate with equal probability, as BLS does for CE
 units [@blsspmhome]. We then carry those donor values to CE units
 through the same cells.
 
-Following Census [@spmtechnical], in each unit we assign to WIC, we
-count every child under 5, plus one mother if the unit has a child aged
-0 or 1, or one pregnant woman if it has no child under 5. We count the
-mother only when the unit includes a woman aged 15 or older. We give
-each participant twelve months of USDA's national average monthly food
+Following Census [@spmtechnical], we count every child under 5 in each
+participating unit, plus one mother if the unit has a child aged 0 or 1
+and a woman aged 15 or older. If the unit has no child under 5, we count
+one pregnant woman. We give each participant twelve months of USDA's national average monthly food
 cost. We add no WIC when the unit's state had fully implemented WIC EBT
 by the midpoint of its three-month reference period. When the CE
 suppresses a unit's state, we draw that status with probability equal
@@ -377,10 +379,10 @@ other lodging such as vacation homes and lodging on out-of-town trips
 Munoz [-@garner2021] restrict shelter to the primary residence and leave
 out rent and meals received as pay. They count owners' utilities for the
 primary residence only, and renters' utilities for any property but a
-rented vacation home. When we follow their written definitions and
-remove those amounts, along with the vacation-home mortgage principal
-we add to shelter, the out-of-pocket replication trails BLS by 1.98 to
-4.20 percent. When we also add the imputed benefits, we estimate
+rented vacation home. When we follow their written definitions, we
+remove those amounts and the vacation-home mortgage principal we add to
+shelter. We then estimate that the out-of-pocket replication trails BLS
+by 1.98 to 4.20 percent. When we also add the imputed benefits, we estimate
 thresholds between 1.71 percent below and 1.47 percent above BLS's, and
 the mean absolute deviation falls from 3.14 to 0.72 percent.
 
@@ -408,9 +410,9 @@ $$
 
 and a component's share times $B_{T,h}/s$ gives its band mean in
 dollars. BLS publishes two internet rows. We use the one that gives
-equal dollars across tenures, "OOP Internet" through 2024 and "Total
-Internet Share" in 2025, treat it as including broadband subsidies, and
-subtract them to recover home internet spending. With that reading,
+equal dollars across tenures: "OOP Internet" through 2024 and "Total
+Internet Share" in 2025. We treat that row as including broadband
+subsidies and subtract them to recover home internet spending. With that reading,
 BLS's published shares, thresholds, and tenure shares satisfy both
 identities within \$0.00001 in every year from 2019 to 2025.
 
@@ -483,8 +485,9 @@ the CE's 44 replicate weights [@blscese; @spmcalculator2026se]. Under
 each replicate weight, we rerun the whole threshold estimator with and
 without the imputed benefits, from the expenditure-deflation weights to
 the percentile band, and hold each implicate's imputed amounts fixed.
-When we deflate with BLS's FCSUti index instead, we apply its published
-values in every replicate, so the price factors do not vary. We
+When we deflate with BLS's FCSUti index instead of the replication's
+composite CPI, we apply its published values in every replicate, so the
+price factors do not vary. We
 combine the replicate variance with the variance across implicates by
 Rubin's rules [@rubin1987]. For the benefits' change to 2022–2025
 growth, we estimate standard errors of 0.74 points for owners with

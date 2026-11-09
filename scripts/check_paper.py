@@ -63,8 +63,11 @@ from rolling_inputs import (
 from verify_commitments import verify_commitments
 from inkind_inputs import (
     BLS_IDENTITY_TOLERANCE_DOLLARS,
+    COMPONENTS,
     INKIND_FILES,
     REPLICATES,
+    REPLICATION,
+    UNCERTAINTY,
     YEARS,
     check_receipt_pins,
     inkind_figures,
@@ -1122,6 +1125,18 @@ inkind_method = json.loads((DATA / "inkind" / "ce_inkind_replication_2019_2025.j
     "in_kind_methodology"
 ]
 inkind_provenance = json.loads((DATA / "inkind" / "provenance.json").read_text())
+receipt_commits = {
+    Path(path).name: record["calculator_commit"] for path, record in inkind_provenance["artifacts"].items()
+}
+BIB_TEXT = (REPO / "bibliography" / "references.bib").read_text()
+
+
+def bib_commits(key: str, field: str) -> set[str]:
+    """The 40-character commits one field of one bibliography entry names.
+    A missing entry or field names none, so its pin fails."""
+    entry = re.search(r"@\w+\{" + re.escape(key) + r",(.*?)\n\}", BIB_TEXT, re.S)
+    value = entry and re.search(r"^\s*" + field + r"\s*=\s*\{(.*)\},?\s*$", entry.group(1), re.M)
+    return set(re.findall(r"\b[0-9a-f]{40}\b", value.group(1))) if value else set()
 
 
 def signed(value: float, digits: int = 2) -> str:
@@ -1241,9 +1256,38 @@ INKIND_METHOD_CONSTANTS = (
     "free rate below 150 percent of the poverty line",  # FREE_LUNCH_POVERTY_RATIO
     "split the income groups at 150 percent of the official poverty line",  # the same ratio, for cells
     "twelve months of USDA's national average monthly food cost",  # 12.0 * cost in the WIC stage
-    "includes a woman aged 15 or older",  # n_women_15_plus in _wic_participants
+    # _wic_participants: n_lt5 children, plus a mother when n_infants > 0
+    # and n_women_15_plus >= 1; otherwise one participant
+    "we count every child under 5 in each participating unit, plus one mother if the unit has a child aged "
+    "0 or 1 and a woman aged 15 or older",
+    "If the unit has no child under 5, we count one pregnant woman",
+    # WIC_BROAD_UNIVERSE_FIRST_TARGET = 2025, and broad = narrow | n_lt5 >= 1
+    "For the 2025 thresholds, as BLS does, we also let the WIC model assign participation to CE units that "
+    "have a child under 5 but no woman aged 15 or older",
     "midpoint of its three-month reference period",  # 1.5 months in _wic_ebt_complete
     "twelve times the difference",  # 12.0 * benefit in the rental stage
+    # income reads FINCBTXM, which BLS's PUMD dictionary defines as the
+    # mean of five imputations
+    "BLS imputes missing CE income five times, and we use the mean of the five",
+)
+# The percentile band the amounts table's caption names, from the
+# threshold estimator's (cdf >= 0.47) & (cdf <= 0.53) at this fingerprint.
+INKIND_THRESHOLD_SOURCE = (
+    "spm_calculator/ce_threshold.py",
+    "4efbe2b03f6b1f4eb2911ab0f79f5151bd655cc1e5addf42f5c4540ace1f852f",
+)
+INKIND_THRESHOLD_CONSTANTS = ("mean imputed benefits per consumer unit in the 47th–53rd percentile band",)
+# Garner and Munoz's utilities rule as the written-definition runs apply it,
+# from spm_calculator/ce_bls_shares.py at this fingerprint (calculator
+# commit 8f632e3): _vacation_utilities takes both vacation-home utility
+# summaries from owners and the rented one alone from other units.
+INKIND_DEFINITION_SOURCE = (
+    "spm_calculator/ce_bls_shares.py",
+    "c6ef2d751feb5b97ead6e4ed74bb03bae6d584d96783033c031d88980b13accf",
+)
+INKIND_DEFINITION_CONSTANTS = (
+    "They count owners' utilities for the primary residence only, and renters' utilities for any property "
+    "but a rented vacation home",
 )
 replication_receipt = json.loads((DATA / "inkind" / "ce_inkind_replication_2019_2025.json").read_text())
 
@@ -1266,18 +1310,41 @@ half_sample_years = sorted(
 # codes the calculator's stated limitation keeps, behind the paper's
 # account of what those runs drop and keep.
 definition_check = inkind_inputs["components"]["definition_check"]
+vacation_fuel_limitations = [
+    limitation
+    for limitation in inkind_inputs["components"]["limitations"]
+    if "vacation" in limitation and "fuel" in limitation
+]
 kept_vacation_fuel_codes = sorted(
-    {
-        code
-        for limitation in inkind_inputs["components"]["limitations"]
-        if "vacation" in limitation and "fuel" in limitation
-        for code in re.findall(r"\b\d{6}\b", limitation)
-    }
+    {code for limitation in vacation_fuel_limitations for code in re.findall(r"\b\d{6}\b", limitation)}
 )
+# The reference years whose school lunch values come from the CPS ASEC
+# files rather than the USDA formula, and the internet row BLS's shares
+# use in each threshold year.
+lunch_sources = [
+    source["value_source"]
+    for _, source in sorted(replication_receipt["imputation_diagnostics"]["nslp"].items())
+]
+lunch_years = sorted(replication_receipt["imputation_diagnostics"]["nslp"])
+census_lunch_years = [y for y, s in zip(lunch_years, lunch_sources) if s == "census_spm_schlunch"]
+internet_rows = [inkind_inputs["components"]["bls"]["years"][year]["checks"]["internet_row"] for year in YEARS]
+oop_internet_years = internet_rows.count("internet_oop_row")
+in_kind_components = inkind_method["components"]
 inkind_pins = (
-    ("in-kind lift range", has_number(lift_literal, text=INKIND_TEXT)),
-    ("abstract in-kind lift range", has_number(lift_literal, text=ABSTRACT)),
-    ("discussion in-kind lift range", has_number(lift_literal, text=DISCUSSION_TEXT)),
+    (
+        "in-kind lift range",
+        lift_low > 0
+        and has_number(f"the imputed benefits raise the replicated thresholds by {lift_literal}", text=INKIND_TEXT),
+    ),
+    (
+        "abstract in-kind lift range",
+        lift_low > 0 and has_number(f"that they raise replicated thresholds by {lift_literal}", text=ABSTRACT),
+    ),
+    (
+        "discussion in-kind lift range",
+        lift_low > 0
+        and has_number(f"imputing in-kind benefits raises our levels by {lift_literal}", text=DISCUSSION_TEXT),
+    ),
     (
         "replication with benefits exceeds BLS in every cell",
         package_run["cells_above_bls_with_stage"] == len(YEARS) * len(TENURES)
@@ -1295,13 +1362,18 @@ inkind_pins = (
     (
         "written-definition out-of-pocket range",
         written_without[1] < 0
-        and has_number(f"trails BLS by {-written_without[1]:.2f} to {-written_without[0]:.2f}", text=INKIND_TEXT),
+        and has_number(
+            f"the out-of-pocket replication trails BLS by {-written_without[1]:.2f} to {-written_without[0]:.2f}",
+            text=INKIND_TEXT,
+        ),
     ),
     (
         "written-definition range with benefits",
         written_with[0] < 0 < written_with[1]
         and has_number(
-            f"{-written_with[0]:.2f} percent below and {written_with[1]:.2f} percent above", text=INKIND_TEXT
+            f"When we also add the imputed benefits, we estimate thresholds between {-written_with[0]:.2f} "
+            f"percent below and {written_with[1]:.2f} percent above",
+            text=INKIND_TEXT,
         ),
     ),
     (
@@ -1310,15 +1382,23 @@ inkind_pins = (
         and all(
             year_check["units_with_amount_removed"]["vacation_utilities"] > 0
             and not any(year_check["units_with_negative_amount"].values())
+            and year_check["units_with_utilities_below_zero"]["after"] == 0
             for year_check in definition_check.values()
         )
-        and "utilities for vacation homes [@cepumd]" in INKIND_TEXT
-        and "They count owners' utilities for the primary residence only" in INKIND_TEXT,
+        and "utilities for vacation homes [@cepumd]" in INKIND_TEXT,
+    ),
+    (
+        "written definitions read from fingerprinted calculator code",
+        inkind_inputs["components"]["code_sha256"].get(INKIND_DEFINITION_SOURCE[0]) == INKIND_DEFINITION_SOURCE[1]
+        and all(has_number(constant, text=INKIND_TEXT) for constant in INKIND_DEFINITION_CONSTANTS),
     ),
     (
         "written-definition runs keep the vacation-home fuel codes the FMLI summaries omit",
-        has_number(
-            f"keep spending under {count_word(len(kept_vacation_fuel_codes))} codes for other fuels in vacation homes",
+        len(vacation_fuel_limitations) == 1
+        and "leave out" in vacation_fuel_limitations[0]
+        and has_number(
+            f"keep spending under {count_word(len(kept_vacation_fuel_codes))} codes for other fuels in vacation "
+            "homes, which the FMLI summaries of vacation-home utilities leave out",
             text=UNCERTAINTY_TEXT,
         ),
     ),
@@ -1333,21 +1413,29 @@ inkind_pins = (
     ),
     (
         "BLS and replication imputed totals",
-        has_ordered(
-            [f"{dollars(bls_total[0])} to {dollars(bls_total[1])}", f"{dollars(our_total[0])} to {dollars(our_total[1])}"],
-            window=120,
+        has_number(
+            f"BLS's imputed benefits rose from {dollars(bls_total[0])} to {dollars(bls_total[1])} per unit in its "
+            f"band, and ours from {dollars(our_total[0])} to {dollars(our_total[1])}",
             text=INKIND_TEXT,
         )
         and bls_total[2] > rise_high
         and has_number("BLS's rise exceeds the rise in each of our implicates", text=INKIND_TEXT),
     ),
-    ("implicate rise range", has_number(f"{dollars(rise_low)} to {dollars(rise_high)}", text=INKIND_TEXT)),
+    (
+        "implicate rise range",
+        has_number(
+            f"BLS's rise exceeds the rise in each of our implicates, which ranges from {dollars(rise_low)} to "
+            f"{dollars(rise_high)} under either price index",
+            text=INKIND_TEXT,
+        ),
+    ),
     (
         "difference in rises by benefit",
         rise_gap["rental_assistance"] > rise_gap["nslp"] > 0 > other_gap
-        and has_ordered(
-            [dollars(rise_gap["rental_assistance"]), dollars(rise_gap["nslp"]), dollars(-other_gap)],
-            window=120,
+        and has_number(
+            f"Rental assistance supplies {dollars(rise_gap['rental_assistance'])} of the difference and school "
+            f"lunch {dollars(rise_gap['nslp'])}, and the other {count_word(len(rise_gap) - 2)} benefits narrow it "
+            f"by {dollars(-other_gap)}",
             text=INKIND_TEXT,
         ),
     ),
@@ -1361,15 +1449,16 @@ inkind_pins = (
     ),
     (
         "price and BLS threshold growth",
-        has_ordered(
-            [
-                f"{inkind['cpi_u_growth']:.2f} percent",
-                f"{inkind['fcsuti_price_growth']:.2f} percent",
-                f"{min(bls_growth):.2f} to {max(bls_growth):.2f}",
-            ],
-            window=120,
+        has_number(
+            f"From {GROWTH_FIRST} to {GROWTH_LAST}, CPI-U rose {inkind['cpi_u_growth']:.2f} percent, BLS's FCSUti "
+            f"price index {inkind['fcsuti_price_growth']:.2f} percent, and BLS's thresholds "
+            f"{min(bls_growth):.2f} to {max(bls_growth):.2f} percent",
             text=INKIND_TEXT,
         ),
+    ),
+    (
+        "growth table caption names the growth window",
+        has_number(f"We report national threshold growth from {GROWTH_FIRST} to {GROWTH_LAST}", text=INKIND_TEXT),
     ),
     (
         "stage changes in tenure order, each within one standard error",
@@ -1475,7 +1564,8 @@ inkind_pins = (
     (
         "displayed share formula reproduces BLS's shares",
         (shares := displayed_shares()) is not None
-        and all(math.isclose(a, b, rel_tol=1e-9) for a, b in zip(shares, bls_shares, strict=True)),
+        and all(math.isclose(a, b, rel_tol=1e-9) for a, b in zip(shares, bls_shares, strict=True))
+        and "$\\pi$ denotes CPI-U's growth factor" in INKIND_TEXT,
     ),
     (
         "renter shortfall with imputed terms removed",
@@ -1488,18 +1578,22 @@ inkind_pins = (
     ),
     (
         "BLS 2024-2025 renter split",
-        has_ordered(
-            [f"{recent['imputed_points']:.2f}", f"{recent['growth']:.2f}", f"{recent['rental_assistance_points']:.2f}"],
-            window=120,
+        has_number(
+            f"BLS's imputed benefits supplied {recent['imputed_points']:.2f} of the {recent['growth']:.2f} points "
+            f"of threshold growth, {recent['rental_assistance_points']:.2f} of them from rental assistance",
             text=INKIND_TEXT,
         )
-        and has_number(f"{dollars(rent_2024)} to {dollars(rent_2025)}", text=INKIND_TEXT),
+        and has_number(
+            f"BLS's rental assistance per renter rose from {dollars(rent_2024)} to {dollars(rent_2025)} between "
+            "those thresholds",
+            text=INKIND_TEXT,
+        ),
     ),
     (
         "replication 2024-2025 renter growth with and without benefits",
-        has_ordered(
-            [f"{recent['replication_with_stage']:.2f} percent", f"{recent['replication_without_stage']:.2f} percent"],
-            window=60,
+        has_number(
+            f"With our imputed benefits, we estimate renter growth of {recent['replication_with_stage']:.2f} "
+            f"percent, against {recent['replication_without_stage']:.2f} percent without them",
             text=INKIND_TEXT,
         ),
     ),
@@ -1543,6 +1637,10 @@ inkind_pins = (
     (
         "implicate, matching-neighbor and cell-donor counts",
         has_number(f"We draw {count_word(inkind_method['implicates'])} implicates", text=INKIND_TEXT)
+        and has_number(
+            f"average the replication rows across {count_word(inkind_method['implicates'])} implicates",
+            text=INKIND_TEXT,
+        )
         and has_number(f"one of the {count_word(inkind_method['pmm_neighbors'])} recipients", text=INKIND_TEXT)
         and has_number(f"fewer than {count_word(inkind_method['min_cell_donors'])} donors", text=INKIND_TEXT)
         and inkind_method["parameter_draws"] is True,
@@ -1551,6 +1649,42 @@ inkind_pins = (
         "method constants read from fingerprinted calculator code",
         replication_receipt["code_sha256"].get(INKIND_METHOD_SOURCE[0]) == INKIND_METHOD_SOURCE[1]
         and all(has_number(constant, text=INKIND_TEXT) for constant in INKIND_METHOD_CONSTANTS),
+    ),
+    (
+        "percentile band read from fingerprinted calculator code",
+        replication_receipt["code_sha256"].get(INKIND_THRESHOLD_SOURCE[0]) == INKIND_THRESHOLD_SOURCE[1]
+        and all(has_number(constant, text=INKIND_TEXT) for constant in INKIND_THRESHOLD_CONSTANTS),
+    ),
+    (
+        "Census school lunch values from their first reference year",
+        bool(census_lunch_years)
+        and lunch_sources
+        == ["usda_formula"] * (len(lunch_sources) - len(census_lunch_years))
+        + ["census_spm_schlunch"] * len(census_lunch_years)
+        and has_number(f"files include from reference year {census_lunch_years[0]}", text=INKIND_TEXT),
+    ),
+    (
+        "BLS internet row by threshold year",
+        0 < oop_internet_years == len(YEARS) - 1
+        and internet_rows == ["internet_oop_row"] * oop_internet_years + ["internet_total_row"]
+        and has_number(
+            f'"OOP Internet" through {YEARS[oop_internet_years - 1]} and "Total Internet Share" in '
+            f"{YEARS[oop_internet_years]}",
+            text=INKIND_TEXT,
+        ),
+    ),
+    (
+        "programs the participation models cover",
+        "rental_assistance" in in_kind_components
+        and has_number(f"For all {count_word(len(in_kind_components) - 1)} programs", text=INKIND_TEXT)
+        and has_number(f"with the {count_word(len(in_kind_components))} benefits", text=INKIND_TEXT),
+    ),
+    (
+        "bibliography cites the recorded calculator commits",
+        bib_commits("spmcalculator2026inkind", "note") == {receipt_commits[REPLICATION], receipt_commits[COMPONENTS]}
+        and bib_commits("spmcalculator2026inkind", "url") == {receipt_commits[COMPONENTS]}
+        and bib_commits("spmcalculator2026se", "note") == {receipt_commits[UNCERTAINTY]}
+        and bib_commits("spmcalculator2026se", "url") == {receipt_commits[UNCERTAINTY]},
     ),
     (
         "appendix names the recorded calculator commits",
