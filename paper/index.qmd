@@ -341,10 +341,12 @@ units [@blsspmhome]. We then carry those donor values to CE units
 through the same cells.
 
 Following Census [@spmtechnical], we count every child under 5 in each
-participating unit, plus one mother if the unit has a child aged 0 or 1
-and a woman aged 15 or older. If the unit has no child under 5, we count
-one pregnant woman. We give each participant twelve months of USDA's national average monthly food
-cost. We add no WIC when the unit's state had fully implemented WIC EBT
+participating unit, plus one mother if the unit has a child aged 0 or 1.
+We count that mother only when the unit has a woman aged 15 or older, so
+in the units we add to the WIC universe for 2025, we count the children
+alone. If the unit has no child under 5, we count one pregnant woman. We
+give each participant twelve months of USDA's national average monthly
+food cost. We add no WIC when the unit's state had fully implemented WIC EBT
 by the midpoint of its three-month reference period. When the CE
 suppresses a unit's state, we draw that status with probability equal
 to the weighted share of known-state units in the same region and
@@ -419,7 +421,7 @@ identities within \$0.00001 in every year from 2019 to 2025.
 Between the 2022 and 2025 thresholds, BLS's imputed benefits rose from
 \$855 to \$1,257 per unit in its band, and ours from \$1,027 to \$1,173
 (@tbl-inkind-amounts). BLS's rise exceeds the rise in each of our
-implicates, which ranges from \$52 to \$287 under either price index.
+implicates, which ranges from \$52 to \$287 across the two price indexes.
 Rental assistance supplies \$169 of the difference and school lunch
 \$94, and the other three benefits narrow it by \$7. Rental assistance
 per renter rose 68 percent in BLS's band and 9 to 13 percent in ours,

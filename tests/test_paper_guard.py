@@ -447,8 +447,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "WIC mother's minimum age",
         "section",
-        r"and(\s+)a(\s+)woman(\s+)aged(\s+)15(\s+)or",
-        r"and\1a\2woman\3aged\g<4>18\5or",
+        r"has(\s+)a(\s+)woman(\s+)aged(\s+)15(\s+)or",
+        r"has\1a\2woman\3aged\g<4>18\5or",
         "method constants read from fingerprinted calculator code",
     ),
     (
@@ -505,8 +505,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "implicate rise price index",
         "section",
-        r"under(\s+)either(\s+)price(\s+)index",
-        r"under\1the\2composite CPI",
+        r"across(\s+)the(\s+)two(\s+)price(\s+)indexes",
+        r"under\1the\2composite\3CPI",
         "implicate rise range",
     ),
     (
@@ -589,8 +589,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "WIC infant age",
         "section",
-        r"child(\s+)aged(\s+)0(\s+)or(\s+)1(\s+)and",
-        r"child\1aged\g<2>0\3to\g<4>2\5and",
+        r"child(\s+)aged(\s+)0(\s+)or(\s+)1\.",
+        r"child\1aged\g<2>0\3to\g<4>2.",
         "method constants read from fingerprinted calculator code",
     ),
     (
@@ -648,6 +648,69 @@ INKIND_PROSE_MUTATIONS = (
         r"across(\s+)five(\s+)implicates",
         r"across\1four\2implicates",
         "implicate, matching-neighbor and cell-donor counts",
+    ),
+    (
+        "WIC mother in the 2025 additions",
+        "section",
+        r"we(\s+)count(\s+)the(\s+)children(\s+)alone",
+        r"we\1count\2the\3children\4and one mother",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "years of the imputed totals",
+        "section",
+        r"Between(\s+)the(\s+)2022(\s+)and(\s+)2025(\s+)thresholds,(\s+)BLS's",
+        r"Between\1the\g<2>2021\3and\g<4>2025\5thresholds,\6BLS's",
+        "BLS and replication imputed totals",
+    ),
+    (
+        "tenure of the 2024-2025 split",
+        "section",
+        r"For(\s+)renters(\s+)from(\s+)2024(\s+)to(\s+)2025,",
+        r"For\1owners with mortgages\2from\g<3>2024\4to\g<5>2025,",
+        "BLS 2024-2025 renter split",
+    ),
+    (
+        "survey holding Census lunch values",
+        "section",
+        r"which(\s+)the(\s+)CPS(\s+)ASEC(\s+)files(\s+)include",
+        r"which\1the\2CE\4files\5include",
+        "Census school lunch values from their first reference year",
+    ),
+    (
+        "programs in the participation list",
+        "section",
+        r"and(\s+)broadband(\s+)subsidies(\s+)to(\s+)CE(\s+)consumer",
+        r"and\1rental\2assistance\3to\4CE\5consumer",
+        "programs the participation models cover",
+    ),
+    (
+        "vacation-home principal kept",
+        "section",
+        r"amounts(\s+)and(\s+)the(\s+)vacation-home(\s+)mortgage",
+        r"amounts\1but keep\2the\3vacation-home\4mortgage",
+        "written definitions read from fingerprinted calculator code",
+    ),
+    (
+        "internet row rule",
+        "section",
+        r"gives(\s+)equal(\s+)dollars(\s+)across(\s+)tenures",
+        r"gives\1the\2most dollars\3across\4tenures",
+        "BLS internet reading from fingerprinted calculator code",
+    ),
+    (
+        "broadband in the internet row",
+        "section",
+        r"as(\s+)including(\s+)broadband(\s+)subsidies(\s+)and(\s+)subtract",
+        r"as\1excluding\2broadband\3subsidies\4and\5add",
+        "BLS internet reading from fingerprinted calculator code",
+    ),
+    (
+        "FCSUti price factors across replicates",
+        "section",
+        r"price(\s+)factors(\s+)do(\s+)not(\s+)vary",
+        r"price\1factors\2vary",
+        "FCSUti price factors held fixed across replicates",
     ),
 )
 
@@ -1152,6 +1215,20 @@ class PaperGuardTests(unittest.TestCase):
             text = text.replace(before[name], hashlib.sha256((inkind / name).read_bytes()).hexdigest())
         pins.write_text(text)
 
+    def reseal_and_repin_uncertainty(self, edit):
+        """Edit the uncertainty receipt, reseal it and pin its new digest in
+        the copy's inkind_inputs.py, so only the drift checks can reject the
+        edit."""
+        inkind = self.repo / "data/inkind"
+        pins = self.repo / "scripts/inkind_inputs.py"
+        before = hashlib.sha256((inkind / INKIND_NAMES[2]).read_bytes()).hexdigest()
+        uncertainty = self.inkind_uncertainty()
+        edit(uncertainty)
+        after = self.reseal_inkind(INKIND_NAMES[2], uncertainty)
+        text = pins.read_text()
+        self.assertEqual(text.count(before), 1, "uncertainty digest not pinned once")
+        pins.write_text(text.replace(before, after))
+
     def inkind_uncertainty(self):
         return json.loads((self.repo / "data/inkind" / INKIND_NAMES[2]).read_text())
 
@@ -1246,6 +1323,30 @@ class PaperGuardTests(unittest.TestCase):
         self.assertIn("in-kind prose: written-definition runs drop vacation-home utilities", result.stdout)
         self.assertNotIn("generators were not run", result.stdout)
 
+    def test_definition_runs_must_drop_the_vacation_home_principal(self):
+        def keep_2022_vacation_home_principal(components):
+            components["definition_check"]["2022"]["units_with_amount_removed"]["vacation_home_principal"] = 0
+
+        self.reseal_and_repin_components(keep_2022_vacation_home_principal)
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(
+            "in-kind prose: written-definition runs drop vacation-home utilities and principal", result.stdout
+        )
+        self.assertNotIn("generators were not run", result.stdout)
+
+    def test_paper_states_which_price_factors_the_replicates_hold_fixed(self):
+        def replicate_the_price_indexes(uncertainty):
+            held = uncertainty["method"]["held_fixed"]
+            self.assertIn("the CPI series and BLS's FCSUti index", held)
+            held.remove("the CPI series and BLS's FCSUti index")
+
+        self.reseal_and_repin_uncertainty(replicate_the_price_indexes)
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("in-kind prose: FCSUti price factors held fixed across replicates", result.stdout)
+        self.assertNotIn("generators were not run", result.stdout)
+
     def test_definition_runs_must_leave_no_utilities_below_zero(self):
         def push_2022_utilities_below_zero(components):
             components["definition_check"]["2022"]["units_with_utilities_below_zero"]["after"] = 57
@@ -1313,6 +1414,7 @@ class PaperGuardTests(unittest.TestCase):
         cases = (
             ("receipt count", "uses three receipts", "uses two receipts"),
             ("commit", "`a581c113dd4319fc0f6f9ebd6db5c3697f4a94fa`", "`a581c11`"),
+            ("tag", "`paper-inkind-se-a581c11`", "`paper-inkind-se-7d8e3c8`"),
         )
         for name, old, new in cases:
             with self.subTest(name=name):
@@ -1320,7 +1422,9 @@ class PaperGuardTests(unittest.TestCase):
                 readme.write_text(original.replace(old, new))
                 result = self.run_guard()
                 self.assertNotEqual(result.returncode, 0)
-                self.assertIn("in-kind prose: README counts the receipts and names the commits", result.stdout)
+                self.assertIn(
+                    "in-kind prose: README counts the receipts and names the commits and tags", result.stdout
+                )
         readme.write_text(original)
 
     def test_bibliography_cites_the_recorded_calculator_commits(self):
@@ -1328,6 +1432,8 @@ class PaperGuardTests(unittest.TestCase):
         original = bib.read_text()
         components, stale_components = "8f632e31b4e48bbc735161d24665a8182dc0d9d6", "8b6766cbfcb7cc3b79451b3b5822425a2cc6590d"
         uncertainty, stale_uncertainty = "a581c113dd4319fc0f6f9ebd6db5c3697f4a94fa", "7d8e3c8309492b4d760e8eb2131a94dbf78b95b1"
+        replication = "4778dfab2d109515b6a14e63da63011dd7feb884"
+        note = f"Imputation at commit {replication}; comparison with BLS components at commit {components}"
         cases = (
             ("stale components commit", original.replace(components, stale_components)),
             ("stale standard-error commit", original.replace(uncertainty, stale_uncertainty)),
@@ -1339,7 +1445,22 @@ class PaperGuardTests(unittest.TestCase):
                 "swapped entries",
                 original.replace(components, "<swap>").replace(uncertainty, components).replace("<swap>", uncertainty),
             ),
+            (
+                "commits swapped inside the in-kind note",
+                original.replace(
+                    note,
+                    f"Imputation at commit {components}; comparison with BLS components at commit {replication}",
+                ),
+            ),
+            (
+                "in-kind link to a fork",
+                original.replace(
+                    f"https://github.com/PolicyEngine/spm-calculator/blob/{components}/",
+                    f"https://github.com/MaxGhenis/spm-calculator/blob/{components}/",
+                ),
+            ),
         )
+        self.assertEqual(original.count(note), 1)
         self.assertEqual(original.count(components), 2)
         self.assertEqual(original.count(uncertainty), 2)
         for name, edited in cases:

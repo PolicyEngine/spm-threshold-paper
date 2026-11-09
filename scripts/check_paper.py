@@ -1131,12 +1131,16 @@ receipt_commits = {
 BIB_TEXT = (REPO / "bibliography" / "references.bib").read_text()
 
 
-def bib_commits(key: str, field: str) -> set[str]:
-    """The 40-character commits one field of one bibliography entry names.
-    A missing entry or field names none, so its pin fails."""
+# The page the bibliography links for each calculator commit.
+CALCULATOR_DOC = "https://github.com/PolicyEngine/spm-calculator/blob/{}/docs/ce-inkind-imputation.md"
+
+
+def bib_field(key: str, field: str) -> str | None:
+    """One field of one bibliography entry, or None when the entry or the
+    field is missing, so its pin fails."""
     entry = re.search(r"@\w+\{" + re.escape(key) + r",(.*?)\n\}", BIB_TEXT, re.S)
     value = entry and re.search(r"^\s*" + field + r"\s*=\s*\{(.*)\},?\s*$", entry.group(1), re.M)
-    return set(re.findall(r"\b[0-9a-f]{40}\b", value.group(1))) if value else set()
+    return value.group(1) if value else None
 
 
 def signed(value: float, digits: int = 2) -> str:
@@ -1257,9 +1261,14 @@ INKIND_METHOD_CONSTANTS = (
     "split the income groups at 150 percent of the official poverty line",  # the same ratio, for cells
     "twelve months of USDA's national average monthly food cost",  # 12.0 * cost in the WIC stage
     # _wic_participants: n_lt5 children, plus a mother when n_infants > 0
-    # and n_women_15_plus >= 1; otherwise one participant
+    # and n_women_15_plus >= 1; otherwise one participant. Census's rule
+    # has no woman test. Every narrow-universe unit has a woman aged 15 or
+    # older, so the test binds only in broad_only units, which take part
+    # from the 2025 thresholds on.
     "we count every child under 5 in each participating unit, plus one mother if the unit has a child aged "
-    "0 or 1 and a woman aged 15 or older",
+    "0 or 1",
+    "We count that mother only when the unit has a woman aged 15 or older, so in the units we add to the WIC "
+    "universe for 2025, we count the children alone",
     "If the unit has no child under 5, we count one pregnant woman",
     # WIC_BROAD_UNIVERSE_FIRST_TARGET = 2025, and broad = narrow | n_lt5 >= 1
     "For the 2025 thresholds, as BLS does, we also let the WIC model assign participation to CE units that "
@@ -1277,17 +1286,29 @@ INKIND_THRESHOLD_SOURCE = (
     "4efbe2b03f6b1f4eb2911ab0f79f5151bd655cc1e5addf42f5c4540ace1f852f",
 )
 INKIND_THRESHOLD_CONSTANTS = ("mean imputed benefits per consumer unit in the 47th–53rd percentile band",)
-# Garner and Munoz's utilities rule as the written-definition runs apply it,
-# from spm_calculator/ce_bls_shares.py at this fingerprint (calculator
-# commit 8f632e3): _vacation_utilities takes both vacation-home utility
-# summaries from owners and the rented one alone from other units.
+# Rules the section quotes from spm_calculator/ce_bls_shares.py at this
+# fingerprint (calculator commit 8f632e3): the written-definition runs and
+# the reading of BLS's internet rows.
 INKIND_DEFINITION_SOURCE = (
     "spm_calculator/ce_bls_shares.py",
     "c6ef2d751feb5b97ead6e4ed74bb03bae6d584d96783033c031d88980b13accf",
 )
 INKIND_DEFINITION_CONSTANTS = (
+    # _vacation_utilities takes both vacation-home utility summaries from
+    # owners and the rented one alone from other units
     "They count owners' utilities for the primary residence only, and renters' utilities for any property "
     "but a rented vacation home",
+    # _REMOVED_PAIRS["vacation_home_principal"] zeroes MRTPRNOP and MRTPRNOC,
+    # which unit_components adds to shelter
+    "When we follow their written definitions, we remove those amounts and the vacation-home mortgage "
+    "principal we add to shelter",
+)
+INKIND_SHARES_CONSTANTS = (
+    # bls_band_components keeps the internet row whose dollars spread least
+    # across tenures, and raises when the spread exceeds its tolerance
+    "We use the one that gives equal dollars across tenures",
+    # pooled["internet"] = internet_total - pooled["broadband"]
+    "We treat that row as including broadband subsidies and subtract them to recover home internet spending",
 )
 replication_receipt = json.loads((DATA / "inkind" / "ce_inkind_replication_2019_2025.json").read_text())
 
@@ -1330,6 +1351,9 @@ census_lunch_years = [y for y, s in zip(lunch_years, lunch_sources) if s == "cen
 internet_rows = [inkind_inputs["components"]["bls"]["years"][year]["checks"]["internet_row"] for year in YEARS]
 oop_internet_years = internet_rows.count("internet_oop_row")
 in_kind_components = inkind_method["components"]
+# The programs the participation models cover, as the section names them.
+PARTICIPATION_NAMES = {"nslp": "school lunch", "wic": "WIC", "liheap": "LIHEAP", "broadband": "broadband subsidies"}
+participation_programs = [PARTICIPATION_NAMES.get(c) for c in in_kind_components if c != "rental_assistance"]
 inkind_pins = (
     (
         "in-kind lift range",
@@ -1377,10 +1401,11 @@ inkind_pins = (
         ),
     ),
     (
-        "written-definition runs drop vacation-home utilities",
+        "written-definition runs drop vacation-home utilities and principal",
         sorted(definition_check) == list(YEARS)
         and all(
             year_check["units_with_amount_removed"]["vacation_utilities"] > 0
+            and year_check["units_with_amount_removed"]["vacation_home_principal"] > 0
             and not any(year_check["units_with_negative_amount"].values())
             and year_check["units_with_utilities_below_zero"]["after"] == 0
             for year_check in definition_check.values()
@@ -1414,8 +1439,9 @@ inkind_pins = (
     (
         "BLS and replication imputed totals",
         has_number(
-            f"BLS's imputed benefits rose from {dollars(bls_total[0])} to {dollars(bls_total[1])} per unit in its "
-            f"band, and ours from {dollars(our_total[0])} to {dollars(our_total[1])}",
+            f"Between the {GROWTH_FIRST} and {GROWTH_LAST} thresholds, BLS's imputed benefits rose from "
+            f"{dollars(bls_total[0])} to {dollars(bls_total[1])} per unit in its band, and ours from "
+            f"{dollars(our_total[0])} to {dollars(our_total[1])}",
             text=INKIND_TEXT,
         )
         and bls_total[2] > rise_high
@@ -1425,7 +1451,7 @@ inkind_pins = (
         "implicate rise range",
         has_number(
             f"BLS's rise exceeds the rise in each of our implicates, which ranges from {dollars(rise_low)} to "
-            f"{dollars(rise_high)} under either price index",
+            f"{dollars(rise_high)} across the two price indexes",
             text=INKIND_TEXT,
         ),
     ),
@@ -1579,8 +1605,9 @@ inkind_pins = (
     (
         "BLS 2024-2025 renter split",
         has_number(
-            f"BLS's imputed benefits supplied {recent['imputed_points']:.2f} of the {recent['growth']:.2f} points "
-            f"of threshold growth, {recent['rental_assistance_points']:.2f} of them from rental assistance",
+            "For renters from 2024 to 2025, where the 2025 nowcast missed most (@sec-evaluation), BLS's imputed "
+            f"benefits supplied {recent['imputed_points']:.2f} of the {recent['growth']:.2f} points of threshold "
+            f"growth, {recent['rental_assistance_points']:.2f} of them from rental assistance",
             text=INKIND_TEXT,
         )
         and has_number(
@@ -1661,7 +1688,9 @@ inkind_pins = (
         and lunch_sources
         == ["usda_formula"] * (len(lunch_sources) - len(census_lunch_years))
         + ["census_spm_schlunch"] * len(census_lunch_years)
-        and has_number(f"files include from reference year {census_lunch_years[0]}", text=INKIND_TEXT),
+        and has_number(
+            f"which the CPS ASEC files include from reference year {census_lunch_years[0]}", text=INKIND_TEXT
+        ),
     ),
     (
         "BLS internet row by threshold year",
@@ -1674,17 +1703,41 @@ inkind_pins = (
         ),
     ),
     (
+        "BLS internet reading from fingerprinted calculator code",
+        inkind_inputs["components"]["code_sha256"].get(INKIND_DEFINITION_SOURCE[0]) == INKIND_DEFINITION_SOURCE[1]
+        and all(has_number(constant, text=INKIND_TEXT) for constant in INKIND_SHARES_CONSTANTS),
+    ),
+    (
+        "FCSUti price factors held fixed across replicates",
+        "the CPI series and BLS's FCSUti index"
+        in inkind_inputs["uncertainty"].get("method", {}).get("held_fixed", [])
+        and has_number(
+            "When we deflate with BLS's FCSUti index instead of the replication's composite CPI, we apply its "
+            "published values in every replicate, so the price factors do not vary",
+            text=UNCERTAINTY_TEXT,
+        ),
+    ),
+    (
         "programs the participation models cover",
         "rental_assistance" in in_kind_components
+        and None not in participation_programs
+        and len(participation_programs) >= 2
+        and has_number(
+            f"assign participation in {', '.join(participation_programs[:-1])}, and {participation_programs[-1]} "
+            "to CE consumer units",
+            text=INKIND_TEXT,
+        )
         and has_number(f"For all {count_word(len(in_kind_components) - 1)} programs", text=INKIND_TEXT)
         and has_number(f"with the {count_word(len(in_kind_components))} benefits", text=INKIND_TEXT),
     ),
     (
         "bibliography cites the recorded calculator commits",
-        bib_commits("spmcalculator2026inkind", "note") == {receipt_commits[REPLICATION], receipt_commits[COMPONENTS]}
-        and bib_commits("spmcalculator2026inkind", "url") == {receipt_commits[COMPONENTS]}
-        and bib_commits("spmcalculator2026se", "note") == {receipt_commits[UNCERTAINTY]}
-        and bib_commits("spmcalculator2026se", "url") == {receipt_commits[UNCERTAINTY]},
+        bib_field("spmcalculator2026inkind", "note")
+        == f"Imputation at commit {receipt_commits[REPLICATION]}; comparison with BLS components at commit "
+        f"{receipt_commits[COMPONENTS]}"
+        and bib_field("spmcalculator2026inkind", "url") == CALCULATOR_DOC.format(receipt_commits[COMPONENTS])
+        and bib_field("spmcalculator2026se", "note") == f"Commit {receipt_commits[UNCERTAINTY]}"
+        and bib_field("spmcalculator2026se", "url") == CALCULATOR_DOC.format(receipt_commits[UNCERTAINTY]),
     ),
     (
         "appendix names the recorded calculator commits",
@@ -1701,7 +1754,7 @@ inkind_pins = (
         ),
     ),
     (
-        "README counts the receipts and names the commits",
+        "README counts the receipts and names the commits and tags",
         has_number(
             f"uses {count_word(len(inkind_provenance['artifacts']))} receipts from spm-calculator",
             text=README_TEXT,
@@ -1709,6 +1762,10 @@ inkind_pins = (
         and all(
             f"`{record['calculator_commit']}`" in README_TEXT
             for record in inkind_provenance["artifacts"].values()
+        )
+        and all(
+            f"`paper-inkind-{name}-{receipt_commits[receipt][:7]}`" in README_TEXT
+            for name, receipt in (("components", COMPONENTS), ("se", UNCERTAINTY))
         ),
     ),
 )

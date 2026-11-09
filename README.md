@@ -57,9 +57,10 @@ we keep in [`data/inkind`](data/inkind) with their provenance and checksums:
 the imputation at commit `4778dfab2d109515b6a14e63da63011dd7feb884`, the
 comparison with BLS's components at commit
 `8f632e31b4e48bbc735161d24665a8182dc0d9d6`, and the replicate-weight standard
-errors at commit `a581c113dd4319fc0f6f9ebd6db5c3697f4a94fa`. Two
-spm-calculator tags, `paper-inkind-components-8f632e3` and
-`paper-inkind-se-a581c11`, keep the last two commits in every clone. The guard
+errors at commit `a581c113dd4319fc0f6f9ebd6db5c3697f4a94fa`. Tags
+`paper-inkind-components-8f632e3` and `paper-inkind-se-a581c11` in
+spm-calculator point at the components and standard-error commits, so a
+default clone holds both. The guard
 recomputes every in-kind estimate and standard error in the tables and text
 and checks that the out-of-pocket run reproduces the retrospective
 replication artifact. It also checks each receipt against the SHA-256 and
