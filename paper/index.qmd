@@ -452,6 +452,10 @@ it. Under the
 written definitions and BLS's index, growth with the benefits comes
 within 0.8 points of BLS's for every tenure.
 
+```{=latex}
+\Needspace{22\baselineskip}
+```
+
 ::: {#tbl-inkind-growth tbl-colwidths="[40,20,20,20]"}
 {{< include tables/inkind_growth.md >}}
 
