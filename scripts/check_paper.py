@@ -541,9 +541,10 @@ APPENDIX_A_SOURCE = section_source(
     "# Appendix A: replication benchmark {.unnumbered}",
     "# Appendix B: reproducibility {.unnumbered}",
 )
-APPENDIX_B_TEXT = section(
-    "# Appendix B: reproducibility {.unnumbered}", "# References {.unnumbered}"
-)
+# Appendix B has two slices: this one bounds it by the bare headings and
+# REPRODUCIBILITY by their {.unnumbered} forms, so a stray copy of either form
+# anywhere in the paper fails both.
+APPENDIX_B_TEXT = section("# Appendix B: reproducibility", "# References")
 
 nowcast = json.loads((DATA / "nowcast_2025.json").read_text())
 AMENDED = {t: f"{nowcast['values'][t]:,.2f}" for t in TENURES}
@@ -1135,7 +1136,9 @@ ROLLING_CE = section(
 )
 ROLLING_ACS = section("## Projecting local relative housing costs", None, ROLLING)
 
-REPRODUCIBILITY = APPENDIX_B_TEXT
+REPRODUCIBILITY = section(
+    "# Appendix B: reproducibility {.unnumbered}", "# References {.unnumbered}"
+)
 check(
     "rolling reproducibility identity matches the sealed calculator commit and content",
     has_ordered(

@@ -1946,6 +1946,22 @@ SECTION_MARKER_CASES = (
             "manuscript links fixed supporting document: docs/forecast-record.md",
         ),
     ),
+    (
+        "appendix B heading restated with a suffix",
+        ((DISCUSSION_HEADING, "# Appendix B: reproducibility (continued)\n\n" + DISCUSSION_HEADING),),
+        (
+            "paper section heading not unique: '# Appendix B: reproducibility' occurs 2 times",
+            "manuscript links fixed supporting document: docs/forecast-record.md",
+        ),
+    ),
+    (
+        "references heading restated with a suffix",
+        ((DISCUSSION_HEADING, "# References (continued)\n\n" + DISCUSSION_HEADING),),
+        (
+            "paper section heading not unique: '# References' occurs 2 times",
+            "manuscript links fixed supporting document: docs/forecast-record.md",
+        ),
+    ),
 )
 
 # The in-kind ties that read the abstract, labeled as the guard reports them.
