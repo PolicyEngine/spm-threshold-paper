@@ -281,8 +281,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "appendix standard-error commit",
         "appendix",
-        r"`b542f3fa4598ed4e83c8081a5ce06d803d6820f1`",
-        "`b542f3fa4598ed4e83c8081a5ce06d803d6820f2`",
+        r"`708ea21d32efb54a0c91dffde5d1c417b62aa847`",
+        "`708ea21d32efb54a0c91dffde5d1c417b62aa840`",
         "appendix names the recorded calculator commits",
     ),
     (
@@ -357,6 +357,13 @@ INKIND_PROSE_MUTATIONS = (
         r"(.*?## Uncertainty and limitations \{#sec-inkind-uncertainty\}\n\n)",
         r"\2\1. ",
         "stage changes in tenure order, each within one standard error",
+    ),
+    (
+        "rental assistance per renter 2019-2022 growth",
+        "section",
+        r"renter(\s+)rose(\s+)17(\s+)percent",
+        r"renter\1rose\g<2>27\3percent",
+        "rental assistance per renter: 2019–2022 growth",
     ),
     (
         "appendix receipt count",
@@ -673,8 +680,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "survey holding Census lunch values",
         "section",
-        r"which(\s+)the(\s+)public(\s+)CPS(\s+)ASEC(\s+)person(\s+)files",
-        r"which\1the\2public\3CE\5person\6files",
+        r"which(\s+)every(\s+)public(\s+)CPS(\s+)ASEC(\s+)person(\s+)file",
+        r"which\1every\2public\3CE\5person\6file",
         "Census school lunch values from their first reference year",
     ),
     (
@@ -862,6 +869,13 @@ INKIND_PROSE_MUTATIONS = (
         'abstract and discussion: each change within one standard error',
     ),
     (
+        'discussion growth claim without its CE-summaries scope',
+        'discussion',
+        "With(\\s+)the(\\s+)CE's(\\s+)spending(\\s+)summaries,(\\s+)we(\\s+)estimate",
+        'We\\6estimate',
+        'abstract and discussion: each change within one standard error',
+    ),
+    (
         'reference-year rule',
         'section',
         'interviews(\\s+)to(\\s+)the(\\s+)year(\\s+)before',
@@ -888,6 +902,13 @@ INKIND_PROSE_MUTATIONS = (
         'top-coded(\\s+)at(\\s+)four',
         'top-coded\\1at\\2three',
         'method constants read from fingerprinted calculator code',
+    ),
+    (
+        'reference year of the Bridge File lunch values',
+        'section',
+        'for(\\s+)2017(\\s+)also(\\s+)in(\\s+)the(\\s+)2018(\\s+)CPS',
+        'for\\g<1>2016\\2also\\3in\\4the\\g<5>2018\\6CPS',
+        'Census school lunch values from their first reference year',
     ),
     (
         'first CPS ASEC file with Census lunch values',
@@ -1618,8 +1639,8 @@ class PaperGuardTests(unittest.TestCase):
         original = readme.read_text()
         cases = (
             ("receipt count", "uses three receipts", "uses two receipts"),
-            ("commit", "`b542f3fa4598ed4e83c8081a5ce06d803d6820f1`", "`b542f3f`"),
-            ("tag", "`paper-inkind-se-b542f3f`", "`paper-inkind-se-a581c11`"),
+            ("commit", "`708ea21d32efb54a0c91dffde5d1c417b62aa847`", "`708ea21`"),
+            ("tag", "`paper-inkind-se-708ea21`", "`paper-inkind-se-a581c11`"),
         )
         for name, old, new in cases:
             with self.subTest(name=name):
@@ -1637,7 +1658,7 @@ class PaperGuardTests(unittest.TestCase):
         original = bib.read_text()
         # Both receipts come from one calculator commit, so the cases edit one
         # entry at a time; a swap of the two entries would change nothing.
-        components = uncertainty = "b542f3fa4598ed4e83c8081a5ce06d803d6820f1"
+        components = uncertainty = "708ea21d32efb54a0c91dffde5d1c417b62aa847"
         stale_components = "8f632e31b4e48bbc735161d24665a8182dc0d9d6"
         stale_uncertainty = "a581c113dd4319fc0f6f9ebd6db5c3697f4a94fa"
         replication = "4778dfab2d109515b6a14e63da63011dd7feb884"

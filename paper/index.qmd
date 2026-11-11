@@ -350,8 +350,8 @@ the months they received a subsidy, and Census values each month at the program'
 BLS assigns each imputed participant a free or reduced-price lunch from
 the unit's before-tax income and values it with amounts it receives from
 Census staff [@blsspmhome]. We do not have those amounts. From reference
-year 2018, we use the value Census assigns each SPM unit, which the
-public CPS ASEC person files carry from the 2019 file onward
+year 2018, we use the value Census assigns each SPM unit, which every
+public CPS ASEC person file carries from the 2019 file onward
 [@spmtechnical]. In those years, each imputed participant receives the
 value Census assigns a participating CPS ASEC household in its cell. We
 form cells by state, SNAP receipt, income group, and number of
@@ -363,8 +363,9 @@ region, then across numbers of children, then across regions, and last
 to all donors. Census applies its pandemic-year methods in those values,
 and BLS says it follows them [@blsspmhome; @spmtechnical]. For reference
 years 2014–2017, Census publishes SPM-unit values in research files, and
-the CPS ASEC family records carry its traditional valuation, `F_MV_SL`
-[@spmtechnical]. We read neither. For those years, we value each CPS
+for 2017 also in the 2018 CPS ASEC Bridge File, while the CPS ASEC family
+records carry its traditional valuation, `F_MV_SL` [@spmtechnical]. We
+read none of these. For those years, we value each CPS
 ASEC donor's reported lunches at USDA's reimbursement and donated-food
 rates over 179 school days. We use the free rate below 150 percent of
 the poverty line and otherwise choose the free or reduced-price rate
@@ -470,8 +471,9 @@ Between the 2022 and 2025 thresholds, BLS's imputed benefits rose from
 from \$1,027 to \$1,173, a rise of \$146 with a standard error of \$191
 (@tbl-inkind-amounts). Rental assistance supplies \$169 of the \$256
 difference between the two rises and school lunch \$94, and the other
-three benefits narrow it by \$7. The two rental assistance series differ
-more in level than in growth (@tbl-inkind-series). For the 2019–2023
+three benefits narrow it by \$7. From the 2019 to the 2022 thresholds, BLS's rental
+assistance per renter rose 17 percent, and we estimate that ours rose 20
+percent (@tbl-inkind-series). For the 2019–2023
 thresholds, we estimate rental assistance per renter 71 to 80 percent
 above BLS's, \$1,331 against \$738 in 2022. BLS's amount then rose to
 \$940 in 2024 and \$1,243 in 2025, where we estimate \$1,446. From 2022
@@ -603,8 +605,8 @@ Under either price index, every change lies within three-quarters of a
 standard error of zero. For the 2022–2025 rises in our band amounts, we
 estimate standard errors of \$191 for all imputed benefits, \$444 for
 rental assistance per renter, and \$50 for school lunch. For the
-benefits' lift to each year's threshold, we estimate standard errors of
-0.31 to 0.61 points for owners with mortgages and renters, whose lifts
+benefits' lift to each year's threshold with the composite CPI, we
+estimate standard errors of 0.31 to 0.61 points for owners with mortgages and renters, whose lifts
 exceed five standard errors in every year. For owners without mortgages,
 we estimate standard errors of 1.04 to 2.00 points, and the 2021–2025
 lifts each fall within 1.5 standard errors of zero.
@@ -839,8 +841,8 @@ any of these rankings will persist.
 The largest miss occurs for renters. BLS reports renter growth of 6.33
 percent against 5.33 and 4.40 percent for the two owner tenures. The
 blend projects renter growth of 3.92 percent, and replication alone 4.62
-percent. If we keep the same units in BLS's band and remove its imputed benefits'
-terms from both years, that renter growth falls by 0.62 points, mostly
+percent. If we take each year's band as BLS's shares give it and remove its
+imputed benefits' terms from both years, that renter growth falls by 0.62 points, mostly
 because of rental assistance.
 We estimate that ours change the retrospective replication's renter
 growth by −0.01 points (@sec-inkind). Price treatment, sample
@@ -1060,9 +1062,10 @@ re-estimation reflects consumption changes that price adjustment alone
 omits, consistent with the measure’s quasi-relative construction. From 2022 to 2025, BLS's FCSUti index supplies 33 to 39 percent of its
 thresholds' growth beyond CPI-U, its imputed benefits 5 to 13 percent,
 and out-of-pocket spending the rest; we do not separate real spending
-from sample composition within that last part (@sec-inkind). We estimate
-that imputing in-kind benefits changes our 2022–2025 growth by −0.62 to
-+0.91 points, each within one standard error of zero. Price-indexed
+from sample composition within that last part (@sec-inkind). With the
+CE's spending summaries, we estimate that imputing in-kind benefits
+changes our 2022–2025 growth by −0.62 to +0.91 points, each within one
+standard error of zero. Price-indexed
 anchored measures serve a different purpose: they hold the real standard
 fixed [@wimer2016; @sehsd2026].
 
@@ -1138,7 +1141,7 @@ spm-calculator, with their provenance and checksums, in the paper
 repository's [`data/inkind`](https://github.com/PolicyEngine/spm-threshold-paper/tree/inkind-section-2026-11/data/inkind) folder: the imputation at commit
 `4778dfab2d109515b6a14e63da63011dd7feb884`, and the comparison with
 BLS's components and the replicate-weight standard errors, both at
-commit `b542f3fa4598ed4e83c8081a5ce06d803d6820f1`. Before each render, we
+commit `708ea21d32efb54a0c91dffde5d1c417b62aa847`. Before each render, we
 check that the out-of-pocket run reproduces the retrospective
 replication artifact exactly. We then recompute every in-kind estimate
 in the tables and text from the receipts' thresholds, band means, and

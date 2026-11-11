@@ -1329,7 +1329,7 @@ INKIND_THRESHOLD_SOURCE = (
 )
 INKIND_THRESHOLD_CONSTANTS = ("mean imputed benefits per consumer unit in the 47th–53rd percentile band",)
 # Rules the section quotes from spm_calculator/ce_bls_shares.py at this
-# fingerprint (calculator commit 8f632e3, unchanged at b542f3f): the written-definition runs and
+# fingerprint (calculator commit 8f632e3, unchanged at 708ea21): the written-definition runs and
 # the reading of BLS's internet rows.
 INKIND_DEFINITION_SOURCE = (
     "spm_calculator/ce_bls_shares.py",
@@ -1501,6 +1501,16 @@ inkind_pins = (
         ),
     ),
     (
+        "rental assistance per renter: 2019–2022 growth",
+        has_number(
+            f"From the 2019 to the {GROWTH_FIRST} thresholds, BLS's rental assistance per renter rose "
+            f"{100 * (year_table['years'][GROWTH_FIRST]['bls_rent'] / year_table['years']['2019']['bls_rent'] - 1):.0f} "
+            f"percent, and we estimate that ours rose "
+            f"{100 * (year_table['years'][GROWTH_FIRST]['rent'] / year_table['years']['2019']['rent'] - 1):.0f} percent",
+            text=INKIND_TEXT,
+        ),
+    ),
+    (
         "rental assistance per renter: level gap before 2024",
         year_table["rent_excess_2019_2023"][0] > 0
         and has_number(
@@ -1614,7 +1624,11 @@ inkind_pins = (
         "abstract and discussion: each change within one standard error",
         all(ratio < 1 for ratio in stage_ratios)
         and "each change within one standard error of zero" in ABSTRACT
-        and has_number("points, each within one standard error of zero", text=DISCUSSION_TEXT),
+        and has_number("points, each within one standard error of zero", text=DISCUSSION_TEXT)
+        and has_number(
+            "With the CE's spending summaries, we estimate that imputing in-kind benefits changes",
+            text=DISCUSSION_TEXT,
+        ),
     ),
     (
         "abstract and discussion: the accounting's shares",
@@ -1870,12 +1884,13 @@ inkind_pins = (
         + ["census_spm_schlunch"] * len(census_lunch_years)
         and has_number(
             f"From reference year {census_lunch_years[0]}, we use the value Census assigns each SPM unit, which "
-            f"the public CPS ASEC person files carry from the {int(census_lunch_years[0]) + 1} file onward",
+            f"every public CPS ASEC person file carries from the {int(census_lunch_years[0]) + 1} file onward",
             text=INKIND_TEXT,
         )
         and has_number(
             f"For reference years {lunch_years[0]}–{int(census_lunch_years[0]) - 1}, Census publishes SPM-unit "
-            "values",
+            f"values in research files, and for {int(census_lunch_years[0]) - 1} also in the "
+            f"{census_lunch_years[0]} CPS ASEC Bridge File",
             text=INKIND_TEXT,
         ),
     ),

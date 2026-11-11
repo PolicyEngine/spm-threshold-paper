@@ -89,11 +89,11 @@ RECEIPT_PINS = {
     ),
     COMPONENTS: (
         "4a08c13e94abb567607a6a1f8e4fba45a049b345ec10f054dae503383f3557be",
-        "b542f3fa4598ed4e83c8081a5ce06d803d6820f1",
+        "708ea21d32efb54a0c91dffde5d1c417b62aa847",
     ),
     UNCERTAINTY: (
         "50a67fab352df9d385ccdc1c70c49794f4e2fc0a7addf013fde27fcfd04af3d2",
-        "b542f3fa4598ed4e83c8081a5ce06d803d6820f1",
+        "708ea21d32efb54a0c91dffde5d1c417b62aa847",
     ),
 }
 # The growth window whose standard errors the section reports.
