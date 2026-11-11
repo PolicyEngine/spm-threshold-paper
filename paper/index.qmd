@@ -563,6 +563,10 @@ sample as newer CE quarters replace older ones.
 When we deflate with the composite CPI and remove the imputed terms from
 both series, the replication's renter shortfall narrows from 2.40 to 0.94 points.
 
+```{=latex}
+\Needspace{14\baselineskip}
+```
+
 ::: {#tbl-inkind-accounting}
 {{< include tables/inkind_accounting.md >}}
 
