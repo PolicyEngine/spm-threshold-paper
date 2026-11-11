@@ -835,7 +835,11 @@ check(
 )
 check(
     "eleven-month CPI-U growth 2.63 quoted",
-    stated("2.63", COMPARATOR_SOURCE, "2.63 percent implied by the eleven-month annual average")
+    stated(
+        "2.63",
+        COMPARATOR_SOURCE,
+        "eleven-month annual average in the pinned CPI observations implies 2.63 percent",
+    )
     and abs(realized_2025 - 0.0263) < 0.0005,
 )
 

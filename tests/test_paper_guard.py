@@ -1161,8 +1161,8 @@ COMPARATOR_GAPS = (
 )
 COMPARATOR_CPI_U = (
     "For 2025, the BLS threshold page reports CPI-U growth of 2.70 percent, "
-    "compared with 2.63 percent implied by the eleven-month annual average in "
-    "the pinned CPI observations."
+    "and the eleven-month annual average in the pinned CPI observations "
+    "implies 2.63 percent."
 )
 APPENDIX_A_RANGES = (
     "The replication used for the 2025 nowcast has mean absolute deviations "
@@ -1171,10 +1171,16 @@ APPENDIX_A_RANGES = (
     "with its corresponding anchor share. Published BLS sampling standard errors "
     "span 0.7 to 2.1 percent of the revised threshold levels in those years."
 )
-APPENDIX_B_LINKS = (
+APPENDIX_B_RECORDS = (
     f"The [data provenance]({PINNED_BLOB}data/PROVENANCE.md) and [forecast "
-    f"record]({PINNED_BLOB}docs/forecast-record.md) identify each experiment’s "
-    "inputs and evidence. The [experiment replay "
+    f"record]({PINNED_BLOB}docs/forecast-record.md) identify the inputs and "
+    "evidence of the earlier experiments, and "
+    "[`data/inkind/provenance.json`](https://github.com/PolicyEngine/"
+    "spm-threshold-paper/blob/inkind-section-2026-11/data/inkind/provenance.json) "
+    "those of the in-kind experiment."
+)
+APPENDIX_B_REPLAY = (
+    "The [experiment replay "
     f"guide]({PINNED_BLOB}docs/reproducing-experiments.md) provides commands "
     "and source-file requirements for raw-data replication."
 )
@@ -1202,7 +1208,7 @@ SECTION_PROSE_MUTATIONS = (
         r"blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0(/docs/forecast-record\.md)",
         r"blob/main\1",
         ("manuscript links fixed supporting document: docs/forecast-record.md",),
-        APPENDIX_B_LINKS,
+        APPENDIX_B_RECORDS,
     ),
     (
         "appendix data provenance links",
@@ -1211,7 +1217,7 @@ SECTION_PROSE_MUTATIONS = (
         r"blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0(/data/PROVENANCE\.md)",
         r"blob/main\1\2blob/main\3",
         ("manuscript links fixed supporting document: data/PROVENANCE.md",),
-        APPENDIX_B_LINKS,
+        APPENDIX_B_RECORDS,
     ),
     (
         "appendix replay guide link",
@@ -1219,7 +1225,7 @@ SECTION_PROSE_MUTATIONS = (
         r"blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0(/docs/reproducing-experiments\.md)",
         r"blob/main\1",
         ("manuscript links fixed supporting document: docs/reproducing-experiments.md",),
-        APPENDIX_B_LINKS,
+        APPENDIX_B_REPLAY,
     ),
     (
         "nowcast forecast record link",
