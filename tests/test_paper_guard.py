@@ -1071,6 +1071,15 @@ ABSTRACT_TIE_LABELS = (
     "abstract evaluation CPI-U MAE 2.58",
 )
 
+# The in-kind ties that read the abstract, labeled as the guard reports them.
+INKIND_ABSTRACT_TIE_LABELS = (
+    "in-kind prose: abstract in-kind lift range",
+    "in-kind prose: abstract and discussion: each change within one standard error",
+    "in-kind prose: abstract and discussion: the accounting's shares",
+    "in-kind prose: written definitions with the composite CPI: the benefits' change to growth",
+    "in-kind prose: abstract stage changes under one point per tenure",
+)
+
 
 def failure_lines(stdout):
     """The labels the guard lists as failures, one per line."""
@@ -2076,7 +2085,7 @@ class PaperGuardTests(unittest.TestCase):
     def test_abstract_ties_skip_a_comment_after_the_block(self):
         """YAML ends the abstract's block at a line indented less than the
         block, a comment included, so a comment that keeps wording the
-        abstract dropped cannot satisfy that wording's tie."""
+        abstract dropped cannot satisfy the ties that read that wording."""
         cases = (
             (
                 "CPI-U rule renamed",
@@ -2089,8 +2098,11 @@ class PaperGuardTests(unittest.TestCase):
                 "stage-change bound changed",
                 r"less(\s+)than(\s+)one(\s+)point",
                 r"less\1than\2half\3a point",
-                "growth by less than one point per tenure",
-                ["in-kind prose: abstract stage changes under one point per tenure"],
+                "change 2022–2025 growth by less than one point per tenure with the CE's spending summaries",
+                [
+                    "in-kind prose: abstract stage changes under one point per tenure",
+                    "in-kind prose: written definitions with the composite CPI: the benefits' change to growth",
+                ],
             ),
         )
         for name, pattern, replacement, comment, labels in cases:
@@ -2139,7 +2151,7 @@ class PaperGuardTests(unittest.TestCase):
                 for label in (
                     "paper must set abstract only in one abstract: | block of its front matter",
                     *ABSTRACT_TIE_LABELS,
-                    "in-kind prose: abstract in-kind lift range",
+                    *INKIND_ABSTRACT_TIE_LABELS,
                 ):
                     self.assertIn(label, failures)
         self.install_article()
