@@ -23,23 +23,25 @@ push to master and every pull request. It fails when:
     triples in the sentences that state them, so a swap between
     tenures fails. The guard pins every registered figure inside the
     section that states it: a slice between two heading strings that
-    must each occur exactly once anywhere in the paper, code and tables
-    included, and must border whitespace. The same numeral elsewhere in
-    the paper cannot satisfy the pin, and a renamed, repeated, reordered
-    or run-on heading fails every figure in that section instead of
-    widening the search. Where two sections state a figure that the
-    guard once searched the whole paper for, each copy gets a pin. Most
-    pins also hold the figure beside the words that say what it
-    measures, so a swap between neighbors fails. The guard reads those
-    phrases from whitespace-normalized text, so rewrapping a line cannot
-    split them, and when a phrase goes missing beside a figure that
-    still matches, the report names the phrase. Pins built with
+    must each occur exactly once in the text it slices (the paper, or
+    the rolling section for its two subsections), code and tables
+    included. A raw slice must also begin with whitespace and, when an
+    end heading bounds it, end with whitespace. The same numeral
+    elsewhere in the paper cannot satisfy the pin, and a renamed,
+    repeated, reordered or run-on heading fails every figure in that
+    section instead of widening the search. Where the abstract and
+    sections 6.1 and 6.2 repeat an error rate, each copy has its own
+    pin. Most pins also hold the figure beside the words that say what
+    it measures, so a swap between neighbors fails. The guard reads
+    those phrases from whitespace-normalized text, so rewrapping a line
+    cannot split them, and when a pin's figure occurs in its section
+    but a phrase doesn't, the report names the phrase. Pins built with
     ``stated()`` match their figure in the section's source text as
-    written, so a line break inside a multi-word figure fails, as it did
-    when the guard searched the whole paper, and each pin fails wherever
-    that search would fail. Every link to a supporting document must
-    carry the pinned commit. The
-    guard reads each error rate the abstract quotes from the front
+    written, so a line break inside a multi-word figure fails. Appendix
+    B must link each supporting document, and section 6.1 the forecast
+    record, with a plain inline link at the pinned commit, and every
+    other URL there that names the document, in any Markdown form, must
+    point at that commit's blob too. The guard reads each error rate the abstract quotes from the front
     matter's ``abstract: |`` block alone, as Quarto and pandoc read it,
     beside the rule it scores, and every rate the abstract gives in that
     rule's wording must equal the registered value. A copy in other
@@ -187,15 +189,17 @@ def section_source(start: str, end: str | None = None, text: str = QMD) -> str:
 
     Each heading string must occur exactly once anywhere in ``text``, code
     spans, tables and fenced code included; the start must come before the
-    end; and the slice must begin and end with whitespace, so a heading
-    cannot run on into the text beside it. Otherwise the slice comes back
-    empty and the guard records a failure that names the heading, once
-    even when it bounds two slices, so every pin inside the slice fails
-    rather than silently widening to the whole document.
+    end; and the slice must begin with whitespace and, when an end heading
+    bounds it, end with whitespace, so a heading cannot run on into the
+    text beside it. Otherwise the slice comes back empty and the guard
+    records a failure that names the heading, once even when it bounds two
+    slices, so every pin inside the slice fails rather than silently
+    widening to the whole document.
 
     No pinned figure begins or ends with whitespace, so a figure that
     matches inside the slice has the same neighbors in the whole paper,
-    and a pin that passes on the slice passes on the whole paper."""
+    and a presence pin that passes on the slice passes on the whole
+    paper."""
     problems = [
         f"paper section heading not unique: {marker!r} occurs {text.count(marker)} times"
         for marker in (start, end)
@@ -234,28 +238,33 @@ def stated(literal: str, source: str, *phrases: str) -> bool:
     tie fails wherever a search of the whole paper for the literal would
     fail. Each phrase holds the figure beside the words that say what it
     measures, and rewrapping a line cannot split a phrase. When the literal
-    matches and a phrase doesn't, the failure report lists the phrase, so a
-    reworded sentence doesn't read as a drifted figure."""
+    occurs in the source and a phrase doesn't, the report lists the phrase
+    after the failures."""
     if not has_number(literal, text=source):
         return False
     text = normalized(source)
     missing = [phrase for phrase in phrases if not has_number(phrase, text=text)]
-    phrase_misses.extend(f"{literal!r} matches, {phrase!r} doesn't" for phrase in missing)
+    phrase_misses.extend(f"{literal!r} occurs in the section; {phrase!r} doesn't" for phrase in missing)
     return not missing
 
 
 def pinned_links(path: str, text: str) -> bool:
-    """At least one Markdown link to ``path`` in this repository's blob
-    tree, and every such link at the pinned commit."""
-    commits = re.findall(rf"\]\({re.escape(REPO_BLOB_URL)}([^/\s)]+)/{re.escape(path)}\)", text)
-    return bool(commits) and set(commits) == {SUPPORTING_COMMIT}
+    """A plain inline link to ``path`` at the pinned commit, and every URL
+    in ``text`` that names this repository and ``path`` pointing at the
+    pinned commit's blob, whether it carries a fragment, a query, a title,
+    angle brackets or a reference definition, or sits on tree/, raw/ or
+    raw.githubusercontent.com."""
+    refs = re.findall(
+        rf"spm-threshold-paper/([^\s()<>\[\]\"']*?)/?{re.escape(path)}(?![\w/-]|\.\w)", text
+    )
+    return f"]({SUPPORTING_URL_BASE}{path})" in text and set(refs) == {f"blob/{SUPPORTING_COMMIT}"}
 
 
 def report_phrase_misses() -> None:
-    """After the failures, list each phrase a pin missed beside a figure
-    that still matches."""
+    """After the failures, list each phrase a pin missed in a section where
+    the pin's figure occurs."""
     if phrase_misses:
-        print("Phrases missing beside figures that still match:")
+        print("Phrases missing from sections that hold the pin's figure:")
         for miss in phrase_misses:
             print(f"    {miss}")
 
@@ -541,9 +550,10 @@ APPENDIX_A_SOURCE = section_source(
     "# Appendix A: replication benchmark {.unnumbered}",
     "# Appendix B: reproducibility {.unnumbered}",
 )
-# Appendix B has two slices: this one bounds it by the bare headings and
-# REPRODUCIBILITY by their {.unnumbered} forms, so a stray copy of either form
-# anywhere in the paper fails both.
+# Appendix B has two slices, this one between the bare headings and
+# REPRODUCIBILITY between their {.unnumbered} forms, so the guard checks that
+# each form of each heading occurs once. A stray bare heading fails this slice,
+# and a stray {.unnumbered} heading, which contains the bare one, fails both.
 APPENDIX_B_TEXT = section("# Appendix B: reproducibility", "# References")
 
 nowcast = json.loads((DATA / "nowcast_2025.json").read_text())
@@ -551,9 +561,9 @@ AMENDED = {t: f"{nowcast['values'][t]:,.2f}" for t in TENURES}
 check("forecast registration record exists", FORECAST_RECORD.is_file())
 record_text = FORECAST_RECORD.read_text() if FORECAST_RECORD.is_file() else ""
 SUPPORTING_COMMIT = "20bfbe1abcb83b4f9f60fbe54789144321ff62b0"
-REPO_BLOB_URL = "https://github.com/PolicyEngine/spm-threshold-paper/blob/"
-SUPPORTING_URL_BASE = f"{REPO_BLOB_URL}{SUPPORTING_COMMIT}/"
-FORECAST_RECORD_URL = SUPPORTING_URL_BASE + "docs/forecast-record.md"
+SUPPORTING_URL_BASE = (
+    f"https://github.com/PolicyEngine/spm-threshold-paper/blob/{SUPPORTING_COMMIT}/"
+)
 for supporting_path in (
     "docs/forecast-record.md",
     "data/PROVENANCE.md",
@@ -920,9 +930,8 @@ check(
     == {count_word(len(retrospective))},
 )
 for rule, value in retrospective.items():
-    # The four rates appear in prose only in the abstract, so this check,
-    # kept from #13 under its label, reads the abstract block, and the
-    # abstract check below implies it.
+    # The four rates appear in prose only in the abstract, so this check
+    # reads the abstract block, and the abstract check below implies it.
     check(f"current projection prose {rule}", has_number(f"{value:.2f}", text=ABSTRACT))
     rule_phrase = ABSTRACT_RETROSPECTIVE_RULES.get(rule, "<unnamed rule>")
     check(

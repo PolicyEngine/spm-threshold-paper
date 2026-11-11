@@ -1241,6 +1241,15 @@ SECTION_PROSE_MUTATIONS = (
         APPENDIX_B_REPLAY,
     ),
     (
+        "appendix replay guide gains an anchored link at main",
+        "appendix",
+        r"(docs/reproducing-experiments\.md\))",
+        r"\1 ([setup](https://github.com/PolicyEngine/spm-threshold-paper/blob/main/"
+        r"docs/reproducing-experiments.md#L1))",
+        ("manuscript links fixed supporting document: docs/reproducing-experiments.md",),
+        APPENDIX_B_REPLAY,
+    ),
+    (
         "nowcast forecast record link",
         "nowcast",
         r"blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0(/docs/forecast-record\.md)",
@@ -1688,6 +1697,14 @@ SECTION_PROSE_MUTATIONS = (
         EVALUATION_BLEND,
     ),
     (
+        "renter miss split across two lines",
+        "evaluation",
+        r"2\.4 standard",
+        "2.4\nstandard",
+        ("owner misses within one SE; renter about 2.4 SE",),
+        EVALUATION_BLEND,
+    ),
+    (
         "owner-with-mortgage standard error",
         "evaluation",
         r"\\\$327",
@@ -1765,10 +1782,12 @@ SECTION_PROSE_MUTATIONS = (
 )
 
 # Each case renames or repeats a heading that bounds a section slice:
-# (name, edits, ties that must fail). A renamed, repeated, reordered or
-# run-on heading empties every slice it bounds, so the guard names the
-# heading and fails the section's ties instead of searching anywhere else.
-# Each slice's start and end heading appears in at least one case.
+# (name, edits, ties that must fail). A renamed, repeated or reordered
+# heading empties every slice it bounds, and a run-on heading empties the
+# slice on the side it runs into, so the guard names the heading and fails
+# that section's ties instead of searching anywhere else. Each heading that
+# bounds the slices for sections 3.2, 5.3, 6.1, 6.2 and 6.3, the rolling
+# section or either appendix appears in at least one case.
 SECTION_MARKER_CASES = (
     (
         "renamed sensitivity heading",
@@ -2826,7 +2845,18 @@ class PaperGuardTests(unittest.TestCase):
         once=True the pattern must match exactly once in that slice."""
         article = self.repo / "paper/index.qmd"
         text = article.read_text()
-        bounds = {
+        start, end = self.article_bounds(text)[where]
+        if once:
+            matches = len(re.findall(pattern, text[start:end], flags=re.S))
+            self.assertEqual(matches, 1, f"fixture pattern must match once, found {matches}: {pattern}")
+        body, count = re.subn(pattern, replacement, text[start:end], count=1, flags=re.S)
+        self.assertEqual(count, 1, f"fixture pattern missing: {pattern}")
+        article.write_text(text[:start] + body + text[end:])
+
+    @staticmethod
+    def article_bounds(text):
+        """Each named slice's start and end offsets in the paper."""
+        return {
             "section": (text.index(INKIND_HEADING), text.index(PROJECTION_HEADING)),
             "replication": (text.index(REPLICATION_HEADING), text.index(INKIND_HEADING)),
             "abstract": PAPER_TEXT.block_scalar_span(text, "abstract") or (0, 0),
@@ -2857,13 +2887,6 @@ class PaperGuardTests(unittest.TestCase):
                 text.index("# Appendix B: reproducibility"),
             ),
         }
-        start, end = bounds[where]
-        if once:
-            matches = len(re.findall(pattern, text[start:end], flags=re.S))
-            self.assertEqual(matches, 1, f"fixture pattern must match once, found {matches}: {pattern}")
-        body, count = re.subn(pattern, replacement, text[start:end], count=1, flags=re.S)
-        self.assertEqual(count, 1, f"fixture pattern missing: {pattern}")
-        article.write_text(text[:start] + body + text[end:])
 
     def test_inkind_prose_figures_drift_from_the_receipts(self):
         for name, where, pattern, replacement, label in INKIND_PROSE_MUTATIONS:
@@ -2934,12 +2957,20 @@ class PaperGuardTests(unittest.TestCase):
         path.write_text(prose[:at] + insert + prose[at:])
 
     def run_section_mutation(self, where, pattern, replacement, decoy=None):
-        """Drift a figure in one section, optionally restate the original
-        wording under the discussion heading, and run the guard."""
+        """Drift a figure in one section and run the guard. With a decoy, the
+        original wording also sits under the discussion heading, just before
+        the section's start heading and just after its end heading's line."""
         self.install_article()
         self.mutate_article(where, pattern, replacement, once=True)
         if decoy is not None:
             self.edit_article((), DISCUSSION_HEADING, decoy)
+            article = self.repo / "paper/index.qmd"
+            text = article.read_text()
+            start, end = self.article_bounds(text)[where]
+            if end < len(text):
+                line_end = text.index("\n", end) + 1
+                text = f"{text[:line_end]}\n{decoy}\n{text[line_end:]}"
+            article.write_text(f"{text[:start]}{decoy}\n\n{text[start:]}")
         return self.run_guard()
 
     def run_abstract_mutation(self, pattern, replacement, decoy=None, host="discussion"):
@@ -3101,13 +3132,32 @@ class PaperGuardTests(unittest.TestCase):
         self.install_article()
 
     def test_section_pins_reject_a_figure_restated_elsewhere(self):
-        """With the original wording restated under the discussion heading,
-        only the ties that read the changed section fail."""
+        """With the original wording restated under the discussion heading
+        and on each side of the section's headings, only the ties that read
+        the changed section fail."""
         for name, where, pattern, replacement, labels, decoy in SECTION_PROSE_MUTATIONS:
             with self.subTest(name=name):
                 result = self.run_section_mutation(where, pattern, replacement, decoy)
                 self.assertNotEqual(result.returncode, 0)
                 self.assertEqual(sorted(failure_lines(result.stdout)), sorted(labels))
+        self.install_article()
+
+    def test_phrase_miss_report_names_the_missing_phrase(self):
+        """When a pin's figure still occurs in its section but a phrase
+        doesn't, the report names the phrase after the failures; a changed
+        figure adds no such note."""
+        result = self.run_section_mutation("evaluation", r"renter(\s+)difference", r"renter\1gap")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(failure_lines(result.stdout), ["owner misses within one SE; renter about 2.4 SE"])
+        self.assertIn("Phrases missing from sections that hold the pin's figure:", result.stdout)
+        self.assertIn(
+            "'2.4 standard errors' occurs in the section; "
+            "'renter difference reaches about 2.4 standard errors' doesn't",
+            result.stdout,
+        )
+        result = self.run_section_mutation("evaluation", r"about(\s+)2\.4(\s+)standard", r"about\g<1>2.5\2standard")
+        self.assertEqual(failure_lines(result.stdout), ["owner misses within one SE; renter about 2.4 SE"])
+        self.assertNotIn("Phrases missing", result.stdout)
         self.install_article()
 
     def test_section_slices_fail_closed_without_unique_markers(self):
@@ -3278,11 +3328,14 @@ class PaperGuardTests(unittest.TestCase):
             self.assertIn(expected, result.stdout)
 
 
+INCLUDE_SCAN = r"\{\{<\s*include\s+tables/([^\s>]+)\s*>\}\}"
+
+
 def whole_paper_reads(source):
     """Each place in a guard's source that reads the paper outside a bounded
-    slice: a load of QMD other than the slicers' default text and the scan
-    for include directives, a slicer call that reads the paper with no end
-    heading, and a second read of paper/index.qmd."""
+    slice: a load of QMD other than the slicers' default text and the guard's
+    scan for include directives, a slicer call that reads the paper without a
+    literal end heading, and any string naming a .qmd file after the first."""
     tree = ast.parse(source)
     allowed = set()
     for node in ast.walk(tree):
@@ -3301,7 +3354,7 @@ def whole_paper_reads(source):
             and ast.unparse(node.func) == "re.findall"
             and len(node.args) == 2
             and isinstance(node.args[0], ast.Constant)
-            and "include" in str(node.args[0].value)
+            and node.args[0].value == INCLUDE_SCAN
         ):
             allowed.add(id(node.args[1]))
     reads = []
@@ -3322,13 +3375,79 @@ def whole_paper_reads(source):
             keywords = {keyword.arg: keyword.value for keyword in node.keywords}
             end = node.args[1] if len(node.args) > 1 else keywords.get("end")
             reads_paper = len(node.args) < 3 and "text" not in keywords
-            if reads_paper and (end is None or (isinstance(end, ast.Constant) and end.value is None)):
+            literal_end = isinstance(end, ast.JoinedStr) or (
+                isinstance(end, ast.Constant) and isinstance(end.value, str)
+            )
+            if reads_paper and not literal_end:
                 reads.append(f"line {node.lineno}: {ast.unparse(node)}")
-        elif isinstance(node, ast.Constant) and node.value == "index.qmd":
+        elif isinstance(node, ast.Constant) and isinstance(node.value, str) and ".qmd" in node.value:
             paper_reads += 1
             if paper_reads > 1:
-                reads.append(f"line {node.lineno}: second read of index.qmd")
+                reads.append(f"line {node.lineno}: second .qmd string {node.value!r}")
     return reads
+
+
+def guard_function(name, **namespace):
+    """One function from the guard's source, defined in ``namespace``
+    without running the guard."""
+    tree = ast.parse((REPO / "scripts/check_paper.py").read_text())
+    node = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == name)
+    exec(compile(ast.Module([node], []), "check_paper.py", "exec"), {"re": re, **namespace}, namespace)
+    return namespace[name]
+
+
+class PinnedLinksTests(unittest.TestCase):
+    COMMIT = "20bfbe1abcb83b4f9f60fbe54789144321ff62b0"
+    REPO_URL = "https://github.com/PolicyEngine/spm-threshold-paper"
+    PINNED = f"[guide]({REPO_URL}/blob/{COMMIT}/docs/guide.md)"
+
+    def setUp(self):
+        self.pinned_links = guard_function(
+            "pinned_links",
+            SUPPORTING_COMMIT=self.COMMIT,
+            SUPPORTING_URL_BASE=f"{self.REPO_URL}/blob/{self.COMMIT}/",
+        )
+
+    def test_every_url_naming_the_document_must_be_at_the_pinned_blob(self):
+        """A second link that names the document off the pinned commit's
+        blob fails in any Markdown form; links at the pinned blob and links
+        to other files pass."""
+        main = f"{self.REPO_URL}/blob/main/docs/guide.md"
+        for extra in (
+            f"[a]({main}#L1)",
+            f'[a]({main} "title")',
+            f"[a](<{main}>)",
+            f"[a]({main}?plain=1)",
+            f"\n[a]: {main}\n",
+            f"<{main}>",
+            f"see {main}.",
+            f"[a]({self.REPO_URL}/tree/main/docs/guide.md)",
+            f"[a]({self.REPO_URL}/tree/{self.COMMIT}/docs/guide.md)",
+            f"[a]({self.REPO_URL}/raw/main/docs/guide.md)",
+            "[a](https://raw.githubusercontent.com/PolicyEngine/spm-threshold-paper/main/docs/guide.md)",
+        ):
+            with self.subTest(extra=extra):
+                self.assertFalse(self.pinned_links("docs/guide.md", f"{self.PINNED} {extra}"))
+        for extra in (
+            "",
+            f"[a]({self.REPO_URL}/blob/{self.COMMIT}/docs/guide.md#L1)",
+            f'[a]({self.REPO_URL}/blob/{self.COMMIT}/docs/guide.md "title")',
+            f"[a]({self.REPO_URL}/blob/main/docs/guide.md.bak)",
+            f"[a]({self.REPO_URL}/blob/main/docs/other.md)",
+        ):
+            with self.subTest(extra=extra):
+                self.assertTrue(self.pinned_links("docs/guide.md", f"{self.PINNED} {extra}"))
+
+    def test_a_plain_inline_link_at_the_pinned_commit_must_exist(self):
+        """Pinned links in other forms don't stand in for the plain one."""
+        for text in (
+            "",
+            f"[guide]({self.REPO_URL}/blob/{self.COMMIT}/docs/guide.md#L1)",
+            f"[guide](<{self.REPO_URL}/blob/{self.COMMIT}/docs/guide.md>)",
+            f"{self.REPO_URL}/blob/{self.COMMIT}/docs/guide.md",
+        ):
+            with self.subTest(text=text):
+                self.assertFalse(self.pinned_links("docs/guide.md", text))
 
 
 class GuardSourceTests(unittest.TestCase):
@@ -3338,14 +3457,14 @@ class GuardSourceTests(unittest.TestCase):
         self.assertEqual(whole_paper_reads((REPO / "scripts/check_paper.py").read_text()), [])
 
     def test_source_check_sees_each_way_to_read_the_whole_paper(self):
-        """Every form a whole-paper read could take trips the source check,
+        """Each listed form of a whole-paper read trips the source check,
         and the guard's own reads don't."""
         base = (
             'QMD = (REPO / "paper" / "index.qmd").read_text()\n'
             "def section_source(start, end=None, text=QMD): ...\n"
             "def section(start, end=None, text=QMD): ...\n"
             "def front_matter_block(key, text=QMD): ...\n"
-            'includes = set(re.findall(r"include tables/(\\S+)", QMD))\n'
+            f"includes = set(re.findall({INCLUDE_SCAN!r}, QMD))\n"
             'ROLLING = section("# A", "# B")\n'
             'ROLLING_ACS = section("## C", None, ROLLING)\n'
             'SLICE = section_source("# A", end="# B")\n'
@@ -3367,6 +3486,12 @@ class GuardSourceTests(unittest.TestCase):
             'TEXT = section_source("# A")',
             'TEXT = section("# A", end=None)',
             'PAPER = (REPO / "paper" / "index.qmd").read_text()',
+            'PAPER = (REPO / "paper/index.qmd").read_text()',
+            'PAPER = open("paper/index.qmd").read()',
+            'PAPERS = sorted(REPO.glob("paper/*.qmd"))',
+            'END = None\nTEXT = section("# A", END)',
+            'TEXT = section("# A", "# B" if FLAG else None)',
+            'check("x", bool(re.findall(r"include|1\\.17", QMD)))',
         ):
             with self.subTest(read=read):
                 self.assertNotEqual(whole_paper_reads(base + read + "\n"), [])
