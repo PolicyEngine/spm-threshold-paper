@@ -965,22 +965,38 @@ INKIND_PROSE_MUTATIONS = (
 # Each case drifts figures in the abstract alone: (name, pattern, replacement,
 # failing ties, decoy). The body or a generated table states every one of these
 # figures too. The decoy restates the original wording, and the tests place it
-# at each of ABSTRACT_DECOY_HOSTS, so a tie that read more than the abstract
-# block, or that settled for one correct copy, would still pass.
+# at each of ABSTRACT_DECOY_HOSTS, so a tie that settled for one correct copy,
+# or for the first or last rate it found, would pass the edited paper. The
+# wording-removal cases in test_abstract_ties_skip_wording_outside_the_block
+# catch a tie that reads past the block.
 ABSTRACT_PROSE_MUTATIONS = (
     (
         "2020-2025 CPI-U error",
         r"2\.29(\s+)percent",
         r"2.30\1percent",
         ("abstract current projection cpi_u 2.29", "current projection prose cpi_u"),
-        "We obtain 2.29 percent with the Consumer Price Index.",
+        "We obtain 2.29 percent with the Consumer Price Index for All Urban Consumers (CPI-U).",
     ),
     (
         "2020-2025 CPI-U sign",
         r"2\.29(\s+)percent",
         "−2.29\\1percent",
         ("abstract current projection cpi_u 2.29",),
-        "We obtain 2.29 percent with the Consumer Price Index.",
+        "We obtain 2.29 percent with the Consumer Price Index for All Urban Consumers (CPI-U).",
+    ),
+    (
+        "2020-2025 CPI-U sign as an en dash",
+        r"2\.29(\s+)percent",
+        "\u20132.29\\1percent",
+        ("abstract current projection cpi_u 2.29",),
+        "We obtain 2.29 percent with the Consumer Price Index for All Urban Consumers (CPI-U).",
+    ),
+    (
+        "CPI-U rule renamed CPI-W",
+        r"All(\s+)Urban(\s+)Consumers(\s+)\(CPI-U\)",
+        r"Urban\1Wage\2Earners\3(CPI-W)",
+        ("abstract current projection cpi_u 2.29",),
+        "We obtain 2.29 percent with the Consumer Price Index for All Urban Consumers (CPI-U).",
     ),
     (
         "2020-2025 composite error",
@@ -1007,7 +1023,7 @@ ABSTRACT_PROSE_MUTATIONS = (
         r"0\.90(\s+)percent",
         r"0.91\1percent",
         ("abstract current projection blend 0.90", "current projection prose blend"),
-        "We obtain 0.90 percent with an equal blend.",
+        "We obtain 0.90 percent with an equal blend of the latter two.",
     ),
     (
         "2025 blend error",
@@ -1045,8 +1061,8 @@ ABSTRACT_PROSE_MUTATIONS = (
             "abstract current projection cpi_u 2.29",
             "abstract current projection fcsuti_cpi 1.65",
         ),
-        "We obtain 2.29 percent with the Consumer Price Index and 1.65 percent "
-        "with a composite price index.",
+        "We obtain 2.29 percent with the Consumer Price Index for All Urban Consumers "
+        "(CPI-U) and 1.65 percent with a composite price index.",
     ),
     (
         "swapped 2025 errors",
@@ -1063,8 +1079,9 @@ ABSTRACT_PROSE_MUTATIONS = (
 
 # Where a decoy can restate an abstract figure's original wording: under the
 # discussion heading, in another front-matter field after the abstract block,
-# in body text before the introduction, and inside the abstract block itself.
-ABSTRACT_DECOY_HOSTS = ("discussion", "metadata", "preamble", "abstract")
+# in body text before the introduction, and as the abstract block's last or
+# first line.
+ABSTRACT_DECOY_HOSTS = ("discussion", "metadata", "preamble", "abstract", "abstract start")
 
 # Every tie this file's abstract mutations target.
 ABSTRACT_TIE_LABELS = (
@@ -2945,16 +2962,21 @@ class PaperGuardTests(unittest.TestCase):
         prose = path.read_text()
         span = PAPER_TEXT.block_scalar_span(prose, "abstract")
         self.assertIsNotNone(span, "fixture has no abstract block")
+        indent = re.search(r"^( +)\S", prose[span[0] : span[1]], re.M).group(1)
         if host == "abstract":
-            indent = re.match(r"[ \t]*", prose[span[0] :]).group()
             at, insert = span[1], f"{indent}{decoy}\n"
+        elif host == "abstract start":
+            at, insert = span[0], f"{indent}{decoy}\n"
         elif host == "metadata":
             at, insert = span[1], f'note: "{decoy}"\n'
         elif host == "preamble":
             at, insert = prose.index("\n# Introduction\n") + 1, f"{decoy}\n\n"
         else:
             self.fail(f"unknown decoy host: {host}")
-        path.write_text(prose[:at] + insert + prose[at:])
+        edited = prose[:at] + insert + prose[at:]
+        inside = decoy in (PAPER_TEXT.block_words(edited, "abstract") or "")
+        self.assertEqual(inside, host.startswith("abstract"), f"decoy misplaced at {host}")
+        path.write_text(edited)
 
     def run_section_mutation(self, where, pattern, replacement, decoy=None):
         """Drift a figure in one section and run the guard. With a decoy, the
@@ -3001,7 +3023,7 @@ class PaperGuardTests(unittest.TestCase):
                     result = self.run_abstract_mutation(pattern, replacement, decoy, host)
                     self.assertNotEqual(result.returncode, 0)
                     expected = labels
-                    if host == "abstract":
+                    if host.startswith("abstract"):
                         # A copy inside the abstract keeps the original figure
                         # there, so the ties that only look for it pass, and
                         # the ties that require every stated rate to match fail.
@@ -3046,16 +3068,17 @@ class PaperGuardTests(unittest.TestCase):
                 )
         self.install_article()
 
-    def test_abstract_ties_skip_a_comment_after_the_block(self):
-        """YAML ends the abstract's block at a line indented less than the
-        block, a comment included, so a comment that keeps wording the
-        abstract dropped cannot satisfy the ties that read that wording."""
+    def test_abstract_ties_skip_wording_outside_the_block(self):
+        """Wording the abstract dropped cannot satisfy the ties that read it
+        from a comment after the block, which YAML ends at a line indented
+        less than the block, from a field before the abstract's key, or from
+        an HTML comment inside the block, which Quarto leaves unrendered."""
         cases = (
             (
                 "CPI-U rule renamed",
                 r"with(\s+)the(\s+)Consumer(\s+)Price(\s+)Index",
                 r"with\1the\2CPI-U\3price\4index",
-                "2.29 percent with the Consumer Price Index",
+                "2.29 percent with the Consumer Price Index for All Urban Consumers (CPI-U)",
                 ["abstract current projection cpi_u 2.29"],
             ),
             (
@@ -3069,24 +3092,38 @@ class PaperGuardTests(unittest.TestCase):
                 ],
             ),
         )
-        for name, pattern, replacement, comment, labels in cases:
-            with self.subTest(case=name):
-                self.install_article()
-                self.mutate_article("abstract", pattern, replacement)
-                path = self.repo / "paper/index.qmd"
-                prose = path.read_text()
-                span = PAPER_TEXT.block_scalar_span(prose, "abstract")
-                self.assertIsNotNone(span, "fixture has no abstract block")
-                path.write_text(f"{prose[: span[1]]} # {comment}\n{prose[span[1] :]}")
-                result = self.run_guard()
-                self.assertEqual(sorted(failure_lines(result.stdout)), sorted(labels))
+        places = {
+            "comment after the block": lambda prose, span, old: (span[1], f" # {old}\n"),
+            "field before the key": lambda prose, span, old: (
+                prose.index("\nabstract: |\n") + 1,
+                f"keywords: {json.dumps(old, ensure_ascii=False)}\n",
+            ),
+            "HTML comment inside the block": lambda prose, span, old: (
+                span[1],
+                f"  <!-- {old} -->\n",
+            ),
+        }
+        for name, pattern, replacement, old, labels in cases:
+            for place, insert in places.items():
+                with self.subTest(case=name, place=place):
+                    self.install_article()
+                    self.mutate_article("abstract", pattern, replacement)
+                    path = self.repo / "paper/index.qmd"
+                    prose = path.read_text()
+                    span = PAPER_TEXT.block_scalar_span(prose, "abstract")
+                    self.assertIsNotNone(span, "fixture has no abstract block")
+                    at, text = insert(prose, span, old)
+                    path.write_text(prose[:at] + text + prose[at:])
+                    result = self.run_guard()
+                    self.assertEqual(sorted(failure_lines(result.stdout)), sorted(labels))
         self.install_article()
 
     def test_abstract_block_fails_closed_unless_one_key_sets_the_abstract(self):
-        """A folded, repeated or relocated `abstract: |` key, or a metadata
-        block in the body that sets the abstract, empties the abstract slice,
-        so every abstract tie fails instead of reading text that the paper
-        does not render as its abstract."""
+        """A folded, repeated, nested or relocated `abstract: |` key, a
+        metadata block in the body, or a lone carriage return in the front
+        matter empties the abstract slice, so every abstract tie fails
+        instead of reading text that the paper may not render as its
+        abstract."""
         prose = (self.repo / "paper/index.qmd").read_text()
         span = PAPER_TEXT.block_scalar_span(prose, "abstract")
         self.assertIsNotNone(span, "fixture has no abstract block")
@@ -3104,6 +3141,33 @@ class PaperGuardTests(unittest.TestCase):
                 "body metadata block sets the abstract",
                 ((DISCUSSION_HEADING, f"---\n{key}{block}---\n\n{DISCUSSION_HEADING}"),),
             ),
+            (
+                "format-level abstract",
+                (("    toc: true\n", "    toc: true\n    abstract: |\n      A copy for the web.\n"),),
+            ),
+            (
+                "explicit key with a comment in a body block",
+                ((DISCUSSION_HEADING, f"---\n? abstract # set here\n: |\n  A copy.\n---\n\n{DISCUSSION_HEADING}"),),
+            ),
+            (
+                "escaped key in a body block",
+                ((DISCUSSION_HEADING, f'---\n"\\x61bstract": A copy.\n---\n\n{DISCUSSION_HEADING}'),),
+            ),
+            (
+                "lone carriage return in the front matter",
+                (("Supplemental Poverty\n", "Supplemental Poverty\r"),),
+            ),
+            (
+                "tagged format-level abstract",
+                (("    toc: true\n", "    toc: true\n    !!str abstract: A copy for the web.\n"),),
+            ),
+        )
+        expected = sorted(
+            (
+                "paper must set abstract only in one abstract: | block of its front matter",
+                *ABSTRACT_TIE_LABELS,
+                *INKIND_ABSTRACT_TIE_LABELS,
+            )
         )
         for name, edits in cases:
             with self.subTest(case=name):
@@ -3111,13 +3175,41 @@ class PaperGuardTests(unittest.TestCase):
                 self.edit_article(edits)
                 result = self.run_guard()
                 self.assertNotEqual(result.returncode, 0)
-                failures = failure_lines(result.stdout)
-                for label in (
-                    "paper must set abstract only in one abstract: | block of its front matter",
-                    *ABSTRACT_TIE_LABELS,
-                    *INKIND_ABSTRACT_TIE_LABELS,
-                ):
-                    self.assertIn(label, failures)
+                self.assertEqual(sorted(failure_lines(result.stdout)), expected)
+        self.install_article()
+
+    def test_abstract_comes_only_from_the_paper(self):
+        """Quarto merges project and directory metadata into the paper's, so
+        an abstract or a metadata-files list in any of them fails the guard,
+        while the paper's own abstract still passes every tie."""
+        label = "only paper/index.qmd may set the abstract or name metadata files"
+        cases = (
+            ("project file", "_quarto.yml", "abstract: A copy.\n"),
+            ("project format", "_quarto.yml", "format:\n  html:\n    abstract: A copy.\n"),
+            ("project profile", "_quarto-web.yml", "abstract: A copy.\n"),
+            ("paper folder metadata", "paper/_metadata.yml", "abstract: A copy.\n"),
+            ("root metadata", "_metadata.yml", "format: {pdf: {abstract: A copy.}}\n"),
+            ("project metadata files", "_quarto.yml", "metadata-files: [extra.yml]\n"),
+            ("paper metadata files", "paper/index.qmd", "metadata-files:\n  - extra.yml\n"),
+        )
+        for name, relative, addition in cases:
+            with self.subTest(case=name):
+                self.install_article()
+                path = self.repo / relative
+                original = path.read_text() if path.exists() else None
+                if relative == "paper/index.qmd":
+                    path.write_text(original.replace("abstract: |\n", addition + "abstract: |\n", 1))
+                else:
+                    path.write_text((original or "") + addition)
+                try:
+                    result = self.run_guard()
+                finally:
+                    if original is None:
+                        path.unlink()
+                    else:
+                        path.write_text(original)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertEqual(failure_lines(result.stdout), [label])
         self.install_article()
 
     def test_section_figures_drift_alone(self):
@@ -3329,13 +3421,17 @@ class PaperGuardTests(unittest.TestCase):
 
 
 INCLUDE_SCAN = r"\{\{<\s*include\s+tables/([^\s>]+)\s*>\}\}"
+METADATA_SCAN = r"metadata-files?"
+PAPER_NAMES = ("QMD", "QMD_RAW")
 
 
 def whole_paper_reads(source):
     """Each place in a guard's source that reads the paper outside a bounded
-    slice: a load of QMD other than the slicers' default text and the guard's
-    scan for include directives, a slicer call that reads the paper without a
-    literal end heading, and any string naming a .qmd file after the first."""
+    slice: a load of QMD or QMD_RAW other than a slicer's default text, the
+    guard's scan for include directives and its search for a metadata-files
+    key; a slicer call that reads the paper without a literal end heading;
+    and a path-like string, one without whitespace, that names a .qmd file
+    outside the assignments of QMD and QMD_RAW."""
     tree = ast.parse(source)
     allowed = set()
     for node in ast.walk(tree):
@@ -3343,30 +3439,35 @@ def whole_paper_reads(source):
             "section_source",
             "section",
             "front_matter_block",
+            "front_matter_source",
         ):
             allowed.update(
                 id(default)
                 for default in node.args.defaults + node.args.kw_defaults
-                if isinstance(default, ast.Name) and default.id == "QMD"
+                if isinstance(default, ast.Name) and default.id in PAPER_NAMES
             )
         elif (
             isinstance(node, ast.Call)
-            and ast.unparse(node.func) == "re.findall"
             and len(node.args) == 2
             and isinstance(node.args[0], ast.Constant)
-            and node.args[0].value == INCLUDE_SCAN
+            and (ast.unparse(node.func), node.args[0].value)
+            in (("re.findall", INCLUDE_SCAN), ("re.search", METADATA_SCAN))
         ):
             allowed.add(id(node.args[1]))
+        elif isinstance(node, ast.Assign) and [ast.unparse(target) for target in node.targets] in (
+            ["QMD"],
+            ["QMD_RAW"],
+        ):
+            allowed.update(id(part) for part in ast.walk(node.value) if isinstance(part, ast.Constant))
     reads = []
-    paper_reads = 0
     for node in ast.walk(tree):
         if (
             isinstance(node, ast.Name)
-            and node.id == "QMD"
+            and node.id in PAPER_NAMES
             and isinstance(node.ctx, ast.Load)
             and id(node) not in allowed
         ):
-            reads.append(f"line {node.lineno}: QMD")
+            reads.append(f"line {node.lineno}: {node.id}")
         elif (
             isinstance(node, ast.Call)
             and isinstance(node.func, ast.Name)
@@ -3380,10 +3481,13 @@ def whole_paper_reads(source):
             )
             if reads_paper and not literal_end:
                 reads.append(f"line {node.lineno}: {ast.unparse(node)}")
-        elif isinstance(node, ast.Constant) and isinstance(node.value, str) and ".qmd" in node.value:
-            paper_reads += 1
-            if paper_reads > 1:
-                reads.append(f"line {node.lineno}: second .qmd string {node.value!r}")
+        elif (
+            isinstance(node, ast.Constant)
+            and isinstance(node.value, str)
+            and re.fullmatch(r"\S*\.qmd", node.value)
+            and id(node) not in allowed
+        ):
+            reads.append(f"line {node.lineno}: {node.value!r} names a .qmd file")
     return reads
 
 
@@ -3453,7 +3557,8 @@ class PinnedLinksTests(unittest.TestCase):
 class GuardSourceTests(unittest.TestCase):
     def test_no_tie_reads_the_whole_paper(self):
         """The guard reads the paper only through slices that a heading
-        bounds on each side, the abstract block and the include scan."""
+        bounds on each side, the abstract block, the include scan and the
+        metadata-files search."""
         self.assertEqual(whole_paper_reads((REPO / "scripts/check_paper.py").read_text()), [])
 
     def test_source_check_sees_each_way_to_read_the_whole_paper(self):
@@ -3461,10 +3566,13 @@ class GuardSourceTests(unittest.TestCase):
         and the guard's own reads don't."""
         base = (
             'QMD = (REPO / "paper" / "index.qmd").read_text()\n'
+            'QMD_RAW = (REPO / "paper" / "index.qmd").read_bytes().decode()\n'
             "def section_source(start, end=None, text=QMD): ...\n"
             "def section(start, end=None, text=QMD): ...\n"
-            "def front_matter_block(key, text=QMD): ...\n"
+            "def front_matter_block(key, text=QMD_RAW): ...\n"
+            "def front_matter_source(key, text=QMD_RAW): ...\n"
             f"includes = set(re.findall({INCLUDE_SCAN!r}, QMD))\n"
+            f"named = re.search({METADATA_SCAN!r}, QMD_RAW)\n"
             'ROLLING = section("# A", "# B")\n'
             'ROLLING_ACS = section("## C", None, ROLLING)\n'
             'SLICE = section_source("# A", end="# B")\n'
@@ -3492,6 +3600,9 @@ class GuardSourceTests(unittest.TestCase):
             'END = None\nTEXT = section("# A", END)',
             'TEXT = section("# A", "# B" if FLAG else None)',
             'check("x", bool(re.findall(r"include|1\\.17", QMD)))',
+            'check("x", has_number("1.17", text=QMD_RAW))',
+            'check("x", bool(re.search(r"metadata-files?|1\\.17", QMD_RAW)))',
+            'TEXT = front_matter_source("abstract", QMD)',
         ):
             with self.subTest(read=read):
                 self.assertNotEqual(whole_paper_reads(base + read + "\n"), [])

@@ -38,6 +38,7 @@ def load_paper_text():
 
 PAPER_TEXT = load_paper_text()
 block_scalar_span = PAPER_TEXT.block_scalar_span
+block_words = PAPER_TEXT.block_words
 stated_values = PAPER_TEXT.stated_values
 
 MINUS = "\u2212"
@@ -87,6 +88,9 @@ def with_body(insert):
 NESTED_FLOW_KEY = PAPER.replace(
     'title: "Thresholds"\n', 'title: "Thresholds"\nlinks: {abstract: "Nested 9.99."}\n'
 )
+FORMAT_LEVEL_KEY = PAPER.replace(
+    "format:\n", "format:\n  html:\n    abstract: |\n      Format copy 9.99.\n"
+)
 
 
 class BlockScalarSpanTests(unittest.TestCase):
@@ -125,6 +129,7 @@ class BlockScalarSpanTests(unittest.TestCase):
             '"abstract": |\n  A quoted copy.\n',
             "'abstract': A quoted copy.\n",
             "? abstract\n: |\n  An explicit copy.\n",
+            "? abstract # a comment\n: |\n  An explicit copy.\n",
         ):
             before = PAPER.replace('title: "Thresholds"\n', f'title: "Thresholds"\n{repeat}')
             after = PAPER.replace(CLOSE, f"{repeat}{CLOSE}")
@@ -140,15 +145,77 @@ class BlockScalarSpanTests(unittest.TestCase):
         text = PAPER.replace('title: "Thresholds"\n', f'title: "Thresholds"\n{extra}')
         self.assertEqual(block_lines(text), ABSTRACT_LINES)
 
-    def test_nested_keys_belong_to_other_mappings(self):
-        nested = PAPER.replace(
-            "      text: |\n", "      abstract: |\n        Nested copy.\n      text: |\n"
-        )
-        self.assertEqual(block_lines(nested), ABSTRACT_LINES)
-        self.assertEqual(block_lines(NESTED_FLOW_KEY), ABSTRACT_LINES)
+    def test_a_nested_key_fails_closed(self):
+        """Quarto renders an abstract set under ``format: html:`` or
+        ``format: pdf:`` in place of the top-level one, so a key at any depth
+        of the front matter fails closed."""
+        for name, text in {
+            "format html": FORMAT_LEVEL_KEY,
+            "format pdf": PAPER.replace(
+                "    include-in-header:\n", "    abstract: Format copy 9.99.\n    include-in-header:\n"
+            ),
+            "beside a nested block": PAPER.replace(
+                "      text: |\n", "      abstract: |\n        Nested copy.\n      text: |\n"
+            ),
+            "flow mapping": NESTED_FLOW_KEY,
+            "nested flow mapping": PAPER.replace(
+                "format:\n", "links: {html: {abstract: Flow copy 9.99.}}\nformat:\n"
+            ),
+            "sequence entry": PAPER.replace(
+                'title: "Thresholds"\n', 'title: "Thresholds"\nnotes:\n  - abstract: Copy 9.99.\n'
+            ),
+            "explicit nested key": PAPER.replace(
+                "  pdf:\n", "  html:\n    ? abstract\n    : Copy 9.99.\n  pdf:\n"
+            ),
+        }.items():
+            with self.subTest(case=name):
+                self.assertIsNone(block_scalar_span(text, "abstract"))
         self.assertIsNone(block_scalar_span(PAPER, "text"))
-        only_nested = nested.replace(f"abstract: |\n{ABSTRACT_LINES}", "")
-        self.assertIsNone(block_scalar_span(only_nested, "abstract"))
+
+    def test_yaml_syntax_the_parser_cannot_resolve_fails_closed(self):
+        """The parser resolves no YAML tags, anchors, aliases, explicit keys
+        or escapes, so a front-matter line that holds one could set the key
+        unseen, as under ``format: html:``, and fails closed."""
+        for name, insert in {
+            "tagged nested key": "  html:\n    !!str abstract: Copy 9.99.\n",
+            "anchored nested key": "  html:\n    &k abstract: Copy 9.99.\n",
+            "aliased nested key": "  html:\n    *k : Copy 9.99.\n",
+            "escaped nested key": '  html:\n    "\\x61bstract": Copy 9.99.\n',
+            "escaped key in a nested flow mapping": '  html: {"\\x61bstract": Copy 9.99.}\n',
+            "anchored value": "  html:\n    toc: &on true\n",
+            "tagged sequence entry": "  html:\n    css:\n      - !!str style.css\n",
+            "explicit key named in a block": "  html:\n    ? |-\n      abstract\n    : Copy 9.99.\n",
+            "explicit key in a sequence entry": "  html:\n    css:\n      - ? x\n",
+            "explicit key in a flow mapping": "  html: {? toc: true}\n",
+        }.items():
+            with self.subTest(case=name):
+                text = PAPER.replace("format:\n", f"format:\n{insert}")
+                self.assertIsNone(block_scalar_span(text, "abstract"))
+
+    def test_punctuation_in_values_is_no_node_property(self):
+        for value in ('"Wow!"', "A & B", "A*B", "50% & up", '"Line\\nbreak"', "[a, b]", "Why? Because", "A ?B"):
+            with self.subTest(value=value):
+                text = PAPER.replace('title: "Thresholds"\n', f'title: "Thresholds"\nnote: {value}\n')
+                self.assertEqual(block_lines(text), ABSTRACT_LINES)
+
+    def test_key_text_inside_another_block_names_nothing(self):
+        """A block scalar's lines hold text, not keys, and a YAML comment
+        line holds neither, so they leave the abstract's block readable."""
+        for name, text in {
+            "literal block": PAPER.replace(
+                "        \\usepackage{needspace}\n",
+                "        \\usepackage{needspace}\n        abstract: |\n        {abstract: x}\n",
+            ),
+            "folded block in a sequence": PAPER.replace(
+                'title: "Thresholds"\n',
+                'title: "Thresholds"\nnotes:\n  - >-\n    abstract: 9.99\n',
+            ),
+            "comment line": PAPER.replace(
+                'title: "Thresholds"\n', 'title: "Thresholds"\n# old notes, abstract: 9.99\n'
+            ),
+        }.items():
+            with self.subTest(case=name):
+                self.assertEqual(block_lines(text), ABSTRACT_LINES)
 
     def test_a_key_after_the_front_matter_fails_closed(self):
         """pandoc lets a metadata block anywhere in the body, even inside a
@@ -162,7 +229,9 @@ class BlockScalarSpanTests(unittest.TestCase):
             "block quote": "> ---\n> abstract: |\n>   Body copy.\n> ---\n",
             "quoted key": '---\n"abstract": |\n  Body copy.\n---\n',
             "explicit key": "---\n? abstract\n: |\n  Body copy.\n---\n",
+            "explicit key with a comment": "---\n? abstract # set here\n: |\n  Body copy.\n---\n",
             "bare key line": "abstract: Body copy.\n",
+            "bare explicit key line with a comment": "? abstract # set here\n: Body copy.\n",
             "flow mapping": "---\n{abstract: Body copy.}\n---\n",
             "quoted flow key after a comma": '---\n{title: X, "abstract": Body copy.}\n---\n',
             "explicit flow key": "---\n{? abstract : Body copy.}\n---\n",
@@ -177,6 +246,39 @@ class BlockScalarSpanTests(unittest.TestCase):
             "Body text.\n", f"Body text.\n\nabstract: |\n{ABSTRACT_LINES}"
         )
         self.assertIsNone(block_scalar_span(moved, "abstract"))
+
+    def test_a_metadata_block_in_the_body_fails_closed(self):
+        """pandoc and Quarto resolve aliases, anchors, tags and escapes in a
+        body metadata block's keys, which the parser does not, so any such
+        block fails closed whatever its keys spell."""
+        for name, insert in {
+            "alias": "---\nk: &k abstract\n*k : Body copy 9.99.\n---\n",
+            "anchored explicit key": "---\n? &k abstract\n: Body copy 9.99.\n---\n",
+            "escaped quoted key": '---\n"\\x61bstract": Body copy 9.99.\n---\n',
+            "tagged key": "---\n!!str abstract: Body copy 9.99.\n---\n",
+            "another key": "---\nnote: Body copy 9.99.\n---\n",
+            "closed by dots": "---\nnote: Body copy 9.99.\n...\n",
+            "list item": "- item\n\n  ---\n  note: Body copy 9.99.\n  ---\n",
+            "block quote": "> ---\n> note: Body copy 9.99.\n> ---\n",
+            "numbered list item": "1. ---\n   note: Body copy 9.99.\n   ---\n",
+        }.items():
+            with self.subTest(case=name):
+                self.assertIsNone(block_scalar_span(with_body(insert), "abstract"))
+                crlf = with_body(insert).replace("\n", "\r\n")
+                self.assertIsNone(block_scalar_span(crlf, "abstract"))
+
+    def test_a_thematic_break_is_not_a_metadata_block(self):
+        """A ``---`` line opens a metadata block only before a line with text
+        and a later closing line, so a thematic break leaves the block
+        readable."""
+        for insert in (
+            "---\n",
+            "---\n\nText after a break.\n",
+            "Text.\n\n---\nMore.",
+            "---\n\nText between two breaks.\n\n---\n",
+        ):
+            with self.subTest(insert=insert):
+                self.assertEqual(block_lines(with_body(insert)), ABSTRACT_LINES)
 
     def test_prose_that_mentions_the_abstract_does_not_name_the_key(self):
         for line in (
@@ -203,6 +305,12 @@ class BlockScalarSpanTests(unittest.TestCase):
         self.assertEqual(block_lines(with_lines(shallower)), "    Four spaces,\n")
         leading_blank = "\n" + ABSTRACT_LINES
         self.assertEqual(block_lines(with_lines(leading_blank)), leading_blank)
+
+    def test_only_spaces_and_tabs_make_a_line_blank(self):
+        """YAML reads a no-break space as text, so a first line of spaces and
+        a no-break space sets the block's indentation, as pandoc reads it."""
+        lines = "   \u00a0\n    Four 2.29,\n   three 9.99.\n"
+        self.assertEqual(block_lines(with_lines(lines)), lines)
 
     def test_a_trailing_comment_ends_the_block(self):
         """YAML ends the block at a line indented less than its first line,
@@ -286,6 +394,10 @@ class BlockScalarSpanTests(unittest.TestCase):
             with self.subTest(filler=filler):
                 text = PAPER.replace(ABSTRACT_LINES, filler)
                 self.assertIsNone(block_scalar_span(text, "abstract"))
+        for field in ("note: |\n", "note: Field text.\n", "\nnote: |\n"):
+            with self.subTest(field=field):
+                text = PAPER.replace("abstract: |\n", f"abstract: |\n{field}")
+                self.assertIsNone(block_scalar_span(text, "abstract"))
 
     def test_windows_line_endings_keep_the_span_exact(self):
         text = PAPER.replace("\n", "\r\n")
@@ -303,6 +415,22 @@ class BlockScalarSpanTests(unittest.TestCase):
                 self.assertIsNone(block_scalar_span(text, "abstract"))
         body = PAPER.replace("Body text.\n", "Body\rtext.\n")
         self.assertEqual(block_lines(body), ABSTRACT_LINES)
+
+    def test_windows_line_endings_keep_every_rule(self):
+        """Each rule that fails closed on line feeds fails closed on carriage
+        return and line feed pairs too."""
+        for name, text in {
+            "explicit key repeated": PAPER.replace(CLOSE, f"? abstract\n: |\n  Copy.\n{CLOSE}"),
+            "explicit key with a comment": PAPER.replace(
+                CLOSE, f"? abstract # c\n: |\n  Copy.\n{CLOSE}"
+            ),
+            "key in the body": with_body("abstract: Body copy.\n"),
+            "flow key in the body": with_body("---\n{abstract: Body copy.}\n---\n"),
+            "nested key": FORMAT_LEVEL_KEY,
+            "tab within the indentation": with_lines(ABSTRACT_LINES + "\tTabbed.\n"),
+        }.items():
+            with self.subTest(case=name):
+                self.assertIsNone(block_scalar_span(text.replace("\n", "\r\n"), "abstract"))
 
     def test_only_line_feeds_end_lines(self):
         """A form feed or Unicode line separator stays inside its line, so it
@@ -323,10 +451,46 @@ class BlockScalarSpanTests(unittest.TestCase):
         self.assertEqual(block_lines(lookalike, "ab.tract"), ABSTRACT_LINES)
 
 
+class BlockWordsTests(unittest.TestCase):
+    def test_reads_the_block_as_words(self):
+        self.assertEqual(block_words(PAPER, "abstract"), words(ABSTRACT_LINES))
+
+    def test_html_comments_drop_out(self):
+        """Quarto and pandoc leave HTML comments out of the rendered abstract,
+        so a comment that keeps an old sentence cannot satisfy a tie."""
+        for lines, expected in (
+            ("  First line, <!-- 9.99 percent --> second.\n", "First line, second."),
+            ("  First line,\n  <!-- was: 9.99 percent\n  with the CPI -->\n  second.\n", "First line, second."),
+            ("  Fir<!-- x -->st line.\n", "First line."),
+        ):
+            with self.subTest(lines=lines):
+                self.assertEqual(block_words(with_lines(lines), "abstract"), expected)
+
+    def test_a_comment_that_never_closes_fails_closed(self):
+        self.assertIsNone(block_words(with_lines("  First line, <!-- 9.99 percent.\n"), "abstract"))
+
+    def test_no_block_reads_as_none(self):
+        self.assertIsNone(block_words(PAPER.replace("abstract: |", "abstract: >"), "abstract"))
+
+
 class StatedValuesTests(unittest.TestCase):
     def test_reads_the_value_in_the_slot(self):
         text = "we obtain 2.29 percent with the Consumer Price Index for All Urban"
         self.assertEqual(stated_values(CPI_U, text), ["2.29"])
+
+    def test_a_dash_before_the_slot_reads_no_value(self):
+        """A writer can type an en dash, a hyphen or another dash for a minus
+        sign or a range, so any dash right before the slot leaves the slot
+        empty instead of reading the bare rate."""
+        for text in (
+            "of \u20132.29 percent with the Consumer Price Index",
+            "of \u20112.29 percent with the Consumer Price Index",
+            "of \u20142.29 percent with the Consumer Price Index",
+            "of 2.20\u20132.29 percent with the Consumer Price Index",
+            "of 2.20-2.29 percent with the Consumer Price Index",
+        ):
+            with self.subTest(text=text):
+                self.assertEqual(stated_values(CPI_U, text), [])
 
     def test_keeps_a_sign(self):
         for sign in (MINUS, "-"):
@@ -540,6 +704,7 @@ class PropertyTests(unittest.TestCase):
             '"abstract": |',
             "'abstract': |",
             "? abstract",
+            "? abstract # set here",
             "{abstract: Copy.}",
             '{title: X, "abstract": Copy.}',
             "{? abstract : Copy.}",
@@ -679,6 +844,33 @@ EDGE_CASES = {
     ),
     "nested flow key in the body": with_body("---\n{meta: {abstract: Body copy 9.99.}}\n---\n"),
     "nested flow key in the front matter": NESTED_FLOW_KEY,
+    "format-level key in the front matter": FORMAT_LEVEL_KEY,
+    "tagged format-level key": PAPER.replace(
+        "format:\n", "format:\n  html:\n    !!str abstract: |\n      Format copy 9.99.\n"
+    ),
+    "anchored format-level key": PAPER.replace(
+        "format:\n", "format:\n  html:\n    &k abstract: |\n      Format copy 9.99.\n"
+    ),
+    "aliased format-level key": PAPER.replace(
+        "format:\n", "names: [&k abstract]\nformat:\n  html:\n    *k : Format copy 9.99.\n"
+    ),
+    "escaped format-level key": PAPER.replace(
+        "format:\n", 'format:\n  html:\n    "\\x61bstract": Format copy 9.99.\n'
+    ),
+    "explicit format-level key in a block": PAPER.replace(
+        "format:\n", "format:\n  html:\n    ? |-\n      abstract\n    : Format copy 9.99.\n"
+    ),
+    "explicit key with a comment in the body": with_body(
+        "---\n? abstract # set here\n: Body copy 9.99.\n---\n"
+    ),
+    "escaped quoted key in the body": with_body('---\n"\\x61bstract": Body copy 9.99.\n---\n'),
+    "anchored explicit key in the body": with_body("---\n? &k abstract\n: Body copy 9.99.\n---\n"),
+    "empty block, then a field": PAPER.replace("abstract: |\n", "abstract: |\nnote: |\n"),
+    "HTML comment inside the block": with_lines("  First line, <!-- 9.99 percent --> second.\n"),
+    "HTML comment line inside the block": with_lines(ABSTRACT_LINES + "  <!-- 9.99 percent -->\n"),
+    "HTML comment inside a word": with_lines("  Fir<!-- 9.99 -->st line.\n"),
+    "two thematic breaks in the body": with_body("---\n\nText between two breaks.\n\n---\n"),
+    "no-break space on the first line": with_lines("   \u00a0\n    Four 1.11,\n   three 9.99.\n"),
     "key line outside any metadata block": with_body("abstract: |\n  Body copy 9.99.\n"),
     "metadata block in a code fence": with_body(
         "```yaml\n---\nabstract: |\n  Body copy 9.99.\n---\n```\n"
@@ -718,13 +910,13 @@ class PandocAgreementTests(unittest.TestCase):
     def agrees(self, text):
         """Whether the parser read an abstract that pandoc renders, after
         asserting that pandoc renders the parser's words."""
-        span = block_scalar_span(text, "abstract")
-        if span is None:
+        ours = block_words(text, "abstract")
+        if ours is None:
             return False
         rendered = self.rendered(text)
         if rendered is None:
             return False
-        self.assertEqual(words(text[span[0] : span[1]]), rendered, text)
+        self.assertEqual(words(ours), rendered, text)
         return True
 
     def test_pandoc_renders_the_fixture(self):
@@ -834,9 +1026,9 @@ class QuartoAgreementTests(unittest.TestCase):
         reads an abstract from, rendering JOBS documents at a time."""
         parsed = {}
         for name, text in documents.items():
-            span = block_scalar_span(text, "abstract")
-            if span is not None:
-                parsed[name] = words(text[span[0] : span[1]])
+            ours = block_words(text, "abstract")
+            if ours is not None:
+                parsed[name] = words(ours)
         with concurrent.futures.ThreadPoolExecutor(self.JOBS) as pool:
             rendered = pool.map(lambda name: self.rendered(documents[name]), parsed)
             return {name: (ours, theirs) for (name, ours), theirs in zip(parsed.items(), rendered)}

@@ -34,19 +34,24 @@ push to master and every pull request. It fails when:
     pin. Most pins also hold the figure beside the words that say what
     it measures, so a swap between neighbors fails. The guard reads
     those phrases from whitespace-normalized text, so rewrapping a line
-    cannot split them, and when a pin's figure occurs in its section
-    but a phrase doesn't, the report names the phrase. Pins built with
+    cannot split them, and when a pin's figure occurs in its section but
+    a phrase doesn't, the report names the phrase. Pins built with
     ``stated()`` match their figure in the section's source text as
     written, so a line break inside a multi-word figure fails. Appendix
     B must link each supporting document, and section 6.1 the forecast
     record, with a plain inline link at the pinned commit, and every
     other URL there that names the document, in any Markdown form, must
-    point at that commit's blob too. The guard reads each error rate the abstract quotes from the front
-    matter's ``abstract: |`` block alone, as Quarto and pandoc read it,
-    beside the rule it scores, and every rate the abstract gives in that
-    rule's wording must equal the registered value. A copy in other
-    metadata, in a comment, in the body or inside the abstract cannot
-    rescue a drifted figure, and a swap between rules fails;
+    point at that commit's blob too. The guard reads each error rate the
+    abstract quotes from the front matter's ``abstract: |`` block alone,
+    as Quarto and pandoc read it, beside the rule it scores, and every
+    rate the abstract gives in that rule's wording must equal the
+    registered value. A copy in other metadata, in a comment, in the
+    body or inside the abstract cannot rescue a drifted figure, and a
+    swap between rules fails. A key that could set the abstract
+    elsewhere, such as under ``format: html:``, YAML syntax the parser
+    does not resolve, or a metadata block in the body fails every
+    abstract tie. A project or directory metadata file that names the
+    abstract or more metadata files fails too;
 (e) the README miscounts the in-kind receipts or omits a calculator
     commit that their provenance records.
 
@@ -97,13 +102,17 @@ from inkind_inputs import (
     published_standard_errors,
     uncertainty_figures,
 )
-from paper_text import block_scalar_span, stated_values
+from paper_text import block_scalar_span, block_words, stated_values
 
 REPO = Path(__file__).resolve().parent.parent
 DATA = REPO / "data"
 TABLES = REPO / "paper" / "tables"
 FORECAST_RECORD = REPO / "docs" / "forecast-record.md"
 QMD = (REPO / "paper" / "index.qmd").read_text()
+# The paper as stored, line endings included: read_text() turns a lone
+# carriage return into a line feed, and the abstract's parser fails closed on
+# one, since Quarto and pandoc read it differently.
+QMD_RAW = (REPO / "paper" / "index.qmd").read_bytes().decode()
 
 TENURES = ("owner_with_mortgage", "owner_without_mortgage", "renter")
 
@@ -269,17 +278,28 @@ def report_phrase_misses() -> None:
             print(f"    {miss}")
 
 
-def front_matter_block(key: str, text: str = QMD) -> str:
-    """Whitespace-normalized text of the front matter's one ``key: |``
-    literal block, read as Quarto and pandoc read it. Pins that read it see
-    no other metadata field, comment or body text. When ``block_scalar_span``
-    finds no such block, or finds another line that sets the key, the slice
-    is empty, so every pin inside it fails instead of reading other text."""
-    span = block_scalar_span(text, key)
-    if span is None:
+def front_matter_block(key: str, text: str = QMD_RAW) -> str:
+    """Whitespace-normalized words of the front matter's one ``key: |``
+    literal block, read as Quarto and pandoc read it, without its HTML
+    comments. Pins that read it see no other metadata field, comment or body
+    text. When ``block_words`` finds no such block, or finds another line
+    that could set the key, the slice is empty, so every pin inside it fails
+    instead of reading other text."""
+    words = block_words(text, key)
+    if words is None:
         failures.append(f"paper must set {key} only in one {key}: | block of its front matter")
         return ""
-    return " ".join(text[span[0] : span[1]].split())
+    return words
+
+
+def front_matter_source(key: str, text: str = QMD_RAW) -> str:
+    """Raw text of the front matter's one ``key: |`` block, HTML comments
+    included, or an empty string when ``block_scalar_span`` finds no such
+    block. The block starts at the start of a line and ends after a line
+    feed, so a figure that matches inside it at numeric-token boundaries
+    has the same neighbors in the paper."""
+    span = block_scalar_span(text, key)
+    return "" if span is None else text[span[0] : span[1]]
 
 
 COUNT_WORDS = (
@@ -907,20 +927,36 @@ check(
 
 # Figures in the abstract also appear in the body or its tables, so their
 # abstract ties read only the front matter's `abstract: |` block, as Quarto
-# and pandoc read it. Other metadata fields, comments and body text fall
-# outside that block, so a copy there cannot rescue a drifted figure, and a
-# metadata block in the body that sets the abstract fails every tie. Each tie
-# collects every rate the abstract gives in its rule's wording and requires
-# them all to equal the registered value, so a swap between rules fails, and
-# so does a changed rate that leaves a correct copy elsewhere in the abstract.
+# and pandoc read it. Other metadata fields, comments, HTML comments and body
+# text fall outside it, so a copy there cannot rescue a drifted figure. A key
+# that could set the abstract anywhere else, such as under `format: html:`,
+# or any metadata block in the body fails every tie. Each tie collects every
+# rate the abstract gives in its rule's full wording and requires them all to
+# equal the registered value, so a swap between rules fails, and so does a
+# changed rate that leaves a correct copy elsewhere in the abstract.
 ABSTRACT = front_matter_block("abstract")
+# Quarto merges the project's _quarto files, each _metadata file from the
+# project root down to paper/, and any metadata-files they or the paper name
+# into the paper's metadata, so an abstract set there could replace the block
+# the ties read. Neither may name the abstract or more metadata files.
+METADATA_SOURCES = sorted(
+    path
+    for folder in (REPO, REPO / "paper")
+    for pattern in ("_quarto*.y*ml", "_metadata.y*ml")
+    for path in folder.glob(pattern)
+)
+check(
+    "only paper/index.qmd may set the abstract or name metadata files",
+    not re.search(r"metadata-files?", QMD_RAW)
+    and not any(re.search(r"abstract|metadata-files?", path.read_text()) for path in METADATA_SOURCES),
+)
 
 # Current retrospective results in the abstract are a separate experiment.
 ABSTRACT_RETROSPECTIVE_RULES = {
-    "cpi_u": "with the Consumer Price Index",
+    "cpi_u": "with the Consumer Price Index for All Urban Consumers (CPI-U)",
     "fcsuti_cpi": "with a composite price index",
     "replication_ratio": "with replicated consumption growth",
-    "blend": "with an equal blend",
+    "blend": "with an equal blend of the latter two",
 }
 retrospective = current_ce["projection_evaluation"]["summary_2020_2025"]
 check(
@@ -929,10 +965,12 @@ check(
     and set(stated_values("compare {} projection rules", ABSTRACT, r"\S+"))
     == {count_word(len(retrospective))},
 )
+# The four rates appear in prose only in the abstract, so their prose checks
+# read the abstract block's raw text, HTML comments included, and come up
+# empty whenever the abstract ties' slice does.
+ABSTRACT_SOURCE = front_matter_source("abstract") if ABSTRACT else ""
 for rule, value in retrospective.items():
-    # The four rates appear in prose only in the abstract, so this check
-    # reads the abstract block, and the abstract check below implies it.
-    check(f"current projection prose {rule}", has_number(f"{value:.2f}", text=ABSTRACT))
+    check(f"current projection prose {rule}", has_number(f"{value:.2f}", text=ABSTRACT_SOURCE))
     rule_phrase = ABSTRACT_RETROSPECTIVE_RULES.get(rule, "<unnamed rule>")
     check(
         f"abstract current projection {rule} {value:.2f}",
