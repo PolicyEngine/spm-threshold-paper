@@ -1171,6 +1171,10 @@ APPENDIX_A_RANGES = (
     "with its corresponding anchor share. Published BLS sampling standard errors "
     "span 0.7 to 2.1 percent of the revised threshold levels in those years."
 )
+APPENDIX_B_SOURCES = (
+    f"Its [source-data provenance]({PINNED_BLOB}data/PROVENANCE.md) "
+    "describes the experimental collections."
+)
 APPENDIX_B_RECORDS = (
     f"The [data provenance]({PINNED_BLOB}data/PROVENANCE.md) and [forecast "
     f"record]({PINNED_BLOB}docs/forecast-record.md) identify the inputs and "
@@ -1190,9 +1194,9 @@ GAP_TIE = "composite within 0.7pp of BLS FCSUti, mean gap 0.4"
 
 # Each case drifts figures in the one body section that states them: (name,
 # section, pattern, replacement, failing ties, decoy). The section names a
-# mutate_article slice, and the pattern edits its first match there. With the
-# decoy restated under the discussion heading, the failing ties are the only
-# lines the guard reports.
+# mutate_article slice, and the pattern must match exactly once there. With
+# the decoy restated under the discussion heading, the failing ties are the
+# only lines the guard reports.
 SECTION_PROSE_MUTATIONS = (
     (
         "tenure-sensitivity maximum",
@@ -1211,11 +1215,20 @@ SECTION_PROSE_MUTATIONS = (
         APPENDIX_B_RECORDS,
     ),
     (
-        "appendix data provenance links",
+        "appendix source-data provenance link",
         "appendix",
-        r"blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0(/data/PROVENANCE\.md)(.*?)"
-        r"blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0(/data/PROVENANCE\.md)",
-        r"blob/main\1\2blob/main\3",
+        r"(source-data\s+provenance\]\(\S+/)blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0"
+        r"(/data/PROVENANCE\.md)",
+        r"\1blob/main\2",
+        ("manuscript links fixed supporting document: data/PROVENANCE.md",),
+        APPENDIX_B_SOURCES,
+    ),
+    (
+        "appendix data provenance link",
+        "appendix",
+        r"(\[data\s+provenance\]\(\S+/)blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0"
+        r"(/data/PROVENANCE\.md)",
+        r"\1blob/main\2",
         ("manuscript links fixed supporting document: data/PROVENANCE.md",),
         APPENDIX_B_RECORDS,
     ),
@@ -1752,9 +1765,10 @@ SECTION_PROSE_MUTATIONS = (
 )
 
 # Each case renames or repeats a heading that bounds a section slice:
-# (name, edits, ties that must fail). The slice comes back empty, so the
-# guard reports the heading and fails the section's ties instead of
-# searching anywhere else.
+# (name, edits, ties that must fail). A renamed, repeated, reordered or
+# run-on heading empties every slice it bounds, so the guard names the
+# heading and fails the section's ties instead of searching anywhere else.
+# Each slice's start and end heading appears in at least one case.
 SECTION_MARKER_CASES = (
     (
         "renamed sensitivity heading",
@@ -1765,7 +1779,22 @@ SECTION_MARKER_CASES = (
             ),
         ),
         (
-            "paper section heading not unique: '## Replicated levels and sample sensitivities'",
+            "paper section heading not unique: "
+            "'## Replicated levels and sample sensitivities' occurs 0 times",
+            "current tenure-sensitivity prose",
+        ),
+    ),
+    (
+        "repeated in-kind heading",
+        (
+            (
+                DISCUSSION_HEADING,
+                "# Imputing in-kind benefits {#sec-inkind}\n\n" + DISCUSSION_HEADING,
+            ),
+        ),
+        (
+            "paper section heading not unique: "
+            "'# Imputing in-kind benefits {#sec-inkind}' occurs 2 times",
             "current tenure-sensitivity prose",
         ),
     ),
@@ -1773,9 +1802,24 @@ SECTION_MARKER_CASES = (
         "renamed benchmark heading",
         (("## Five-year benchmark for the 2025 nowcast\n", "## Five-year benchmark\n"),),
         (
-            "paper section heading not unique: '## Five-year benchmark for the 2025 nowcast'",
+            "paper section heading not unique: "
+            "'## Five-year benchmark for the 2025 nowcast' occurs 0 times",
             "backtest prose literal 2.23",
             "signed CPI-U bias -1.9",
+        ),
+    ),
+    (
+        "benchmark heading runs into the text after it",
+        (
+            (
+                "## Five-year benchmark for the 2025 nowcast\n",
+                "## Five-year benchmark for the 2025 nowcasts\n",
+            ),
+        ),
+        (
+            "paper section heading runs into the text after it: "
+            "'## Five-year benchmark for the 2025 nowcast'",
+            "backtest prose literal 2.23",
         ),
     ),
     (
@@ -1787,12 +1831,27 @@ SECTION_MARKER_CASES = (
             ),
         ),
         (
-            "paper section heading not unique: '# Pre-committed 2025 validation'",
-            "paper section heading not unique: '## Five-year benchmark for the 2025 nowcast'",
+            "paper section heading not unique: '# Pre-committed 2025 validation' occurs 0 times",
             "nowcast section links to the fixed forecast registration record",
             "nowcast literal 41,036.34",
             "price growth 3.2",
             "backtest prose literal 2.23",
+        ),
+    ),
+    (
+        "nowcast and evaluation headings swapped",
+        (
+            ("# Pre-committed 2025 validation {#sec-nowcast}\n", "NOWCAST HEADING\n"),
+            (
+                "## Evaluation against published thresholds {#sec-evaluation}\n",
+                "# Pre-committed 2025 validation {#sec-nowcast}\n",
+            ),
+            ("NOWCAST HEADING\n", "## Evaluation against published thresholds {#sec-evaluation}\n"),
+        ),
+        (
+            "paper sections out of order: "
+            "'# Pre-committed 2025 validation' before '## Evaluation against published thresholds'",
+            "nowcast literal 41,036.34",
         ),
     ),
     (
@@ -1806,8 +1865,9 @@ SECTION_MARKER_CASES = (
         ),
         (
             "paper section heading not unique: "
-            "'## Evaluation against published thresholds {#sec-evaluation}'",
-            "paper section heading not unique: '# Pre-committed 2025 validation'",
+            "'## Evaluation against published thresholds {#sec-evaluation}' occurs 2 times",
+            "paper section heading not unique: "
+            "'## Evaluation against published thresholds' occurs 2 times",
             "evaluation amended MAE 1.17",
             "2025 SE triple in tenure order",
             "nowcast literal 41,036.34",
@@ -1817,12 +1877,27 @@ SECTION_MARKER_CASES = (
         "repeated comparator heading",
         ((DISCUSSION_HEADING, "## Validation of the price comparator\n\n" + DISCUSSION_HEADING),),
         (
-            "paper section heading not unique: '## Validation of the price comparator'",
             "paper section heading not unique: "
-            "'## Evaluation against published thresholds {#sec-evaluation}'",
+            "'## Validation of the price comparator' occurs 2 times",
             GAP_TIE,
             "BLS page 2025 CPI-U growth 2.70 quoted",
             "evaluation amended MAE 1.17",
+        ),
+    ),
+    (
+        "repeated forecasts heading",
+        (
+            (
+                DISCUSSION_HEADING,
+                "# Conditional forecasts beyond available microdata {#sec-rolling}\n\n"
+                + DISCUSSION_HEADING,
+            ),
+        ),
+        (
+            "paper section heading not unique: "
+            "'# Conditional forecasts beyond available microdata {#sec-rolling}' occurs 2 times",
+            GAP_TIE,
+            "BLS page 2025 CPI-U growth 2.70 quoted",
         ),
     ),
     (
@@ -1834,7 +1909,8 @@ SECTION_MARKER_CASES = (
             ),
         ),
         (
-            "paper section heading not unique: '# Appendix A: replication benchmark {.unnumbered}'",
+            "paper section heading not unique: "
+            "'# Appendix A: replication benchmark {.unnumbered}' occurs 0 times",
             "SE range 0.7 to 2.1 percent",
             "replication fidelity 1.5 to 2.1 vs corrected",
         ),
@@ -1848,10 +1924,26 @@ SECTION_MARKER_CASES = (
             ),
         ),
         (
-            "paper section heading not unique: '# Appendix A: replication benchmark {.unnumbered}'",
-            "paper section heading not unique: '# Appendix B: reproducibility'",
+            "paper section heading not unique: "
+            "'# Appendix B: reproducibility {.unnumbered}' occurs 0 times",
             "manuscript links fixed supporting document: docs/forecast-record.md",
             "SE range 0.7 to 2.1 percent",
+        ),
+    ),
+    (
+        "repeated references heading",
+        ((DISCUSSION_HEADING, "# References {.unnumbered}\n\n" + DISCUSSION_HEADING),),
+        (
+            "paper section heading not unique: '# References {.unnumbered}' occurs 2 times",
+            "manuscript links fixed supporting document: docs/forecast-record.md",
+        ),
+    ),
+    (
+        "references heading joined to the text before it",
+        (("# References {.unnumbered}", "See below.# References {.unnumbered}"),),
+        (
+            "paper section text runs into the heading after it: '# References {.unnumbered}'",
+            "manuscript links fixed supporting document: docs/forecast-record.md",
         ),
     ),
 )
@@ -2713,7 +2805,9 @@ class PaperGuardTests(unittest.TestCase):
         self.assertIn("article tables never included", result.stdout)
         self.assertIn("inkind_amounts.md", result.stdout)
 
-    def mutate_article(self, where, pattern, replacement):
+    def mutate_article(self, where, pattern, replacement, once=False):
+        """Apply one regex edit inside a named slice of the paper. With
+        once=True the pattern must match exactly once in that slice."""
         article = self.repo / "paper/index.qmd"
         text = article.read_text()
         bounds = {
@@ -2748,6 +2842,9 @@ class PaperGuardTests(unittest.TestCase):
             ),
         }
         start, end = bounds[where]
+        if once:
+            matches = len(re.findall(pattern, text[start:end], flags=re.S))
+            self.assertEqual(matches, 1, f"fixture pattern must match once, found {matches}: {pattern}")
         body, count = re.subn(pattern, replacement, text[start:end], count=1, flags=re.S)
         self.assertEqual(count, 1, f"fixture pattern missing: {pattern}")
         article.write_text(text[:start] + body + text[end:])
@@ -2824,7 +2921,7 @@ class PaperGuardTests(unittest.TestCase):
         """Drift a figure in one section, optionally restate the original
         wording under the discussion heading, and run the guard."""
         self.install_article()
-        self.mutate_article(where, pattern, replacement)
+        self.mutate_article(where, pattern, replacement, once=True)
         if decoy is not None:
             self.edit_article((), DISCUSSION_HEADING, decoy)
         return self.run_guard()
@@ -3165,31 +3262,98 @@ class PaperGuardTests(unittest.TestCase):
             self.assertIn(expected, result.stdout)
 
 
+def whole_paper_reads(source):
+    """Each place in a guard's source that reads the paper outside a bounded
+    slice: a load of QMD other than the slicers' default text and the scan
+    for include directives, a slicer call that reads the paper with no end
+    heading, and a second read of paper/index.qmd."""
+    tree = ast.parse(source)
+    allowed = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.FunctionDef) and node.name in (
+            "section_source",
+            "section",
+            "front_matter_block",
+        ):
+            allowed.update(
+                id(default)
+                for default in node.args.defaults + node.args.kw_defaults
+                if isinstance(default, ast.Name) and default.id == "QMD"
+            )
+        elif (
+            isinstance(node, ast.Call)
+            and ast.unparse(node.func) == "re.findall"
+            and len(node.args) == 2
+            and isinstance(node.args[0], ast.Constant)
+            and "include" in str(node.args[0].value)
+        ):
+            allowed.add(id(node.args[1]))
+    reads = []
+    paper_reads = 0
+    for node in ast.walk(tree):
+        if (
+            isinstance(node, ast.Name)
+            and node.id == "QMD"
+            and isinstance(node.ctx, ast.Load)
+            and id(node) not in allowed
+        ):
+            reads.append(f"line {node.lineno}: QMD")
+        elif (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id in ("section_source", "section")
+        ):
+            keywords = {keyword.arg: keyword.value for keyword in node.keywords}
+            end = node.args[1] if len(node.args) > 1 else keywords.get("end")
+            reads_paper = len(node.args) < 3 and "text" not in keywords
+            if reads_paper and (end is None or (isinstance(end, ast.Constant) and end.value is None)):
+                reads.append(f"line {node.lineno}: {ast.unparse(node)}")
+        elif isinstance(node, ast.Constant) and node.value == "index.qmd":
+            paper_reads += 1
+            if paper_reads > 1:
+                reads.append(f"line {node.lineno}: second read of index.qmd")
+    return reads
+
+
 class GuardSourceTests(unittest.TestCase):
     def test_no_tie_reads_the_whole_paper(self):
-        """Every has_number and has_ordered call names the text it reads, none
-        reads QMD, and no tie tests a literal's membership in QMD."""
-        tree = ast.parse((REPO / "scripts/check_paper.py").read_text())
-        offenders = []
-        for node in ast.walk(tree):
-            if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
-                if node.func.id not in ("has_number", "has_ordered"):
-                    continue
-                texts = [keyword.value for keyword in node.keywords if keyword.arg == "text"]
-                if node.func.id == "has_number" and len(node.args) > 1:
-                    texts.append(node.args[1])
-                if not texts or any(
-                    isinstance(text, ast.Name) and text.id == "QMD" for text in texts
-                ):
-                    offenders.append(f"line {node.lineno}: {ast.unparse(node)}")
-            elif isinstance(node, ast.Compare) and any(
-                isinstance(operator, (ast.In, ast.NotIn))
-                and isinstance(right, ast.Name)
-                and right.id == "QMD"
-                for operator, right in zip(node.ops, node.comparators)
-            ):
-                offenders.append(f"line {node.lineno}: {ast.unparse(node)}")
-        self.assertEqual(offenders, [])
+        """The guard reads the paper only through slices that a heading
+        bounds on each side, the abstract block and the include scan."""
+        self.assertEqual(whole_paper_reads((REPO / "scripts/check_paper.py").read_text()), [])
+
+    def test_source_check_sees_each_way_to_read_the_whole_paper(self):
+        """Every form a whole-paper read could take trips the source check,
+        and the guard's own reads don't."""
+        base = (
+            'QMD = (REPO / "paper" / "index.qmd").read_text()\n'
+            "def section_source(start, end=None, text=QMD): ...\n"
+            "def section(start, end=None, text=QMD): ...\n"
+            "def front_matter_block(key, text=QMD): ...\n"
+            'includes = set(re.findall(r"include tables/(\\S+)", QMD))\n'
+            'ROLLING = section("# A", "# B")\n'
+            'ROLLING_ACS = section("## C", None, ROLLING)\n'
+            'SLICE = section_source("# A", end="# B")\n'
+        )
+        self.assertEqual(whole_paper_reads(base), [])
+        for read in (
+            'check("x", has_number("1.17", text=QMD))',
+            'check("x", has_ordered(["1", "2"], text=QMD))',
+            'check("x", "1.17" in QMD)',
+            'check("x", stated("1.17", QMD))',
+            'check("x", stated("1.17", source=QMD))',
+            'check("x", set(stated_values("{} percent", QMD)) == {"1.17"})',
+            "PAPER = QMD",
+            'check("x", has_number("1.17", text=normalized(QMD)))',
+            'check("x", "1.17" in QMD[0:])',
+            'check("x", QMD.count("1.17") > 0)',
+            'check("x", re.search("1.17", QMD) is not None)',
+            'check("x", "1.17" in QMD.split("# A")[1])',
+            'TEXT = section_source("# A")',
+            'TEXT = section("# A", end=None)',
+            'PAPER = (REPO / "paper" / "index.qmd").read_text()',
+        ):
+            with self.subTest(read=read):
+                self.assertNotEqual(whole_paper_reads(base + read + "\n"), [])
 
 
 if __name__ == "__main__":

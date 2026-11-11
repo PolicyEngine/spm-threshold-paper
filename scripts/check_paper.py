@@ -22,17 +22,23 @@ push to master and every pull request. It fails when:
     ``sevens``), and the three tenure amounts are matched as ordered
     triples in the sentences that state them, so a swap between
     tenures fails. The guard pins every registered figure inside the
-    section that states it: a slice between two headings that must each
-    occur exactly once. The same numeral elsewhere in the paper cannot
-    satisfy the pin, and a renamed or repeated heading fails every
-    figure in that section instead of widening the search. A figure
-    that two sections state gets a pin in each. Most pins also hold the
-    figure beside the words that say what it measures, so a swap
-    between neighbors fails; the guard reads those phrases from
-    whitespace-normalized text, so rewrapping a line cannot split them.
-    Pins built with ``stated()`` match their figure in the section's
-    source text as written, line breaks included, so each fails
-    wherever a search of the whole paper for its figure would fail. The
+    section that states it: a slice between two heading strings that
+    must each occur exactly once anywhere in the paper, code and tables
+    included, and must border whitespace. The same numeral elsewhere in
+    the paper cannot satisfy the pin, and a renamed, repeated, reordered
+    or run-on heading fails every figure in that section instead of
+    widening the search. Where two sections state a figure that the
+    guard once searched the whole paper for, each copy gets a pin. Most
+    pins also hold the figure beside the words that say what it
+    measures, so a swap between neighbors fails. The guard reads those
+    phrases from whitespace-normalized text, so rewrapping a line cannot
+    split them, and when a phrase goes missing beside a figure that
+    still matches, the report names the phrase. Pins built with
+    ``stated()`` match their figure in the section's source text as
+    written, so a line break inside a multi-word figure fails, as it did
+    when the guard searched the whole paper, and each pin fails wherever
+    that search would fail. Every link to a supporting document must
+    carry the pinned commit. The
     guard reads each error rate the abstract quotes from the front
     matter's ``abstract: |`` block alone, as Quarto and pandoc read it,
     beside the rule it scores, and every rate the abstract gives in that
@@ -139,6 +145,9 @@ GENERATORS = (
 failures: list[str] = []
 
 
+phrase_misses: list[str] = []
+
+
 def check(label: str, ok: bool) -> None:
     if not ok:
         failures.append(label)
@@ -153,7 +162,7 @@ def bounded(literal: str) -> str:
     return r"\b" + pattern + r"\b"
 
 
-def has_number(literal: str, text: str, min_count: int = 1) -> bool:
+def has_number(literal: str, *, text: str, min_count: int = 1) -> bool:
     """Literal present at numeric-token boundaries: no digit, comma-digit,
     or dot-digit continuation on either side. The caller names the text,
     so no tie can fall back to searching the whole paper."""
@@ -174,19 +183,37 @@ def normalized(text: str) -> str:
 
 
 def section_source(start: str, end: str | None = None, text: str = QMD) -> str:
-    """The paper's text between two headings that must each occur exactly
-    once, as written. A missing, duplicated or reordered heading yields an
-    empty slice and records a failure, so every pin inside it fails rather
-    than silently widening to the whole document."""
-    if text.count(start) != 1 or (end is not None and text.count(end) != 1):
-        failures.append(f"paper section heading not unique: {start!r}")
-        return ""
-    first = text.index(start) + len(start)
-    last = len(text) if end is None else text.index(end)
-    if last <= first:
-        failures.append(f"paper sections out of order: {start!r} before {end!r}")
-        return ""
-    return text[first:last]
+    """The paper's text between two heading strings, as written.
+
+    Each heading string must occur exactly once anywhere in ``text``, code
+    spans, tables and fenced code included; the start must come before the
+    end; and the slice must begin and end with whitespace, so a heading
+    cannot run on into the text beside it. Otherwise the slice comes back
+    empty and the guard records a failure that names the heading, once
+    even when it bounds two slices, so every pin inside the slice fails
+    rather than silently widening to the whole document.
+
+    No pinned figure begins or ends with whitespace, so a figure that
+    matches inside the slice has the same neighbors in the whole paper,
+    and a pin that passes on the slice passes on the whole paper."""
+    problems = [
+        f"paper section heading not unique: {marker!r} occurs {text.count(marker)} times"
+        for marker in (start, end)
+        if marker is not None and text.count(marker) != 1
+    ]
+    if not problems:
+        first = text.index(start) + len(start)
+        last = len(text) if end is None else text.index(end)
+        if last <= first:
+            problems.append(f"paper sections out of order: {start!r} before {end!r}")
+        elif not text[first].isspace():
+            problems.append(f"paper section heading runs into the text after it: {start!r}")
+        elif end is not None and not text[last - 1].isspace():
+            problems.append(f"paper section text runs into the heading after it: {end!r}")
+    for problem in problems:
+        if problem not in failures:
+            failures.append(problem)
+    return "" if problems else text[first:last]
 
 
 def section(start: str, end: str | None = None, text: str = QMD) -> str:
@@ -206,10 +233,31 @@ def stated(literal: str, source: str, *phrases: str) -> bool:
     The literal matches the source as written, line breaks included, so the
     tie fails wherever a search of the whole paper for the literal would
     fail. Each phrase holds the figure beside the words that say what it
-    measures, and rewrapping a line cannot split a phrase."""
-    return has_number(literal, text=source) and all(
-        has_number(phrase, text=normalized(source)) for phrase in phrases
-    )
+    measures, and rewrapping a line cannot split a phrase. When the literal
+    matches and a phrase doesn't, the failure report lists the phrase, so a
+    reworded sentence doesn't read as a drifted figure."""
+    if not has_number(literal, text=source):
+        return False
+    text = normalized(source)
+    missing = [phrase for phrase in phrases if not has_number(phrase, text=text)]
+    phrase_misses.extend(f"{literal!r} matches, {phrase!r} doesn't" for phrase in missing)
+    return not missing
+
+
+def pinned_links(path: str, text: str) -> bool:
+    """At least one Markdown link to ``path`` in this repository's blob
+    tree, and every such link at the pinned commit."""
+    commits = re.findall(rf"\]\({re.escape(REPO_BLOB_URL)}([^/\s)]+)/{re.escape(path)}\)", text)
+    return bool(commits) and set(commits) == {SUPPORTING_COMMIT}
+
+
+def report_phrase_misses() -> None:
+    """After the failures, list each phrase a pin missed beside a figure
+    that still matches."""
+    if phrase_misses:
+        print("Phrases missing beside figures that still match:")
+        for miss in phrase_misses:
+            print(f"    {miss}")
 
 
 def front_matter_block(key: str, text: str = QMD) -> str:
@@ -414,6 +462,7 @@ if failures:
     print("PAPER INPUT CHECK FAILED (generators were not run):")
     for failure in failures:
         print(f"  - {failure}")
+    report_phrase_misses()
     sys.exit(1)
 
 # (a) Generate only in scratch; never repair or restore source files.
@@ -471,8 +520,8 @@ check(
 # each figure from the section that states it, between two headings that must
 # each occur exactly once, so a copy elsewhere in the paper cannot satisfy it
 # and a renamed or repeated heading fails every figure in that section. The
-# *_SOURCE slices keep line breaks for stated(); the *_TEXT slices normalize
-# whitespace.
+# *_SOURCE slices keep line breaks for stated(); slices built with section()
+# normalize whitespace.
 NOWCAST_SOURCE = section_source(
     "# Pre-committed 2025 validation", "## Evaluation against published thresholds"
 )
@@ -492,16 +541,17 @@ APPENDIX_A_SOURCE = section_source(
     "# Appendix A: replication benchmark {.unnumbered}",
     "# Appendix B: reproducibility {.unnumbered}",
 )
-APPENDIX_B_TEXT = section("# Appendix B: reproducibility", "# References")
+APPENDIX_B_TEXT = section(
+    "# Appendix B: reproducibility {.unnumbered}", "# References {.unnumbered}"
+)
 
 nowcast = json.loads((DATA / "nowcast_2025.json").read_text())
 AMENDED = {t: f"{nowcast['values'][t]:,.2f}" for t in TENURES}
 check("forecast registration record exists", FORECAST_RECORD.is_file())
 record_text = FORECAST_RECORD.read_text() if FORECAST_RECORD.is_file() else ""
 SUPPORTING_COMMIT = "20bfbe1abcb83b4f9f60fbe54789144321ff62b0"
-SUPPORTING_URL_BASE = (
-    f"https://github.com/PolicyEngine/spm-threshold-paper/blob/{SUPPORTING_COMMIT}/"
-)
+REPO_BLOB_URL = "https://github.com/PolicyEngine/spm-threshold-paper/blob/"
+SUPPORTING_URL_BASE = f"{REPO_BLOB_URL}{SUPPORTING_COMMIT}/"
 FORECAST_RECORD_URL = SUPPORTING_URL_BASE + "docs/forecast-record.md"
 for supporting_path in (
     "docs/forecast-record.md",
@@ -520,15 +570,16 @@ for supporting_path in (
         and local_path.is_file()
         and pinned.stdout == local_path.read_bytes(),
     )
-    # Appendix B links every supporting document; the nowcast section links
-    # the forecast record again beside the pre-commitment claim.
+    # Appendix B links every supporting document, some more than once, and
+    # each link must carry the pinned commit. The nowcast section links the
+    # forecast record again beside the pre-commitment claim.
     check(
         f"manuscript links fixed supporting document: {supporting_path}",
-        f"]({SUPPORTING_URL_BASE}{supporting_path})" in APPENDIX_B_TEXT,
+        pinned_links(supporting_path, APPENDIX_B_TEXT),
     )
 check(
     "nowcast section links to the fixed forecast registration record",
-    f"]({FORECAST_RECORD_URL})" in NOWCAST_SOURCE,
+    pinned_links("docs/forecast-record.md", NOWCAST_SOURCE),
 )
 for t, literal in AMENDED.items():
     check(f"nowcast literal {literal}", stated(literal, NOWCAST_SOURCE))
@@ -868,6 +919,9 @@ check(
     == {count_word(len(retrospective))},
 )
 for rule, value in retrospective.items():
+    # The four rates appear in prose only in the abstract, so this check,
+    # kept from #13 under its label, reads the abstract block, and the
+    # abstract check below implies it.
     check(f"current projection prose {rule}", has_number(f"{value:.2f}", text=ABSTRACT))
     rule_phrase = ABSTRACT_RETROSPECTIVE_RULES.get(rule, "<unnamed rule>")
     check(
@@ -1081,9 +1135,7 @@ ROLLING_CE = section(
 )
 ROLLING_ACS = section("## Projecting local relative housing costs", None, ROLLING)
 
-REPRODUCIBILITY = section(
-    "# Appendix B: reproducibility {.unnumbered}", "# References {.unnumbered}"
-)
+REPRODUCIBILITY = APPENDIX_B_TEXT
 check(
     "rolling reproducibility identity matches the sealed calculator commit and content",
     has_ordered(
@@ -1329,9 +1381,7 @@ GROWTH_TEXT = section(
     f"## Threshold growth, {GROWTH_FIRST}–{GROWTH_LAST}", "## Uncertainty and limitations {#sec-inkind-uncertainty}"
 )
 README_TEXT = " ".join((REPO / "README.md").read_text().split())
-PRICE_VALIDATION_TEXT = section(
-    "## Validation of the price comparator", "# Conditional forecasts beyond available microdata {#sec-rolling}"
-)
+PRICE_VALIDATION_TEXT = normalized(COMPARATOR_SOURCE)
 inkind_method = json.loads((DATA / "inkind" / "ce_inkind_replication_2019_2025.json").read_text())[
     "in_kind_methodology"
 ]
@@ -2209,6 +2259,7 @@ if failures:
     print("PAPER DRIFT CHECK FAILED:")
     for f in failures:
         print(f"  - {f}")
+    report_phrase_misses()
     sys.exit(1)
 print(
     f"paper drift check passed ({len(EXPECTED_TABLES)} tables, {len(listed)} frozen + {len(current_listed)} retrospective + {len(ROLLING_FILES)} rolling + {len(INKIND_FILES)} in-kind artifacts, prose pins OK)"
