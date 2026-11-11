@@ -33,7 +33,9 @@ push to master and every pull request. It fails when:
     and every rate the abstract gives in that rule's wording must equal
     the registered value. A copy in other metadata, in a comment, in the
     body or inside the abstract cannot rescue a drifted figure, and a swap
-    between rules fails;
+    between rules fails. A key that could set the abstract elsewhere, such
+    as under ``format: html:``, or a metadata block in the body fails every
+    abstract tie;
 (e) the README miscounts the in-kind receipts or omits a calculator
     commit that their provenance records.
 
@@ -84,13 +86,17 @@ from inkind_inputs import (
     published_standard_errors,
     uncertainty_figures,
 )
-from paper_text import block_scalar_span, stated_values
+from paper_text import block_words, stated_values
 
 REPO = Path(__file__).resolve().parent.parent
 DATA = REPO / "data"
 TABLES = REPO / "paper" / "tables"
 FORECAST_RECORD = REPO / "docs" / "forecast-record.md"
 QMD = (REPO / "paper" / "index.qmd").read_text()
+# The paper as stored, line endings included: read_text() turns a lone
+# carriage return into a line feed, and the abstract's parser fails closed on
+# one, since Quarto and pandoc read it differently.
+QMD_RAW = (REPO / "paper" / "index.qmd").read_bytes().decode()
 
 TENURES = ("owner_with_mortgage", "owner_without_mortgage", "renter")
 
@@ -179,17 +185,18 @@ def section(start: str, end: str | None = None, text: str = QMD) -> str:
     return " ".join(text[first:last].split())
 
 
-def front_matter_block(key: str, text: str = QMD) -> str:
-    """Whitespace-normalized text of the front matter's one ``key: |``
-    literal block, read as Quarto and pandoc read it. Pins that read it see
-    no other metadata field, comment or body text. When ``block_scalar_span``
-    finds no such block, or finds another line that sets the key, the slice
-    is empty, so every pin inside it fails instead of reading other text."""
-    span = block_scalar_span(text, key)
-    if span is None:
+def front_matter_block(key: str, text: str = QMD_RAW) -> str:
+    """Whitespace-normalized words of the front matter's one ``key: |``
+    literal block, read as Quarto and pandoc read it, without its HTML
+    comments. Pins that read it see no other metadata field, comment or body
+    text. When ``block_words`` finds no such block, or finds another line
+    that could set the key, the slice is empty, so every pin inside it fails
+    instead of reading other text."""
+    words = block_words(text, key)
+    if words is None:
         failures.append(f"paper must set {key} only in one {key}: | block of its front matter")
         return ""
-    return " ".join(text[span[0] : span[1]].split())
+    return words
 
 
 COUNT_WORDS = (
@@ -754,20 +761,21 @@ check(
 
 # Figures in the abstract also appear in the body or its tables, so their
 # abstract ties read only the front matter's `abstract: |` block, as Quarto
-# and pandoc read it. Other metadata fields, comments and body text fall
-# outside that block, so a copy there cannot rescue a drifted figure, and a
-# metadata block in the body that sets the abstract fails every tie. Each tie
-# collects every rate the abstract gives in its rule's wording and requires
-# them all to equal the registered value, so a swap between rules fails, and
-# so does a changed rate that leaves a correct copy elsewhere in the abstract.
+# and pandoc read it. Other metadata fields, comments, HTML comments and body
+# text fall outside it, so a copy there cannot rescue a drifted figure. A key
+# that could set the abstract anywhere else, such as under `format: html:`,
+# or any metadata block in the body fails every tie. Each tie collects every
+# rate the abstract gives in its rule's full wording and requires them all to
+# equal the registered value, so a swap between rules fails, and so does a
+# changed rate that leaves a correct copy elsewhere in the abstract.
 ABSTRACT = front_matter_block("abstract")
 
 # Current retrospective results in the abstract are a separate experiment.
 ABSTRACT_RETROSPECTIVE_RULES = {
-    "cpi_u": "with the Consumer Price Index",
+    "cpi_u": "with the Consumer Price Index for All Urban Consumers (CPI-U)",
     "fcsuti_cpi": "with a composite price index",
     "replication_ratio": "with replicated consumption growth",
-    "blend": "with an equal blend",
+    "blend": "with an equal blend of the latter two",
 }
 retrospective = current_ce["projection_evaluation"]["summary_2020_2025"]
 check(

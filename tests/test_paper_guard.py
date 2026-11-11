@@ -964,22 +964,38 @@ INKIND_PROSE_MUTATIONS = (
 # Each case drifts figures in the abstract alone: (name, pattern, replacement,
 # failing ties, decoy). The body or a generated table states every one of these
 # figures too. The decoy restates the original wording, and the tests place it
-# at each of ABSTRACT_DECOY_HOSTS, so a tie that read more than the abstract
-# block, or that settled for one correct copy, would still pass.
+# at each of ABSTRACT_DECOY_HOSTS, so a tie that settled for one correct copy,
+# or for the first or last rate it found, would pass the edited paper. The
+# wording-removal cases in test_abstract_ties_skip_wording_outside_the_block
+# catch a tie that reads past the block.
 ABSTRACT_PROSE_MUTATIONS = (
     (
         "2020-2025 CPI-U error",
         r"2\.29(\s+)percent",
         r"2.30\1percent",
         ("abstract current projection cpi_u 2.29",),
-        "We obtain 2.29 percent with the Consumer Price Index.",
+        "We obtain 2.29 percent with the Consumer Price Index for All Urban Consumers (CPI-U).",
     ),
     (
         "2020-2025 CPI-U sign",
         r"2\.29(\s+)percent",
         "−2.29\\1percent",
         ("abstract current projection cpi_u 2.29",),
-        "We obtain 2.29 percent with the Consumer Price Index.",
+        "We obtain 2.29 percent with the Consumer Price Index for All Urban Consumers (CPI-U).",
+    ),
+    (
+        "2020-2025 CPI-U sign as an en dash",
+        r"2\.29(\s+)percent",
+        "\u20132.29\\1percent",
+        ("abstract current projection cpi_u 2.29",),
+        "We obtain 2.29 percent with the Consumer Price Index for All Urban Consumers (CPI-U).",
+    ),
+    (
+        "CPI-U rule renamed CPI-W",
+        r"All(\s+)Urban(\s+)Consumers(\s+)\(CPI-U\)",
+        r"Urban\1Wage\2Earners\3(CPI-W)",
+        ("abstract current projection cpi_u 2.29",),
+        "We obtain 2.29 percent with the Consumer Price Index for All Urban Consumers (CPI-U).",
     ),
     (
         "2020-2025 composite error",
@@ -1000,7 +1016,7 @@ ABSTRACT_PROSE_MUTATIONS = (
         r"0\.90(\s+)percent",
         r"0.91\1percent",
         ("abstract current projection blend 0.90",),
-        "We obtain 0.90 percent with an equal blend.",
+        "We obtain 0.90 percent with an equal blend of the latter two.",
     ),
     (
         "2025 blend error",
@@ -1038,8 +1054,8 @@ ABSTRACT_PROSE_MUTATIONS = (
             "abstract current projection cpi_u 2.29",
             "abstract current projection fcsuti_cpi 1.65",
         ),
-        "We obtain 2.29 percent with the Consumer Price Index and 1.65 percent "
-        "with a composite price index.",
+        "We obtain 2.29 percent with the Consumer Price Index for All Urban Consumers "
+        "(CPI-U) and 1.65 percent with a composite price index.",
     ),
     (
         "swapped 2025 errors",
@@ -1056,8 +1072,9 @@ ABSTRACT_PROSE_MUTATIONS = (
 
 # Where a decoy can restate an abstract figure's original wording: under the
 # discussion heading, in another front-matter field after the abstract block,
-# in body text before the introduction, and inside the abstract block itself.
-ABSTRACT_DECOY_HOSTS = ("discussion", "metadata", "preamble", "abstract")
+# in body text before the introduction, and as the abstract block's last or
+# first line.
+ABSTRACT_DECOY_HOSTS = ("discussion", "metadata", "preamble", "abstract", "abstract start")
 
 # Every tie this file's abstract mutations target.
 ABSTRACT_TIE_LABELS = (
@@ -2008,16 +2025,21 @@ class PaperGuardTests(unittest.TestCase):
         prose = path.read_text()
         span = PAPER_TEXT.block_scalar_span(prose, "abstract")
         self.assertIsNotNone(span, "fixture has no abstract block")
+        indent = re.search(r"^( +)\S", prose[span[0] : span[1]], re.M).group(1)
         if host == "abstract":
-            indent = re.match(r"[ \t]*", prose[span[0] :]).group()
             at, insert = span[1], f"{indent}{decoy}\n"
+        elif host == "abstract start":
+            at, insert = span[0], f"{indent}{decoy}\n"
         elif host == "metadata":
             at, insert = span[1], f'note: "{decoy}"\n'
         elif host == "preamble":
             at, insert = prose.index("\n# Introduction\n") + 1, f"{decoy}\n\n"
         else:
             self.fail(f"unknown decoy host: {host}")
-        path.write_text(prose[:at] + insert + prose[at:])
+        edited = prose[:at] + insert + prose[at:]
+        inside = decoy in (PAPER_TEXT.block_words(edited, "abstract") or "")
+        self.assertEqual(inside, host.startswith("abstract"), f"decoy misplaced at {host}")
+        path.write_text(edited)
 
     def run_abstract_mutation(self, pattern, replacement, decoy=None, host="discussion"):
         self.install_article()
@@ -2082,16 +2104,17 @@ class PaperGuardTests(unittest.TestCase):
                 )
         self.install_article()
 
-    def test_abstract_ties_skip_a_comment_after_the_block(self):
-        """YAML ends the abstract's block at a line indented less than the
-        block, a comment included, so a comment that keeps wording the
-        abstract dropped cannot satisfy the ties that read that wording."""
+    def test_abstract_ties_skip_wording_outside_the_block(self):
+        """Wording the abstract dropped cannot satisfy the ties that read it
+        from a comment after the block, which YAML ends at a line indented
+        less than the block, from a field before the abstract's key, or from
+        an HTML comment inside the block, which Quarto leaves unrendered."""
         cases = (
             (
                 "CPI-U rule renamed",
                 r"with(\s+)the(\s+)Consumer(\s+)Price(\s+)Index",
                 r"with\1the\2CPI-U\3price\4index",
-                "2.29 percent with the Consumer Price Index",
+                "2.29 percent with the Consumer Price Index for All Urban Consumers (CPI-U)",
                 ["abstract current projection cpi_u 2.29"],
             ),
             (
@@ -2105,24 +2128,38 @@ class PaperGuardTests(unittest.TestCase):
                 ],
             ),
         )
-        for name, pattern, replacement, comment, labels in cases:
-            with self.subTest(case=name):
-                self.install_article()
-                self.mutate_article("abstract", pattern, replacement)
-                path = self.repo / "paper/index.qmd"
-                prose = path.read_text()
-                span = PAPER_TEXT.block_scalar_span(prose, "abstract")
-                self.assertIsNotNone(span, "fixture has no abstract block")
-                path.write_text(f"{prose[: span[1]]} # {comment}\n{prose[span[1] :]}")
-                result = self.run_guard()
-                self.assertEqual(sorted(failure_lines(result.stdout)), sorted(labels))
+        places = {
+            "comment after the block": lambda prose, span, old: (span[1], f" # {old}\n"),
+            "field before the key": lambda prose, span, old: (
+                prose.index("\nabstract: |\n") + 1,
+                f"keywords: {json.dumps(old, ensure_ascii=False)}\n",
+            ),
+            "HTML comment inside the block": lambda prose, span, old: (
+                span[1],
+                f"  <!-- {old} -->\n",
+            ),
+        }
+        for name, pattern, replacement, old, labels in cases:
+            for place, insert in places.items():
+                with self.subTest(case=name, place=place):
+                    self.install_article()
+                    self.mutate_article("abstract", pattern, replacement)
+                    path = self.repo / "paper/index.qmd"
+                    prose = path.read_text()
+                    span = PAPER_TEXT.block_scalar_span(prose, "abstract")
+                    self.assertIsNotNone(span, "fixture has no abstract block")
+                    at, text = insert(prose, span, old)
+                    path.write_text(prose[:at] + text + prose[at:])
+                    result = self.run_guard()
+                    self.assertEqual(sorted(failure_lines(result.stdout)), sorted(labels))
         self.install_article()
 
     def test_abstract_block_fails_closed_unless_one_key_sets_the_abstract(self):
-        """A folded, repeated or relocated `abstract: |` key, or a metadata
-        block in the body that sets the abstract, empties the abstract slice,
-        so every abstract tie fails instead of reading text that the paper
-        does not render as its abstract."""
+        """A folded, repeated, nested or relocated `abstract: |` key, a
+        metadata block in the body, or a lone carriage return in the front
+        matter empties the abstract slice, so every abstract tie fails
+        instead of reading text that the paper may not render as its
+        abstract."""
         prose = (self.repo / "paper/index.qmd").read_text()
         span = PAPER_TEXT.block_scalar_span(prose, "abstract")
         self.assertIsNotNone(span, "fixture has no abstract block")
@@ -2140,6 +2177,29 @@ class PaperGuardTests(unittest.TestCase):
                 "body metadata block sets the abstract",
                 ((DISCUSSION_HEADING, f"---\n{key}{block}---\n\n{DISCUSSION_HEADING}"),),
             ),
+            (
+                "format-level abstract",
+                (("    toc: true\n", "    toc: true\n    abstract: |\n      A copy for the web.\n"),),
+            ),
+            (
+                "explicit key with a comment in a body block",
+                ((DISCUSSION_HEADING, f"---\n? abstract # set here\n: |\n  A copy.\n---\n\n{DISCUSSION_HEADING}"),),
+            ),
+            (
+                "escaped key in a body block",
+                ((DISCUSSION_HEADING, f'---\n"\\x61bstract": A copy.\n---\n\n{DISCUSSION_HEADING}'),),
+            ),
+            (
+                "lone carriage return in the front matter",
+                (("Supplemental Poverty\n", "Supplemental Poverty\r"),),
+            ),
+        )
+        expected = sorted(
+            (
+                "paper must set abstract only in one abstract: | block of its front matter",
+                *ABSTRACT_TIE_LABELS,
+                *INKIND_ABSTRACT_TIE_LABELS,
+            )
         )
         for name, edits in cases:
             with self.subTest(case=name):
@@ -2147,13 +2207,7 @@ class PaperGuardTests(unittest.TestCase):
                 self.edit_article(edits)
                 result = self.run_guard()
                 self.assertNotEqual(result.returncode, 0)
-                failures = failure_lines(result.stdout)
-                for label in (
-                    "paper must set abstract only in one abstract: | block of its front matter",
-                    *ABSTRACT_TIE_LABELS,
-                    *INKIND_ABSTRACT_TIE_LABELS,
-                ):
-                    self.assertIn(label, failures)
+                self.assertEqual(sorted(failure_lines(result.stdout)), expected)
         self.install_article()
 
     def test_rolling_prose_figures_drift_from_the_sealed_forecast(self):
