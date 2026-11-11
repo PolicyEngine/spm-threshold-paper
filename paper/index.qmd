@@ -6,7 +6,7 @@ author:
     affiliations:
       - name: PolicyEngine
     email: max@policyengine.org
-date: 2026-09-13
+date: 2026-11-11
 date-format: long
 bibliography: ../bibliography/references.bib
 format:
@@ -44,9 +44,15 @@ abstract: |
   percent for CPI-U adjustment and 0.75 percent for consumption growth
   alone. We obtain the largest error for renters. Beyond available
   microdata, we project expenditure and rent records through 2035
-  under explicit assumptions about prices and real spending. We
-  evaluate prospective accuracy for 2025 only and leave several
-  official imputations unreplicated.
+  under explicit assumptions about prices and real spending. We also impute the five in-kind benefits BLS adds to spending. We
+  estimate that they raise replicated thresholds by 1.1 to 3.8 percent
+  and change 2022–2025 growth by less than one point per tenure with
+  the CE's spending summaries, each change within one standard error of
+  zero. From BLS's published
+  shares, we compute that its imputed benefits supply 5 to 13 percent
+  of its thresholds' growth beyond CPI-U over those years, and that its
+  price index and out-of-pocket spending supply the rest. We evaluate
+  prospective accuracy for 2025 only.
 ---
 
 # Introduction
@@ -73,7 +79,9 @@ framework initially carried the latest published thresholds forward,
 identifying the need for more timely consumption data to project new
 ones [@parolin2022]. Researchers also use price adjustment to hold
 anchored-SPM thresholds fixed in real terms and compare resources and
-policy across years [@wimer2016; @nasem2019]. An anchored standard
+policy across years [@wimer2016; @nasem2019]. Creamer [-@sehsd2026]
+proposes thresholds that update the standard of living once a decade and
+adjust it for prices with CPI-U in between. An anchored standard
 measures resource changes against a fixed real threshold; predicting
 the thresholds BLS will publish requires estimating changes in that
 standard.
@@ -110,8 +118,8 @@ benefits. The latter include broadband subsidies, energy assistance,
 school lunches, rental assistance, and the Special Supplemental
 Nutrition Program for Women, Infants, and Children (WIC). BLS normalizes
 spending to the reference family using the three-parameter equivalence
-scale and updates it to target-year dollars with a composite FCSUti
-price index [@betson1996; @garner2021].
+scale [@betson1996; @garner2021] and updates it to target-year dollars
+with a composite FCSUti price index [@blsspmhome].
 
 Let $E$ denote the pooled, survey-weighted 47th–53rd percentile band
 of reference-family FCSUti expenditures across all housing tenures.
@@ -126,8 +134,11 @@ $$
 The pooled expenditure band defines the basic-needs amount. The 1.2
 multiplier allows for other basic goods and services, and replacing the
 pooled housing mean with the tenure-specific mean differentiates the
-three thresholds. The revised official series uses an anchor share $s$
-of 0.82, compared with 0.83 in the preceding series [@bls2026corrected].
+three thresholds. In July 2026, BLS reissued its 2019–2024 thresholds after correcting its
+computer code [@bls2026corrected], and Creamer [-@creamer2026revising]
+describes the correction as a fix to the imputation of in-kind benefits.
+The corrected series sets $s$, the share of median expenditures, at
+0.82, where the earlier series used 0.83 [@creamer2026revising].
 
 We benchmark against the corrected BLS 2005–2024 workbook issued in July
 2026 and the published 2025 values. In particular, the 2019–2024
@@ -202,15 +213,19 @@ the FMLI outlay fields [@cepumd; @blsspmhome].
 
 Newer CE records combine grocery spending in one summary. We allocate
 80 percent of that summary to food; BLS specifies a narrower item-code
-allocation in its errata. We omit home-internet spending and in-kind
-imputations because the public FMLI summaries lack those components.
+allocation in its errata. We omit home-internet spending because the
+public FMLI summaries lack it, and we add imputed in-kind benefits in
+@sec-inkind.
 
 We normalize each consumer unit's expenditures to the two-adult,
 two-child reference family before estimating the expenditure band and
 housing means. We use CE interview survey weights and an inclusive
 47th–53rd percentile band from a midpoint weighted cumulative
-distribution. We adjust prices annually by collection year; BLS
-adjusts them quarterly. For each target year, we derive
+distribution. We adjust each interview's spending with the annual index for its
+collection year. BLS adjusts each quarter's spending to threshold-year
+dollars with an index it produces as an annual average [@blsspmhome;
+@bls2025thresholds], and we have not established which year's index it
+applies to each interview quarter. For each target year, we derive
 expenditure-deflation weights from the selected CE sample before
 selecting the percentile band. We use separate, fixed weights for the
 price comparator in @sec-projection. We have not verified the
@@ -220,15 +235,17 @@ Independent minors can form CE consumer units, so age counts alone
 cannot establish the SPM roles needed for equivalence scaling. We
 exclude these unresolved records from the baseline sample. To test
 sensitivity, we assign one adult and retain the reported child count.
-This nonofficial recode leaves membership unresolved. We also exclude
-housing-tenure codes 5 and 6 and assign code 3 to owners with a
-mortgage. We have not established whether BLS applies the same sample
-rules.
+This nonofficial recode leaves membership unresolved. We also exclude units that occupy their homes without paying cash rent
+(tenure code 5) and units in student housing (code 6), as BLS does
+[@schild2023]. BLS also drops owners who do not report whether they hold
+a mortgage (code 3); we would assign them to owners with a mortgage, and
+these windows contain none. We have not established how BLS treats
+independent minors.
 
 ## Replicated levels and sample sensitivities
 
 We reconstruct seven target years, 2019–2025.
-@tbl-current-replication reports signed deviations from the revised
+@tbl-current-replication reports signed deviations from the corrected
 published thresholds. Differences vary by tenure and year, including
 positive deviations for owners without mortgages in later windows. The
 comparison measures the combined discrepancy; it does not identify the
@@ -258,13 +275,393 @@ changes no estimates. We cannot infer its effect in a sample that
 contains those records. We count consumer-unit interviews in the
 weighted shares, including repeated interviews.
 
-We test sensitivity to youth and tenure treatment. Annual price
-adjustment, the food allocation, omitted home internet and in-kind
-imputations, and percentile conventions can also affect the estimates. We
-have not estimated the replication’s sampling and imputation
-uncertainty. Published BLS standard errors provide scale for the level
-differences, but they do not account for replication error or covariance
-from shared survey inputs.
+We test sensitivity to youth and tenure treatment. The assignment of
+interviews to price years, the food allocation, omitted home internet and in-kind
+benefits (@sec-inkind), and percentile conventions can also affect the
+estimates. We estimate the replication's standard errors with the CE's
+replicate weights (@sec-inkind-uncertainty). They run 0.85 to 1.35 times
+BLS's published ones for owners with mortgages, 1.01 to 1.95 times for
+owners without mortgages, and 0.66 to 1.02 times for renters. Garner [-@garner2010] estimated the standard errors of earlier BLS
+thresholds by balanced repeated replication with the CE's 44 replicate
+weights, as we do, and Garner and Gudrais [-@garnergudrais2018] base
+theirs on the same 44 replicates. BLS's methods page and threshold
+workbooks do not say how its current replicates treat the percentile
+band or the imputed benefits, so the two calculations can still differ. We use many of the same
+CE interviews as BLS, so neither set of standard errors measures the
+sampling error in the gap between our thresholds and BLS's.
+
+# Imputing in-kind benefits {#sec-inkind}
+
+Before it estimates the thresholds, BLS adds the value of five in-kind
+benefits to each consumer unit's out-of-pocket FCSUti: school lunches,
+WIC, payments from the Low Income Home Energy Assistance Program
+(LIHEAP), broadband subsidies, and rental assistance [@blsspmhome]. It
+adds no benefits from the Supplemental Nutrition Assistance Program
+(SNAP). Because SNAP benefits arrive by electronic benefit transfer
+(EBT), BLS assumes that households use them like cash or credit to buy
+food, so reported food spending already includes them [@blsspmhome].
+For the same reason, it stops adding WIC once a state fully implements
+WIC EBT [@blsspmhome; @schild2023]. BLS describes its current imputation
+models briefly on its methods page [@blsspmhome], and Garner and Gudrais
+[-@garnergudrais2018] document an earlier version in more detail. BLS
+has not published its code, so we implement the page's description in
+the companion calculator and rerun the 2019–2025 replication with the
+five benefits [@spmcalculator2026inkind].
+Without them, the rerun reproduces the thresholds behind
+@tbl-current-replication exactly. We omit the benefits from the
+projections, the 2025 nowcast, and the conditional forecasts in later
+sections.
+
+## Imputation models
+
+As BLS describes, we fit weighted logistic regressions on households in
+the Current Population Survey Annual Social and Economic Supplement (CPS
+ASEC) and use them to assign participation in free or reduced-price
+school lunch, WIC, LIHEAP, and broadband subsidies to CE consumer units
+[@blsspmhome; @cpsasec]. We assign each CE interview to its collection
+year, and first-quarter interviews to the year before. For each of those
+reference years, we use donors from the following year's CPS ASEC. For all four programs, we use covariates that both surveys
+measure: income relative to the official poverty threshold; receipt of
+SNAP, public assistance, Supplemental Security Income, and housing
+assistance; tenure; and household size. We also use counts of children
+under 5, children aged 5–18, members 65 and older, and earners, along
+with the reference person's age, sex, race, Hispanic origin, and
+education. We add state or region indicators where the CE identifies them. We scale
+the survey weights to average one and add a ridge penalty of one to
+every slope, in these models and in the amount and rent regressions
+below. Garner and Gudrais [-@garnergudrais2018] list the covariates of
+BLS's earlier models. Their list includes marital status, employment
+status, disability, single parenthood, Medicaid, and urban residence,
+which ours omits, and they pool five years of CPS ASEC households with
+state fixed effects, where we fit each reference year separately. The
+school lunch model covers households with a member aged 5–18. The WIC
+model covers the CPS ASEC WIC universe as BLS defines it: households
+with a woman aged 15 to 45, or with a child under 5 and a woman aged 15
+or older [@blsspmhome]. For the 2025 thresholds, as BLS does, we also let the WIC model assign participation
+to CE units that have a child under 5 but no woman aged 15 or older
+[@blsspmhome].
+
+We assign LIHEAP and broadband amounts by predictive mean matching. We
+run a weighted regression of log amounts on the covariates among CPS
+ASEC recipients, and each imputed CE recipient takes the amount of one
+of the five recipients nearest it in predicted value. Households report their LIHEAP amounts. For broadband, households report
+the months they received a subsidy, and Census values each month at the program's monthly benefit for their area, from 2021 until the Affordable Connectivity Program ended in June 2024 [@spmtechnical].
+
+BLS assigns each imputed participant a free or reduced-price lunch from
+the unit's before-tax income and values it with amounts it receives from
+Census staff [@blsspmhome]. We do not have those amounts. From reference
+year 2018, we use the value Census assigns each SPM unit, which every
+public CPS ASEC person file carries from the 2019 file onward
+[@spmtechnical]. In those years, each imputed participant receives the
+value Census assigns a participating CPS ASEC household in its cell. We
+form cells by state, SNAP receipt, income group, and number of
+school-age children, top-coded at four, and scale the value to the
+unit's children aged 5–18. We split the income groups at 150 percent of
+the official poverty line. When a cell has fewer than five donors, or
+the CE withholds the unit's state, we widen it in steps: from state to
+region, then across numbers of children, then across regions, and last
+to all donors. Census applies its pandemic-year methods in those values,
+and BLS says it follows them [@blsspmhome; @spmtechnical]. For reference
+years 2014–2017, Census publishes SPM-unit values in research files, and
+for 2017 also in the 2018 CPS ASEC Bridge File, while the CPS ASEC family
+records carry its traditional valuation, `F_MV_SL` [@spmtechnical]. We
+read none of these. For those years, we value each CPS
+ASEC donor's reported lunches at USDA's reimbursement and donated-food
+rates over 179 school days. We use the free rate below 150 percent of
+the poverty line and otherwise choose the free or reduced-price rate
+with equal probability, as BLS does for CE units [@blsspmhome]. We then
+carry those donor values to CE units through the same cells.
+
+Following Census [@spmtechnical], we count every child under 5 in each
+participating unit, plus one mother if the unit has a child aged 0 or 1.
+We count that mother only when the unit has a woman aged 15 or older, so
+in the units we add to the WIC universe for 2025, we count the children
+alone. If the unit has no child under 5, we count one pregnant woman. We
+give each participant twelve months of USDA's national average monthly
+food cost for the fiscal year that matches the unit's reference year. We
+add no WIC when the unit's state had fully implemented WIC EBT
+by the midpoint of its three-month reference period. When the CE
+suppresses a unit's state, we draw that status with probability equal
+to the weighted share of known-state units in the same region and
+quarter whose states had done so.
+
+For rental assistance, BLS fits a limited dependent variable model that
+treats assisted renters' rents as censored from above, and it values the
+benefit as imputed market rent less rent paid [@blsspmhome]. Garner and
+Gudrais [-@garnergudrais2018] document an earlier two-step model: a
+logistic regression for paying market rent, then, among the renters who
+do, a regression of log rent on building characteristics and the first
+step's Mills ratio, with state and year effects. They predict a market
+rent for each assisted unit and count a subsidy where that rent exceeds
+the rent paid. We fit a weighted Tobit model of log monthly rent on CE
+renters in each reference year, and treat the rents of units that report
+government-reduced rent or public housing as censored from above at the
+rent they pay. We condition on bedrooms, bathrooms, building type,
+urbanicity, population size, state or region, and interview quarter. We
+leave unassisted renters who pay under \$50 a month, and assisted
+renters who report no rent, out of the fit. We draw a market rent from the fitted distribution above each assisted
+unit's paid rent and value its benefit at twelve times the difference,
+so every assisted unit receives a positive benefit.
+
+We draw five implicates, each with a fresh draw of every model's
+parameters from their estimated sampling distribution [@rubin1987], so that we can measure imputation uncertainty from the spread across
+implicates. We add
+every benefit to FCSUti and add LIHEAP and rental assistance to shelter
+and utilities as well. We carry each unit's benefits to threshold-year
+dollars with the price factor we apply to its out-of-pocket spending.
+
+## Threshold levels
+
+We estimate that the imputed benefits raise the replicated thresholds
+by 1.1 to 3.8 percent. With them, we estimate thresholds that exceed
+BLS's for every tenure in every year, by 0.26 to 3.53 percent
+(@tbl-inkind-levels). We read the CE's shelter, utilities, and food summaries, and we omit
+home internet, which averages \$547 to \$878 per unit in BLS's band and
+supplies 1.85 to 2.55 percent of each BLS threshold. Those summaries include rent and meals received as pay,
+other lodging such as vacation homes and lodging on out-of-town trips
+[@ceglossary], and utilities for vacation homes [@cepumd]. Garner and
+Munoz [-@garner2021] restrict shelter to the primary residence and leave
+out rent and meals received as pay. They count owners' utilities for the
+primary residence only, and renters' utilities for any property but a
+rented vacation home. When we follow their written definitions, we
+remove those amounts and the vacation-home mortgage principal we add to
+shelter. We then estimate that the out-of-pocket replication trails BLS
+by 1.98 to 4.20 percent. When we also add the imputed benefits, we estimate
+thresholds between 1.71 percent below and 1.47 percent above BLS's, and
+the mean absolute deviation falls from 3.14 to 0.72 percent. That fit
+relies on the internet we omit. On the components both series hold, we
+estimate thresholds that exceed BLS's in every tenure and year, by 0.83
+to 3.80 percent under the written definitions and by 2.34 to 5.86
+percent with the CE summaries.
+
+::: {#tbl-inkind-levels}
+{{< include tables/inkind_levels.md >}}
+
+We report the signed deviation of the replication with imputed in-kind
+benefits from each published national threshold. In each cell, we give
+the deviation with the CE summaries first, then with the shelter,
+utilities, and food definitions of @garner2021. We deflate both with the
+replication's composite CPI.
+:::
+
+## BLS's imputed amounts
+
+BLS computes each component's share of each threshold from band means
+and publishes the shares, together with each tenure's share of the band
+[@blsspmshares; @bls2025thresholds]. The 2019–2024 shares reproduce the
+thresholds BLS reissued in July 2026. Let $C$ sum the components common to
+every tenure and $P_h$ denote tenure $h$'s share of the band, so that
+$\overline{FCSUti}_E=\overline{C}_E+\sum_h P_h\,\overline{SU}_{E,h}$.
+Each threshold then satisfies
+
+$$
+B_{T,h}/s=\overline{C}_E+\overline{SU}_{E,h}+0.2\,\overline{FCSUti}_E,
+$$
+
+and a component's share times $B_{T,h}/s$ gives its band mean in
+dollars. Besides its broadband subsidy row, BLS publishes two internet rows. We use the one that gives
+equal dollars across tenures: "OOP Internet" through 2024 and "Total
+Internet Share" in 2025. We treat that row as including broadband
+subsidies and subtract them to recover home internet spending. With that reading,
+BLS's published shares, thresholds, and tenure shares satisfy both
+identities within \$0.00001 in every year from 2019 to 2025.
+
+Between the 2022 and 2025 thresholds, BLS's imputed benefits rose from
+\$855 to \$1,257 per unit in its band, and we estimate that ours rose
+from \$1,027 to \$1,173, a rise of \$146 with a standard error of \$191
+(@tbl-inkind-amounts). Of the \$256 difference between the two rises,
+rental assistance supplies \$169 and school lunch \$94, and the other
+three benefits narrow it by \$7. From the 2019 to the 2022 thresholds, BLS's rental
+assistance per renter rose 17 percent, and we estimate that ours rose 20
+percent (@tbl-inkind-series). For the 2019–2023
+thresholds, we estimate rental assistance per renter 71 to 80 percent
+above BLS's, \$1,331 against \$738 in 2022. BLS's amount then rose to
+\$940 in 2024 and \$1,243 in 2025, where we estimate \$1,446. From 2022
+to 2025, BLS's amount rose by \$505, and we estimate that ours rose by
+\$115, with a standard error of \$444. BLS draws on many of the same CE
+interviews, so that standard error does not measure the sampling error
+in the gap between the two rises. We have not established what produces
+the level gap or what raised BLS's amount in 2024 and 2025
+(@sec-inkind-uncertainty).
+
+::: {#tbl-inkind-amounts}
+{{< include tables/inkind_amounts.md >}}
+
+We report mean imputed benefits per consumer unit in the 47th–53rd
+percentile band, in threshold-year dollars for the reference family.
+Rental assistance per renter averages over all renters in the band. We
+average the replication rows across five implicates and compute changes
+from unrounded amounts. Parentheses give each replication change's
+standard error.
+:::
+
+::: {#tbl-inkind-series}
+{{< include tables/inkind_series.md >}}
+
+We report mean imputed benefits per consumer unit (All) and rental
+assistance per renter (Rental) in the 47th–53rd percentile band, by
+threshold year, in threshold-year dollars. We average the replication
+across five implicates and give its standard error in parentheses. We
+recover BLS's values from its published shares.
+:::
+
+## Threshold growth, 2022–2025
+
+From 2022 to 2025, CPI-U rose 10.01 percent, BLS's
+FCSUti price index 14.19 percent, and BLS's thresholds 20.63 to 22.15
+percent (@tbl-inkind-growth). Schild [-@schild2023] attributes 7.21
+points of the 2021–2022 rise in the thresholds BLS first published to
+its FCSUti index, and 2.5 to 2.9 points to newer CE data and changes in
+BLS's code for imputing in-kind benefits. We use CPI-U's official annual
+averages. BLS's 2025 thresholds page uses a twelve-month 2025 average
+with October interpolated, 138.289 against the official 138.198 (2013 =
+100) [@bls2025thresholds], which puts CPI-U's 2022–2025 growth at 10.08
+percent. We estimate that the imputed benefits
+change the replication's growth by +0.06 points for owners with
+mortgages, +0.91 for owners without mortgages, and −0.62 for renters,
+each within one standard error of zero (@sec-inkind-uncertainty). When
+we deflate with
+BLS's FCSUti index instead of the replication's composite CPI, growth
+rises by 0.9 to 2.0 points, more in every tenure than the benefits move
+it. Under the
+written definitions and BLS's index, growth with the benefits comes
+within 0.8 points of BLS's for every tenure. With the written
+definitions and the replication's composite CPI, we estimate that the
+benefits change growth by +0.09, −1.51, and −0.05 points.
+
+```{=latex}
+\Needspace{22\baselineskip}
+```
+
+::: {#tbl-inkind-growth tbl-colwidths="[40,20,20,20]"}
+{{< include tables/inkind_growth.md >}}
+
+We report national threshold growth from 2022 to 2025. Each replication
+row reports growth without imputed benefits, and the row below it
+reports growth with them, followed by the between-implicate standard
+deviation of the change in points. In the final two rows, we apply the
+shelter, utilities, and food definitions of @garner2021.
+:::
+
+BLS's shares, its FCSUti index, and CPI-U split each threshold's growth
+beyond CPI-U into three parts (@tbl-inkind-accounting). For owners with
+mortgages, BLS's threshold outgrew CPI-U by 11.61 points of its 2022
+level. The FCSUti index outgrew CPI-U by 4.18 points, which, on the
+threshold's out-of-pocket terms, supplies 4.11 points. Growth in the
+imputed benefits' terms beyond CPI-U supplies 0.57 points, and growth in
+out-of-pocket spending beyond BLS's index supplies the remaining 6.92.
+The three parts supply 4.10, 0.81, and 5.72 of 10.63 points for owners
+without mortgages, and 4.04, 1.57, and 6.54 of 12.14 points for renters.
+Imputed benefits therefore supply 4.9, 7.6, and 12.9 percent of BLS's
+growth beyond CPI-U, and we estimate 2.2, 2.8, and 2.0 percent for ours.
+We compute each share as $(I_{2025}-\pi I_{2022})/(B_{2025}-\pi
+B_{2022})$, where $I$ sums the imputed benefits' terms in threshold $B$
+and $\pi$ denotes CPI-U's growth factor. If we apply the index's lead to
+the benefits' terms as well, out-of-pocket spending keeps its part and
+the benefits supply 4.3, 6.8, and 11.7 percent. The split takes each year's
+band means as BLS's shares give them, so it leaves out how the benefits
+change which units fall in the band; in our replication, that re-ranking
+moves 2022–2025 growth by −0.01, +0.82, and −0.34 points. The
+out-of-pocket part combines real spending growth with changes in the
+sample as newer CE quarters replace older ones.
+When we deflate with the composite CPI and remove the imputed terms from
+both series, the replication's renter shortfall narrows from 2.40 to 0.94 points.
+
+```{=latex}
+\Needspace{14\baselineskip}
+```
+
+::: {#tbl-inkind-accounting}
+{{< include tables/inkind_accounting.md >}}
+
+We split BLS's 2022–2025 threshold growth beyond CPI-U into three
+parts, in points of the 2022 threshold, from its published shares, its
+FCSUti index, and CPI-U. Parentheses give each part's share of that
+growth.
+:::
+
+For renters from 2024 to 2025, where the 2025 nowcast missed most
+(@sec-evaluation), BLS's threshold grew 6.33 percent. With its imputed
+benefits' terms removed from both years, it grows 5.71 percent, 0.62
+points less, and rental assistance alone accounts for 0.57 of those
+points. BLS's rental assistance per renter rose from \$940 to \$1,243
+between those thresholds, and we estimate that ours rose from \$1,258 to
+\$1,446. With our imputed benefits, we estimate the retrospective replication's
+renter growth at 4.84 percent, against 4.85 percent without them.
+
+## Uncertainty and limitations {#sec-inkind-uncertainty}
+
+We estimate sampling uncertainty by balanced repeated replication with
+the CE's 44 replicate weights [@blscese; @spmcalculator2026se]. Under
+each replicate weight, we rerun the whole threshold estimator with and
+without the imputed benefits, from the expenditure-deflation weights to
+the percentile band, and hold each implicate's imputed amounts fixed.
+When we deflate with BLS's FCSUti index instead of the replication's
+composite CPI, we apply its published values in every replicate, so the
+price factors do not vary. We
+combine the replicate variance with the variance across implicates by
+Rubin's rules [@rubin1987]. For the benefits' change to 2022–2025
+growth, we estimate standard errors of 0.74 points for owners with
+mortgages, 2.54 for owners without mortgages, and 1.01 for renters.
+Under either price index, every change lies within three-quarters of a
+standard error of zero. For the 2022–2025 rises in our band amounts, we
+estimate standard errors of \$191 for all imputed benefits, \$444 for
+rental assistance per renter, and \$50 for school lunch. For the
+benefits' lift to each year's threshold with the composite CPI, we
+estimate standard errors of 0.31 to 0.61 points for owners with mortgages and renters, whose lifts
+exceed five standard errors in every year. For owners without mortgages,
+we estimate standard errors of 1.04 to 2.00 points, and the 2021–2025
+lifts each fall within 1.5 standard errors of zero.
+
+We estimate that the spread across implicates accounts for 17 to 46
+percent of each change's variance under Rubin's rules. Because we draw
+fresh model parameters for each implicate, that spread includes part of
+the models' estimation uncertainty. We estimate the parameter
+covariances without accounting for either survey's strata or clusters.
+Since we fix each implicate's imputed amounts, the replicate variance
+leaves out sampling variation in the rental model's fit and in the CPS
+ASEC donor samples. BLS imputes missing CE income five times, and we
+use the mean of the five as each unit's income, so our standard errors
+also leave out the spread across them. For
+most units interviewed in both 2015Q1 and 2015Q2, or in both 2016Q4 and
+2017Q1, BLS leaves a different set of replicate weights blank in the two
+quarters. Replicates for the 2019–2021 thresholds, whose windows span at
+least one of those pairs, can then miss part of the correlation between
+a unit's interviews.
+
+We use one covariate set for the CPS-to-CE models across programs and
+years, and the CE and CPS ASEC measure income differently: the CE's before-tax
+income, which we divide by the poverty threshold, includes SNAP
+benefits, and the CPS ASEC's money income does not [@cepumd; @cpsasec]. We take reported rents as exact in the rental model. Garner and Gudrais
+[-@garnergudrais2018] pool the window's years, condition their first
+step on program participation and household characteristics, and assign
+each assisted unit its predicted rent; we fit each reference year
+separately on unit characteristics and draw each market rent. The public
+files do not identify rent-controlled units, and our market-rent sample
+keeps units that receive rent as pay. Our school lunch donors report free or reduced-price lunches, while
+Census also values paid lunches and, for respondents who report EBT
+benefits but no SNAP, summer EBT [@spmtechnical]. BLS says it values school lunches by the
+traditional method before and after the COVID-19 period [@blsspmhome],
+and we use Census's SPM-unit values for every reference year from 2018;
+from reference year 2023, Census estimates those values with its fall
+2022 method [@spmtechnical]. Census accounts for Pandemic EBT in its
+2020 and 2021 values, and states paid those benefits on EBT cards; under
+BLS's reasoning for SNAP, reported food spending may already include
+them. We value WIC at USDA's national average food cost, while Census uses
+state averages [@spmtechnical] and BLS assigns the WIC values Census
+staff supply [@blsspmhome]. BLS adds broadband subsidies
+from the 2023 thresholds [@bls2025thresholds], and we impute them from
+reference year 2021, so they also enter our 2022 thresholds. In the written-definition runs, we follow @garner2021 with two
+exceptions. We keep spending under two codes for other fuels in vacation
+homes, which the FMLI summaries of vacation-home utilities leave out
+[@cepumd]. We also keep owners' spending under the CE's rented-dwelling
+summary, which averages \$64 to \$683 per owner without a mortgage in
+the band, and renters' spending under its owned-dwelling summary.
+BLS's current code may differ from that paper. BLS changed the CE
+Interview's sections on owned and rental property and on utilities and
+fuels in April 2024 [@cegemini], and interviews from April 2024 on first
+enter the 2025 thresholds. We have not tested whether rents, housing
+assistance, or utilities shift at that change.
 
 # Projecting thresholds {#sec-projection}
 
@@ -446,9 +843,13 @@ any of these rankings will persist.
 The largest miss occurs for renters. BLS reports renter growth of 6.33
 percent against 5.33 and 4.40 percent for the two owner tenures. The
 blend projects renter growth of 3.92 percent, and replication alone 4.62
-percent. Omitted imputations, price treatment, sample classification,
-and percentile conventions can each affect growth. The comparison does
-not isolate their contributions to the renter miss.
+percent. If we take each year's band as BLS's shares give it and remove its
+imputed benefits' terms from both years, that renter growth falls by 0.62 points, mostly
+because of rental assistance.
+We estimate that ours change the retrospective replication's renter
+growth by −0.01 points (@sec-inkind). Price treatment, sample
+classification, and percentile conventions can also affect growth, and
+the comparison does not isolate their contributions to the renter miss.
 
 ## Validation of the price comparator
 
@@ -473,10 +874,11 @@ backtest's fixed-2019-base composite, with the CPI-U figures alongside.
 :::
 
 For 2025, the BLS threshold page reports CPI-U growth of 2.70 percent,
-compared with 2.63 percent implied by the eleven-month annual average in
-the pinned CPI observations. The threshold page does not reconcile this
-difference with the CPI program's documented eleven-month averaging rule
-[@blscpi2025shutdown]. The forecast evaluation uses the recorded
+and the eleven-month annual average in the pinned CPI observations
+implies 2.63 percent. To make CPI-U comparable with its twelve-month
+FCSUti index, BLS interpolates October 2025 on that page, which gives a
+2025 average of 138.289 against the official eleven-month average of
+138.198 [@bls2025thresholds; @blscpi2025shutdown]. The forecast evaluation uses the recorded
 eleven-month average.
 
 # Conditional forecasts beyond available microdata {#sec-rolling}
@@ -647,20 +1049,27 @@ they do not estimate survey-design uncertainty.
 
 # Discussion {#sec-discussion}
 
-We approximate published threshold levels from public CE data. Sample
-treatment, price adjustment, and omitted imputations can affect the
-estimates; we do not isolate their contributions to the observed
-discrepancies. Stable proportional differences cancel in adjacent-year
+We approximate published threshold levels from public CE data. We
+estimate that imputing in-kind benefits raises our levels by 1.1 to 3.8
+percent, and shelter definitions and the omitted home internet also
+move them (@sec-inkind).
+Sample treatment and price adjustment can affect the estimates; we do
+not isolate their contributions to the observed discrepancies. Stable proportional differences cancel in adjacent-year
 growth ratios. We evaluate those growth ratios separately from
 threshold levels.
 
 In the periods examined, consumption-based growth improves on CPI-U
 adjustment as a predictor of published SPM thresholds. Annual
 re-estimation reflects consumption changes that price adjustment alone
-omits, consistent with the measure’s quasi-relative construction. The
-comparisons do not separate contributions from real spending, relative
-prices, sample composition, and in-kind benefits. Price-indexed anchored
-measures serve a different purpose: they hold the real standard fixed.
+omits, consistent with the measure’s quasi-relative construction. From 2022 to 2025, BLS's FCSUti index supplies 33 to 39 percent of its
+thresholds' growth beyond CPI-U, its imputed benefits 5 to 13 percent,
+and out-of-pocket spending the rest; we do not separate real spending
+from sample composition within that last part (@sec-inkind). With the
+CE's spending summaries, we estimate that imputing in-kind benefits
+changes our 2022–2025 growth by −0.62 to +0.91 points, each within one
+standard error of zero. Price-indexed
+anchored measures serve a different purpose: they hold the real standard
+fixed [@wimer2016; @sehsd2026].
 
 We evaluate prospective performance against one year's outcome. We run
 the six-year comparison on revised data after BLS published all six
@@ -729,12 +1138,24 @@ digest is:
 3d86d5c4c0423480e6b69b75d222ffa4a7a2639e4094df5ba2504af01be17173
 ```
 
+For the in-kind experiment in @sec-inkind, we keep three receipts from
+spm-calculator, with their provenance and checksums, in the paper
+repository's [`data/inkind`](https://github.com/PolicyEngine/spm-threshold-paper/tree/inkind-section-2026-11/data/inkind) folder: the imputation, the comparison with BLS's components, and the
+replicate-weight standard errors, all at commit
+`53cb0fa08a0ca2fe1ea4b15a32ec77090ca8b91c`. Before each render, we
+check that the out-of-pocket run reproduces the retrospective
+replication artifact exactly. We then recompute every in-kind estimate
+in the tables and text from the receipts' thresholds, band means, and
+replicate thresholds.
+
 The input manifests record exact source and release identities. The
 [data
 provenance](https://github.com/PolicyEngine/spm-threshold-paper/blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0/data/PROVENANCE.md)
 and [forecast
 record](https://github.com/PolicyEngine/spm-threshold-paper/blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0/docs/forecast-record.md)
-identify each experiment’s inputs and evidence.
+identify the inputs and evidence of the earlier experiments, and
+[`data/inkind/provenance.json`](https://github.com/PolicyEngine/spm-threshold-paper/blob/inkind-section-2026-11/data/inkind/provenance.json)
+those of the in-kind experiment.
 
 To verify the reported tables, clone the paper repository with its full
 tag history and check out the manuscript revision being evaluated. Run

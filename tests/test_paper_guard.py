@@ -1,9 +1,11 @@
 """Mutation tests run the real guard in independent temporary Git clones."""
 
 import hashlib
+import importlib.util
 import json
 import math
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -180,6 +182,806 @@ ROLLING_PROSE_MUTATIONS = (
         "rolling thin-donor warnings cover 31",
     ),
 )
+
+
+INKIND_HEADING = "# Imputing in-kind benefits {#sec-inkind}\n"
+PROJECTION_HEADING = "# Projecting thresholds {#sec-projection}\n"
+INKIND_NAMES = (
+    "ce_inkind_bls_components_2019_2025.json",
+    "ce_inkind_replication_2019_2025.json",
+    "ce_replicate_uncertainty_2019_2025.json",
+    "provenance.json",
+)
+REPLICATION_HEADING = "# Replication from public consumption data {#sec-replication}\n"
+
+# Each case drifts one in-kind figure where the paper states it. The lift
+# range also appears in the abstract and the discussion, so the first case
+# fails only because the pin reads the in-kind section itself.
+INKIND_PROSE_MUTATIONS = (
+    ("lift range", "section", r"1\.1(\s+)to(\s+)3\.8", r"1.2\1to\g<2>3.8", "in-kind lift range"),
+    ("abstract lift range", "abstract", r"1\.1(\s+)to(\s+)3\.8", r"1.1\1to\g<2>3.9", "abstract in-kind lift range"),
+    (
+        "swapped stage changes",
+        "section",
+        r"\+0\.06(.*?)\+0\.91",
+        r"+0.91\1+0.06",
+        "stage changes in tenure order",
+    ),
+    (
+        "rental assistance share of the difference",
+        "section",
+        r"\\\$169",
+        r"\\$196",
+        "difference in rises by benefit",
+    ),
+    (
+        "BLS imputed renter points",
+        "section",
+        r"5\.71(\s+)percent,(\s+)0\.62",
+        r"5.71\1percent,\g<2>0.66",
+        "BLS 2024-2025 renter growth without its imputed terms",
+    ),
+    (
+        "written-definition lower bound",
+        "section",
+        r"1\.71(\s+)percent(\s+)below",
+        r"1.72\1percent\2below",
+        "written-definition range with benefits",
+    ),
+    (
+        "vacation-home utilities",
+        "section",
+        r"and(\s+)utilities(\s+)for(\s+)vacation(\s+)homes",
+        r"and\1fuels\2for\3vacation\4homes",
+        "written-definition runs drop vacation-home utilities",
+    ),
+    (
+        "kept vacation-home fuel codes",
+        "section",
+        r"under(\s+)two(\s+)codes",
+        r"under\1three\2codes",
+        "written-definition runs keep the vacation-home fuel codes",
+    ),
+    ("implicate count", "section", r"We draw five implicates", "We draw four implicates", "implicate, matching-neighbor"),
+    (
+        "abstract stage changes",
+        "abstract",
+        r"less(\s+)than(\s+)one(\s+)point",
+        r"less\1than\2half\3a point",
+        "abstract stage changes under one point per tenure",
+    ),
+    (
+        "abstract accounting share",
+        "abstract",
+        r"supply(\s+)5(\s+)to(\s+)13(\s+)percent",
+        r"supply\g<1>5\2to\g<3>12\4percent",
+        "abstract and discussion: the accounting's shares",
+    ),
+    ("identity tolerance", "section", r"0\.00001", "0.000001", "BLS identity tolerance"),
+    (
+        "evaluation BLS renter growth",
+        "evaluation",
+        r"renter(\s+)growth(\s+)of(\s+)6\.33",
+        r"renter\1growth\2of\g<3>6.38",
+        "evaluation section's BLS growth rates for 2024-2025",
+    ),
+    (
+        "evaluation renter points",
+        "evaluation",
+        r"falls(\s+)by(\s+)0\.62(\s+)points",
+        r"falls\1by\g<2>0.72\3points",
+        "evaluation section cites BLS's imputed renter points",
+    ),
+    (
+        "appendix names the imputation's old commit",
+        "appendix",
+        r"`53cb0fa08a0ca2fe1ea4b15a32ec77090ca8b91c`",
+        "`4778dfab2d109515b6a14e63da63011dd7feb884`",
+        "appendix names the recorded calculator commits",
+    ),
+    (
+        "appendix standard-error commit",
+        "appendix",
+        r"`53cb0fa08a0ca2fe1ea4b15a32ec77090ca8b91c`",
+        "`53cb0fa08a0ca2fe1ea4b15a32ec77090ca8b910`",
+        "appendix names the recorded calculator commits",
+    ),
+    (
+        "replication standard-error ratios",
+        "replication",
+        r"0\.66(\s+)to(\s+)1\.02",
+        r"0.67\1to\g<2>1.02",
+        "replication standard errors relative to BLS's",
+    ),
+    (
+        "swapped replication standard-error ratios",
+        "replication",
+        r"0\.85(\s+)to(\s+)1\.35(.*?)1\.01(\s+)to(\s+)1\.95",
+        r"1.01\1to\g<2>1.95\g<3>0.85\g<4>to\g<5>1.35",
+        "replication standard errors relative to BLS's",
+    ),
+    (
+        "stage change within one standard error",
+        "section",
+        r"each(\s+)within(\s+)one(\s+)standard(\s+)error",
+        r"each\1within\2half\3a\4standard error",
+        "stage changes in tenure order, each within one standard error",
+    ),
+    (
+        "stage-change standard error",
+        "section",
+        r"2\.54(\s+)for",
+        r"2.45\1for",
+        "standard errors of the stage change",
+    ),
+    ("replicate count", "section", r"CE's(\s+)44(\s+)replicate", r"CE's\g<1>40\2replicate", "standard errors of the stage change"),
+    (
+        "three-quarters bound",
+        "section",
+        r"three-quarters(\s+)of(\s+)a",
+        r"half\1of\2a",
+        "every stage change within three-quarters of a standard error",
+    ),
+    (
+        "implicate variance share",
+        "section",
+        r"17(\s+)to(\s+)46(\s+)percent",
+        r"17\1to\g<2>45\3percent",
+        "implicate share of the stage change's variance",
+    ),
+    (
+        "half-sample quarters",
+        "section",
+        r"2016Q4(\s+)and(\s+)2017Q1",
+        r"2016Q3\1and\g<2>2016Q4",
+        "half-sample pattern changes",
+    ),
+    (
+        "half-sample thresholds",
+        "section",
+        r"Replicates(\s+)for(\s+)the(\s+)2019–2021",
+        r"Replicates\1for\2the\g<3>2019–2022",
+        "half-sample pattern changes",
+    ),
+    (
+        "stage-change standard error period",
+        "section",
+        r"change(\s+)to(\s+)2022–2025(\s+)growth",
+        r"change\1to\g<2>2021–2025\3growth",
+        "standard errors of the stage change",
+    ),
+    (
+        "stage changes moved out of the growth section",
+        "section",
+        r"(We estimate that the imputed benefits\s+change the replication's growth by .*?"
+        r"each within one standard error of zero) \(@sec-inkind-uncertainty\)\."
+        r"(.*?## Uncertainty and limitations \{#sec-inkind-uncertainty\}\n\n)",
+        r"\2\1. ",
+        "stage changes in tenure order, each within one standard error",
+    ),
+    (
+        "benefits' share with the index's lead on their terms",
+        "section",
+        r"benefits(\s+)supply(\s+)4\.3,(\s+)6\.8,",
+        r"benefits\1supply\g<2>6.8,\g<3>4.3,",
+        "accounting with the index's lead on the benefits' terms",
+    ),
+    (
+        "rental assistance per renter 2019-2022 growth",
+        "section",
+        r"renter(\s+)rose(\s+)17(\s+)percent",
+        r"renter\1rose\g<2>27\3percent",
+        "rental assistance per renter: 2019–2022 growth",
+    ),
+    (
+        "appendix receipt count",
+        "appendix",
+        r"we(\s+)keep(\s+)three(\s+)receipts",
+        r"we\1keep\2two\3receipts",
+        "appendix counts the receipts",
+    ),
+    # Labels, directions and the displayed formula: each figure stays put
+    # while the words that give it meaning change.
+    (
+        "swapped stage-change tenure labels",
+        "section",
+        r"\+0\.06(\s+)points(\s+)for(\s+)owners(\s+)with(\s+)mortgages,(\s+)\+0\.91(\s+)for(\s+)owners(\s+)without",
+        r"+0.06\1points\2for\3owners\4without\5mortgages,\6+0.91\7for\8owners\9with",
+        "stage changes in tenure order",
+    ),
+    (
+        "level comparison direction",
+        "section",
+        r"thresholds(\s+)that(\s+)exceed",
+        r"thresholds\1that\2fall below",
+        "replication with benefits exceeds BLS in every cell",
+    ),
+    (
+        "rental assistance level gap direction",
+        "section",
+        r"71(\s+)to(\s+)80(\s+)percent(\s+)above",
+        r"71\1to\g<2>80\3percent\4below",
+        "rental assistance per renter: level gap before 2024",
+    ),
+    (
+        "mean absolute deviation direction",
+        "section",
+        r"deviation(\s+)falls(\s+)from",
+        r"deviation\1rises\2from",
+        "written-definition mean absolute deviation",
+    ),
+    (
+        "deflator direction",
+        "section",
+        r"growth(\s+)rises(\s+)by(\s+)0\.9",
+        r"growth\1falls\2by\g<3>0.9",
+        "deflator effect exceeds the stage in every tenure",
+    ),
+    (
+        "renter shortfall direction",
+        "section",
+        r"shortfall(\s+)narrows",
+        r"shortfall\1widens",
+        "renter shortfall with imputed terms removed",
+    ),
+    (
+        "swapped share tenures",
+        "section",
+        r"supply(\s+)4\.9,(\s+)7\.6,(\s+)and(\s+)12\.9",
+        r"supply\g<1>12.9,\g<2>7.6,\3and\g<4>4.9",
+        "three-part accounting of BLS's growth beyond CPI-U",
+    ),
+    (
+        "swapped BLS and replication shares",
+        "section",
+        r"percent(\s+)of(\s+)BLS's(\s+)growth(\s+)beyond(\s+)CPI-U,(\s+)and(\s+)we(\s+)estimate",
+        r"percent\1of\2our\3growth\4beyond\5CPI-U,\6and\7BLS\8estimates",
+        "three-part accounting of BLS's growth beyond CPI-U",
+    ),
+    (
+        "share formula operator",
+        "section",
+        r"I_\{2025\}-\\pi",
+        r"I_{2025}+\\pi",
+        "displayed share formula reproduces BLS's shares",
+    ),
+    (
+        "share formula year",
+        "section",
+        r"\(I_\{2025\}",
+        r"(I_{2022}",
+        "displayed share formula reproduces BLS's shares",
+    ),
+    (
+        "school days",
+        "section",
+        r"179(\s+)school",
+        r"180\1school",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "WIC mother's minimum age",
+        "section",
+        r"has(\s+)a(\s+)woman(\s+)aged(\s+)15(\s+)or",
+        r"has\1a\2woman\3aged\g<4>18\5or",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "discussion accounting parts swapped",
+        "discussion",
+        r"FCSUti(\s+)index(\s+)supplies(\s+)33(\s+)to(\s+)39(\s+)percent(.*?)benefits(\s+)5(\s+)to(\s+)13",
+        r"FCSUti\1index\2supplies\g<3>5\4to\g<5>13\6percent\7benefits\g<8>33\9to\g<10>39",
+        "abstract and discussion: the accounting's shares",
+    ),
+    # Round 2: the verb or label beside each figure, and the method facts
+    # the section quotes, each changed while every figure stays put.
+    (
+        "lift direction",
+        "section",
+        r"imputed(\s+)benefits(\s+)raise(\s+)the(\s+)replicated",
+        r"imputed\1benefits\2lower\3the\4replicated",
+        "in-kind lift range",
+    ),
+    (
+        "abstract lift direction",
+        "abstract",
+        r"they(\s+)raise(\s+)replicated",
+        r"they\1lower\2replicated",
+        "abstract in-kind lift range",
+    ),
+    (
+        "discussion lift direction",
+        "discussion",
+        r"benefits(\s+)raises(\s+)our(\s+)levels",
+        r"benefits\1lowers\2our\3levels",
+        "discussion in-kind lift range",
+    ),
+    (
+        "swapped stages in the 2024-2025 renter growth",
+        "section",
+        r"With(\s+)our(\s+)imputed(\s+)benefits,(\s+)we(\s+)estimate(\s+)the(\s+)retrospective(.*?)without(\s+)them",
+        r"Without\1our\2imputed\3benefits,\4we\5estimate\6the\7retrospective\8with\9them",
+        "replication 2024-2025 renter growth with and without benefits",
+    ),
+    (
+        "swapped benefits in the difference",
+        "section",
+        r"rental(\s+)assistance(\s+)supplies(.*?)and(\s+)school(\s+)lunch",
+        r"school\1lunch\2supplies\3and\4rental\5assistance",
+        "difference in rises by benefit",
+    ),
+    (
+        "swapped owners of the imputed totals",
+        "section",
+        r"BLS's(\s+)imputed(\s+)benefits(\s+)rose(\s+)from(.*?)that(\s+)ours(\s+)rose",
+        r"our\1imputed\2benefits\3rose\4from\5that\6BLS's\7rose",
+        "BLS and replication imputed totals",
+    ),
+    (
+        "standard error of our rise",
+        "section",
+        r"standard(\s+)error(\s+)of(\s+)\\\$191",
+        r"standard\1error\2of\3\\$119",
+        "BLS and replication imputed totals",
+    ),
+    (
+        "swapped price series",
+        "section",
+        r"CPI-U(\s+)rose(\s+)10\.01(\s+)percent,(\s+)BLS's(\s+)FCSUti(\s+)price(\s+)index(\s+)14\.19",
+        r"BLS's FCSUti price index\1rose\g<2>10.01\3percent,\4CPI-U\g<8>14.19",
+        "price and BLS threshold growth",
+    ),
+    (
+        "growth caption window",
+        "section",
+        r"national(\s+)threshold(\s+)growth(\s+)from(\s+)2022",
+        r"national\1threshold\2growth\3from\g<4>2021",
+        "growth table caption names the growth window",
+    ),
+    (
+        "written-definition stage without benefits",
+        "section",
+        r"the(\s+)out-of-pocket(\s+)replication(\s+)trails",
+        r"the\1replication\2with benefits\3trails",
+        "written-definition out-of-pocket range",
+    ),
+    (
+        "written-definition stage with benefits",
+        "section",
+        r"When(\s+)we(\s+)also(\s+)add(\s+)the(\s+)imputed(\s+)benefits",
+        r"When\1we\2also\3remove\4the\5imputed\6benefits",
+        "written-definition range with benefits",
+    ),
+    (
+        "share formula deflator",
+        "section",
+        r"denotes(\s+)CPI-U's(\s+)growth",
+        r"denotes\1the FCSUti index's\2growth",
+        "displayed share formula reproduces BLS's shares",
+    ),
+    (
+        "BLS 2024-2025 renter split source",
+        "section",
+        r"and(\s+)rental(\s+)assistance(\s+)alone(\s+)accounts",
+        r"and\1school\2lunch\3alone\4accounts",
+        "BLS 2024-2025 renter growth without its imputed terms",
+    ),
+    (
+        "owner of the 2024-2025 rental assistance per renter",
+        "section",
+        r"BLS's(\s+)rental(\s+)assistance(\s+)per(\s+)renter(\s+)rose(\s+)from",
+        r"Our\1rental\2assistance\3per\4renter\5rose\6from",
+        "BLS 2024-2025 renter growth without its imputed terms",
+    ),
+    (
+        "renters' utilities rule",
+        "section",
+        r"renters'(\s+)utilities(\s+)for(\s+)any(\s+)property(\s+)but(\s+)a(\s+)rented(\s+)vacation(\s+)home",
+        r"renters'\1utilities\2for\3the primary residence only",
+        "written definitions read from fingerprinted calculator code",
+    ),
+    (
+        "kept fuel codes' reason",
+        "section",
+        r"vacation-home(\s+)utilities(\s+)leave(\s+)out",
+        r"vacation-home\1utilities\2include",
+        "written-definition runs keep the vacation-home fuel codes",
+    ),
+    (
+        "WIC universe year",
+        "section",
+        r"For(\s+)the(\s+)2025(\s+)thresholds,(\s+)as(\s+)BLS(\s+)does",
+        r"For\1the\g<2>2024\3thresholds,\4as\5BLS\6does",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "WIC universe rule",
+        "section",
+        r"but(\s+)no(\s+)woman(\s+)aged(\s+)15",
+        r"but\1no\2woman\3aged\g<4>18",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "WIC infant age",
+        "section",
+        r"child(\s+)aged(\s+)0(\s+)or(\s+)1\.",
+        r"child\1aged\g<2>0\3to\g<4>2.",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "WIC pregnant woman",
+        "section",
+        r"we(\s+)count(\s+)one(\s+)pregnant(\s+)woman",
+        r"we\1count\2two\3pregnant\4women",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "income imputations",
+        "section",
+        r"income(\s+)five(\s+)times",
+        r"income\1three\2times",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "amounts caption band",
+        "section",
+        r"consumer(\s+)unit(\s+)in(\s+)the(\s+)47th–53rd",
+        r"consumer\1unit\2in\3the\g<4>45th–55th",
+        "percentile band read from fingerprinted calculator code",
+    ),
+    (
+        "Census school lunch first year",
+        "section",
+        r"From(\s+)reference(\s+)year(\s+)2018,",
+        r"From\1reference\2year\g<3>2019,",
+        "Census school lunch values from their first reference year",
+    ),
+    (
+        "internet row years",
+        "section",
+        r'through(\s+)2024(\s+)and(\s+)"Total',
+        r'through\g<1>2023\2and\3"Total',
+        "BLS internet row by threshold year",
+    ),
+    (
+        "program count",
+        "section",
+        r"For(\s+)all(\s+)four(\s+)programs",
+        r"For\1all\2five\3programs",
+        "programs the participation models cover",
+    ),
+    (
+        "benefit count",
+        "section",
+        r"with(\s+)the(\s+)five(\s+)benefits",
+        r"with\1the\2four\3benefits",
+        "programs the participation models cover",
+    ),
+    (
+        "amounts caption implicate count",
+        "section",
+        r"across(\s+)five(\s+)implicates",
+        r"across\1four\2implicates",
+        "implicate, matching-neighbor and cell-donor counts",
+    ),
+    (
+        "WIC mother in the 2025 additions",
+        "section",
+        r"we(\s+)count(\s+)the(\s+)children(\s+)alone",
+        r"we\1count\2the\3children\4and one mother",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "years of the imputed totals",
+        "section",
+        r"Between(\s+)the(\s+)2022(\s+)and(\s+)2025(\s+)thresholds,(\s+)BLS's",
+        r"Between\1the\g<2>2021\3and\g<4>2025\5thresholds,\6BLS's",
+        "BLS and replication imputed totals",
+    ),
+    (
+        "tenure of the 2024-2025 split",
+        "section",
+        r"For(\s+)renters(\s+)from(\s+)2024(\s+)to(\s+)2025,",
+        r"For\1owners with mortgages\2from\g<3>2024\4to\g<5>2025,",
+        "BLS 2024-2025 renter growth without its imputed terms",
+    ),
+    (
+        "survey holding Census lunch values",
+        "section",
+        r"which(\s+)every(\s+)public(\s+)CPS(\s+)ASEC(\s+)person(\s+)file",
+        r"which\1every\2public\3CE\5person\6file",
+        "Census school lunch values from their first reference year",
+    ),
+    (
+        "programs in the participation list",
+        "section",
+        r"and(\s+)broadband(\s+)subsidies(\s+)to(\s+)CE(\s+)consumer",
+        r"and\1rental\2assistance\3to\4CE\5consumer",
+        "programs the participation models cover",
+    ),
+    (
+        "vacation-home principal kept",
+        "section",
+        r"amounts(\s+)and(\s+)the(\s+)vacation-home(\s+)mortgage",
+        r"amounts\1but keep\2the\3vacation-home\4mortgage",
+        "written definitions read from fingerprinted calculator code",
+    ),
+    (
+        "internet row rule",
+        "section",
+        r"gives(\s+)equal(\s+)dollars(\s+)across(\s+)tenures",
+        r"gives\1the\2most dollars\3across\4tenures",
+        "BLS internet reading from fingerprinted calculator code",
+    ),
+    (
+        "broadband in the internet row",
+        "section",
+        r"as(\s+)including(\s+)broadband(\s+)subsidies(\s+)and(\s+)subtract",
+        r"as\1excluding\2broadband\3subsidies\4and\5add",
+        "BLS internet reading from fingerprinted calculator code",
+    ),
+    (
+        "FCSUti price factors across replicates",
+        "section",
+        r"price(\s+)factors(\s+)do(\s+)not(\s+)vary",
+        r"price\1factors\2vary",
+        "FCSUti price factors held fixed across replicates",
+    ),
+    # Round 3 (the r4 review): the accounting, the level gap, the new
+    # standard errors and the method facts read from code.
+    (
+        "written-definition stage change",
+        "section",
+        r"by(\s+)\+0\.09,(\s+)−1\.51,",
+        r"by\1+0.09,\2−1.15,",
+        "written definitions with the composite CPI",
+    ),
+    (
+        "abstract names the CE summaries",
+        "abstract",
+        r"with(\s+)the(\s+)CE's(\s+)spending(\s+)summaries",
+        r"with\1the\2written\3shelter\4definitions",
+        "written definitions with the composite CPI",
+    ),
+    (
+        'internet share of thresholds',
+        'section',
+        '1\\.85(\\s+)to(\\s+)2\\.55',
+        '1.85\\1to\\g<2>2.65',
+        "home internet's share of BLS's thresholds",
+    ),
+    (
+        'common-component gap',
+        'section',
+        '0\\.83(\\s+)to(\\s+)3\\.80',
+        '0.83\\1to\\g<2>3.90',
+        'thresholds on the components both series hold',
+    ),
+    (
+        'common-component definitions swapped',
+        'section',
+        'under(\\s+)the(\\s+)written(\\s+)definitions(\\s+)and(\\s+)by(.*?)with(\\s+)the(\\s+)CE(\\s+)summaries',
+        'with\\1the\\2CE\\3summaries\\4and\\5by\\6under\\7the\\8written\\9definitions',
+        'thresholds on the components both series hold',
+    ),
+    (
+        'BLS 2025 rental assistance per renter',
+        'section',
+        '\\\\\\$1,243(\\s+)in(\\s+)2025',
+        '\\\\$1,234\\1in\\g<2>2025',
+        "rental assistance per renter: BLS's 2024 and 2025 rise",
+    ),
+    (
+        'standard error of our rental rise',
+        'section',
+        'with(\\s+)a(\\s+)standard(\\s+)error(\\s+)of(\\s+)\\\\\\$444',
+        'with\\1a\\2standard\\3error\\4of\\5\\\\$404',
+        "rental assistance per renter: BLS's 2024 and 2025 rise",
+    ),
+    (
+        'accounting excess',
+        'section',
+        'outgrew(\\s+)CPI-U(\\s+)by(\\s+)11\\.61',
+        'outgrew\\1CPI-U\\2by\\g<3>11.16',
+        "three-part accounting of BLS's growth beyond CPI-U",
+    ),
+    (
+        'index beyond CPI-U',
+        'section',
+        'by(\\s+)4\\.18(\\s+)points',
+        'by\\g<1>4.81\\2points',
+        "three-part accounting of BLS's growth beyond CPI-U",
+    ),
+    (
+        'renter benefits part',
+        'section',
+        '4\\.04,(\\s+)1\\.57,',
+        '4.04,\\g<1>1.75,',
+        "three-part accounting of BLS's growth beyond CPI-U",
+    ),
+    (
+        're-ranking sign',
+        'section',
+        '−0\\.01,(\\s+)\\+0\\.82,',
+        '−0.01,\\1−0.82,',
+        're-ranking left out of the accounting',
+    ),
+    (
+        "CPI-U growth at BLS's vintage",
+        'section',
+        'growth(\\s+)at(\\s+)10\\.08',
+        'growth\\1at\\g<2>10.01',
+        "CPI-U vintage on BLS's 2025 page",
+    ),
+    (
+        'interpolated 2025 CPI-U in the price section',
+        'price',
+        'average(\\s+)of(\\s+)138\\.289',
+        'average\\1of\\g<2>138.298',
+        "CPI-U vintage on BLS's 2025 page",
+    ),
+    (
+        "Schild's inflation points",
+        'section',
+        'attributes(\\s+)7\\.21',
+        'attributes\\g<1>7.12',
+        "Schild's attribution of the 2021-2022 rise",
+    ),
+    (
+        'school lunch rise standard error',
+        'section',
+        '\\\\\\$50(\\s+)for(\\s+)school(\\s+)lunch',
+        '\\\\$55\\1for\\2school\\3lunch',
+        'standard errors of the rises in band amounts',
+    ),
+    (
+        'lift standard errors',
+        'section',
+        '0\\.31(\\s+)to(\\s+)0\\.61',
+        '0.31\\1to\\g<2>0.71',
+        "standard errors of the benefits' lifts",
+    ),
+    (
+        'lift years within 1.5 standard errors',
+        'section',
+        'the(\\s+)2021–2025(\\s+)lifts',
+        'the\\g<1>2020–2025\\2lifts',
+        "standard errors of the benefits' lifts",
+    ),
+    (
+        'lift standard-error multiple',
+        'section',
+        'exceed(\\s+)five(\\s+)standard(\\s+)errors',
+        'exceed\\1six\\2standard\\3errors',
+        "standard errors of the benefits' lifts",
+    ),
+    (
+        "owners' rented-dwelling spending",
+        'section',
+        '\\\\\\$64(\\s+)to(\\s+)\\\\\\$683',
+        '\\\\$64\\1to\\2\\\\$638',
+        "written definitions keep owners' rented-dwelling spending",
+    ),
+    (
+        'abstract uncertainty',
+        'abstract',
+        'each(\\s+)change(\\s+)within(\\s+)one(\\s+)standard',
+        'each\\1change\\2within\\3half a\\4standard',
+        'abstract and discussion: each change within one standard error',
+    ),
+    (
+        'discussion uncertainty',
+        'discussion',
+        'points,(\\s+)each(\\s+)within(\\s+)one',
+        'points,\\1each\\2within\\3half a',
+        'abstract and discussion: each change within one standard error',
+    ),
+    (
+        'discussion growth claim without its CE-summaries scope',
+        'discussion',
+        "With(\\s+)the(\\s+)CE's(\\s+)spending(\\s+)summaries,(\\s+)we(\\s+)estimate",
+        'We\\6estimate',
+        'abstract and discussion: each change within one standard error',
+    ),
+    (
+        'reference-year rule',
+        'section',
+        'interviews(\\s+)to(\\s+)the(\\s+)year(\\s+)before',
+        'interviews\\1to\\2the\\3year\\4after',
+        'method constants read from fingerprinted calculator code',
+    ),
+    (
+        'ridge penalty',
+        'section',
+        'ridge(\\s+)penalty(\\s+)of(\\s+)one',
+        'ridge\\1penalty\\2of\\3two',
+        'method constants read from fingerprinted calculator code',
+    ),
+    (
+        'school lunch cell ladder',
+        'section',
+        'then(\\s+)across(\\s+)numbers(\\s+)of(\\s+)children,(\\s+)then(\\s+)across(\\s+)regions',
+        'then\\1across\\2regions,\\5then\\6across\\7numbers of children',
+        'method constants read from fingerprinted calculator code',
+    ),
+    (
+        'children top-code',
+        'section',
+        'top-coded(\\s+)at(\\s+)four',
+        'top-coded\\1at\\2three',
+        'method constants read from fingerprinted calculator code',
+    ),
+    (
+        'reference year of the Bridge File lunch values',
+        'section',
+        'for(\\s+)2017(\\s+)also(\\s+)in(\\s+)the(\\s+)2018(\\s+)CPS',
+        'for\\g<1>2016\\2also\\3in\\4the\\g<5>2018\\6CPS',
+        'Census school lunch values from their first reference year',
+    ),
+    (
+        'first CPS ASEC file with Census lunch values',
+        'section',
+        'from(\\s+)the(\\s+)2019(\\s+)file(\\s+)onward',
+        'from\\1the\\g<2>2018\\3file\\4onward',
+        'Census school lunch values from their first reference year',
+    ),
+    (
+        'research-file years',
+        'section',
+        'For(\\s+)reference(\\s+)years(\\s+)2014–2017,',
+        'For\\1reference\\2years\\g<3>2015–2017,',
+        'Census school lunch values from their first reference year',
+    ),
+    (
+        'our 2024-2025 rental assistance per renter',
+        'section',
+        'ours(\\s+)rose(\\s+)from(\\s+)\\\\\\$1,258',
+        'ours\\1rose\\2from\\3\\\\$1,285',
+        'BLS 2024-2025 renter growth without its imputed terms',
+    ),
+    (
+        'BLS renter growth without imputed terms',
+        'section',
+        'grows(\\s+)5\\.71',
+        'grows\\g<1>5.17',
+        'BLS 2024-2025 renter growth without its imputed terms',
+    ),
+)
+
+
+def reflect_replicates(uncertainty, year):
+    """Mirror each of one year's replicate thresholds around its full-sample
+    value, with and without the benefits, in both runs. Every squared
+    deviation, and so every threshold's standard error, stays the same. The
+    lift is a ratio of thresholds, so reflection moves its variance; reseal
+    the recorded lift as a forger would."""
+    inkind = load_inkind_module()
+    for run in uncertainty["runs"].values():
+        replicates = run["years"][year]["replicates"]
+        series = list(replicates["without_in_kind"].values())
+        series += [draw for draws in replicates["with_in_kind"].values() for draw in draws]
+        for values in series:
+            values[1:] = [2 * values[0] - value for value in values[1:]]
+        for tenure, without in replicates["without_in_kind"].items():
+            lifts = [
+                [inkind._growth(w, v) for w, v in zip(without, draw)]
+                for draw in replicates["with_in_kind"][tenure]
+            ]
+            run["years"][year]["in_kind_lift_percent"][tenure].update(inkind._rubin(lifts))
+
+
+def load_inkind_module():
+    """Load scripts/inkind_inputs.py for its growth and Rubin helpers."""
+    spec = importlib.util.spec_from_file_location(
+        "paper_guard_inkind_inputs", REPO / "scripts/inkind_inputs.py"
+    )
+    module = importlib.util.module_from_spec(spec)
+    sys.path.insert(0, str(REPO / "scripts"))
+    try:
+        spec.loader.exec_module(module)
+    finally:
+        sys.path.pop(0)
+    return module
 
 
 def excluded_diagnostic(path):
@@ -596,6 +1398,447 @@ class PaperGuardTests(unittest.TestCase):
         result = self.run_guard()
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("preserved commitment/proof bytes changed", result.stdout)
+
+    def refresh_inkind_manifest(self):
+        lines = [
+            f"{hashlib.sha256((self.repo / 'data/inkind' / name).read_bytes()).hexdigest()}  data/inkind/{name}"
+            for name in INKIND_NAMES
+        ]
+        (self.repo / "data/inkind/SHA256SUMS").write_text("\n".join(lines) + "\n")
+
+    def test_inkind_corruption_fails_before_generators_without_repair(self):
+        (self.repo / "data/inkind/ce_inkind_replication_2019_2025.json").write_text(
+            "invalid in-kind JSON\n"
+        )
+        (self.repo / "scripts/build_inkind_tables.py").write_text(
+            "from pathlib import Path\nPath('GENERATOR_RAN').write_text('wrong')\n"
+        )
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("in-kind input validation", result.stdout)
+        self.assertIn("hash of data/inkind/ce_inkind_replication_2019_2025.json", result.stdout)
+        self.assertIn("generators were not run", result.stdout)
+        self.assertFalse((self.repo / "GENERATOR_RAN").exists())
+
+    def test_inkind_manifest_must_cover_exactly_the_receipts(self):
+        (self.repo / "data/inkind/extra.json").write_text("{}\n")
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("manifest coverage", result.stdout)
+        self.assertIn("generators were not run", result.stdout)
+
+    def reseal_inkind(self, name, receipt):
+        """Write an edited receipt and update every hash that records it, so
+        only the semantic checks can reject the edit."""
+        path = self.repo / "data/inkind" / name
+        path.write_text(json.dumps(receipt))
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        provenance_path = self.repo / "data/inkind/provenance.json"
+        provenance = json.loads(provenance_path.read_text())
+        provenance["artifacts"][f"data/inkind/{name}"]["sha256"] = digest
+        provenance_path.write_text(json.dumps(provenance))
+        self.refresh_inkind_manifest()
+        return digest
+
+    def reseal_inkind_replication(self, replication):
+        """Reseal an edited replication receipt and repoint the component and
+        uncertainty receipts at it."""
+        digest = self.reseal_inkind(INKIND_NAMES[1], replication)
+        components = json.loads((self.repo / "data/inkind" / INKIND_NAMES[0]).read_text())
+        components["inputs"]["replication_receipt"]["sha256"] = digest
+        components_digest = self.reseal_inkind(INKIND_NAMES[0], components)
+        uncertainty = self.inkind_uncertainty()
+        uncertainty["inputs"]["replication_receipt"]["sha256"] = digest
+        uncertainty["inputs"]["components_receipt"]["sha256"] = components_digest
+        self.reseal_inkind(INKIND_NAMES[2], uncertainty)
+
+    def reseal_and_repin_components(self, edit):
+        """Edit the components receipt, reseal it and the uncertainty receipt
+        that records it, and pin both new digests in the copy's
+        inkind_inputs.py, so only the drift checks can reject the edit."""
+        inkind = self.repo / "data/inkind"
+        pins = self.repo / "scripts/inkind_inputs.py"
+        names = (INKIND_NAMES[0], INKIND_NAMES[2])
+        before = {name: hashlib.sha256((inkind / name).read_bytes()).hexdigest() for name in names}
+        components = json.loads((inkind / INKIND_NAMES[0]).read_text())
+        edit(components)
+        digest = self.reseal_inkind(INKIND_NAMES[0], components)
+        uncertainty = self.inkind_uncertainty()
+        uncertainty["inputs"]["components_receipt"]["sha256"] = digest
+        self.reseal_inkind(INKIND_NAMES[2], uncertainty)
+        text = pins.read_text()
+        for name in names:
+            self.assertEqual(text.count(before[name]), 1, f"{name} digest not pinned once")
+            text = text.replace(before[name], hashlib.sha256((inkind / name).read_bytes()).hexdigest())
+        pins.write_text(text)
+
+    def reseal_and_repin_uncertainty(self, edit):
+        """Edit the uncertainty receipt, reseal it and pin its new digest in
+        the copy's inkind_inputs.py, so only the drift checks can reject the
+        edit."""
+        inkind = self.repo / "data/inkind"
+        pins = self.repo / "scripts/inkind_inputs.py"
+        before = hashlib.sha256((inkind / INKIND_NAMES[2]).read_bytes()).hexdigest()
+        uncertainty = self.inkind_uncertainty()
+        edit(uncertainty)
+        after = self.reseal_inkind(INKIND_NAMES[2], uncertainty)
+        text = pins.read_text()
+        self.assertEqual(text.count(before), 1, "uncertainty digest not pinned once")
+        pins.write_text(text.replace(before, after))
+
+    def inkind_uncertainty(self):
+        return json.loads((self.repo / "data/inkind" / INKIND_NAMES[2]).read_text())
+
+    def assert_resealed_uncertainty_fails(self, edit, expected):
+        """Edit the uncertainty receipt, update every hash that records it,
+        and expect the semantic check named ``expected`` to reject it."""
+        uncertainty = self.inkind_uncertainty()
+        edit(uncertainty)
+        self.reseal_inkind(INKIND_NAMES[2], uncertainty)
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(expected, result.stdout)
+        self.assertIn("generators were not run", result.stdout)
+
+    def test_resealed_uncertainty_receipt_must_match_its_replicates(self):
+        def move_one_replicate(uncertainty):
+            uncertainty["runs"]["package"]["years"]["2025"]["replicates"]["with_in_kind"]["renter"][0][7] += 40
+
+        self.assert_resealed_uncertainty_fails(
+            move_one_replicate, "within variance level with benefits package 2025 renter"
+        )
+
+    def test_uncertainty_receipt_must_name_the_recorded_receipts(self):
+        def repoint(uncertainty):
+            uncertainty["inputs"]["replication_receipt"]["sha256"] = "0" * 64
+
+        self.assert_resealed_uncertainty_fails(
+            repoint, "uncertainty receipt derives from the recorded replication receipt"
+        )
+
+    def test_uncertainty_receipt_must_start_from_the_replication(self):
+        def shift_full_sample(uncertainty):
+            uncertainty["runs"]["package"]["years"]["2023"]["replicates"]["without_in_kind"]["renter"][0] += 1
+
+        self.assert_resealed_uncertainty_fails(
+            shift_full_sample, "full-sample threshold without benefits package 2023 renter"
+        )
+
+    def test_uncertainty_receipt_must_carry_bls_published_standard_errors(self):
+        def shift_bls_se(uncertainty):
+            uncertainty["runs"]["fcsuti"]["years"]["2024"]["bls"]["standard_errors"]["renter"] += 1
+
+        self.assert_resealed_uncertainty_fails(shift_bls_se, "BLS standard error fcsuti 2024 renter")
+
+    def test_receipts_must_share_code_fingerprints(self):
+        def change_fingerprint(uncertainty):
+            uncertainty["code_sha256"]["spm_calculator/ce_inkind.py"] = "0" * 64
+
+        uncertainty = self.inkind_uncertainty()
+        change_fingerprint(uncertainty)
+        self.reseal_inkind(INKIND_NAMES[2], uncertainty)
+        provenance_path = self.repo / "data/inkind/provenance.json"
+        provenance = json.loads(provenance_path.read_text())
+        provenance["artifacts"][f"data/inkind/{INKIND_NAMES[2]}"]["code_sha256"] = uncertainty["code_sha256"]
+        provenance_path.write_text(json.dumps(provenance))
+        self.refresh_inkind_manifest()
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("spm_calculator/ce_inkind.py differs across receipts", result.stdout)
+        self.assertIn("generators were not run", result.stdout)
+
+    def test_uncertainty_receipt_must_read_the_replication_inputs(self):
+        def zero_bundle(uncertainty):
+            uncertainty["inputs"]["ce_bundles"]["intrvw24.zip"]["sha256"] = "0" * 64
+
+        self.assert_resealed_uncertainty_fails(
+            zero_bundle, "uncertainty receipt reads the replication receipt's raw inputs and seed"
+        )
+
+    def test_uncertainty_receipt_must_use_the_replication_seed(self):
+        def change_seed(uncertainty):
+            uncertainty["inputs"]["imputation_seed"] += 1
+
+        self.assert_resealed_uncertainty_fails(
+            change_seed, "uncertainty receipt reads the replication receipt's raw inputs and seed"
+        )
+
+    def test_resealed_and_repinned_components_reach_the_drift_checks(self):
+        """Control for the two tests below: a resealed, repinned components
+        receipt with unchanged content passes the whole guard."""
+        self.reseal_and_repin_components(lambda components: None)
+        result = self.run_guard()
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_definition_runs_must_drop_vacation_home_utilities(self):
+        def keep_2022_vacation_utilities(components):
+            components["definition_check"]["2022"]["units_with_amount_removed"]["vacation_utilities"] = 0
+
+        self.reseal_and_repin_components(keep_2022_vacation_utilities)
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("in-kind prose: written-definition runs drop vacation-home utilities", result.stdout)
+        self.assertNotIn("generators were not run", result.stdout)
+
+    def test_definition_runs_must_drop_the_vacation_home_principal(self):
+        def keep_2022_vacation_home_principal(components):
+            components["definition_check"]["2022"]["units_with_amount_removed"]["vacation_home_principal"] = 0
+
+        self.reseal_and_repin_components(keep_2022_vacation_home_principal)
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(
+            "in-kind prose: written-definition runs drop vacation-home utilities and principal", result.stdout
+        )
+        self.assertNotIn("generators were not run", result.stdout)
+
+    def test_paper_states_which_price_factors_the_replicates_hold_fixed(self):
+        def replicate_the_price_indexes(uncertainty):
+            held = uncertainty["method"]["held_fixed"]
+            self.assertIn("the CPI series and BLS's FCSUti index", held)
+            held.remove("the CPI series and BLS's FCSUti index")
+
+        self.reseal_and_repin_uncertainty(replicate_the_price_indexes)
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("in-kind prose: FCSUti price factors held fixed across replicates", result.stdout)
+        self.assertNotIn("generators were not run", result.stdout)
+
+    def test_definition_runs_must_leave_no_utilities_below_zero(self):
+        def push_2022_utilities_below_zero(components):
+            components["definition_check"]["2022"]["units_with_utilities_below_zero"]["after"] = 57
+
+        self.reseal_and_repin_components(push_2022_utilities_below_zero)
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("in-kind prose: written-definition runs drop vacation-home utilities", result.stdout)
+        self.assertNotIn("generators were not run", result.stdout)
+
+    def test_paper_names_the_internet_row_each_year_uses(self):
+        def read_2024_from_the_total_row(components):
+            components["bls"]["years"]["2024"]["checks"]["internet_row"] = "internet_total_row"
+
+        self.reseal_and_repin_components(read_2024_from_the_total_row)
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("in-kind prose: BLS internet row by threshold year", result.stdout)
+        self.assertNotIn("generators were not run", result.stdout)
+
+    def test_paper_counts_the_vacation_fuel_codes_the_calculator_keeps(self):
+        def name_a_third_code(components):
+            limitations = components["limitations"]
+            matches = [i for i, text in enumerate(limitations) if "250913 and 250914" in text]
+            self.assertEqual(len(matches), 1, limitations)
+            limitations[matches[0]] = limitations[matches[0]].replace(
+                "250913 and 250914", "250912, 250913 and 250914"
+            )
+
+        self.reseal_and_repin_components(name_a_third_code)
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("in-kind prose: written-definition runs keep the vacation-home fuel codes", result.stdout)
+        self.assertNotIn("generators were not run", result.stdout)
+
+    def test_reflected_replicates_fail_only_the_pinned_digest(self):
+        """A resealed receipt whose 2019 replicates mirror the committed ones
+        passes every consistency check; the digest pinned outside data/inkind
+        rejects it, and no generator runs."""
+        uncertainty = self.inkind_uncertainty()
+        reflect_replicates(uncertainty, "2019")
+        self.reseal_inkind(INKIND_NAMES[2], uncertainty)
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(f"{INKIND_NAMES[2]} matches the SHA-256 pinned in inkind_inputs.py", result.stdout)
+        self.assertEqual(result.stdout.count("in-kind input validation"), 1, result.stdout)
+        self.assertIn("generators were not run", result.stdout)
+
+    def test_provenance_must_name_the_pinned_calculator_commit(self):
+        provenance_path = self.repo / "data/inkind/provenance.json"
+        provenance = json.loads(provenance_path.read_text())
+        provenance["artifacts"][f"data/inkind/{INKIND_NAMES[2]}"]["calculator_commit"] = "1" * 40
+        provenance_path.write_text(json.dumps(provenance))
+        self.refresh_inkind_manifest()
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(
+            f"{INKIND_NAMES[2]} comes from the calculator commit pinned in inkind_inputs.py", result.stdout
+        )
+        self.assertIn("generators were not run", result.stdout)
+
+    def test_readme_counts_the_receipts_and_names_their_commits(self):
+        readme = self.repo / "README.md"
+        original = readme.read_text()
+        cases = (
+            ("receipt count", "uses three receipts", "uses two receipts"),
+            ("commit", "`53cb0fa08a0ca2fe1ea4b15a32ec77090ca8b91c`", "`53cb0fa`"),
+            ("tag", "`paper-inkind-se-53cb0fa`", "`paper-inkind-se-a581c11`"),
+        )
+        for name, old, new in cases:
+            with self.subTest(name=name):
+                self.assertEqual(original.count(old), 1, f"ambiguous README edit: {old!r}")
+                readme.write_text(original.replace(old, new))
+                result = self.run_guard()
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(
+                    "in-kind prose: README counts the receipts and names the commits and tags", result.stdout
+                )
+        readme.write_text(original)
+
+    def test_bibliography_cites_the_recorded_calculator_commits(self):
+        bib = self.repo / "bibliography/references.bib"
+        original = bib.read_text()
+        # All three receipts come from one calculator commit, so the cases
+        # edit one entry at a time; a swap of two commits would change nothing.
+        components = uncertainty = replication = "53cb0fa08a0ca2fe1ea4b15a32ec77090ca8b91c"
+        stale_components = "8f632e31b4e48bbc735161d24665a8182dc0d9d6"
+        stale_uncertainty = "a581c113dd4319fc0f6f9ebd6db5c3697f4a94fa"
+        stale_replication = "4778dfab2d109515b6a14e63da63011dd7feb884"
+        note = f"Imputation and comparison with BLS components at commit {components}"
+        inkind = original.index("@misc{spmcalculator2026inkind")
+        inkind = (inkind, original.index("\n}\n", inkind) + 3)
+        se = original.index("@misc{spmcalculator2026se")
+        se = (se, original.index("\n}\n", se) + 3)
+
+        def in_entry(entry, old, new):
+            start, end = entry
+            return original[:start] + original[start:end].replace(old, new) + original[end:]
+
+        cases = (
+            ("stale components commit", in_entry(inkind, components, stale_components)),
+            ("stale standard-error commit", in_entry(se, uncertainty, stale_uncertainty)),
+            ("stale components link", in_entry(inkind, f"blob/{components}/", f"blob/{stale_components}/")),
+            ("stale standard-error link", in_entry(se, f"blob/{uncertainty}/", f"blob/{stale_uncertainty}/")),
+            (
+                "note names the imputation's old commit",
+                original.replace(
+                    note,
+                    f"Imputation at commit {stale_replication}; comparison with BLS components at commit {components}",
+                ),
+            ),
+            (
+                "in-kind link to a fork",
+                in_entry(
+                    inkind,
+                    "https://github.com/PolicyEngine/spm-calculator/blob/",
+                    "https://github.com/MaxGhenis/spm-calculator/blob/",
+                ),
+            ),
+        )
+        self.assertEqual(original.count(note), 1)
+        self.assertEqual(original[inkind[0] : inkind[1]].count(components), 2)
+        self.assertEqual(original[se[0] : se[1]].count(uncertainty), 2)
+        for name, edited in cases:
+            with self.subTest(name=name):
+                self.assertNotEqual(edited, original)
+                bib.write_text(edited)
+                result = self.run_guard()
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("in-kind prose: bibliography cites the recorded calculator commits", result.stdout)
+        bib.write_text(original)
+
+    def inkind_replication(self):
+        return json.loads((self.repo / "data/inkind" / INKIND_NAMES[1]).read_text())
+
+    def test_resealed_inkind_receipts_must_agree_with_their_sources(self):
+        replication = self.inkind_replication()
+        replication["results"]["2025"]["without_in_kind"]["renter"] += 1
+        with self.subTest(stage="component receipt still names the old replication"):
+            self.reseal_inkind(INKIND_NAMES[1], replication)
+            result = self.run_guard()
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("component receipt derives from the recorded replication receipt", result.stdout)
+            self.assertIn("generators were not run", result.stdout)
+        with self.subTest(stage="both receipts resealed"):
+            self.reseal_inkind_replication(replication)
+            result = self.run_guard()
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("out-of-pocket threshold 2025 renter", result.stdout)
+            self.assertIn("generators were not run", result.stdout)
+
+    def test_internally_consistent_inkind_edit_fails_the_cross_receipt_check(self):
+        """Shift one threshold with its implicates and lift, so the replication
+        receipt agrees with itself; the component receipt still disagrees."""
+        replication = self.inkind_replication()
+        record = replication["results"]["2025"]
+        for draw in record["with_in_kind_by_implicate"]:
+            draw["renter"] += 5
+        record["with_in_kind"]["renter"] += 5
+        record["in_kind_lift_percent"]["renter"] = 100 * (
+            record["with_in_kind"]["renter"] / record["without_in_kind"]["renter"] - 1
+        )
+        self.reseal_inkind_replication(replication)
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("package run with 2025 renter", result.stdout)
+        self.assertNotIn("implicate mean", result.stdout)
+        self.assertNotIn("in-kind lift 2025", result.stdout)
+        self.assertIn("generators were not run", result.stdout)
+
+    def test_inkind_table_drift_is_detected_without_repair(self):
+        table = self.repo / "paper/tables/inkind_growth.md"
+        table.write_text(table.read_text() + "| unreviewed | row | row | row |\n")
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("generated output drifted: paper/tables/inkind_growth.md", result.stdout)
+
+    def test_inkind_tables_must_be_included_in_article(self):
+        article = self.repo / "paper/index.qmd"
+        article.write_text(
+            article.read_text().replace("{{< include tables/inkind_amounts.md >}}", "")
+        )
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("article tables never included", result.stdout)
+        self.assertIn("inkind_amounts.md", result.stdout)
+
+    def mutate_article(self, where, pattern, replacement):
+        article = self.repo / "paper/index.qmd"
+        text = article.read_text()
+        bounds = {
+            "section": (text.index(INKIND_HEADING), text.index(PROJECTION_HEADING)),
+            "replication": (text.index(REPLICATION_HEADING), text.index(INKIND_HEADING)),
+            "abstract": (0, text.index("# Introduction")),
+            "evaluation": (
+                text.index("## Evaluation against published thresholds"),
+                text.index("## Validation of the price comparator"),
+            ),
+            "discussion": (text.index(DISCUSSION_HEADING), text.index("# Appendix A: replication benchmark")),
+            "appendix": (text.index("# Appendix B: reproducibility"), len(text)),
+            "price": (
+                text.index("## Validation of the price comparator"),
+                text.index("# Conditional forecasts beyond available microdata"),
+            ),
+        }
+        start, end = bounds[where]
+        body, count = re.subn(pattern, replacement, text[start:end], count=1, flags=re.S)
+        self.assertEqual(count, 1, f"fixture pattern missing: {pattern}")
+        article.write_text(text[:start] + body + text[end:])
+
+    def test_inkind_prose_figures_drift_from_the_receipts(self):
+        for name, where, pattern, replacement, label in INKIND_PROSE_MUTATIONS:
+            with self.subTest(name=name):
+                self.install_article()
+                self.mutate_article(where, pattern, replacement)
+                result = self.run_guard()
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(f"in-kind prose: {label}", result.stdout)
+        self.install_article()
+
+    def test_inkind_pins_reject_a_figure_borrowed_from_another_section(self):
+        cases = (
+            ("rental assistance share", (("supplies \\$169 and school", "supplies \\$196 and school"),),
+             "difference in rises by benefit",
+             "Of the \\$256 difference between the two rises, rental assistance supplies \\$169 and school "
+             "lunch \\$94, and the other three benefits narrow it by \\$7."),
+            ("renter split", (("5.71 percent, 0.62", "5.71 percent, 0.66"),),
+             "BLS 2024-2025 renter growth without its imputed terms",
+             "With its imputed benefits' terms removed from both years, it grows 5.71 percent, 0.62 points less."),
+        )
+        for name, edits, label, decoy in cases:
+            with self.subTest(name=name):
+                self.assert_article_mutation_fails(
+                    name, edits, f"in-kind prose: {label}", DISCUSSION_HEADING, decoy
+                )
 
     def edit_article(self, edits, host=None, decoy=None):
         """Apply exact single-occurrence prose edits, optionally restating the
