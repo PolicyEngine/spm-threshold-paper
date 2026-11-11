@@ -1,5 +1,6 @@
 """Mutation tests run the real guard in independent temporary Git clones."""
 
+import ast
 import hashlib
 import importlib.util
 import json
@@ -977,7 +978,7 @@ ABSTRACT_PROSE_MUTATIONS = (
         "2020-2025 CPI-U error",
         r"2\.29(\s+)percent",
         r"2.30\1percent",
-        ("abstract current projection cpi_u 2.29",),
+        ("abstract current projection cpi_u 2.29", "current projection prose cpi_u"),
         "We obtain 2.29 percent with the Consumer Price Index for All Urban Consumers (CPI-U).",
     ),
     (
@@ -1012,7 +1013,7 @@ ABSTRACT_PROSE_MUTATIONS = (
         "2020-2025 CPI-U error in emphasis",
         r"2\.29(\s+)percent",
         r"*2.30*\1percent",
-        ("abstract current projection cpi_u 2.29",),
+        ("abstract current projection cpi_u 2.29", "current projection prose cpi_u"),
         "We obtain 2.29 percent with the Consumer Price Index for All Urban Consumers (CPI-U).",
     ),
     (
@@ -1033,21 +1034,27 @@ ABSTRACT_PROSE_MUTATIONS = (
         "2020-2025 composite error",
         r"1\.65(\s+)percent",
         r"1.66\1percent",
-        ("abstract current projection fcsuti_cpi 1.65",),
+        (
+            "abstract current projection fcsuti_cpi 1.65",
+            "current projection prose fcsuti_cpi",
+        ),
         "We obtain 1.65 percent with a composite price index.",
     ),
     (
         "2020-2025 replication error",
         r"0\.51(\s+)percent",
         r"0.52\1percent",
-        ("abstract current projection replication_ratio 0.51",),
+        (
+            "abstract current projection replication_ratio 0.51",
+            "current projection prose replication_ratio",
+        ),
         "We obtain 0.51 percent with replicated consumption growth.",
     ),
     (
         "2020-2025 blend error",
         r"0\.90(\s+)percent",
         r"0.91\1percent",
-        ("abstract current projection blend 0.90",),
+        ("abstract current projection blend 0.90", "current projection prose blend"),
         "We obtain 0.90 percent with an equal blend of the latter two.",
     ),
     (
@@ -1122,6 +1129,1018 @@ ABSTRACT_TIE_LABELS = (
     "abstract evaluation amended MAE 1.17",
     "abstract evaluation replication MAE 0.75",
     "abstract evaluation CPI-U MAE 2.58",
+    "current projection prose cpi_u",
+    "current projection prose fcsuti_cpi",
+    "current projection prose replication_ratio",
+    "current projection prose blend",
+)
+
+# Sentences as the body states them, for decoys to restate under the
+# discussion heading. Each carries every literal a whole-paper search would
+# look for, so only a tie that reads the right section can still fail.
+PINNED_BLOB = (
+    "https://github.com/PolicyEngine/spm-threshold-paper/blob/"
+    "20bfbe1abcb83b4f9f60fbe54789144321ff62b0/"
+)
+SENSITIVITY_SENTENCE = (
+    "We obtain a maximum threshold change of 1.74 percent when we include "
+    "tenure codes 5 and 6 as renters."
+)
+BENCHMARK_CPI_U = (
+    "CPI-U adjustment has a mean absolute error of 2.23 percent and understates "
+    "threshold growth in four of five years, with a signed mean error of "
+    "−1.9 percent."
+)
+BENCHMARK_COMPOSITE = (
+    "Composite-price adjustment reduces the mean absolute error to 1.57 percent, "
+    "removing about thirty percent of the CPI-U error in this sample."
+)
+BENCHMARK_REPLICATION = (
+    "The replication ratio scores 0.41 percent, with a signed mean of +0.1 "
+    "percent and annual signed means ranging from +0.5 to −0.3 percent."
+)
+BENCHMARK_BLEND = (
+    "The equal blend scores 0.76 percent; its annual signed means range from "
+    "−0.1 to −1.4 percent."
+)
+NOWCAST_LINK = (
+    f"The [forecast record]({PINNED_BLOB}docs/forecast-record.md) links the "
+    "August 7 archived page, tags, and timestamp proof that document both "
+    "forecasts before BLS’s August 24 publication."
+)
+NOWCAST_NOTE = (
+    "The superseded blend had a mean absolute error of 0.98 percent, compared "
+    "with 1.17 percent for the committed blend."
+)
+NOWCAST_AMOUNTS = (
+    "We committed to an equal blend that projected \\$41,036.34 for owners with "
+    "mortgages, \\$34,135.99 for owners without mortgages, and \\$40,755.98 for "
+    "renters."
+)
+NOWCAST_GROWTH = (
+    "Replicated threshold growth ranged from 4.4 to 6.0 percent by tenure, "
+    "against 3.2 percent composite-price growth. Their blend projected 3.8 to "
+    "4.6 percent growth, compared with 2.6 percent realized CPI-U growth."
+)
+EVALUATION_LEVELS = (
+    "BLS published the 2025 thresholds on August 24, 2026: \\$41,323 for owners "
+    "with mortgages, \\$34,326 for owners without, and \\$41,701 for renters. "
+    "The linked workbook carries full-precision values and standard errors of "
+    "\\$327, \\$560, and \\$393. BLS reports growth of 4.40 to 6.33 percent by "
+    "tenure over the corrected 2024 base."
+)
+EVALUATION_BLEND = (
+    "The committed blend understates the three thresholds by 0.69, 0.55, and "
+    "2.27 percent, giving a mean absolute error of 1.17 percent. The signed mean "
+    "error also equals −1.17 percent. The owner differences fall within one "
+    "published BLS standard error; the renter difference reaches about 2.4 "
+    "standard errors."
+)
+EVALUATION_RULES = (
+    "CPI-U adjustment understates all three thresholds by 1.70 to 3.47 percent, "
+    "for a mean absolute error of 2.58 percent. The replication ratio alone "
+    "scores 0.75 percent and has errors on both sides of zero; composite-price "
+    "adjustment scores 2.02 percent."
+)
+EVALUATION_RENTERS = (
+    "BLS reports renter growth of 6.33 percent against 5.33 and 4.40 percent for "
+    "the two owner tenures. The blend projects renter growth of 3.92 percent, "
+    "and replication alone 4.62 percent."
+)
+COMPARATOR_GAPS = (
+    "The fixed-base composite differs from the BLS index by at most 0.7 "
+    "percentage point in each year from 2020 through 2025, with a mean absolute "
+    "gap of 0.4 point and no consistent sign."
+)
+COMPARATOR_CPI_U = (
+    "For 2025, the BLS threshold page reports CPI-U growth of 2.70 percent, "
+    "and the eleven-month annual average in the pinned CPI observations "
+    "implies 2.63 percent."
+)
+APPENDIX_A_RANGES = (
+    "The replication used for the 2025 nowcast has mean absolute deviations "
+    "across tenures of 1.5 to 2.1 percent per year against revised 2019–2024 "
+    "thresholds, and 1.0 to 1.6 percent against the preceding published series "
+    "with its corresponding anchor share. Published BLS sampling standard errors "
+    "span 0.7 to 2.1 percent of the revised threshold levels in those years."
+)
+APPENDIX_B_SOURCES = (
+    f"Its [source-data provenance]({PINNED_BLOB}data/PROVENANCE.md) "
+    "describes the experimental collections."
+)
+APPENDIX_B_RECORDS = (
+    f"The [data provenance]({PINNED_BLOB}data/PROVENANCE.md) and [forecast "
+    f"record]({PINNED_BLOB}docs/forecast-record.md) identify the inputs and "
+    "evidence of the earlier experiments, and "
+    "[`data/inkind/provenance.json`](https://github.com/PolicyEngine/"
+    "spm-threshold-paper/blob/inkind-section-2026-11/data/inkind/provenance.json) "
+    "those of the in-kind experiment."
+)
+APPENDIX_B_REPLAY = (
+    "The [experiment replay "
+    f"guide]({PINNED_BLOB}docs/reproducing-experiments.md) provides commands "
+    "and source-file requirements for raw-data replication."
+)
+BLS_GROWTH_TIE = "BLS-stated 2025 growth 4.40-6.33 and per-tenure 5.33/4.40/6.33"
+INKIND_BLS_GROWTH_TIE = "in-kind prose: evaluation section's BLS growth rates for 2024-2025"
+GAP_TIE = "composite within 0.7pp of BLS FCSUti, mean gap 0.4"
+
+# Each case drifts figures in the one body section that states them: (name,
+# section, pattern, replacement, failing ties, decoy). The section names a
+# mutate_article slice, and the pattern must match exactly once there. With
+# the decoy restated under the discussion heading, the failing ties are the
+# only lines the guard reports.
+SECTION_PROSE_MUTATIONS = (
+    (
+        "tenure-sensitivity maximum",
+        "sensitivity",
+        r"1\.74(\s+)percent",
+        r"1.75\1percent",
+        ("current tenure-sensitivity prose",),
+        SENSITIVITY_SENTENCE,
+    ),
+    (
+        "appendix forecast record link",
+        "appendix B",
+        r"blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0(/docs/forecast-record\.md)",
+        r"blob/main\1",
+        ("manuscript links fixed supporting document: docs/forecast-record.md",),
+        APPENDIX_B_RECORDS,
+    ),
+    (
+        "appendix source-data provenance link",
+        "appendix B",
+        r"(source-data\s+provenance\]\(\S+/)blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0"
+        r"(/data/PROVENANCE\.md)",
+        r"\1blob/main\2",
+        ("manuscript links fixed supporting document: data/PROVENANCE.md",),
+        APPENDIX_B_SOURCES,
+    ),
+    (
+        "appendix data provenance link",
+        "appendix B",
+        r"(\[data\s+provenance\]\(\S+/)blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0"
+        r"(/data/PROVENANCE\.md)",
+        r"\1blob/main\2",
+        ("manuscript links fixed supporting document: data/PROVENANCE.md",),
+        APPENDIX_B_RECORDS,
+    ),
+    (
+        "appendix replay guide link",
+        "appendix B",
+        r"blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0(/docs/reproducing-experiments\.md)",
+        r"blob/main\1",
+        ("manuscript links fixed supporting document: docs/reproducing-experiments.md",),
+        APPENDIX_B_REPLAY,
+    ),
+    (
+        "appendix replay guide gains an anchored link at main",
+        "appendix B",
+        r"(docs/reproducing-experiments\.md\))",
+        r"\1 ([setup](https://github.com/PolicyEngine/spm-threshold-paper/blob/main/"
+        r"docs/reproducing-experiments.md#L1))",
+        ("manuscript links fixed supporting document: docs/reproducing-experiments.md",),
+        APPENDIX_B_REPLAY,
+    ),
+    (
+        "appendix forecast record loses its link",
+        "appendix B",
+        r"\[(forecast\s+record)\]\(\S+/docs/forecast-record\.md\)",
+        r"\1",
+        ("manuscript links fixed supporting document: docs/forecast-record.md",),
+        APPENDIX_B_RECORDS,
+    ),
+    (
+        "appendix replay guide loses its link",
+        "appendix B",
+        r"\[(experiment replay\s+guide)\]\(\S+/docs/reproducing-experiments\.md\)",
+        r"\1",
+        ("manuscript links fixed supporting document: docs/reproducing-experiments.md",),
+        APPENDIX_B_REPLAY,
+    ),
+    (
+        "nowcast forecast record link",
+        "nowcast",
+        r"blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0(/docs/forecast-record\.md)",
+        r"blob/main\1",
+        ("nowcast section links to the fixed forecast registration record",),
+        NOWCAST_LINK,
+    ),
+    (
+        "committed owner-with-mortgage amount",
+        "nowcast",
+        r"41,036\.34",
+        "41,036.43",
+        (
+            "nowcast literal 41,036.34",
+            "committed estimate states the amended triple in tenure order",
+        ),
+        NOWCAST_AMOUNTS,
+    ),
+    (
+        "committed owner-without-mortgage amount",
+        "nowcast",
+        r"34,135\.99",
+        "34,135.98",
+        (
+            "nowcast literal 34,135.99",
+            "committed estimate states the amended triple in tenure order",
+        ),
+        NOWCAST_AMOUNTS,
+    ),
+    (
+        "committed renter amount",
+        "nowcast",
+        r"40,755\.98",
+        "40,755.89",
+        (
+            "nowcast literal 40,755.98",
+            "committed estimate states the amended triple in tenure order",
+        ),
+        NOWCAST_AMOUNTS,
+    ),
+    (
+        "swapped committed owner amounts",
+        "nowcast",
+        r"41,036\.34(.*?)34,135\.99",
+        r"34,135.99\g<1>41,036.34",
+        ("committed estimate states the amended triple in tenure order",),
+        NOWCAST_AMOUNTS,
+    ),
+    (
+        "replicated growth range",
+        "nowcast",
+        r"4\.4(\s+)to(\s+)6\.0",
+        r"4.4\1to\g<2>6.1",
+        ("replication growth 4.4 to 6.0",),
+        NOWCAST_GROWTH,
+    ),
+    (
+        "composite-price growth",
+        "nowcast",
+        r"3\.2(\s+)percent",
+        r"3.3\1percent",
+        ("price growth 3.2",),
+        NOWCAST_GROWTH,
+    ),
+    (
+        "projected blend growth range",
+        "nowcast",
+        r"3\.8(\s+)to(\s+)4\.6",
+        r"3.8\1to\g<2>4.7",
+        ("blend growth 3.8 to 4.6",),
+        NOWCAST_GROWTH,
+    ),
+    (
+        "realized CPI-U growth",
+        "nowcast",
+        r"2\.6(\s+)percent(\s+)realized",
+        r"2.7\1percent\2realized",
+        ("realized CPI-U 2025 growth 2.6",),
+        NOWCAST_GROWTH,
+    ),
+    (
+        "swapped composite-price and realized CPI-U growth",
+        "nowcast",
+        r"3\.2(\s+)percent(\s+)composite-price(.*?)2\.6(\s+)percent",
+        r"2.6\1percent\2composite-price\g<3>3.2\4percent",
+        ("price growth 3.2", "realized CPI-U 2025 growth 2.6"),
+        NOWCAST_GROWTH,
+    ),
+    (
+        "superseded blend error",
+        "nowcast",
+        r"0\.98(\s+)percent",
+        r"0.99\1percent",
+        ("forecast record evaluation original MAE 0.98",),
+        NOWCAST_NOTE,
+    ),
+    (
+        "committed blend error in the nowcast note",
+        "nowcast",
+        r"1\.17(\s+)percent(\s+)for(\s+)the",
+        r"1.18\1percent\2for\3the",
+        ("nowcast evaluation amended MAE 1.17",),
+        NOWCAST_NOTE,
+    ),
+    (
+        "CPI-U benchmark error",
+        "benchmark",
+        r"2\.23(\s+)percent",
+        r"2.32\1percent",
+        ("backtest prose literal 2.23",),
+        BENCHMARK_CPI_U,
+    ),
+    (
+        "composite benchmark error",
+        "benchmark",
+        r"1\.57(\s+)percent",
+        r"1.58\1percent",
+        ("backtest prose literal 1.57",),
+        BENCHMARK_COMPOSITE,
+    ),
+    (
+        "replication benchmark error",
+        "benchmark",
+        r"0\.41(\s+)percent",
+        r"0.42\1percent",
+        ("backtest prose literal 0.41",),
+        BENCHMARK_REPLICATION,
+    ),
+    (
+        "blend benchmark error",
+        "benchmark",
+        r"0\.76(\s+)percent",
+        r"0.67\1percent",
+        ("backtest prose literal 0.76",),
+        BENCHMARK_BLEND,
+    ),
+    (
+        "swapped CPI-U and composite benchmark errors",
+        "benchmark",
+        r"2\.23(\s+)percent(.*?)1\.57(\s+)percent",
+        r"1.57\1percent\g<2>2.23\3percent",
+        ("backtest prose literal 2.23", "backtest prose literal 1.57"),
+        BENCHMARK_CPI_U + " " + BENCHMARK_COMPOSITE,
+    ),
+    (
+        "CPI-U signed benchmark error",
+        "benchmark",
+        r"−1\.9(\s+)percent",
+        r"−2.9\1percent",
+        ("signed CPI-U bias -1.9",),
+        BENCHMARK_CPI_U,
+    ),
+    (
+        "CPI-U signed benchmark error sign",
+        "benchmark",
+        r"−1\.9",
+        "+1.9",
+        ("signed CPI-U bias -1.9",),
+        BENCHMARK_CPI_U,
+    ),
+    (
+        "CPI-U understated years",
+        "benchmark",
+        r"in(\s+)four(\s+)of(\s+)five",
+        r"in\1three\2of\3five",
+        ("CPI-U understated four of five years",),
+        BENCHMARK_CPI_U,
+    ),
+    (
+        "share of CPI-U error the composite removes",
+        "benchmark",
+        r"about(\s+)thirty(\s+)percent",
+        r"about\1forty\2percent",
+        ("composite removes ~thirty percent of CPI-U error",),
+        BENCHMARK_COMPOSITE,
+    ),
+    (
+        "replication signed benchmark mean",
+        "benchmark",
+        r"\+0\.1(\s+)percent",
+        r"+0.2\1percent",
+        ("replication signed mean +0.1",),
+        BENCHMARK_REPLICATION,
+    ),
+    (
+        "replication annual signed range",
+        "benchmark",
+        r"\+0\.5(\s+)to(\s+)−0\.3",
+        r"+0.5\1to\2−0.4",
+        ("replication annual signed range +0.5 to −0.3",),
+        BENCHMARK_REPLICATION,
+    ),
+    (
+        "blend annual signed range",
+        "benchmark",
+        r"−0\.1(\s+)to(\s+)−1\.4",
+        r"−0.1\1to\2−1.5",
+        ("blend annual signed range −0.1 to −1.4",),
+        BENCHMARK_BLEND,
+    ),
+    (
+        "swapped annual signed ranges",
+        "benchmark",
+        r"\+0\.5(\s+)to(\s+)−0\.3(.*?)−0\.1(\s+)to(\s+)−1\.4",
+        r"−0.1\1to\2−1.4\g<3>+0.5\4to\5−0.3",
+        (
+            "replication annual signed range +0.5 to −0.3",
+            "blend annual signed range −0.1 to −1.4",
+        ),
+        BENCHMARK_REPLICATION + " " + BENCHMARK_BLEND,
+    ),
+    (
+        "benchmark standard-error floor",
+        "appendix A",
+        r"span(\s+)0\.7",
+        r"span\g<1>0.8",
+        ("SE range 0.7 to 2.1 percent",),
+        APPENDIX_A_RANGES,
+    ),
+    (
+        "benchmark standard-error ceiling",
+        "appendix A",
+        r"0\.7(\s+)to(\s+)2\.1",
+        r"0.7\1to\g<2>2.2",
+        ("SE range 0.7 to 2.1 percent",),
+        APPENDIX_A_RANGES,
+    ),
+    (
+        "replication fidelity against revised thresholds",
+        "appendix A",
+        r"1\.5(\s+)to(\s+)2\.1",
+        r"1.5\1to\g<2>2.2",
+        ("replication fidelity 1.5 to 2.1 vs corrected",),
+        APPENDIX_A_RANGES,
+    ),
+    (
+        "replication fidelity against the published series",
+        "appendix A",
+        r"1\.0(\s+)to(\s+)1\.6",
+        r"0.9\1to\g<2>1.6",
+        ("replication fidelity 1.0 to 1.6 vs published",),
+        APPENDIX_A_RANGES,
+    ),
+    (
+        "swapped replication fidelity ranges",
+        "appendix A",
+        r"1\.5(\s+)to(\s+)2\.1(.*?)1\.0(\s+)to(\s+)1\.6",
+        r"1.0\1to\g<2>1.6\g<3>1.5\4to\g<5>2.1",
+        (
+            "replication fidelity 1.5 to 2.1 vs corrected",
+            "replication fidelity 1.0 to 1.6 vs published",
+        ),
+        APPENDIX_A_RANGES,
+    ),
+    (
+        "committed blend evaluation error",
+        "evaluation",
+        r"error(\s+)of(\s+)1\.17",
+        r"error\1of\g<2>1.18",
+        ("evaluation amended MAE 1.17",),
+        EVALUATION_BLEND,
+    ),
+    (
+        "CPI-U evaluation error",
+        "evaluation",
+        r"error(\s+)of(\s+)2\.58",
+        r"error\1of\g<2>2.59",
+        ("evaluation CPI-U MAE 2.58",),
+        EVALUATION_RULES,
+    ),
+    (
+        "replication evaluation error",
+        "evaluation",
+        r"scores(\s+)0\.75",
+        r"scores\g<1>0.74",
+        ("evaluation replication MAE 0.75",),
+        EVALUATION_RULES,
+    ),
+    (
+        "composite evaluation error",
+        "evaluation",
+        r"scores(\s+)2\.02",
+        r"scores\g<1>2.03",
+        ("evaluation composite MAE 2.02",),
+        EVALUATION_RULES,
+    ),
+    (
+        "swapped replication and composite evaluation errors",
+        "evaluation",
+        r"scores(\s+)0\.75(.*?)scores(\s+)2\.02",
+        r"scores\g<1>2.02\g<2>scores\g<3>0.75",
+        ("evaluation replication MAE 0.75", "evaluation composite MAE 2.02"),
+        EVALUATION_RULES,
+    ),
+    (
+        "owner-with-mortgage miss",
+        "evaluation",
+        r"by(\s+)0\.69,",
+        r"by\g<1>0.96,",
+        ("evaluation per-tenure misses 0.69, 0.55, 2.27 in order",),
+        EVALUATION_BLEND,
+    ),
+    (
+        "owner-without-mortgage miss",
+        "evaluation",
+        r"0\.69,(\s+)0\.55",
+        r"0.69,\g<1>0.56",
+        ("evaluation per-tenure misses 0.69, 0.55, 2.27 in order",),
+        EVALUATION_BLEND,
+    ),
+    (
+        "renter miss",
+        "evaluation",
+        r"and(\s+)2\.27",
+        r"and\g<1>2.28",
+        ("evaluation per-tenure misses 0.69, 0.55, 2.27 in order",),
+        EVALUATION_BLEND,
+    ),
+    (
+        "swapped owner misses",
+        "evaluation",
+        r"0\.69,(\s+)0\.55",
+        r"0.55,\g<1>0.69",
+        ("evaluation per-tenure misses 0.69, 0.55, 2.27 in order",),
+        EVALUATION_BLEND,
+    ),
+    (
+        "signed evaluation mean",
+        "evaluation",
+        r"−1\.17",
+        "−1.18",
+        ("evaluation signed mean −1.17",),
+        EVALUATION_BLEND,
+    ),
+    (
+        "CPI-U understatement range",
+        "evaluation",
+        r"1\.70(\s+)to(\s+)3\.47",
+        r"1.70\1to\g<2>3.48",
+        ("CPI-U 2025 understated every tenure by 1.70 to 3.47 percent",),
+        EVALUATION_RULES,
+    ),
+    (
+        "BLS owner-with-mortgage threshold",
+        "evaluation",
+        r"41,323",
+        "41,332",
+        ("BLS 2025 literal 41,323", "BLS 2025 triple in tenure order"),
+        EVALUATION_LEVELS,
+    ),
+    (
+        "BLS owner-without-mortgage threshold",
+        "evaluation",
+        r"34,326",
+        "34,362",
+        ("BLS 2025 literal 34,326", "BLS 2025 triple in tenure order"),
+        EVALUATION_LEVELS,
+    ),
+    (
+        "BLS renter threshold",
+        "evaluation",
+        r"41,701",
+        "41,710",
+        ("BLS 2025 literal 41,701", "BLS 2025 triple in tenure order"),
+        EVALUATION_LEVELS,
+    ),
+    (
+        "BLS growth range floor",
+        "evaluation",
+        r"growth(\s+)of(\s+)4\.40(\s+)to",
+        r"growth\1of\g<2>4.41\3to",
+        (BLS_GROWTH_TIE,),
+        EVALUATION_LEVELS,
+    ),
+    (
+        "BLS growth range ceiling",
+        "evaluation",
+        r"4\.40(\s+)to(\s+)6\.33",
+        r"4.40\1to\g<2>6.34",
+        (BLS_GROWTH_TIE,),
+        EVALUATION_LEVELS,
+    ),
+    (
+        "BLS renter growth",
+        "evaluation",
+        r"renter(\s+)growth(\s+)of(\s+)6\.33",
+        r"renter\1growth\2of\g<3>6.38",
+        (BLS_GROWTH_TIE, INKIND_BLS_GROWTH_TIE),
+        EVALUATION_RENTERS,
+    ),
+    (
+        "BLS owner-with-mortgage growth",
+        "evaluation",
+        r"against(\s+)5\.33",
+        r"against\g<1>5.34",
+        (BLS_GROWTH_TIE, INKIND_BLS_GROWTH_TIE),
+        EVALUATION_RENTERS,
+    ),
+    (
+        "BLS owner-without-mortgage growth",
+        "evaluation",
+        r"and(\s+)4\.40(\s+)percent",
+        r"and\g<1>4.41\2percent",
+        (BLS_GROWTH_TIE, INKIND_BLS_GROWTH_TIE),
+        EVALUATION_RENTERS,
+    ),
+    (
+        "projected renter growth",
+        "evaluation",
+        r"growth(\s+)of(\s+)3\.92",
+        r"growth\1of\g<2>3.93",
+        ("nowcast renter growth 3.92",),
+        EVALUATION_RENTERS,
+    ),
+    (
+        "replication renter growth",
+        "evaluation",
+        r"alone(\s+)4\.62",
+        r"alone\g<1>4.63",
+        ("replication renter growth 4.62",),
+        EVALUATION_RENTERS,
+    ),
+    (
+        "swapped projected and replication renter growth",
+        "evaluation",
+        r"3\.92(\s+)percent,(\s+)and(\s+)replication(\s+)alone(\s+)4\.62",
+        r"4.62\1percent,\2and\3replication\4alone\g<5>3.92",
+        ("nowcast renter growth 3.92", "replication renter growth 4.62"),
+        EVALUATION_RENTERS,
+    ),
+    (
+        "renter miss in standard errors",
+        "evaluation",
+        r"about(\s+)2\.4(\s+)standard",
+        r"about\g<1>2.5\2standard",
+        ("owner misses within one SE; renter about 2.4 SE",),
+        EVALUATION_BLEND,
+    ),
+    (
+        "owner misses in standard errors",
+        "evaluation",
+        r"within(\s+)one(\s+)published",
+        r"within\1two\2published",
+        ("owner misses within one SE; renter about 2.4 SE",),
+        EVALUATION_BLEND,
+    ),
+    (
+        "renter miss split across two lines",
+        "evaluation",
+        r"2\.4 standard",
+        "2.4\nstandard",
+        ("owner misses within one SE; renter about 2.4 SE",),
+        EVALUATION_BLEND,
+    ),
+    (
+        "committed amounts split across two lines",
+        "nowcast",
+        r"for owners with mortgages,",
+        "for owners\nwith mortgages,",
+        ("committed estimate states the amended triple in tenure order",),
+        NOWCAST_AMOUNTS,
+    ),
+    (
+        "BLS levels split across two lines",
+        "evaluation",
+        r"owners with mortgages, (\\\$34,326)",
+        r"owners\nwith mortgages, \1",
+        ("BLS 2025 triple in tenure order",),
+        EVALUATION_LEVELS,
+    ),
+    (
+        "evaluation misses pushed onto an indented line",
+        "evaluation",
+        r"and\n2\.27 percent",
+        "and\n" + " " * 21 + "2.27 percent",
+        ("evaluation per-tenure misses 0.69, 0.55, 2.27 in order",),
+        EVALUATION_BLEND,
+    ),
+    (
+        "sensitivity maximum split across two lines",
+        "sensitivity",
+        r"1\.74 percent",
+        "1.74\npercent",
+        ("current tenure-sensitivity prose",),
+        SENSITIVITY_SENTENCE,
+    ),
+    (
+        "benchmark year count split across two lines",
+        "benchmark",
+        r"in four of five years",
+        "in four\nof five years",
+        ("CPI-U understated four of five years",),
+        BENCHMARK_CPI_U,
+    ),
+    (
+        "comparator mean gap split across two lines",
+        "price",
+        r"gap of 0\.4 point",
+        "gap of 0.4\npoint",
+        ("composite within 0.7pp of BLS FCSUti, mean gap 0.4",),
+        COMPARATOR_GAPS,
+    ),
+    (
+        "fidelity range split across two lines",
+        "appendix A",
+        r"of 1\.5 to 2\.1 percent",
+        "of 1.5 to\n2.1 percent",
+        ("replication fidelity 1.5 to 2.1 vs corrected",),
+        APPENDIX_A_RANGES,
+    ),
+    (
+        "owner-with-mortgage standard error",
+        "evaluation",
+        r"\\\$327",
+        r"\\$372",
+        ("2025 SE literal 327", "2025 SE triple in tenure order"),
+        EVALUATION_LEVELS,
+    ),
+    (
+        "owner-without-mortgage standard error",
+        "evaluation",
+        r"\\\$560",
+        r"\\$506",
+        ("2025 SE literal 560", "2025 SE triple in tenure order"),
+        EVALUATION_LEVELS,
+    ),
+    (
+        "renter standard error",
+        "evaluation",
+        r"\\\$393",
+        r"\\$339",
+        ("2025 SE literal 393", "2025 SE triple in tenure order"),
+        EVALUATION_LEVELS,
+    ),
+    (
+        "swapped owner standard errors",
+        "evaluation",
+        r"\\\$327,(\s+)\\\$560",
+        r"\\$560,\1\\$327",
+        ("2025 SE triple in tenure order",),
+        EVALUATION_LEVELS,
+    ),
+    (
+        "largest comparator gap",
+        "price",
+        r"most(\s+)0\.7(\s+)percentage",
+        r"most\g<1>0.8\2percentage",
+        (GAP_TIE,),
+        COMPARATOR_GAPS,
+    ),
+    (
+        "mean comparator gap",
+        "price",
+        r"gap(\s+)of(\s+)0\.4(\s+)point",
+        r"gap\1of\g<2>0.5\3point",
+        (GAP_TIE,),
+        COMPARATOR_GAPS,
+    ),
+    (
+        "BLS-page CPI-U growth",
+        "price",
+        r"2\.70(\s+)percent",
+        r"2.71\1percent",
+        ("BLS page 2025 CPI-U growth 2.70 quoted",),
+        COMPARATOR_CPI_U,
+    ),
+    (
+        "eleven-month CPI-U growth",
+        "price",
+        r"2\.63(\s+)percent",
+        r"2.64\1percent",
+        ("eleven-month CPI-U growth 2.63 quoted",),
+        COMPARATOR_CPI_U,
+    ),
+    (
+        "swapped CPI-U growth figures",
+        "price",
+        r"2\.70(\s+)percent(.*?)2\.63(\s+)percent",
+        r"2.63\1percent\g<2>2.70\3percent",
+        (
+            "BLS page 2025 CPI-U growth 2.70 quoted",
+            "eleven-month CPI-U growth 2.63 quoted",
+        ),
+        COMPARATOR_CPI_U,
+    ),
+)
+
+# Each case renames or repeats a heading that bounds a section slice:
+# (name, edits, ties that must fail). A renamed, repeated or reordered
+# heading empties every slice it bounds, and a run-on heading empties the
+# slice on the side it runs into, so the guard names the heading and fails
+# that section's ties instead of searching anywhere else. Each heading that
+# bounds the slices for sections 3.2, 5.3, 6.1, 6.2 and 6.3, the rolling
+# section and its two subsections, or either appendix appears in at least
+# one case.
+SECTION_MARKER_CASES = (
+    (
+        "renamed sensitivity heading",
+        (
+            (
+                "## Replicated levels and sample sensitivities\n",
+                "## Replicated levels and sensitivities\n",
+            ),
+        ),
+        (
+            "paper section heading not unique: "
+            "'## Replicated levels and sample sensitivities' occurs 0 times",
+            "current tenure-sensitivity prose",
+        ),
+    ),
+    (
+        "repeated in-kind heading",
+        (
+            (
+                DISCUSSION_HEADING,
+                "# Imputing in-kind benefits {#sec-inkind}\n\n" + DISCUSSION_HEADING,
+            ),
+        ),
+        (
+            "paper section heading not unique: "
+            "'# Imputing in-kind benefits {#sec-inkind}' occurs 2 times",
+            "current tenure-sensitivity prose",
+        ),
+    ),
+    (
+        "renamed benchmark heading",
+        (("## Five-year benchmark for the 2025 nowcast\n", "## Five-year benchmark\n"),),
+        (
+            "paper section heading not unique: "
+            "'## Five-year benchmark for the 2025 nowcast' occurs 0 times",
+            "backtest prose literal 2.23",
+            "signed CPI-U bias -1.9",
+        ),
+    ),
+    (
+        "benchmark heading runs into the text after it",
+        (
+            (
+                "## Five-year benchmark for the 2025 nowcast\n",
+                "## Five-year benchmark for the 2025 nowcasts\n",
+            ),
+        ),
+        (
+            "paper section heading runs into the text after it: "
+            "'## Five-year benchmark for the 2025 nowcast'",
+            "backtest prose literal 2.23",
+        ),
+    ),
+    (
+        "renamed nowcast heading",
+        (
+            (
+                "# Pre-committed 2025 validation {#sec-nowcast}\n",
+                "# Pre-registered 2025 validation {#sec-nowcast}\n",
+            ),
+        ),
+        (
+            "paper section heading not unique: '# Pre-committed 2025 validation' occurs 0 times",
+            "nowcast section links to the fixed forecast registration record",
+            "nowcast literal 41,036.34",
+            "price growth 3.2",
+            "backtest prose literal 2.23",
+        ),
+    ),
+    (
+        "nowcast and evaluation headings swapped",
+        (
+            ("# Pre-committed 2025 validation {#sec-nowcast}\n", "NOWCAST HEADING\n"),
+            (
+                "## Evaluation against published thresholds {#sec-evaluation}\n",
+                "# Pre-committed 2025 validation {#sec-nowcast}\n",
+            ),
+            ("NOWCAST HEADING\n", "## Evaluation against published thresholds {#sec-evaluation}\n"),
+        ),
+        (
+            "paper sections out of order: "
+            "'# Pre-committed 2025 validation' before '## Evaluation against published thresholds'",
+            "nowcast literal 41,036.34",
+        ),
+    ),
+    (
+        "repeated evaluation heading",
+        (
+            (
+                DISCUSSION_HEADING,
+                "## Evaluation against published thresholds {#sec-evaluation}\n\n"
+                + DISCUSSION_HEADING,
+            ),
+        ),
+        (
+            "paper section heading not unique: "
+            "'## Evaluation against published thresholds {#sec-evaluation}' occurs 2 times",
+            "paper section heading not unique: "
+            "'## Evaluation against published thresholds' occurs 2 times",
+            "evaluation amended MAE 1.17",
+            "2025 SE triple in tenure order",
+            "nowcast literal 41,036.34",
+        ),
+    ),
+    (
+        "repeated comparator heading",
+        ((DISCUSSION_HEADING, "## Validation of the price comparator\n\n" + DISCUSSION_HEADING),),
+        (
+            "paper section heading not unique: "
+            "'## Validation of the price comparator' occurs 2 times",
+            GAP_TIE,
+            "BLS page 2025 CPI-U growth 2.70 quoted",
+            "evaluation amended MAE 1.17",
+        ),
+    ),
+    (
+        "repeated forecasts heading",
+        (
+            (
+                DISCUSSION_HEADING,
+                "# Conditional forecasts beyond available microdata {#sec-rolling}\n\n"
+                + DISCUSSION_HEADING,
+            ),
+        ),
+        (
+            "paper section heading not unique: "
+            "'# Conditional forecasts beyond available microdata {#sec-rolling}' occurs 2 times",
+            GAP_TIE,
+            "BLS page 2025 CPI-U growth 2.70 quoted",
+        ),
+    ),
+    (
+        "renamed appendix A heading",
+        (
+            (
+                "# Appendix A: replication benchmark {.unnumbered}\n",
+                "# Appendix A: benchmark {.unnumbered}\n",
+            ),
+        ),
+        (
+            "paper section heading not unique: "
+            "'# Appendix A: replication benchmark {.unnumbered}' occurs 0 times",
+            "SE range 0.7 to 2.1 percent",
+            "replication fidelity 1.5 to 2.1 vs corrected",
+        ),
+    ),
+    (
+        "renamed appendix B heading",
+        (
+            (
+                "# Appendix B: reproducibility {.unnumbered}\n",
+                "# Appendix B: replication {.unnumbered}\n",
+            ),
+        ),
+        (
+            "paper section heading not unique: "
+            "'# Appendix B: reproducibility {.unnumbered}' occurs 0 times",
+            "manuscript links fixed supporting document: docs/forecast-record.md",
+            "SE range 0.7 to 2.1 percent",
+        ),
+    ),
+    (
+        "repeated references heading",
+        ((DISCUSSION_HEADING, "# References {.unnumbered}\n\n" + DISCUSSION_HEADING),),
+        (
+            "paper section heading not unique: '# References {.unnumbered}' occurs 2 times",
+            "manuscript links fixed supporting document: docs/forecast-record.md",
+        ),
+    ),
+    (
+        "references heading joined to the text before it",
+        (("# References {.unnumbered}", "See below.# References {.unnumbered}"),),
+        (
+            "paper section text runs into the heading after it: '# References {.unnumbered}'",
+            "manuscript links fixed supporting document: docs/forecast-record.md",
+        ),
+    ),
+    (
+        "appendix B heading restated with a suffix",
+        ((DISCUSSION_HEADING, "# Appendix B: reproducibility (continued)\n\n" + DISCUSSION_HEADING),),
+        (
+            "paper section heading not unique: '# Appendix B: reproducibility' occurs 2 times",
+            "manuscript links fixed supporting document: docs/forecast-record.md",
+        ),
+    ),
+    (
+        "references heading restated with a suffix",
+        ((DISCUSSION_HEADING, "# References (continued)\n\n" + DISCUSSION_HEADING),),
+        (
+            "paper section heading not unique: '# References' occurs 2 times",
+            "manuscript links fixed supporting document: docs/forecast-record.md",
+        ),
+    ),
+    (
+        "renamed rolling expenditure heading",
+        (
+            (
+                "## Projecting expenditure records and rolling windows\n",
+                "## Projecting expenditure records\n",
+            ),
+        ),
+        (
+            "paper section heading not unique: "
+            "'## Projecting expenditure records and rolling windows' occurs 0 times",
+            "rolling real-growth sensitivities in stated order with their block counts",
+        ),
+    ),
+    (
+        "repeated rolling housing-cost heading",
+        ((DISCUSSION_HEADING, "## Projecting local relative housing costs\n\n" + DISCUSSION_HEADING),),
+        (
+            "paper section heading not unique: '## Projecting local relative housing costs' occurs 2 times",
+            "rolling real-growth sensitivities in stated order with their block counts",
+            "rolling geographic validation covers 341 anchored areas",
+        ),
+    ),
+    (
+        "repeated discussion heading",
+        ((DISCUSSION_HEADING, DISCUSSION_HEADING + "\n" + DISCUSSION_HEADING),),
+        (
+            "paper section heading not unique: '# Discussion {#sec-discussion}' occurs 2 times",
+            "no text to slice for paper section '## Projecting expenditure records and rolling windows'",
+            "no text to slice for paper section '## Projecting local relative housing costs'",
+            "rolling real-growth sensitivities in stated order with their block counts",
+            "in-kind prose: discussion stage-change range",
+        ),
+    ),
 )
 
 # The in-kind ties that read the abstract, labeled as the guard reports them.
@@ -1132,6 +2151,41 @@ INKIND_ABSTRACT_TIE_LABELS = (
     "in-kind prose: written definitions with the composite CPI: the benefits' change to growth",
     "in-kind prose: abstract stage changes under one point per tenure",
 )
+
+
+# Each literal with a space in it that a tie searches one of the six section
+# slices' raw text for: the section the slice covers, the literal and the
+# tie's label.
+RAW_LITERALS = (
+    ("sensitivity", "1.74 percent", "current tenure-sensitivity prose"),
+    ("benchmark", "1.9 percent", "signed CPI-U bias -1.9"),
+    ("benchmark", "four of five", "CPI-U understated four of five years"),
+    ("benchmark", "thirty percent", "composite removes ~thirty percent of CPI-U error"),
+    ("benchmark", "+0.5 to −0.3", "replication annual signed range +0.5 to −0.3"),
+    ("benchmark", "−0.1 to −1.4", "blend annual signed range −0.1 to −1.4"),
+    ("nowcast", "owners with", "committed estimate states the amended triple in tenure order"),
+    ("nowcast", "owners without", "committed estimate states the amended triple in tenure order"),
+    ("nowcast", "4.4 to 6.0", "replication growth 4.4 to 6.0"),
+    ("nowcast", "3.2 percent", "price growth 3.2"),
+    ("nowcast", "3.8 to 4.6", "blend growth 3.8 to 4.6"),
+    ("nowcast", "2.6 percent", "realized CPI-U 2025 growth 2.6"),
+    ("evaluation", "1.70 to 3.47 percent", "CPI-U 2025 understated every tenure by 1.70 to 3.47 percent"),
+    ("evaluation", "owners with", "BLS 2025 triple in tenure order"),
+    ("evaluation", "owners without", "BLS 2025 triple in tenure order"),
+    ("evaluation", "4.40 to 6.33", "BLS-stated 2025 growth 4.40-6.33 and per-tenure 5.33/4.40/6.33"),
+    ("evaluation", "2.4 standard errors", "owner misses within one SE; renter about 2.4 SE"),
+    ("price", "0.7 percentage point", "composite within 0.7pp of BLS FCSUti, mean gap 0.4"),
+    ("price", "0.4 point", "composite within 0.7pp of BLS FCSUti, mean gap 0.4"),
+    ("price", "2.70 percent", "BLS page 2025 CPI-U growth 2.70 quoted"),
+    ("appendix A", "1.5 to 2.1", "replication fidelity 1.5 to 2.1 vs corrected"),
+    ("appendix A", "1.0 to 1.6", "replication fidelity 1.0 to 1.6 vs published"),
+)
+
+
+# Whitespace that breaks a raw literal's single space and that normalized()
+# collapses back to one space: a doubled space, a line break and a no-break
+# space.
+SPACINGS = ("  ", "\n", "\u00a0")
 
 
 def failure_lines(stdout):
@@ -1981,10 +3035,23 @@ class PaperGuardTests(unittest.TestCase):
         self.assertIn("article tables never included", result.stdout)
         self.assertIn("inkind_amounts.md", result.stdout)
 
-    def mutate_article(self, where, pattern, replacement):
+    def mutate_article(self, where, pattern, replacement, once=False):
+        """Apply one regex edit inside a named slice of the paper. With
+        once=True the pattern must match exactly once in that slice."""
         article = self.repo / "paper/index.qmd"
         text = article.read_text()
-        bounds = {
+        start, end = self.article_bounds(text)[where]
+        if once:
+            matches = len(re.findall(pattern, text[start:end], flags=re.S))
+            self.assertEqual(matches, 1, f"fixture pattern must match once, found {matches}: {pattern}")
+        body, count = re.subn(pattern, replacement, text[start:end], count=1, flags=re.S)
+        self.assertEqual(count, 1, f"fixture pattern missing: {pattern}")
+        article.write_text(text[:start] + body + text[end:])
+
+    @staticmethod
+    def article_bounds(text):
+        """Each named slice's start and end offsets in the paper."""
+        return {
             "section": (text.index(INKIND_HEADING), text.index(PROJECTION_HEADING)),
             "replication": (text.index(REPLICATION_HEADING), text.index(INKIND_HEADING)),
             "abstract": PAPER_TEXT.block_scalar_span(text, "abstract") or (0, 0),
@@ -1994,15 +3061,28 @@ class PaperGuardTests(unittest.TestCase):
             ),
             "discussion": (text.index(DISCUSSION_HEADING), text.index("# Appendix A: replication benchmark")),
             "appendix": (text.index("# Appendix B: reproducibility"), len(text)),
+            "appendix B": (text.index("# Appendix B: reproducibility"), text.index("# References")),
             "price": (
                 text.index("## Validation of the price comparator"),
                 text.index("# Conditional forecasts beyond available microdata"),
             ),
+            "sensitivity": (
+                text.index("## Replicated levels and sample sensitivities"),
+                text.index(INKIND_HEADING),
+            ),
+            "benchmark": (
+                text.index("## Five-year benchmark for the 2025 nowcast"),
+                text.index("# Pre-committed 2025 validation"),
+            ),
+            "nowcast": (
+                text.index("# Pre-committed 2025 validation"),
+                text.index("## Evaluation against published thresholds"),
+            ),
+            "appendix A": (
+                text.index("# Appendix A: replication benchmark"),
+                text.index("# Appendix B: reproducibility"),
+            ),
         }
-        start, end = bounds[where]
-        body, count = re.subn(pattern, replacement, text[start:end], count=1, flags=re.S)
-        self.assertEqual(count, 1, f"fixture pattern missing: {pattern}")
-        article.write_text(text[:start] + body + text[end:])
 
     def test_inkind_prose_figures_drift_from_the_receipts(self):
         for name, where, pattern, replacement, label in INKIND_PROSE_MUTATIONS:
@@ -2077,6 +3157,23 @@ class PaperGuardTests(unittest.TestCase):
         self.assertEqual(inside, host.startswith("abstract"), f"decoy misplaced at {host}")
         path.write_text(edited)
 
+    def run_section_mutation(self, where, pattern, replacement, decoy=None):
+        """Drift a figure in one section and run the guard. With a decoy, the
+        original wording also sits under the discussion heading, just before
+        the section's start heading and just after its end heading's line."""
+        self.install_article()
+        self.mutate_article(where, pattern, replacement, once=True)
+        if decoy is not None:
+            self.edit_article((), DISCUSSION_HEADING, decoy)
+            article = self.repo / "paper/index.qmd"
+            text = article.read_text()
+            start, end = self.article_bounds(text)[where]
+            if end < len(text):
+                line_end = text.index("\n", end) + 1
+                text = f"{text[:line_end]}\n{decoy}\n{text[line_end:]}"
+            article.write_text(f"{text[:start]}{decoy}\n\n{text[start:]}")
+        return self.run_guard()
+
     def run_abstract_mutation(self, pattern, replacement, decoy=None, host="discussion"):
         self.install_article()
         self.mutate_article("abstract", pattern, replacement)
@@ -2109,7 +3206,17 @@ class PaperGuardTests(unittest.TestCase):
                         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                         continue
                     self.assertNotEqual(result.returncode, 0)
-                    self.assertEqual(sorted(failure_lines(result.stdout)), sorted(labels))
+                    expected = labels
+                    if host.startswith("abstract"):
+                        # A copy inside the abstract keeps the original figure
+                        # there, so the ties that only look for it pass, and
+                        # the ties that require every stated rate to match fail.
+                        expected = tuple(
+                            label
+                            for label in labels
+                            if not label.startswith("current projection prose")
+                        )
+                    self.assertEqual(sorted(failure_lines(result.stdout)), sorted(expected))
         self.install_article()
 
     def test_abstract_ties_ignore_the_introduction_heading(self):
@@ -2339,6 +3446,110 @@ class PaperGuardTests(unittest.TestCase):
         (self.repo / "paper/notes.qmd").unlink()
         self.install_article()
 
+    def test_section_figures_drift_alone(self):
+        """A figure changed in the section that states it fails its tie, even
+        where the paper states the same numeral in another section."""
+        for name, where, pattern, replacement, labels, _ in SECTION_PROSE_MUTATIONS:
+            with self.subTest(name=name):
+                result = self.run_section_mutation(where, pattern, replacement)
+                self.assertNotEqual(result.returncode, 0)
+                for label in labels:
+                    self.assertIn(label, failure_lines(result.stdout))
+        self.install_article()
+
+    def test_section_pins_reject_a_figure_restated_elsewhere(self):
+        """With the original wording restated under the discussion heading
+        and on each side of the section's headings, only the ties that read
+        the changed section fail."""
+        for name, where, pattern, replacement, labels, decoy in SECTION_PROSE_MUTATIONS:
+            with self.subTest(name=name):
+                result = self.run_section_mutation(where, pattern, replacement, decoy)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertEqual(sorted(failure_lines(result.stdout)), sorted(labels))
+        self.install_article()
+
+    def test_phrase_miss_report_names_the_missing_phrase(self):
+        """When a pin's figure still occurs in its section but a phrase
+        doesn't, the report names the phrase after the failures; a changed
+        figure adds no such note."""
+        result = self.run_section_mutation("evaluation", r"renter(\s+)difference", r"renter\1gap")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(failure_lines(result.stdout), ["owner misses within one SE; renter about 2.4 SE"])
+        self.assertIn("Phrases missing from sections that hold the pin's figure:", result.stdout)
+        self.assertIn(
+            "'2.4 standard errors' occurs in the section; "
+            "'renter difference reaches about 2.4 standard errors' doesn't",
+            result.stdout,
+        )
+        result = self.run_section_mutation("evaluation", r"about(\s+)2\.4(\s+)standard", r"about\g<1>2.5\2standard")
+        self.assertEqual(failure_lines(result.stdout), ["owner misses within one SE; renter about 2.4 SE"])
+        self.assertNotIn("Phrases missing", result.stdout)
+        self.install_article()
+
+    def test_section_slices_fail_closed_without_unique_markers(self):
+        """A renamed or repeated heading empties the slices it bounds, so
+        their ties fail instead of reading the whole paper."""
+        for name, edits, labels in SECTION_MARKER_CASES:
+            with self.subTest(case=name):
+                self.install_article()
+                self.edit_article(edits)
+                result = self.run_guard()
+                self.assertNotEqual(result.returncode, 0)
+                failures = failure_lines(result.stdout)
+                for label in labels:
+                    self.assertIn(label, failures)
+        self.install_article()
+
+    def run_respaced(self, where, spacing, literal=None):
+        """Put `spacing` in place of each space between two words on the
+        section's lines that don't start with '#', or only inside each
+        whole-token occurrence of the literal, and run the guard."""
+        self.install_article()
+        article = self.repo / "paper/index.qmd"
+        text = article.read_text()
+        start, end = self.article_bounds(text)[where]
+        if literal is None:
+            body = "".join(
+                line if line.startswith("#") else re.sub(r"(?<=\S) (?=\S)", spacing, line)
+                for line in text[start:end].splitlines(keepends=True)
+            )
+        else:
+            body = re.sub(
+                rf"(?<!\w){re.escape(literal)}(?!\w)",
+                lambda match: match.group(0).replace(" ", spacing),
+                text[start:end],
+            )
+        self.assertNotEqual(body, text[start:end], f"nothing to respace in {where}: {literal!r}")
+        article.write_text(text[:start] + body + text[end:])
+        return self.run_guard()
+
+    def test_each_raw_literal_fails_only_its_tie_when_respaced(self):
+        """Each spacing in place of the spaces inside one literal fails the
+        tie that searches the raw slice for it, and no other tie. A tie that
+        maps that spacing back to a space, as normalized() does, passes the
+        paper, whatever code hands it that text."""
+        for where, literal, label in RAW_LITERALS:
+            for spacing in SPACINGS:
+                with self.subTest(where=where, literal=literal, spacing=spacing):
+                    result = self.run_respaced(where, spacing, literal)
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertEqual(failure_lines(result.stdout), [label])
+        self.install_article()
+
+    def test_respaced_sections_fail_exactly_the_raw_literal_ties(self):
+        """Each spacing in place of every space between two words in a
+        section fails exactly the ties RAW_LITERALS lists for the section, so
+        the table names every tie that searches the section's raw slice for a
+        literal with a space in it."""
+        for where in dict.fromkeys(where for where, _, _ in RAW_LITERALS):
+            expected = sorted({label for host, _, label in RAW_LITERALS if host == where})
+            for spacing in SPACINGS:
+                with self.subTest(where=where, spacing=spacing):
+                    result = self.run_respaced(where, spacing)
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertEqual(sorted(failure_lines(result.stdout)), expected)
+        self.install_article()
+
     def test_rolling_prose_figures_drift_from_the_sealed_forecast(self):
         for label, edits, _, _, expected in ROLLING_PROSE_MUTATIONS:
             with self.subTest(figure=label):
@@ -2492,6 +3703,410 @@ class PaperGuardTests(unittest.TestCase):
         ):
             self.assertIn(expected, result.stdout)
 
+
+INCLUDE_SCAN = r"\{\{<\s*include\s+tables/([^\s>]+)\s*>\}\}"
+INCLUDE_TARGETS = r"\{\{<\s*include\s+(.*?)\s*>\}\}"
+METADATA_SCAN = r"metadata-files?"
+PAPER_NAMES = ("QMD", "QMD_RAW")
+
+
+def whole_paper_reads(source):
+    """Each place in a guard's source that reads the paper outside a bounded
+    slice: a load of QMD or QMD_RAW other than a slicer's default text, the
+    guard's two scans for include directives and its search for a
+    metadata-files key, each in its exact call; a slicer call that reads the paper without a literal end heading;
+    and a path-like string, one without whitespace, that names a .qmd file
+    outside the assignments of QMD and QMD_RAW."""
+    tree = ast.parse(source)
+    allowed = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.FunctionDef) and node.name in (
+            "section_source",
+            "section",
+            "front_matter_block",
+            "front_matter_source",
+        ):
+            allowed.update(
+                id(default)
+                for default in node.args.defaults + node.args.kw_defaults
+                if isinstance(default, ast.Name) and default.id in PAPER_NAMES
+            )
+        elif (
+            isinstance(node, ast.Call)
+            and len(node.args) == 2
+            and not node.keywords
+            and isinstance(node.args[0], ast.Constant)
+            and (ast.unparse(node.func), node.args[0].value)
+            in (("re.findall", INCLUDE_SCAN), ("re.findall", INCLUDE_TARGETS), ("re.search", METADATA_SCAN))
+        ):
+            allowed.add(id(node.args[1]))
+        elif isinstance(node, ast.Assign) and [ast.unparse(target) for target in node.targets] in (
+            ["QMD"],
+            ["QMD_RAW"],
+        ):
+            allowed.update(id(part) for part in ast.walk(node.value) if isinstance(part, ast.Constant))
+    reads = []
+    for node in ast.walk(tree):
+        if (
+            isinstance(node, ast.Name)
+            and node.id in PAPER_NAMES
+            and isinstance(node.ctx, ast.Load)
+            and id(node) not in allowed
+        ):
+            reads.append(f"line {node.lineno}: {node.id}")
+        elif (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id in ("section_source", "section")
+        ):
+            keywords = {keyword.arg: keyword.value for keyword in node.keywords}
+            end = node.args[1] if len(node.args) > 1 else keywords.get("end")
+            reads_paper = len(node.args) < 3 and "text" not in keywords
+            literal_end = isinstance(end, ast.JoinedStr) or (
+                isinstance(end, ast.Constant) and isinstance(end.value, str)
+            )
+            if reads_paper and not literal_end:
+                reads.append(f"line {node.lineno}: {ast.unparse(node)}")
+        elif (
+            isinstance(node, ast.Constant)
+            and isinstance(node.value, str)
+            and re.fullmatch(r"\S*\.qmd", node.value)
+            and id(node) not in allowed
+        ):
+            reads.append(f"line {node.lineno}: {node.value!r} names a .qmd file")
+    return reads
+
+
+def guard_function(name, **namespace):
+    """One function from the guard's source, defined in ``namespace``
+    without running the guard."""
+    tree = ast.parse((REPO / "scripts/check_paper.py").read_text())
+    node = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == name)
+    exec(compile(ast.Module([node], []), "check_paper.py", "exec"), {"re": re, **namespace}, namespace)
+    return namespace[name]
+
+
+# Each slicer that returns raw text, and the position of its text argument.
+RAW_SLICERS = {"section_source": 2, "front_matter_source": 1}
+# Functions the raw-text check relies on, which the guard must define once.
+RAW_TEXT_FUNCTIONS = ("stated", "section_source", "front_matter_source", "normalized")
+# Ways to bind a name that the check can't follow.
+DYNAMIC_BINDERS = ("globals", "vars", "locals", "exec", "eval", "setattr", "__import__")
+
+
+def stated_reads_off_raw_text(source):
+    """Each stated() call in a guard's source that reads anything but a raw
+    slice of the paper, each use of stated() other than a direct call, each
+    second binding of stated, section_source, front_matter_source or
+    normalized, and each use of globals, vars, locals, exec, eval, setattr,
+    __import__ or __dict__. A raw slice is a name the guard binds once in all
+    its source, at module level, to a section_source() or
+    front_matter_source() call whose text is the paper or another raw slice,
+    alone or as a conditional whose other branch is an empty string."""
+    tree = ast.parse(source)
+    bindings = {}
+
+    def bind(name):
+        bindings[name] = bindings.get(name, 0) + 1
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Name) and isinstance(node.ctx, ast.Store):
+            bind(node.id)
+        elif isinstance(node, ast.arg):
+            bind(node.arg)
+        elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            bind(node.name)
+        elif isinstance(node, ast.alias):
+            bind((node.asname or node.name).split(".")[0])
+        elif isinstance(node, (ast.ExceptHandler, ast.MatchAs, ast.MatchStar)) and node.name:
+            bind(node.name)
+        elif isinstance(node, ast.MatchMapping) and node.rest:
+            bind(node.rest)
+        elif isinstance(node, (ast.Global, ast.Nonlocal)):
+            for name in node.names:
+                bind(name)
+    once = {
+        node.targets[0].id: node.value
+        for node in tree.body
+        if isinstance(node, ast.Assign)
+        and len(node.targets) == 1
+        and isinstance(node.targets[0], ast.Name)
+        and bindings[node.targets[0].id] == 1
+    }
+    paper = {name for name in PAPER_NAMES if name in once}
+    raw = set()
+
+    def raw_slice(value):
+        if isinstance(value, ast.IfExp):
+            return raw_slice(value.body) and isinstance(value.orelse, ast.Constant) and value.orelse.value == ""
+        if not (isinstance(value, ast.Call) and isinstance(value.func, ast.Name) and value.func.id in RAW_SLICERS):
+            return False
+        position = RAW_SLICERS[value.func.id]
+        if len(value.args) > position + 1 or any(isinstance(arg, ast.Starred) for arg in value.args):
+            return False
+        texts = value.args[position:]
+        for keyword in value.keywords:
+            if keyword.arg is None:
+                return False
+            if keyword.arg == "text":
+                texts.append(keyword.value)
+        return all(isinstance(each, ast.Name) and each.id in paper | raw for each in texts)
+
+    while True:
+        grown = {name for name, value in once.items() if raw_slice(value)}
+        if grown == raw:
+            break
+        raw = grown
+    calls = [
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "stated"
+    ]
+    direct = {id(node.func) for node in calls}
+    return [
+        f"line {node.lineno}: {ast.unparse(node)}"
+        for node in calls
+        if not (len(node.args) > 1 and isinstance(node.args[1], ast.Name) and node.args[1].id in raw)
+    ] + [
+        f"line {node.lineno}: stated used other than in a direct call"
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Name) and node.id == "stated" and isinstance(node.ctx, ast.Load) and id(node) not in direct
+    ] + [
+        f"{name} bound {bindings[name]} times"
+        for name in RAW_TEXT_FUNCTIONS
+        if bindings.get(name, 0) > 1
+    ] + [
+        f"line {node.lineno}: {ast.unparse(node)} can rebind a name out of the check's sight"
+        for node in ast.walk(tree)
+        if (isinstance(node, ast.Name) and node.id in DYNAMIC_BINDERS)
+        or (isinstance(node, ast.Attribute) and node.attr == "__dict__")
+    ]
+
+
+class SectionSourceTests(unittest.TestCase):
+    def setUp(self):
+        self.failures = []
+        self.section_source = guard_function("section_source", QMD="", failures=self.failures)
+
+    def test_a_slice_keeps_the_text_between_its_headings(self):
+        """A slice keeps its edges' whitespace, and a slice with no end
+        heading runs to the end of the text."""
+        text = "x\n# A\nbody\n# B\ny"
+        self.assertEqual(self.section_source("# A", "# B", text), "\nbody\n")
+        self.assertEqual(self.section_source("# B", None, text), "\ny")
+        self.assertEqual(self.failures, [])
+
+    def test_each_failure_names_its_heading(self):
+        """Each way a slice can fail, at its start or its end heading,
+        empties it and records one failure that names the heading."""
+        cases = (
+            ("# A", "# B", "x\n# B\n", "paper section heading not unique: '# A' occurs 0 times"),
+            ("# A", "# B", "# A\n# A\n# B\n", "paper section heading not unique: '# A' occurs 2 times"),
+            ("# A", "# B", "# A\nbody\n", "paper section heading not unique: '# B' occurs 0 times"),
+            ("# A", "# B", "# A\nx\n# B\ny\n# B\n", "paper section heading not unique: '# B' occurs 2 times"),
+            ("# A", "# B", "# B\nx\n# A\n", "paper sections out of order: '# A' before '# B'"),
+            ("# A", "# B", "# Ab\n# B\n", "paper section heading runs into the text after it: '# A'"),
+            ("# A", "# B", "# A\nbody# B\n", "paper section text runs into the heading after it: '# B'"),
+            ("# A", None, "x\n# A", "nothing follows paper section heading '# A'"),
+            ("# A", "# B", "", "no text to slice for paper section '# A'"),
+        )
+        for start, end, text, failure in cases:
+            with self.subTest(failure=failure):
+                self.failures.clear()
+                self.assertEqual(self.section_source(start, end, text), "")
+                self.assertEqual(self.failures, [failure])
+
+    def test_a_heading_that_bounds_two_slices_fails_once(self):
+        """A repeated heading that ends one slice and starts the next
+        records one failure."""
+        text = "# A\nx\n# B\ny\n# B\nz\n# C\n"
+        self.assertEqual(self.section_source("# A", "# B", text), "")
+        self.assertEqual(self.section_source("# B", "# C", text), "")
+        self.assertEqual(self.failures, ["paper section heading not unique: '# B' occurs 2 times"])
+
+
+class PinnedLinksTests(unittest.TestCase):
+    COMMIT = "20bfbe1abcb83b4f9f60fbe54789144321ff62b0"
+    REPO_URL = "https://github.com/PolicyEngine/spm-threshold-paper"
+    PINNED = f"[guide]({REPO_URL}/blob/{COMMIT}/docs/guide.md)"
+
+    def setUp(self):
+        self.pinned_links = guard_function(
+            "pinned_links",
+            SUPPORTING_COMMIT=self.COMMIT,
+            SUPPORTING_URL_BASE=f"{self.REPO_URL}/blob/{self.COMMIT}/",
+        )
+
+    def test_every_url_naming_the_document_must_be_at_the_pinned_blob(self):
+        """A second link that names the document off the pinned commit's
+        blob fails in any Markdown form; links at the pinned blob and links
+        to other files pass."""
+        main = f"{self.REPO_URL}/blob/main/docs/guide.md"
+        for extra in (
+            f"[a]({main}#L1)",
+            f'[a]({main} "title")',
+            f"[a](<{main}>)",
+            f"[a]({main}?plain=1)",
+            f"\n[a]: {main}\n",
+            f"<{main}>",
+            f"see {main}.",
+            f"[a]({self.REPO_URL}/tree/main/docs/guide.md)",
+            f"[a]({self.REPO_URL}/tree/{self.COMMIT}/docs/guide.md)",
+            f"[a]({self.REPO_URL}/raw/main/docs/guide.md)",
+            "[a](https://raw.githubusercontent.com/PolicyEngine/spm-threshold-paper/main/docs/guide.md)",
+            "[a](https://github.com/PolicyEngine/SPM-Threshold-Paper/blob/main/docs/guide.md)",
+        ):
+            with self.subTest(extra=extra):
+                self.assertFalse(self.pinned_links("docs/guide.md", f"{self.PINNED} {extra}"))
+        for extra in (
+            "",
+            f"[a]({self.REPO_URL}/blob/{self.COMMIT}/docs/guide.md#L1)",
+            f'[a]({self.REPO_URL}/blob/{self.COMMIT}/docs/guide.md "title")',
+            f"[a]({self.REPO_URL}/blob/main/docs/guide.md.bak)",
+            f"[a]({self.REPO_URL}/blob/main/docs/other.md)",
+            f"[a](https://github.com/PolicyEngine/SPM-Threshold-Paper/blob/{self.COMMIT}/docs/guide.md)",
+        ):
+            with self.subTest(extra=extra):
+                self.assertTrue(self.pinned_links("docs/guide.md", f"{self.PINNED} {extra}"))
+
+    def test_a_plain_inline_link_at_the_pinned_commit_must_exist(self):
+        """Pinned links in other forms don't stand in for the plain one."""
+        for text in (
+            "",
+            f"[guide]({self.REPO_URL}/blob/{self.COMMIT}/docs/guide.md#L1)",
+            f"[guide](<{self.REPO_URL}/blob/{self.COMMIT}/docs/guide.md>)",
+            f"{self.REPO_URL}/blob/{self.COMMIT}/docs/guide.md",
+        ):
+            with self.subTest(text=text):
+                self.assertFalse(self.pinned_links("docs/guide.md", text))
+
+
+class GuardSourceTests(unittest.TestCase):
+    def test_no_tie_reads_the_whole_paper(self):
+        """The guard reads the paper only through slices that a heading
+        bounds on each side, the abstract block, the include scans and the
+        metadata-files search."""
+        self.assertEqual(whole_paper_reads((REPO / "scripts/check_paper.py").read_text()), [])
+
+    def test_source_check_sees_each_way_to_read_the_whole_paper(self):
+        """Each listed form of a whole-paper read trips the source check,
+        and the guard's own reads don't."""
+        base = (
+            'QMD = (REPO / "paper" / "index.qmd").read_text()\n'
+            'QMD_RAW = (REPO / "paper" / "index.qmd").read_bytes().decode()\n'
+            "def section_source(start, end=None, text=QMD): ...\n"
+            "def section(start, end=None, text=QMD): ...\n"
+            "def front_matter_block(key, text=QMD_RAW): ...\n"
+            "def front_matter_source(key, text=QMD_RAW): ...\n"
+            f"includes = set(re.findall({INCLUDE_SCAN!r}, QMD))\n"
+            f"INCLUDES = re.findall({INCLUDE_TARGETS!r}, QMD_RAW)\n"
+            f"named = re.search({METADATA_SCAN!r}, QMD_RAW)\n"
+            'ROLLING = section("# A", "# B")\n'
+            'ROLLING_ACS = section("## C", None, ROLLING)\n'
+            'SLICE = section_source("# A", end="# B")\n'
+        )
+        self.assertEqual(whole_paper_reads(base), [])
+        for read in (
+            'check("x", has_number("1.17", text=QMD))',
+            'check("x", has_ordered(["1", "2"], text=QMD))',
+            'check("x", "1.17" in QMD)',
+            'check("x", stated("1.17", QMD))',
+            'check("x", stated("1.17", source=QMD))',
+            'check("x", set(stated_values("{} percent", QMD)) == {"1.17"})',
+            "PAPER = QMD",
+            'check("x", has_number("1.17", text=normalized(QMD)))',
+            'check("x", "1.17" in QMD[0:])',
+            'check("x", QMD.count("1.17") > 0)',
+            'check("x", re.search("1.17", QMD) is not None)',
+            'check("x", "1.17" in QMD.split("# A")[1])',
+            'TEXT = section_source("# A")',
+            'TEXT = section("# A", end=None)',
+            'PAPER = (REPO / "paper" / "index.qmd").read_text()',
+            'PAPER = (REPO / "paper/index.qmd").read_text()',
+            'PAPER = open("paper/index.qmd").read()',
+            'PAPERS = sorted(REPO.glob("paper/*.qmd"))',
+            'END = None\nTEXT = section("# A", END)',
+            'TEXT = section("# A", "# B" if FLAG else None)',
+            'check("x", bool(re.findall(r"include|1\\.17", QMD)))',
+            'check("x", has_number("1.17", text=QMD_RAW))',
+            'check("x", bool(re.search(r"metadata-files?|1\\.17", QMD_RAW)))',
+            'TEXT = front_matter_source("abstract", QMD)',
+            'check("x", bool(re.findall(r"\\{\\{<\\s*include\\s+(.*?)\\s*>\\}\\}|1\\.17", QMD_RAW)))',
+            'check("x", bool(re.search(r"\\{\\{<\\s*include\\s+(.*?)\\s*>\\}\\}", QMD_RAW)))',
+            f"INCLUDES = re.findall({INCLUDE_TARGETS!r}, QMD_RAW, flags=re.S)",
+        ):
+            with self.subTest(read=read):
+                self.assertNotEqual(whole_paper_reads(base + read + "\n"), [])
+
+
+    def test_stated_ties_read_raw_slices(self):
+        """Every stated() call reads a raw slice, which keeps the paper's
+        line breaks, so a rewrap that splits a multi-word figure fails the
+        tie as it failed #13's search of the whole paper."""
+        source = (REPO / "scripts/check_paper.py").read_text()
+        self.assertIn("stated(", source)
+        self.assertEqual(stated_reads_off_raw_text(source), [])
+
+    def test_raw_text_check_sees_each_way_to_hand_stated_other_text(self):
+        """Each listed form trips the raw-text check, and reads of names
+        bound once to a raw slice don't."""
+        base = (
+            'QMD = (REPO / "paper" / "index.qmd").read_text()\n'
+            "def normalized(text): ...\n"
+            "def section_source(start, end=None, text=QMD): ...\n"
+            "def front_matter_source(key, text=QMD): ...\n"
+            "def stated(literal, source, *phrases): ...\n"
+            'NOWCAST_SOURCE = section_source("# A", "## B")\n'
+            'NOTE_SOURCE = section_source("### C", "### D", NOWCAST_SOURCE)\n'
+            'ABSTRACT_SOURCE = front_matter_source("abstract") if ABSTRACT else ""\n'
+            'check("x", stated("3.2 percent", NOWCAST_SOURCE, "y"))\n'
+            'check("x", stated("0.98", NOTE_SOURCE))\n'
+            'check("x", stated("2.29", ABSTRACT_SOURCE))\n'
+        )
+        self.assertEqual(stated_reads_off_raw_text(base), [])
+        for form in (
+            'check("x", stated("3.2 percent", normalized(NOWCAST_SOURCE)))',
+            'check("x", stated("3.2 percent", QMD))',
+            'check("x", stated("3.2 percent", source=NOWCAST_SOURCE))',
+            'NOWCAST_TEXT = section("# A", "## B")\ncheck("x", stated("3.2 percent", NOWCAST_TEXT))',
+            'FLAT_SOURCE = normalized(section_source("# A", "## B"))\ncheck("x", stated("3.2", FLAT_SOURCE))',
+            'WIDE_SOURCE = section_source("# A", "## B") if X else QMD\ncheck("x", stated("3.2", WIDE_SOURCE))',
+            "NOWCAST_SOURCE = normalized(NOWCAST_SOURCE)",
+            "for NOWCAST_SOURCE in (QMD,):\n    pass",
+            'WIDE_SOURCE = section("# A", "## B") if X else ""\ncheck("x", stated("3.2", WIDE_SOURCE))',
+            'WIDE_TEXT = section("# A", "## C")\nNESTED_SOURCE = section_source("# A", "## B", WIDE_TEXT)\n'
+            'check("x", stated("3.2", NESTED_SOURCE))',
+            'NESTED_SOURCE = section_source("# A", "## B", text=normalized(QMD))\ncheck("x", stated("3.2", NESTED_SOURCE))',
+            "def stated_in(literal, NOWCAST_SOURCE):\n    return stated(literal, NOWCAST_SOURCE)",
+            'say = stated\ncheck("x", say("3.2", normalized(NOWCAST_SOURCE)))',
+            "import NOWCAST_SOURCE",
+            'HEADS = ("# A", "## B", normalized(NOWCAST_SOURCE))\nSTAR_SOURCE = section_source(*HEADS)\n'
+            'check("x", stated("3.2", STAR_SOURCE))',
+            'KW_SOURCE = section_source("# A", "## B", **{"text": normalized(NOWCAST_SOURCE)})\n'
+            'check("x", stated("3.2", KW_SOURCE))',
+            "match normalized(NOWCAST_SOURCE):\n    case NOWCAST_SOURCE:\n        pass",
+            "def NOWCAST_SOURCE():\n    pass",
+            "class NOWCAST_SOURCE:\n    pass",
+            "try:\n    pass\nexcept ValueError as NOWCAST_SOURCE:\n    pass",
+            "match {}:\n    case {**NOWCAST_SOURCE}:\n        pass",
+            'globals()["NOWCAST_SOURCE"] = normalized(NOWCAST_SOURCE)',
+            "vars().update(NOWCAST_SOURCE=normalized(NOWCAST_SOURCE))",
+            'setattr(sys.modules[__name__], "NOWCAST_SOURCE", normalized(NOWCAST_SOURCE))',
+            'exec("NOWCAST_SOURCE = normalized(NOWCAST_SOURCE)")',
+            'sys.modules[__name__].__dict__["NOWCAST_SOURCE"] = ""',
+            "def section_source(start, end=None, text=QMD):\n    return normalized(text)",
+            "def stated(literal, source, *phrases):\n    return True",
+            "def normalized(text):\n    return text",
+            "def front_matter_source(key, text=QMD):\n    return normalized(text)",
+            "def f():\n    global NOWCAST_SOURCE",
+            "match []:\n    case [*NOWCAST_SOURCE]:\n        pass",
+            "async def NOWCAST_SOURCE():\n    pass",
+            'locals()["NOWCAST_SOURCE"] = ""',
+            'eval("NOWCAST_SOURCE")',
+            '__import__("sys").modules[__name__].NOWCAST_SOURCE = ""',
+        ):
+            with self.subTest(form=form):
+                self.assertNotEqual(stated_reads_off_raw_text(base + form + "\n"), [])
 
 if __name__ == "__main__":
     unittest.main()
