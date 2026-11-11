@@ -34,8 +34,14 @@ AMOUNT_LABELS = {
 }
 
 
-def markdown_table(headers: list[str], rows: list[list[str]]) -> str:
-    lines = ["| " + " | ".join(headers) + " |", "|" + "---|" * len(headers)]
+def markdown_table(headers: list[str], rows: list[list[str]], widths: tuple[int, ...] | None = None) -> str:
+    """A pipe table. Pandoc sets each column's PDF width in proportion to
+    the dashes under its header once a row runs past 72 characters, so
+    ``widths`` widens a column whose labels would otherwise wrap."""
+    widths = widths or (3,) * len(headers)
+    if len(widths) != len(headers):
+        raise ValueError("one width per column")
+    lines = ["| " + " | ".join(headers) + " |", "|" + "|".join("-" * w for w in widths) + "|"]
     lines.extend("| " + " | ".join(row) + " |" for row in rows)
     return "\n".join(lines) + "\n"
 
@@ -115,7 +121,7 @@ def accounting_table(figures: dict) -> str:
         rows.append(
             [label, *(f"{accounting[t][part]:.2f} ({accounting[t]['shares'][part]:.1f}%)" for t in TENURES)]
         )
-    return markdown_table(headers, rows)
+    return markdown_table(headers, rows, widths=(12, 6, 6, 6))
 
 
 def level_table(figures: dict) -> str:
