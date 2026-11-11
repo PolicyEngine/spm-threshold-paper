@@ -1143,6 +1143,17 @@ BIB_TEXT = (REPO / "bibliography" / "references.bib").read_text()
 CALCULATOR_DOC = "https://github.com/PolicyEngine/spm-calculator/blob/{}/docs/ce-inkind-imputation.md"
 
 
+def inkind_bib_note(commits):
+    """The in-kind entry's note: one commit when the imputation and the
+    comparison with BLS's components share it, else each."""
+    if commits[REPLICATION] == commits[COMPONENTS]:
+        return f"Imputation and comparison with BLS components at commit {commits[COMPONENTS]}"
+    return (
+        f"Imputation at commit {commits[REPLICATION]}; comparison with BLS components at commit "
+        f"{commits[COMPONENTS]}"
+    )
+
+
 def bib_field(key: str, field: str) -> str | None:
     """One field of one bibliography entry, or None when the entry or the
     field is missing, so its pin fails."""
@@ -1279,7 +1290,7 @@ def displayed_shares() -> list[float] | None:
 
 # Method constants the section quotes from the calculator's code rather
 # than from a receipt. We read each from spm_calculator/ce_inkind.py at
-# this fingerprint (calculator commit 4778dfa); a receipt rebuilt from
+# this fingerprint (calculator commit 4778dfa, unchanged at 53cb0fa); a receipt rebuilt from
 # changed code fails the pin until someone rereads them.
 INKIND_METHOD_SOURCE = (
     "spm_calculator/ce_inkind.py",
@@ -1329,7 +1340,7 @@ INKIND_THRESHOLD_SOURCE = (
 )
 INKIND_THRESHOLD_CONSTANTS = ("mean imputed benefits per consumer unit in the 47th–53rd percentile band",)
 # Rules the section quotes from spm_calculator/ce_bls_shares.py at this
-# fingerprint (calculator commit 8f632e3, unchanged at 708ea21): the written-definition runs and
+# fingerprint (calculator commit 8f632e3, unchanged at 53cb0fa): the written-definition runs and
 # the reading of BLS's internet rows.
 INKIND_DEFINITION_SOURCE = (
     "spm_calculator/ce_bls_shares.py",
@@ -1953,9 +1964,7 @@ inkind_pins = (
     ),
     (
         "bibliography cites the recorded calculator commits",
-        bib_field("spmcalculator2026inkind", "note")
-        == f"Imputation at commit {receipt_commits[REPLICATION]}; comparison with BLS components at commit "
-        f"{receipt_commits[COMPONENTS]}"
+        bib_field("spmcalculator2026inkind", "note") == inkind_bib_note(receipt_commits)
         and bib_field("spmcalculator2026inkind", "url") == CALCULATOR_DOC.format(receipt_commits[COMPONENTS])
         and bib_field("spmcalculator2026se", "note") == f"Commit {receipt_commits[UNCERTAINTY]}"
         and bib_field("spmcalculator2026se", "url") == CALCULATOR_DOC.format(receipt_commits[UNCERTAINTY]),

@@ -1140,10 +1140,9 @@ digest is:
 
 For the in-kind experiment in @sec-inkind, we keep three receipts from
 spm-calculator, with their provenance and checksums, in the paper
-repository's [`data/inkind`](https://github.com/PolicyEngine/spm-threshold-paper/tree/inkind-section-2026-11/data/inkind) folder: the imputation at commit
-`4778dfab2d109515b6a14e63da63011dd7feb884`, and the comparison with
-BLS's components and the replicate-weight standard errors, both at
-commit `708ea21d32efb54a0c91dffde5d1c417b62aa847`. Before each render, we
+repository's [`data/inkind`](https://github.com/PolicyEngine/spm-threshold-paper/tree/inkind-section-2026-11/data/inkind) folder: the imputation, the comparison with BLS's components, and the
+replicate-weight standard errors, all at commit
+`53cb0fa08a0ca2fe1ea4b15a32ec77090ca8b91c`. Before each render, we
 check that the out-of-pocket run reproduces the retrospective
 replication artifact exactly. We then recompute every in-kind estimate
 in the tables and text from the receipts' thresholds, band means, and

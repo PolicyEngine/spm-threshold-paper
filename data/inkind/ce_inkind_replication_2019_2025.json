@@ -82,7 +82,7 @@
   },
   "classification": "current_retrospective_research",
   "code_sha256": {
-    "scripts/replicate_ce_inkind.py": "dd46d305b6cf4d2b62a55bfd063b93498728663ae00df245a0a332bb3ae33ae9",
+    "scripts/replicate_ce_inkind.py": "8bb1355db12ff47b0f82cf1167df7868a8145b9017db98cf54214e5c5aecad99",
     "spm_calculator/ce_decomposition.py": "39be6fc2ceef0764cbf1133a1f4ea39c67a4de6a4e781357f717a7a82d0e00c0",
     "spm_calculator/ce_inkind.py": "c23e6f26ef32328ef0952d90edca9b382e7fa6e5e029d530a7a0beb9e1d10724",
     "spm_calculator/ce_inkind_stage.py": "9543b1ce76b6ce1974d1dcfc11e4840202633666da2684201836668f52210986",
@@ -2075,8 +2075,8 @@
     }
   },
   "generated_by": "scripts/replicate_ce_inkind.py",
-  "generated_on": "2026-11-06",
-  "git_head": "5514c6996bfd71e13adcf4dc720fa47c06814e55",
+  "generated_on": "2026-11-11",
+  "git_head": "b1a635b3c6915ad620dd5001c5faa48c81fce648",
   "imputation_diagnostics": {
     "broadband": {
       "2014": {
@@ -3545,14 +3545,16 @@
     "seed": 20261105
   },
   "limitations": [
-    "BLS has not published its imputation code or covariates; the models follow its method description",
+    "BLS has not published its imputation code; the models follow its methods page, and their covariates differ from the set Garner and Gudrais (2018, BLS Working Paper 510) list for BLS's earlier models",
     "Rental assistance uses a log-normal Tobit on CE unit characteristics and takes reported rents as exact",
     "School lunch donor values for reference years 2014-2017 come from the USDA formula; later years use Census SPM_SCHLUNCH values",
+    "BLS says it assigns school lunch by the traditional method before and after the COVID-19 period; the stage uses Census SPM_SCHLUNCH values for every reference year from 2018, and from reference year 2023 Census estimates those values with its fall 2022 method",
     "The imputation assigns school lunch only to households it imputes as receiving free, reduced-price or universal-free lunch; Census also values paid lunches and, in some years, P-EBT or Summer EBT for other households",
-    "Census's school lunch values for reference years 2020-2023 include P-EBT, which arrived on EBT cards; BLS says it follows Census's COVID-era methods, but by its reasoning for leaving out SNAP, reported food spending may already include those benefits",
+    "Census accounts for P-EBT in its school lunch values for reference years 2020 and 2021, and states paid P-EBT on EBT cards; BLS says it follows Census's COVID-era methods, but by its reasoning for leaving out SNAP, reported food spending may already include those benefits",
     "WIC uses USDA's national fiscal-year average food cost; Census has used state averages since its revised 2019 estimates",
     "Participation models share one covariate set across programs and years; CE and CPS income concepts differ",
     "The replication omits home internet spending, which BLS's FCSUti includes",
+    "BLS adds broadband subsidies from the 2023 thresholds, with underlying data from 2022; the stage imputes them from reference year 2021, so they also enter the 2022 thresholds",
     "The runs estimate imputation uncertainty (implicate spread) but not sampling uncertainty"
   ],
   "results": {
@@ -4886,6 +4888,6 @@
     "python": "3.14.7",
     "scipy": "1.18.1"
   },
-  "runtime_seconds": 54,
+  "runtime_seconds": 239,
   "schema_version": 1
 }

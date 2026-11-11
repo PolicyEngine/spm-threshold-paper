@@ -33,8 +33,8 @@
   },
   "classification": "current_retrospective_research",
   "code_sha256": {
-    "scripts/estimate_ce_replicate_uncertainty.py": "743667482af0f505e4e5c85fad8a601f650713c76bd80a8eaa0a6345e58de20c",
-    "scripts/replicate_ce_inkind.py": "dd46d305b6cf4d2b62a55bfd063b93498728663ae00df245a0a332bb3ae33ae9",
+    "scripts/estimate_ce_replicate_uncertainty.py": "a8d19fb172ae695da1b6b046885229ec821c55545accc7790562260061967d6f",
+    "scripts/replicate_ce_inkind.py": "8bb1355db12ff47b0f82cf1167df7868a8145b9017db98cf54214e5c5aecad99",
     "spm_calculator/ce_bls_shares.py": "c6ef2d751feb5b97ead6e4ed74bb03bae6d584d96783033c031d88980b13accf",
     "spm_calculator/ce_decomposition.py": "39be6fc2ceef0764cbf1133a1f4ea39c67a4de6a4e781357f717a7a82d0e00c0",
     "spm_calculator/ce_inkind.py": "c23e6f26ef32328ef0952d90edca9b382e7fa6e5e029d530a7a0beb9e1d10724",
@@ -48,8 +48,8 @@
   },
   "complete": true,
   "generated_by": "scripts/estimate_ce_replicate_uncertainty.py",
-  "generated_on": "2026-11-08",
-  "git_head": "6273b3c039205f5fafd53c1a47da358dc3c0f686",
+  "generated_on": "2026-11-11",
+  "git_head": "b1a635b3c6915ad620dd5001c5faa48c81fce648",
   "inputs": {
     "ce_bundles": {
       "intrvw14.zip": {
@@ -99,7 +99,7 @@
     },
     "components_receipt": {
       "path": "spm_calculator/data/current/ce_inkind_bls_components_2019_2025.json",
-      "sha256": "4a08c13e94abb567607a6a1f8e4fba45a049b345ec10f054dae503383f3557be"
+      "sha256": "429cd862c4809fe712163017e8fb89ace6e38bccc19ecdad51d0ce463717cbe4"
     },
     "cpi": {
       "path": "spm_calculator/data/bls/cpi_annual.json",
@@ -252,7 +252,7 @@
     "imputation_seed": 20261105,
     "replication_receipt": {
       "path": "spm_calculator/data/current/ce_inkind_replication_2019_2025.json",
-      "sha256": "22e62cee945028faf063df553d41ed3e64a26d1f82e4dd4ef82aa1da830b3dcb"
+      "sha256": "8cbfd872d972f42bd2f7b9a89a2409eb581d81d8446fc96e23b8768632acd168"
     }
   },
   "limitations": [
@@ -260,7 +260,7 @@
     "Implicates draw model parameters from covariances that ignore the CPS ASEC and CE designs' strata and clusters",
     "In 2015Q2 and 2017Q1, most consumer units interviewed in both that quarter and the one before changed their pattern of positive and zero replicate weights, so under one replicate number a unit's interviews on either side can fall in different half samples; the 2019-2021 windows span one or both quarters, and their replicates can miss part of the correlation between a unit's interviews",
     "The FCSUti-index run deflates every component by BLS's published index, so its price factors do not vary across replicates",
-    "BLS's threshold workbooks do not say how BLS computes its published standard errors"
+    "Garner (2010, BLS Working Paper 436) computed the standard errors of BLS's 2006-2008 experimental thresholds by balanced repeated replication with the CE's 44 replicate weights; BLS's methods page and threshold workbooks do not say how its current replicates treat the percentile band or the imputed benefits"
   ],
   "method": {
     "combining": "Rubin's rules: T = U + (1 + 1/M) B, with U the mean of the implicates' replicate variances and B the variance of their full-sample estimates (divisor M - 1)",
@@ -5899,7 +5899,7 @@
     "python": "3.13.13",
     "scipy": "1.18.1"
   },
-  "runtime_seconds": 260,
+  "runtime_seconds": 708,
   "schema_version": 1,
   "targets": [2019, 2020, 2021, 2022, 2023, 2024, 2025]
 }

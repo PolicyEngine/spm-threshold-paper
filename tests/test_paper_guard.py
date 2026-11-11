@@ -273,17 +273,17 @@ INKIND_PROSE_MUTATIONS = (
         "evaluation section cites BLS's imputed renter points",
     ),
     (
-        "appendix commit",
+        "appendix names the imputation's old commit",
         "appendix",
-        r"`4778dfab2d109515b6a14e63da63011dd7feb884`",
-        "`4778dfab2d109515b6a14e63da63011dd7feb885`",
+        r"`53cb0fa08a0ca2fe1ea4b15a32ec77090ca8b91c`",
+        "`4778dfab2d109515b6a14e63da63011dd7feb884`",
         "appendix names the recorded calculator commits",
     ),
     (
         "appendix standard-error commit",
         "appendix",
-        r"`708ea21d32efb54a0c91dffde5d1c417b62aa847`",
-        "`708ea21d32efb54a0c91dffde5d1c417b62aa840`",
+        r"`53cb0fa08a0ca2fe1ea4b15a32ec77090ca8b91c`",
+        "`53cb0fa08a0ca2fe1ea4b15a32ec77090ca8b910`",
         "appendix names the recorded calculator commits",
     ),
     (
@@ -1670,8 +1670,8 @@ class PaperGuardTests(unittest.TestCase):
         original = readme.read_text()
         cases = (
             ("receipt count", "uses three receipts", "uses two receipts"),
-            ("commit", "`708ea21d32efb54a0c91dffde5d1c417b62aa847`", "`708ea21`"),
-            ("tag", "`paper-inkind-se-708ea21`", "`paper-inkind-se-a581c11`"),
+            ("commit", "`53cb0fa08a0ca2fe1ea4b15a32ec77090ca8b91c`", "`53cb0fa`"),
+            ("tag", "`paper-inkind-se-53cb0fa`", "`paper-inkind-se-a581c11`"),
         )
         for name, old, new in cases:
             with self.subTest(name=name):
@@ -1687,13 +1687,13 @@ class PaperGuardTests(unittest.TestCase):
     def test_bibliography_cites_the_recorded_calculator_commits(self):
         bib = self.repo / "bibliography/references.bib"
         original = bib.read_text()
-        # Both receipts come from one calculator commit, so the cases edit one
-        # entry at a time; a swap of the two entries would change nothing.
-        components = uncertainty = "708ea21d32efb54a0c91dffde5d1c417b62aa847"
+        # All three receipts come from one calculator commit, so the cases
+        # edit one entry at a time; a swap of two commits would change nothing.
+        components = uncertainty = replication = "53cb0fa08a0ca2fe1ea4b15a32ec77090ca8b91c"
         stale_components = "8f632e31b4e48bbc735161d24665a8182dc0d9d6"
         stale_uncertainty = "a581c113dd4319fc0f6f9ebd6db5c3697f4a94fa"
-        replication = "4778dfab2d109515b6a14e63da63011dd7feb884"
-        note = f"Imputation at commit {replication}; comparison with BLS components at commit {components}"
+        stale_replication = "4778dfab2d109515b6a14e63da63011dd7feb884"
+        note = f"Imputation and comparison with BLS components at commit {components}"
         inkind = original.index("@misc{spmcalculator2026inkind")
         inkind = (inkind, original.index("\n}\n", inkind) + 3)
         se = original.index("@misc{spmcalculator2026se")
@@ -1709,10 +1709,10 @@ class PaperGuardTests(unittest.TestCase):
             ("stale components link", in_entry(inkind, f"blob/{components}/", f"blob/{stale_components}/")),
             ("stale standard-error link", in_entry(se, f"blob/{uncertainty}/", f"blob/{stale_uncertainty}/")),
             (
-                "commits swapped inside the in-kind note",
+                "note names the imputation's old commit",
                 original.replace(
                     note,
-                    f"Imputation at commit {components}; comparison with BLS components at commit {replication}",
+                    f"Imputation at commit {stale_replication}; comparison with BLS components at commit {components}",
                 ),
             ),
             (

@@ -615,7 +615,7 @@
   "classification": "current_retrospective_research",
   "code_sha256": {
     "scripts/compare_ce_inkind_bls_shares.py": "2fe9f2413005d3a5dccfd5eeedaec233eb3eb5aaa603a622a9c6fa056a36917a",
-    "scripts/replicate_ce_inkind.py": "dd46d305b6cf4d2b62a55bfd063b93498728663ae00df245a0a332bb3ae33ae9",
+    "scripts/replicate_ce_inkind.py": "8bb1355db12ff47b0f82cf1167df7868a8145b9017db98cf54214e5c5aecad99",
     "spm_calculator/ce_bls_shares.py": "c6ef2d751feb5b97ead6e4ed74bb03bae6d584d96783033c031d88980b13accf",
     "spm_calculator/ce_decomposition.py": "39be6fc2ceef0764cbf1133a1f4ea39c67a4de6a4e781357f717a7a82d0e00c0",
     "spm_calculator/ce_inkind.py": "c23e6f26ef32328ef0952d90edca9b382e7fa6e5e029d530a7a0beb9e1d10724",
@@ -811,8 +811,8 @@
     }
   },
   "generated_by": "scripts/compare_ce_inkind_bls_shares.py",
-  "generated_on": "2026-11-08",
-  "git_head": "686705e506b9244fb1dc502fffe2cd7319e9af69",
+  "generated_on": "2026-11-11",
+  "git_head": "b1a635b3c6915ad620dd5001c5faa48c81fce648",
   "inputs": {
     "bls_shares_workbook": {
       "path": "spm_calculator/data/current/bls_spm_shares.xlsx",
@@ -826,7 +826,7 @@
     },
     "replication_receipt": {
       "path": "spm_calculator/data/current/ce_inkind_replication_2019_2025.json",
-      "sha256": "22e62cee945028faf063df553d41ed3e64a26d1f82e4dd4ef82aa1da830b3dcb"
+      "sha256": "8cbfd872d972f42bd2f7b9a89a2409eb581d81d8446fc96e23b8768632acd168"
     },
     "threshold_series": {
       "path": "spm_calculator/data/bls/threshold_series.json",
@@ -8864,6 +8864,6 @@
     "pandas": "3.0.0",
     "python": "3.13.13"
   },
-  "runtime_seconds": 77,
+  "runtime_seconds": 391,
   "schema_version": 1
 }
