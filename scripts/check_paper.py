@@ -40,8 +40,9 @@ push to master and every pull request. It fails when:
     written, so a line break inside a multi-word figure fails. Appendix
     B must link each supporting document, and section 6.1 the forecast
     record, with a plain inline link at the pinned commit, and every
-    other URL there that names the document, in any Markdown form, must
-    point at that commit's blob too. The guard reads each error rate the
+    other URL there that names this repository and the document must
+    point at that commit's blob too, in any Markdown form and with the
+    repository's name in any letter case. The guard reads each error rate the
     abstract quotes from the front matter's ``abstract: |`` block alone,
     as Quarto and pandoc read it, beside the rule it scores, and every
     rate the abstract gives in that rule's wording must equal the
@@ -203,22 +204,32 @@ def section_source(start: str, end: str | None = None, text: str = QMD) -> str:
     text beside it. Otherwise the slice comes back empty and the guard
     records a failure that names the heading, once even when it bounds two
     slices, so every pin inside the slice fails rather than silently
-    widening to the whole document.
+    widening to the whole document. When ``text`` is empty, as after an
+    enclosing slice fails, the failure says so and names the start heading
+    rather than counting headings the paper may hold.
 
     No pinned figure begins or ends with whitespace, so a figure that
     matches inside the slice has the same neighbors in the whole paper,
     and a presence pin that passes on the slice passes on the whole
     paper."""
-    problems = [
-        f"paper section heading not unique: {marker!r} occurs {text.count(marker)} times"
-        for marker in (start, end)
-        if marker is not None and text.count(marker) != 1
-    ]
+    problems = (
+        [
+            f"paper section heading not unique: {marker!r} occurs {text.count(marker)} times"
+            for marker in (start, end)
+            if marker is not None and text.count(marker) != 1
+        ]
+        if text
+        else [f"no text to slice for paper section {start!r}"]
+    )
     if not problems:
         first = text.index(start) + len(start)
         last = len(text) if end is None else text.index(end)
         if last <= first:
-            problems.append(f"paper sections out of order: {start!r} before {end!r}")
+            problems.append(
+                f"nothing follows paper section heading {start!r}"
+                if end is None
+                else f"paper sections out of order: {start!r} before {end!r}"
+            )
         elif not text[first].isspace():
             problems.append(f"paper section heading runs into the text after it: {start!r}")
         elif end is not None and not text[last - 1].isspace():
@@ -262,9 +273,10 @@ def pinned_links(path: str, text: str) -> bool:
     in ``text`` that names this repository and ``path`` pointing at the
     pinned commit's blob, whether it carries a fragment, a query, a title,
     angle brackets or a reference definition, or sits on tree/, raw/ or
-    raw.githubusercontent.com."""
+    raw.githubusercontent.com. The repository's name matches in any letter
+    case."""
     refs = re.findall(
-        rf"spm-threshold-paper/([^\s()<>\[\]\"']*?)/?{re.escape(path)}(?![\w/-]|\.\w)", text
+        rf"(?i:spm-threshold-paper)/([^\s()<>\[\]\"']*?)/?{re.escape(path)}(?![\w/-]|\.\w)", text
     )
     return f"]({SUPPORTING_URL_BASE}{path})" in text and set(refs) == {f"blob/{SUPPORTING_COMMIT}"}
 

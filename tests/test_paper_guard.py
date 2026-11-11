@@ -1804,7 +1804,8 @@ SECTION_PROSE_MUTATIONS = (
 # slice on the side it runs into, so the guard names the heading and fails
 # that section's ties instead of searching anywhere else. Each heading that
 # bounds the slices for sections 3.2, 5.3, 6.1, 6.2 and 6.3, the rolling
-# section or either appendix appears in at least one case.
+# section and its two subsections, or either appendix appears in at least
+# one case.
 SECTION_MARKER_CASES = (
     (
         "renamed sensitivity heading",
@@ -1996,6 +1997,40 @@ SECTION_MARKER_CASES = (
         (
             "paper section heading not unique: '# References' occurs 2 times",
             "manuscript links fixed supporting document: docs/forecast-record.md",
+        ),
+    ),
+    (
+        "renamed rolling expenditure heading",
+        (
+            (
+                "## Projecting expenditure records and rolling windows\n",
+                "## Projecting expenditure records\n",
+            ),
+        ),
+        (
+            "paper section heading not unique: "
+            "'## Projecting expenditure records and rolling windows' occurs 0 times",
+            "rolling real-growth sensitivities in stated order with their block counts",
+        ),
+    ),
+    (
+        "repeated rolling housing-cost heading",
+        ((DISCUSSION_HEADING, "## Projecting local relative housing costs\n\n" + DISCUSSION_HEADING),),
+        (
+            "paper section heading not unique: '## Projecting local relative housing costs' occurs 2 times",
+            "rolling real-growth sensitivities in stated order with their block counts",
+            "rolling geographic validation covers 341 anchored areas",
+        ),
+    ),
+    (
+        "repeated discussion heading",
+        ((DISCUSSION_HEADING, DISCUSSION_HEADING + "\n" + DISCUSSION_HEADING),),
+        (
+            "paper section heading not unique: '# Discussion {#sec-discussion}' occurs 2 times",
+            "no text to slice for paper section '## Projecting expenditure records and rolling windows'",
+            "no text to slice for paper section '## Projecting local relative housing costs'",
+            "rolling real-growth sensitivities in stated order with their block counts",
+            "in-kind prose: discussion stage-change range",
         ),
     ),
 )
@@ -3118,6 +3153,29 @@ class PaperGuardTests(unittest.TestCase):
                     self.assertEqual(sorted(failure_lines(result.stdout)), sorted(labels))
         self.install_article()
 
+    def test_retrospective_prose_ties_read_the_abstract_with_its_comments(self):
+        """An empty HTML comment inside one of the abstract's four
+        retrospective rates breaks the figure in the paper's source, where
+        #13's search of the whole paper fails it, so the rate's prose tie,
+        which reads the block's raw text, fails too. The abstract ties read
+        the block without its comments and pass."""
+        record = json.loads((self.repo / "data/current/ce_replication_2019_2025.json").read_text())
+        rates = record["projection_evaluation"]["summary_2020_2025"]
+        self.assertEqual(len(rates), 4)
+        for rule, value in rates.items():
+            whole, part = f"{value:.2f}".split(".")
+            with self.subTest(rule=rule):
+                self.install_article()
+                self.mutate_article(
+                    "abstract",
+                    rf"{whole}\.{part} percent",
+                    f"{whole}.<!-- -->{part} percent",
+                    once=True,
+                )
+                result = self.run_guard()
+                self.assertEqual(failure_lines(result.stdout), [f"current projection prose {rule}"])
+        self.install_article()
+
     def test_abstract_block_fails_closed_unless_one_key_sets_the_abstract(self):
         """A folded, repeated, nested or relocated `abstract: |` key, a
         metadata block in the body, or a lone carriage return in the front
@@ -3500,6 +3558,76 @@ def guard_function(name, **namespace):
     return namespace[name]
 
 
+RAW_SLICERS = ("section_source", "front_matter_source")
+
+
+def stated_reads_off_raw_text(source):
+    """Each stated() call in a guard's source that reads anything but a name
+    the guard binds once, at module level, to a section_source() or
+    front_matter_source() call, alone or as a conditional whose other branch
+    is an empty string."""
+    tree = ast.parse(source)
+
+    def raw_slice(value):
+        if isinstance(value, ast.IfExp):
+            return (
+                raw_slice(value.body)
+                and isinstance(value.orelse, ast.Constant)
+                and value.orelse.value == ""
+            )
+        return isinstance(value, ast.Call) and ast.unparse(value.func) in RAW_SLICERS
+
+    stores = [node.id for node in ast.walk(tree) if isinstance(node, ast.Name) and isinstance(node.ctx, ast.Store)]
+    raw = {
+        node.targets[0].id
+        for node in tree.body
+        if isinstance(node, ast.Assign)
+        and len(node.targets) == 1
+        and isinstance(node.targets[0], ast.Name)
+        and stores.count(node.targets[0].id) == 1
+        and raw_slice(node.value)
+    }
+    return [
+        f"line {node.lineno}: {ast.unparse(node)}"
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and ast.unparse(node.func) == "stated"
+        and not (len(node.args) > 1 and isinstance(node.args[1], ast.Name) and node.args[1].id in raw)
+    ]
+
+
+class SectionSourceTests(unittest.TestCase):
+    def setUp(self):
+        self.failures = []
+        self.section_source = guard_function("section_source", QMD="", failures=self.failures)
+
+    def test_a_slice_keeps_the_text_between_its_headings(self):
+        """A slice keeps its edges' whitespace, and a slice with no end
+        heading runs to the end of the text."""
+        text = "x\n# A\nbody\n# B\ny"
+        self.assertEqual(self.section_source("# A", "# B", text), "\nbody\n")
+        self.assertEqual(self.section_source("# B", None, text), "\ny")
+        self.assertEqual(self.failures, [])
+
+    def test_each_failure_names_its_heading(self):
+        """Each way a slice can fail empties it and records one failure
+        that names the heading."""
+        cases = (
+            ("# A", "# B", "x\n# B\n", "paper section heading not unique: '# A' occurs 0 times"),
+            ("# A", "# B", "# A\n# A\n# B\n", "paper section heading not unique: '# A' occurs 2 times"),
+            ("# A", "# B", "# B\nx\n# A\n", "paper sections out of order: '# A' before '# B'"),
+            ("# A", "# B", "# Ab\n# B\n", "paper section heading runs into the text after it: '# A'"),
+            ("# A", "# B", "# A\nbody# B\n", "paper section text runs into the heading after it: '# B'"),
+            ("# A", None, "x\n# A", "nothing follows paper section heading '# A'"),
+            ("# A", "# B", "", "no text to slice for paper section '# A'"),
+        )
+        for start, end, text, failure in cases:
+            with self.subTest(failure=failure):
+                self.failures.clear()
+                self.assertEqual(self.section_source(start, end, text), "")
+                self.assertEqual(self.failures, [failure])
+
+
 class PinnedLinksTests(unittest.TestCase):
     COMMIT = "20bfbe1abcb83b4f9f60fbe54789144321ff62b0"
     REPO_URL = "https://github.com/PolicyEngine/spm-threshold-paper"
@@ -3529,6 +3657,7 @@ class PinnedLinksTests(unittest.TestCase):
             f"[a]({self.REPO_URL}/tree/{self.COMMIT}/docs/guide.md)",
             f"[a]({self.REPO_URL}/raw/main/docs/guide.md)",
             "[a](https://raw.githubusercontent.com/PolicyEngine/spm-threshold-paper/main/docs/guide.md)",
+            "[a](https://github.com/PolicyEngine/SPM-Threshold-Paper/blob/main/docs/guide.md)",
         ):
             with self.subTest(extra=extra):
                 self.assertFalse(self.pinned_links("docs/guide.md", f"{self.PINNED} {extra}"))
@@ -3538,6 +3667,7 @@ class PinnedLinksTests(unittest.TestCase):
             f'[a]({self.REPO_URL}/blob/{self.COMMIT}/docs/guide.md "title")',
             f"[a]({self.REPO_URL}/blob/main/docs/guide.md.bak)",
             f"[a]({self.REPO_URL}/blob/main/docs/other.md)",
+            f"[a](https://github.com/PolicyEngine/SPM-Threshold-Paper/blob/{self.COMMIT}/docs/guide.md)",
         ):
             with self.subTest(extra=extra):
                 self.assertTrue(self.pinned_links("docs/guide.md", f"{self.PINNED} {extra}"))
@@ -3607,6 +3737,37 @@ class GuardSourceTests(unittest.TestCase):
             with self.subTest(read=read):
                 self.assertNotEqual(whole_paper_reads(base + read + "\n"), [])
 
+
+    def test_stated_ties_read_raw_slices(self):
+        """Every stated() call reads a raw slice, which keeps the paper's
+        line breaks, so a rewrap that splits a multi-word figure fails the
+        tie as it failed #13's search of the whole paper."""
+        source = (REPO / "scripts/check_paper.py").read_text()
+        self.assertIn("stated(", source)
+        self.assertEqual(stated_reads_off_raw_text(source), [])
+
+    def test_raw_text_check_sees_each_way_to_hand_stated_other_text(self):
+        """Each listed form trips the raw-text check, and reads of names
+        bound once to a raw slice don't."""
+        base = (
+            'NOWCAST_SOURCE = section_source("# A", "## B")\n'
+            'ABSTRACT_SOURCE = front_matter_source("abstract") if ABSTRACT else ""\n'
+            'check("x", stated("3.2 percent", NOWCAST_SOURCE, "y"))\n'
+            'check("x", stated("2.29", ABSTRACT_SOURCE))\n'
+        )
+        self.assertEqual(stated_reads_off_raw_text(base), [])
+        for form in (
+            'check("x", stated("3.2 percent", normalized(NOWCAST_SOURCE)))',
+            'check("x", stated("3.2 percent", QMD))',
+            'check("x", stated("3.2 percent", source=NOWCAST_SOURCE))',
+            'NOWCAST_TEXT = section("# A", "## B")\ncheck("x", stated("3.2 percent", NOWCAST_TEXT))',
+            'FLAT_SOURCE = normalized(section_source("# A", "## B"))\ncheck("x", stated("3.2", FLAT_SOURCE))',
+            'WIDE_SOURCE = section_source("# A", "## B") if X else QMD\ncheck("x", stated("3.2", WIDE_SOURCE))',
+            "NOWCAST_SOURCE = normalized(NOWCAST_SOURCE)",
+            "for NOWCAST_SOURCE in (QMD,):\n    pass",
+        ):
+            with self.subTest(form=form):
+                self.assertNotEqual(stated_reads_off_raw_text(base + form + "\n"), [])
 
 if __name__ == "__main__":
     unittest.main()
