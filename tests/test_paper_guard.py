@@ -2193,6 +2193,10 @@ class PaperGuardTests(unittest.TestCase):
                 "lone carriage return in the front matter",
                 (("Supplemental Poverty\n", "Supplemental Poverty\r"),),
             ),
+            (
+                "tagged format-level abstract",
+                (("    toc: true\n", "    toc: true\n    !!str abstract: A copy for the web.\n"),),
+            ),
         )
         expected = sorted(
             (
@@ -2208,6 +2212,40 @@ class PaperGuardTests(unittest.TestCase):
                 result = self.run_guard()
                 self.assertNotEqual(result.returncode, 0)
                 self.assertEqual(sorted(failure_lines(result.stdout)), expected)
+        self.install_article()
+
+    def test_abstract_comes_only_from_the_paper(self):
+        """Quarto merges project and directory metadata into the paper's, so
+        an abstract or a metadata-files list in any of them fails the guard,
+        while the paper's own abstract still passes every tie."""
+        label = "only paper/index.qmd may set the abstract or name metadata files"
+        cases = (
+            ("project file", "_quarto.yml", "abstract: A copy.\n"),
+            ("project format", "_quarto.yml", "format:\n  html:\n    abstract: A copy.\n"),
+            ("project profile", "_quarto-web.yml", "abstract: A copy.\n"),
+            ("paper folder metadata", "paper/_metadata.yml", "abstract: A copy.\n"),
+            ("root metadata", "_metadata.yml", "format: {pdf: {abstract: A copy.}}\n"),
+            ("project metadata files", "_quarto.yml", "metadata-files: [extra.yml]\n"),
+            ("paper metadata files", "paper/index.qmd", "metadata-files:\n  - extra.yml\n"),
+        )
+        for name, relative, addition in cases:
+            with self.subTest(case=name):
+                self.install_article()
+                path = self.repo / relative
+                original = path.read_text() if path.exists() else None
+                if relative == "paper/index.qmd":
+                    path.write_text(original.replace("abstract: |\n", addition + "abstract: |\n", 1))
+                else:
+                    path.write_text((original or "") + addition)
+                try:
+                    result = self.run_guard()
+                finally:
+                    if original is None:
+                        path.unlink()
+                    else:
+                        path.write_text(original)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertEqual(failure_lines(result.stdout), [label])
         self.install_article()
 
     def test_rolling_prose_figures_drift_from_the_sealed_forecast(self):

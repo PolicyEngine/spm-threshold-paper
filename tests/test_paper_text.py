@@ -172,6 +172,32 @@ class BlockScalarSpanTests(unittest.TestCase):
                 self.assertIsNone(block_scalar_span(text, "abstract"))
         self.assertIsNone(block_scalar_span(PAPER, "text"))
 
+    def test_yaml_syntax_the_parser_cannot_resolve_fails_closed(self):
+        """The parser resolves no YAML tags, anchors, aliases, explicit keys
+        or escapes, so a front-matter line that holds one could set the key
+        unseen, as under ``format: html:``, and fails closed."""
+        for name, insert in {
+            "tagged nested key": "  html:\n    !!str abstract: Copy 9.99.\n",
+            "anchored nested key": "  html:\n    &k abstract: Copy 9.99.\n",
+            "aliased nested key": "  html:\n    *k : Copy 9.99.\n",
+            "escaped nested key": '  html:\n    "\\x61bstract": Copy 9.99.\n',
+            "escaped key in a nested flow mapping": '  html: {"\\x61bstract": Copy 9.99.}\n',
+            "anchored value": "  html:\n    toc: &on true\n",
+            "tagged sequence entry": "  html:\n    css:\n      - !!str style.css\n",
+            "explicit key named in a block": "  html:\n    ? |-\n      abstract\n    : Copy 9.99.\n",
+            "explicit key in a sequence entry": "  html:\n    css:\n      - ? x\n",
+            "explicit key in a flow mapping": "  html: {? toc: true}\n",
+        }.items():
+            with self.subTest(case=name):
+                text = PAPER.replace("format:\n", f"format:\n{insert}")
+                self.assertIsNone(block_scalar_span(text, "abstract"))
+
+    def test_punctuation_in_values_is_no_node_property(self):
+        for value in ('"Wow!"', "A & B", "A*B", "50% & up", '"Line\\nbreak"', "[a, b]", "Why? Because", "A ?B"):
+            with self.subTest(value=value):
+                text = PAPER.replace('title: "Thresholds"\n', f'title: "Thresholds"\nnote: {value}\n')
+                self.assertEqual(block_lines(text), ABSTRACT_LINES)
+
     def test_key_text_inside_another_block_names_nothing(self):
         """A block scalar's lines hold text, not keys, and a YAML comment
         line holds neither, so they leave the abstract's block readable."""
@@ -205,6 +231,7 @@ class BlockScalarSpanTests(unittest.TestCase):
             "explicit key": "---\n? abstract\n: |\n  Body copy.\n---\n",
             "explicit key with a comment": "---\n? abstract # set here\n: |\n  Body copy.\n---\n",
             "bare key line": "abstract: Body copy.\n",
+            "bare explicit key line with a comment": "? abstract # set here\n: Body copy.\n",
             "flow mapping": "---\n{abstract: Body copy.}\n---\n",
             "quoted flow key after a comma": '---\n{title: X, "abstract": Body copy.}\n---\n',
             "explicit flow key": "---\n{? abstract : Body copy.}\n---\n",
@@ -677,6 +704,7 @@ class PropertyTests(unittest.TestCase):
             '"abstract": |',
             "'abstract': |",
             "? abstract",
+            "? abstract # set here",
             "{abstract: Copy.}",
             '{title: X, "abstract": Copy.}',
             "{? abstract : Copy.}",
@@ -817,6 +845,21 @@ EDGE_CASES = {
     "nested flow key in the body": with_body("---\n{meta: {abstract: Body copy 9.99.}}\n---\n"),
     "nested flow key in the front matter": NESTED_FLOW_KEY,
     "format-level key in the front matter": FORMAT_LEVEL_KEY,
+    "tagged format-level key": PAPER.replace(
+        "format:\n", "format:\n  html:\n    !!str abstract: |\n      Format copy 9.99.\n"
+    ),
+    "anchored format-level key": PAPER.replace(
+        "format:\n", "format:\n  html:\n    &k abstract: |\n      Format copy 9.99.\n"
+    ),
+    "aliased format-level key": PAPER.replace(
+        "format:\n", "names: [&k abstract]\nformat:\n  html:\n    *k : Format copy 9.99.\n"
+    ),
+    "escaped format-level key": PAPER.replace(
+        "format:\n", 'format:\n  html:\n    "\\x61bstract": Format copy 9.99.\n'
+    ),
+    "explicit format-level key in a block": PAPER.replace(
+        "format:\n", "format:\n  html:\n    ? |-\n      abstract\n    : Format copy 9.99.\n"
+    ),
     "explicit key with a comment in the body": with_body(
         "---\n? abstract # set here\n: Body copy 9.99.\n---\n"
     ),

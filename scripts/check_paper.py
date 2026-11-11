@@ -34,8 +34,10 @@ push to master and every pull request. It fails when:
     the registered value. A copy in other metadata, in a comment, in the
     body or inside the abstract cannot rescue a drifted figure, and a swap
     between rules fails. A key that could set the abstract elsewhere, such
-    as under ``format: html:``, or a metadata block in the body fails every
-    abstract tie;
+    as under ``format: html:``, YAML syntax the parser does not resolve, or
+    a metadata block in the body fails every abstract tie. A project or
+    directory metadata file that names the abstract or more metadata files
+    fails too;
 (e) the README miscounts the in-kind receipts or omits a calculator
     commit that their provenance records.
 
@@ -769,6 +771,21 @@ check(
 # equal the registered value, so a swap between rules fails, and so does a
 # changed rate that leaves a correct copy elsewhere in the abstract.
 ABSTRACT = front_matter_block("abstract")
+# Quarto merges the project's _quarto files, each _metadata file from the
+# project root down to paper/, and any metadata-files they or the paper name
+# into the paper's metadata, so an abstract set there could replace the block
+# the ties read. Neither may name the abstract or more metadata files.
+METADATA_SOURCES = sorted(
+    path
+    for folder in (REPO, REPO / "paper")
+    for pattern in ("_quarto*.y*ml", "_metadata.y*ml")
+    for path in folder.glob(pattern)
+)
+check(
+    "only paper/index.qmd may set the abstract or name metadata files",
+    not re.search(r"metadata-files?", QMD_RAW)
+    and not any(re.search(r"abstract|metadata-files?", path.read_text()) for path in METADATA_SOURCES),
+)
 
 # Current retrospective results in the abstract are a separate experiment.
 ABSTRACT_RETROSPECTIVE_RULES = {

@@ -23,6 +23,12 @@ HTML_COMMENT = re.compile(r"<!--.*?-->", re.S)
 BLOCK_SCALAR_OPENER = re.compile(r"(?:.*:|(?:.*[ \t])?-)[ \t]+[|>][-+1-9]*[ \t]*(?:#.*)?").fullmatch
 # Indentation and the "- " markers of block sequence entries, before a key.
 SEQUENCE_PREFIX = re.compile(r"[ \t]*(?:-[ \t]+)*").match
+# YAML syntax through which a line could set a key that no plain spelling
+# names: a tag, anchor or alias at a token's start, an explicit "? " key,
+# whose name may follow on later lines, or a double-quoted key with an escape.
+UNRESOLVED_SYNTAX = re.compile(
+    r"""(?:^|[\s{\[,:?])[!&*][^\s,\[\]{}]|(?:^|[{,\[][ \t]*)(?:\?(?:[ \t]|$)|"[^"]*\\)"""
+).search
 # A body line that pandoc could read as a metadata block's fence: "---" or
 # "..." after any block quote, list item or definition markers.
 METADATA_FENCE = re.compile(
@@ -65,6 +71,9 @@ def block_scalar_span(text: str, key: str) -> tuple[int, int] | None:
       Quarto renders a key nested under ``format: html:`` or ``format: pdf:``
       in place of the top-level one. Text inside another block scalar, such
       as ``include-in-header: text: |``, names nothing;
+    - another front-matter line holds a YAML tag, anchor or alias, an
+      explicit ``?`` key or a double-quoted key with an escape, since the
+      parser cannot tell which key such a line sets;
     - any line after the front matter names the key, at the line's start or
       in flow style, or the body holds a metadata block at all: a ``---``
       line, even inside a list item or block quote, followed by a line with
@@ -122,14 +131,15 @@ def block_scalar_span(text: str, key: str) -> tuple[int, int] | None:
     block = header[first:last]
     if not "".join(line for _, line in block).strip():
         return None
-    if _names_key_elsewhere(header, range(starts[0], last), key_anywhere):
+    if _may_set_key_elsewhere(header, range(starts[0], last), key_anywhere):
         return None
     return block[0][0], block[-1][0] + len(block[-1][1])
 
 
-def _names_key_elsewhere(header, skip, key_anywhere) -> bool:
+def _may_set_key_elsewhere(header, skip, key_anywhere) -> bool:
     """Whether a front-matter line outside ``skip`` names the key at any
-    depth. Lines inside another block scalar hold text, not keys, and YAML
+    depth, or holds a tag, anchor, alias, explicit key or escaped quoted key
+    that could set it. Lines inside another block scalar hold text, not keys, and YAML
     comment lines hold neither."""
     opener = None
     for row, (_, line) in enumerate(header):
@@ -145,7 +155,7 @@ def _names_key_elsewhere(header, skip, key_anywhere) -> bool:
         content = bare[SEQUENCE_PREFIX(bare).end() :]
         if content.startswith("#"):
             continue
-        if key_anywhere(content):
+        if key_anywhere(content) or UNRESOLVED_SYNTAX(content):
             return True
         if BLOCK_SCALAR_OPENER(bare):
             opener = spaces
