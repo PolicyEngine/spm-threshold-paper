@@ -966,9 +966,13 @@ INKIND_PROSE_MUTATIONS = (
 # failing ties, decoy). The body or a generated table states every one of these
 # figures too. The decoy restates the original wording, and the tests place it
 # at each of ABSTRACT_DECOY_HOSTS, so a tie that settled for one correct copy,
-# or for the first or last rate it found, would pass the edited paper. The
-# wording-removal cases in test_abstract_ties_skip_wording_outside_the_block
-# catch a tie that reads past the block.
+# or for the first or last rate it found, would pass the edited paper. A sign
+# typed as an en dash and a range, spaced or joined by "to", read whole, and
+# a rate in emphasis reads as no rate in a statement of the rule's wording,
+# so each fails beside a copy too; only ABSTRACT_RULE_RENAMES, which leave no
+# statement of the rule's wording, pass beside a copy inside the abstract. The wording-removal cases in
+# test_abstract_ties_skip_wording_outside_the_block catch a tie that reads
+# past the block.
 ABSTRACT_PROSE_MUTATIONS = (
     (
         "2020-2025 CPI-U error",
@@ -990,6 +994,34 @@ ABSTRACT_PROSE_MUTATIONS = (
         "\u20132.29\\1percent",
         ("abstract current projection cpi_u 2.29",),
         "We obtain 2.29 percent with the Consumer Price Index for All Urban Consumers (CPI-U).",
+    ),
+    (
+        "2020-2025 CPI-U as a spaced range",
+        r"2\.29(\s+)percent",
+        "2.20 \u2013 2.29\\1percent",
+        ("abstract current projection cpi_u 2.29",),
+        "We obtain 2.29 percent with the Consumer Price Index for All Urban Consumers (CPI-U).",
+    ),
+    (
+        "2020-2025 CPI-U as a range with to",
+        r"2\.29(\s+)percent",
+        r"2.20 to 2.29\1percent",
+        ("abstract current projection cpi_u 2.29",),
+        "We obtain 2.29 percent with the Consumer Price Index for All Urban Consumers (CPI-U).",
+    ),
+    (
+        "2020-2025 CPI-U error in emphasis",
+        r"2\.29(\s+)percent",
+        r"*2.30*\1percent",
+        ("abstract current projection cpi_u 2.29", "current projection prose cpi_u"),
+        "We obtain 2.29 percent with the Consumer Price Index for All Urban Consumers (CPI-U).",
+    ),
+    (
+        "blend rule renamed",
+        r"latter(\s+)two\.",
+        r"first\1two.",
+        ("abstract current projection blend 0.90",),
+        "We obtain 0.90 percent with an equal blend of the latter two.",
     ),
     (
         "CPI-U rule renamed CPI-W",
@@ -1082,6 +1114,10 @@ ABSTRACT_PROSE_MUTATIONS = (
 # in body text before the introduction, and as the abstract block's last or
 # first line.
 ABSTRACT_DECOY_HOSTS = ("discussion", "metadata", "preamble", "abstract", "abstract start")
+# Cases that rename a rule, so that the edited sentence states no rate in the
+# rule's wording. A copy of the original sentence inside the abstract then
+# states the rule's rate correctly.
+ABSTRACT_RULE_RENAMES = ("CPI-U rule renamed CPI-W", "blend rule renamed")
 
 # Every tie this file's abstract mutations target.
 ABSTRACT_TIE_LABELS = (
@@ -3092,11 +3128,16 @@ class PaperGuardTests(unittest.TestCase):
     def test_abstract_pins_reject_a_copy_restated_elsewhere(self):
         """With the original wording restated in the discussion, in another
         metadata field, in body text before the introduction or inside the
-        abstract itself, only the abstract's own ties fail."""
+        abstract itself, only the abstract's own ties fail. A renamed rule is
+        the one exception: a correct copy inside the abstract still states
+        that rule's rate, so the guard passes the paper."""
         for host in ABSTRACT_DECOY_HOSTS:
             for name, pattern, replacement, labels, decoy in ABSTRACT_PROSE_MUTATIONS:
                 with self.subTest(host=host, name=name):
                     result = self.run_abstract_mutation(pattern, replacement, decoy, host)
+                    if name in ABSTRACT_RULE_RENAMES and host.startswith("abstract"):
+                        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                        continue
                     self.assertNotEqual(result.returncode, 0)
                     expected = labels
                     if host.startswith("abstract"):
@@ -3147,8 +3188,7 @@ class PaperGuardTests(unittest.TestCase):
     def test_abstract_ties_skip_wording_outside_the_block(self):
         """Wording the abstract dropped cannot satisfy the ties that read it
         from a comment after the block, which YAML ends at a line indented
-        less than the block, from a field before the abstract's key, or from
-        an HTML comment inside the block, which Quarto leaves unrendered."""
+        less than the block, or from a field before the abstract's key."""
         cases = (
             (
                 "CPI-U rule renamed",
@@ -3174,10 +3214,6 @@ class PaperGuardTests(unittest.TestCase):
                 prose.index("\nabstract: |\n") + 1,
                 f"keywords: {json.dumps(old, ensure_ascii=False)}\n",
             ),
-            "HTML comment inside the block": lambda prose, span, old: (
-                span[1],
-                f"  <!-- {old} -->\n",
-            ),
         }
         for name, pattern, replacement, old, labels in cases:
             for place, insert in places.items():
@@ -3192,29 +3228,6 @@ class PaperGuardTests(unittest.TestCase):
                     path.write_text(prose[:at] + text + prose[at:])
                     result = self.run_guard()
                     self.assertEqual(sorted(failure_lines(result.stdout)), sorted(labels))
-        self.install_article()
-
-    def test_retrospective_prose_ties_read_the_abstract_with_its_comments(self):
-        """An empty HTML comment inside one of the abstract's four
-        retrospective rates breaks the figure in the paper's source, where
-        #13's search of the whole paper fails it, so the rate's prose tie,
-        which reads the block's raw text, fails too. The abstract ties read
-        the block without its comments and pass."""
-        record = json.loads((self.repo / "data/current/ce_replication_2019_2025.json").read_text())
-        rates = record["projection_evaluation"]["summary_2020_2025"]
-        self.assertEqual(len(rates), 4)
-        for rule, value in rates.items():
-            whole, part = f"{value:.2f}".split(".")
-            with self.subTest(rule=rule):
-                self.install_article()
-                self.mutate_article(
-                    "abstract",
-                    rf"{whole}\.{part} percent",
-                    f"{whole}.<!-- -->{part} percent",
-                    once=True,
-                )
-                result = self.run_guard()
-                self.assertEqual(failure_lines(result.stdout), [f"current projection prose {rule}"])
         self.install_article()
 
     def test_abstract_block_fails_closed_unless_one_key_sets_the_abstract(self):
@@ -3260,6 +3273,14 @@ class PaperGuardTests(unittest.TestCase):
                 "tagged format-level abstract",
                 (("    toc: true\n", "    toc: true\n    !!str abstract: A copy for the web.\n"),),
             ),
+            (
+                "quote left open over the key line",
+                (("    toc: true\n", "    toc: true\n    pagetitle: 'Thresholds\n"),),
+            ),
+            (
+                "comment glued to a format-level abstract",
+                (("    toc: true\n", "    toc: true\n    <!-- -->abstract: A copy for the web.\n"),),
+            ),
         )
         expected = sorted(
             (
@@ -3277,15 +3298,50 @@ class PaperGuardTests(unittest.TestCase):
                 self.assertEqual(sorted(failure_lines(result.stdout)), expected)
         self.install_article()
 
+    def test_abstract_markup_fails_every_abstract_tie(self):
+        """Quarto renders an HTML comment, a code fence, a shortcode or raw
+        content in the abstract as other text or none, so each fails every tie
+        that reads the abstract, with its own message, even when it restates
+        the abstract's own wording."""
+        decoy = ABSTRACT_PROSE_MUTATIONS[0][4]
+        expected = sorted(
+            (
+                "paper's abstract may not hold HTML comments, code fences, shortcodes or raw content",
+                *ABSTRACT_TIE_LABELS,
+                *INKIND_ABSTRACT_TIE_LABELS,
+            )
+        )
+        for name, line in (
+            ("HTML comment", f"<!-- {decoy} -->"),
+            ("code fence", f"```\n{decoy}\n```"),
+            ("shortcode", "{{< meta title >}}"),
+            ("raw content", "`\\newpage`{=latex}"),
+        ):
+            with self.subTest(case=name):
+                self.install_article()
+                path = self.repo / "paper/index.qmd"
+                prose = path.read_text()
+                span = PAPER_TEXT.block_scalar_span(prose, "abstract")
+                self.assertIsNotNone(span, "fixture has no abstract block")
+                indent = re.search(r"^( +)\S", prose[span[0] : span[1]], re.M).group(1)
+                lines = "".join(f"{indent}{part}\n" for part in line.split("\n"))
+                path.write_text(prose[: span[1]] + lines + prose[span[1] :])
+                result = self.run_guard()
+                self.assertNotEqual(result.returncode, 0)
+                self.assertEqual(sorted(failure_lines(result.stdout)), expected)
+        self.install_article()
+
     def test_abstract_comes_only_from_the_paper(self):
         """Quarto merges project and directory metadata into the paper's, so
-        an abstract or a metadata-files list in any of them fails the guard,
-        while the paper's own abstract still passes every tie."""
+        an abstract or a metadata-files list in any of those files, or a
+        metadata-files list in the paper, fails the guard, while the paper's
+        own abstract still passes every tie."""
         label = "only paper/index.qmd may set the abstract or name metadata files"
         cases = (
             ("project file", "_quarto.yml", "abstract: A copy.\n"),
             ("project format", "_quarto.yml", "format:\n  html:\n    abstract: A copy.\n"),
             ("project profile", "_quarto-web.yml", "abstract: A copy.\n"),
+            ("local project file", "_quarto.yml.local", "abstract: A copy.\n"),
             ("paper folder metadata", "paper/_metadata.yml", "abstract: A copy.\n"),
             ("root metadata", "_metadata.yml", "format: {pdf: {abstract: A copy.}}\n"),
             ("project metadata files", "_quarto.yml", "metadata-files: [extra.yml]\n"),
@@ -3309,6 +3365,18 @@ class PaperGuardTests(unittest.TestCase):
                         path.write_text(original)
                 self.assertNotEqual(result.returncode, 0)
                 self.assertEqual(failure_lines(result.stdout), [label])
+        self.install_article()
+        # An included file's front matter would set the abstract too.
+        (self.repo / "paper/notes.qmd").write_text("---\nabstract: |\n  A copy.\n---\n\nNotes.\n")
+        for directive in ("{{< include notes.qmd >}}", '{{< include "notes.qmd" >}}'):
+            with self.subTest(case=directive):
+                self.install_article()
+                article = self.repo / "paper/index.qmd"
+                article.write_text(article.read_text() + "\n" + directive + "\n")
+                result = self.run_guard()
+                self.assertNotEqual(result.returncode, 0)
+                self.assertEqual(failure_lines(result.stdout), ["paper/index.qmd may include only files under tables/"])
+        (self.repo / "paper/notes.qmd").unlink()
         self.install_article()
 
     def test_section_figures_drift_alone(self):
@@ -3520,6 +3588,7 @@ class PaperGuardTests(unittest.TestCase):
 
 
 INCLUDE_SCAN = r"\{\{<\s*include\s+tables/([^\s>]+)\s*>\}\}"
+INCLUDE_TARGETS = r"\{\{<\s*include\s+(.*?)\s*>\}\}"
 METADATA_SCAN = r"metadata-files?"
 PAPER_NAMES = ("QMD", "QMD_RAW")
 
@@ -3527,8 +3596,8 @@ PAPER_NAMES = ("QMD", "QMD_RAW")
 def whole_paper_reads(source):
     """Each place in a guard's source that reads the paper outside a bounded
     slice: a load of QMD or QMD_RAW other than a slicer's default text, the
-    guard's scan for include directives and its search for a metadata-files
-    key; a slicer call that reads the paper without a literal end heading;
+    guard's two scans for include directives and its search for a
+    metadata-files key; a slicer call that reads the paper without a literal end heading;
     and a path-like string, one without whitespace, that names a .qmd file
     outside the assignments of QMD and QMD_RAW."""
     tree = ast.parse(source)
@@ -3550,7 +3619,7 @@ def whole_paper_reads(source):
             and len(node.args) == 2
             and isinstance(node.args[0], ast.Constant)
             and (ast.unparse(node.func), node.args[0].value)
-            in (("re.findall", INCLUDE_SCAN), ("re.search", METADATA_SCAN))
+            in (("re.findall", INCLUDE_SCAN), ("re.findall", INCLUDE_TARGETS), ("re.search", METADATA_SCAN))
         ):
             allowed.add(id(node.args[1]))
         elif isinstance(node, ast.Assign) and [ast.unparse(target) for target in node.targets] in (
@@ -3782,7 +3851,7 @@ class PinnedLinksTests(unittest.TestCase):
 class GuardSourceTests(unittest.TestCase):
     def test_no_tie_reads_the_whole_paper(self):
         """The guard reads the paper only through slices that a heading
-        bounds on each side, the abstract block, the include scan and the
+        bounds on each side, the abstract block, the include scans and the
         metadata-files search."""
         self.assertEqual(whole_paper_reads((REPO / "scripts/check_paper.py").read_text()), [])
 
@@ -3797,6 +3866,7 @@ class GuardSourceTests(unittest.TestCase):
             "def front_matter_block(key, text=QMD_RAW): ...\n"
             "def front_matter_source(key, text=QMD_RAW): ...\n"
             f"includes = set(re.findall({INCLUDE_SCAN!r}, QMD))\n"
+            f"INCLUDES = re.findall({INCLUDE_TARGETS!r}, QMD_RAW)\n"
             f"named = re.search({METADATA_SCAN!r}, QMD_RAW)\n"
             'ROLLING = section("# A", "# B")\n'
             'ROLLING_ACS = section("## C", None, ROLLING)\n'
@@ -3828,6 +3898,8 @@ class GuardSourceTests(unittest.TestCase):
             'check("x", has_number("1.17", text=QMD_RAW))',
             'check("x", bool(re.search(r"metadata-files?|1\\.17", QMD_RAW)))',
             'TEXT = front_matter_source("abstract", QMD)',
+            'check("x", bool(re.findall(r"\\{\\{<\\s*include\\s+(.*?)\\s*>\\}\\}|1\\.17", QMD_RAW)))',
+            'check("x", bool(re.search(r"\\{\\{<\\s*include\\s+(.*?)\\s*>\\}\\}", QMD_RAW)))',
         ):
             with self.subTest(read=read):
                 self.assertNotEqual(whole_paper_reads(base + read + "\n"), [])
