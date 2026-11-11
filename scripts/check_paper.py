@@ -27,7 +27,21 @@ push to master and every pull request. It fails when:
     and the thin-donor support count — are pinned inside a
     whitespace-normalized slice of that section, so the same numeral
     occurring elsewhere in the paper cannot satisfy them and line
-    rewrapping cannot split a multi-word literal;
+    rewrapping cannot split a multi-word literal. The guard reads each
+    error rate the abstract quotes from the front matter's ``abstract: |``
+    block alone, as Quarto and pandoc read it, beside the rule it scores.
+    Every statement of that rule's wording must hold a rate the guard
+    reads, and every such rate must equal the registered value. A copy in
+    other metadata, in a comment, in the body or inside the abstract cannot
+    rescue a drifted figure, a flipped sign or a range, and a swap between
+    rules fails. A key that could set the abstract elsewhere, such as under
+    ``format: html:``, YAML syntax the parser does not resolve, a quoted
+    value left open, an HTML comment or code fence elsewhere in the front
+    matter, or a metadata block in the body fails every abstract tie, and
+    so does an HTML comment, code fence, shortcode or raw content inside the
+    block. A project or directory metadata file that names the abstract or
+    more metadata files, a paper that names more, or an include outside
+    ``tables/`` fails too;
 (e) the README miscounts the in-kind receipts or omits a calculator
     commit that their provenance records.
 
@@ -78,12 +92,17 @@ from inkind_inputs import (
     published_standard_errors,
     uncertainty_figures,
 )
+from paper_text import block_scalar_span, block_words, stated_values
 
 REPO = Path(__file__).resolve().parent.parent
 DATA = REPO / "data"
 TABLES = REPO / "paper" / "tables"
 FORECAST_RECORD = REPO / "docs" / "forecast-record.md"
 QMD = (REPO / "paper" / "index.qmd").read_text()
+# The paper as stored, line endings included: read_text() turns a lone
+# carriage return into a line feed, and the abstract's parser fails closed on
+# one, since Quarto and pandoc read it differently.
+QMD_RAW = (REPO / "paper" / "index.qmd").read_bytes().decode()
 
 TENURES = ("owner_with_mortgage", "owner_without_mortgage", "renter")
 
@@ -170,6 +189,23 @@ def section(start: str, end: str | None = None, text: str = QMD) -> str:
         failures.append(f"paper sections out of order: {start!r} before {end!r}")
         return ""
     return " ".join(text[first:last].split())
+
+
+def front_matter_block(key: str, text: str = QMD_RAW) -> str:
+    """Whitespace-normalized words of the front matter's one ``key: |``
+    literal block, read as Quarto and pandoc read it. Pins that read it see
+    no other metadata field, comment or body text. When ``block_words`` finds
+    no such block, finds another line that could set the key, or finds markup
+    in the block that renders as other text, the slice is empty, so every pin
+    inside it fails instead of reading other text."""
+    words = block_words(text, key)
+    if words is None:
+        if block_scalar_span(text, key) is None:
+            failures.append(f"paper must set {key} only in one {key}: | block of its front matter")
+        else:
+            failures.append(f"paper's {key} may not hold HTML comments, code fences, shortcodes or raw content")
+        return ""
+    return words
 
 
 COUNT_WORDS = (
@@ -732,9 +768,71 @@ check(
     has_number("2.63") and abs(realized_2025 - 0.0263) < 0.0005,
 )
 
+# Figures in the abstract also appear in the body or its tables, so their
+# abstract ties read only the front matter's `abstract: |` block, as Quarto
+# and pandoc read it. Other metadata fields, comments and body text fall
+# outside it, so a copy there cannot rescue a drifted figure. A key that
+# could set the abstract anywhere else, such as under `format: html:`, any
+# metadata block in the body, or an HTML comment, code fence, shortcode or
+# raw content in the block fails every tie.
+ABSTRACT = front_matter_block("abstract")
+
+
+def abstract_states(template: str, literal: str) -> bool:
+    """Whether the abstract states ``literal`` in ``template``'s slot at least
+    once and nothing else there. Every statement of the template's wording
+    must hold a number the slot reads, so a rate the slot cannot read, such
+    as one in emphasis, fails rather than leaving the tie to a correct copy
+    elsewhere in the abstract. So does a swap between rules, a flipped sign or
+    a range."""
+    values = stated_values(template, ABSTRACT)
+    return set(values) == {literal} and len(values) == len(stated_values(template, ABSTRACT, r"\S+"))
+# Quarto merges the project's _quarto file, with its profile and .local
+# variants, paper/_metadata, and any metadata-files they or the paper name
+# into the paper's metadata, so an abstract set there could replace the block
+# the ties read. None of them, nor a _metadata file at the root, may name the
+# abstract or more metadata files.
+METADATA_SOURCES = sorted(
+    path
+    for folder in (REPO, REPO / "paper")
+    for pattern in ("_quarto*.y*ml", "_quarto*.y*ml.local", "_metadata.y*ml")
+    for path in folder.glob(pattern)
+)
+# Quarto also renders an included file's own front matter and metadata
+# blocks into the paper's metadata, so the paper may include only the
+# generated tables that (a) and (b) check.
+INCLUDES = re.findall(r"\{\{<\s*include\s+(.*?)\s*>\}\}", QMD_RAW)
+check(
+    "paper/index.qmd may include only files under tables/",
+    all(name.strip("\"'").startswith("tables/") for name in INCLUDES),
+)
+check(
+    "only paper/index.qmd may set the abstract or name metadata files",
+    not re.search(r"metadata-files?", QMD_RAW)
+    and not any(re.search(r"abstract|metadata-files?", path.read_text()) for path in METADATA_SOURCES),
+)
+
 # Current retrospective results in the abstract are a separate experiment.
-for rule, value in current_ce["projection_evaluation"]["summary_2020_2025"].items():
+ABSTRACT_RETROSPECTIVE_RULES = {
+    "cpi_u": "with the Consumer Price Index for All Urban Consumers (CPI-U)",
+    "fcsuti_cpi": "with a composite price index",
+    "replication_ratio": "with replicated consumption growth",
+    "blend": "with an equal blend of the latter two",
+}
+retrospective = current_ce["projection_evaluation"]["summary_2020_2025"]
+check(
+    "abstract names the retrospective rules and their count",
+    set(retrospective) == set(ABSTRACT_RETROSPECTIVE_RULES)
+    and set(stated_values("compare {} projection rules", ABSTRACT, r"\S+"))
+    == {count_word(len(retrospective))},
+)
+for rule, value in retrospective.items():
     check(f"current projection prose {rule}", has_number(f"{value:.2f}"))
+    rule_phrase = ABSTRACT_RETROSPECTIVE_RULES.get(rule, "<unnamed rule>")
+    check(
+        f"abstract current projection {rule} {value:.2f}",
+        abstract_states(f"{{}} percent {rule_phrase}", f"{value:.2f}"),
+    )
 
 # (e) The September evaluation, re-derived from data/evaluation_2025.json.
 ev = json.loads((DATA / "evaluation_2025.json").read_text())
@@ -744,13 +842,36 @@ original = R["Original nowcast (pre-repair blend)"]
 repl = R["CE replication growth ratio alone"]
 comp = R["FCSUti-composite CPI aging alone"]
 cpiu = R["All-Items CPI-U aging (status quo)"]
-for label, value, literal in [
-    ("evaluation amended MAE 1.17", amended["mae"], "1.17"),
-    ("evaluation replication MAE 0.75", repl["mae"], "0.75"),
-    ("evaluation composite MAE 2.02", comp["mae"], "2.02"),
-    ("evaluation CPI-U MAE 2.58", cpiu["mae"], "2.58"),
+# The abstract quotes three of these errors, and the body restates each.
+for label, value, literal, abstract_phrase in [
+    (
+        "evaluation amended MAE 1.17",
+        amended["mae"],
+        "1.17",
+        "blend yields a mean absolute error of {} percent",
+    ),
+    (
+        "evaluation replication MAE 0.75",
+        repl["mae"],
+        "0.75",
+        "{} percent for consumption growth alone",
+    ),
+    ("evaluation composite MAE 2.02", comp["mae"], "2.02", None),
+    (
+        "evaluation CPI-U MAE 2.58",
+        cpiu["mae"],
+        "2.58",
+        "{} percent for CPI-U adjustment",
+    ),
 ]:
-    check(label, has_number(literal) and f"{value:.2%}".rstrip("%") == literal)
+    rounds_to_literal = f"{value:.2%}".rstrip("%") == literal
+    check(label, has_number(literal) and rounds_to_literal)
+    if abstract_phrase is not None:
+        check(
+            f"abstract {label}",
+            rounds_to_literal
+            and abstract_states(abstract_phrase, literal),
+        )
 check(
     "forecast record evaluation original MAE 0.98",
     has_number("0.98", text=record_text)
@@ -1108,7 +1229,6 @@ check(
 INKIND_TEXT = section(
     "# Imputing in-kind benefits {#sec-inkind}", "# Projecting thresholds {#sec-projection}"
 )
-ABSTRACT = " ".join(QMD.split("# Introduction", 1)[0].split())
 EVALUATION_TEXT = section(
     "## Evaluation against published thresholds {#sec-evaluation}",
     "## Validation of the price comparator",
