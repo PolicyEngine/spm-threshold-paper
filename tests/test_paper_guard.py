@@ -1225,7 +1225,7 @@ SECTION_PROSE_MUTATIONS = (
     ),
     (
         "appendix forecast record link",
-        "appendix",
+        "appendix B",
         r"blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0(/docs/forecast-record\.md)",
         r"blob/main\1",
         ("manuscript links fixed supporting document: docs/forecast-record.md",),
@@ -1233,7 +1233,7 @@ SECTION_PROSE_MUTATIONS = (
     ),
     (
         "appendix source-data provenance link",
-        "appendix",
+        "appendix B",
         r"(source-data\s+provenance\]\(\S+/)blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0"
         r"(/data/PROVENANCE\.md)",
         r"\1blob/main\2",
@@ -1242,7 +1242,7 @@ SECTION_PROSE_MUTATIONS = (
     ),
     (
         "appendix data provenance link",
-        "appendix",
+        "appendix B",
         r"(\[data\s+provenance\]\(\S+/)blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0"
         r"(/data/PROVENANCE\.md)",
         r"\1blob/main\2",
@@ -1251,7 +1251,7 @@ SECTION_PROSE_MUTATIONS = (
     ),
     (
         "appendix replay guide link",
-        "appendix",
+        "appendix B",
         r"blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0(/docs/reproducing-experiments\.md)",
         r"blob/main\1",
         ("manuscript links fixed supporting document: docs/reproducing-experiments.md",),
@@ -1259,10 +1259,26 @@ SECTION_PROSE_MUTATIONS = (
     ),
     (
         "appendix replay guide gains an anchored link at main",
-        "appendix",
+        "appendix B",
         r"(docs/reproducing-experiments\.md\))",
         r"\1 ([setup](https://github.com/PolicyEngine/spm-threshold-paper/blob/main/"
         r"docs/reproducing-experiments.md#L1))",
+        ("manuscript links fixed supporting document: docs/reproducing-experiments.md",),
+        APPENDIX_B_REPLAY,
+    ),
+    (
+        "appendix forecast record loses its link",
+        "appendix B",
+        r"\[(forecast\s+record)\]\(\S+/docs/forecast-record\.md\)",
+        r"\1",
+        ("manuscript links fixed supporting document: docs/forecast-record.md",),
+        APPENDIX_B_RECORDS,
+    ),
+    (
+        "appendix replay guide loses its link",
+        "appendix B",
+        r"\[(experiment replay\s+guide)\]\(\S+/docs/reproducing-experiments\.md\)",
+        r"\1",
         ("manuscript links fixed supporting document: docs/reproducing-experiments.md",),
         APPENDIX_B_REPLAY,
     ),
@@ -1719,6 +1735,30 @@ SECTION_PROSE_MUTATIONS = (
         r"2\.4 standard",
         "2.4\nstandard",
         ("owner misses within one SE; renter about 2.4 SE",),
+        EVALUATION_BLEND,
+    ),
+    (
+        "committed amounts split across two lines",
+        "nowcast",
+        r"for owners with mortgages,",
+        "for owners\nwith mortgages,",
+        ("committed estimate states the amended triple in tenure order",),
+        NOWCAST_AMOUNTS,
+    ),
+    (
+        "BLS levels split across two lines",
+        "evaluation",
+        r"owners with mortgages, (\\\$34,326)",
+        r"owners\nwith mortgages, \1",
+        ("BLS 2025 triple in tenure order",),
+        EVALUATION_LEVELS,
+    ),
+    (
+        "evaluation misses pushed onto an indented line",
+        "evaluation",
+        r"and\n2\.27 percent",
+        "and\n" + " " * 21 + "2.27 percent",
+        ("evaluation per-tenure misses 0.69, 0.55, 2.27 in order",),
         EVALUATION_BLEND,
     ),
     (
@@ -2918,6 +2958,7 @@ class PaperGuardTests(unittest.TestCase):
             ),
             "discussion": (text.index(DISCUSSION_HEADING), text.index("# Appendix A: replication benchmark")),
             "appendix": (text.index("# Appendix B: reproducibility"), len(text)),
+            "appendix B": (text.index("# Appendix B: reproducibility"), text.index("# References")),
             "price": (
                 text.index("## Validation of the price comparator"),
                 text.index("# Conditional forecasts beyond available microdata"),
@@ -3558,41 +3599,85 @@ def guard_function(name, **namespace):
     return namespace[name]
 
 
-RAW_SLICERS = ("section_source", "front_matter_source")
+# Each slicer that returns raw text, and the position of its text argument.
+RAW_SLICERS = {"section_source": 2, "front_matter_source": 1}
 
 
 def stated_reads_off_raw_text(source):
-    """Each stated() call in a guard's source that reads anything but a name
-    the guard binds once, at module level, to a section_source() or
-    front_matter_source() call, alone or as a conditional whose other branch
-    is an empty string."""
+    """Each stated() call in a guard's source that reads anything but a raw
+    slice of the paper, and each use of stated() other than a direct call.
+    A raw slice is a name the guard binds once in all its source, at module
+    level, to a section_source() or front_matter_source() call whose text is
+    the paper or another raw slice, alone or as a conditional whose other
+    branch is an empty string."""
     tree = ast.parse(source)
+    bindings = {}
 
-    def raw_slice(value):
-        if isinstance(value, ast.IfExp):
-            return (
-                raw_slice(value.body)
-                and isinstance(value.orelse, ast.Constant)
-                and value.orelse.value == ""
-            )
-        return isinstance(value, ast.Call) and ast.unparse(value.func) in RAW_SLICERS
+    def bind(name):
+        bindings[name] = bindings.get(name, 0) + 1
 
-    stores = [node.id for node in ast.walk(tree) if isinstance(node, ast.Name) and isinstance(node.ctx, ast.Store)]
-    raw = {
-        node.targets[0].id
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Name) and isinstance(node.ctx, ast.Store):
+            bind(node.id)
+        elif isinstance(node, ast.arg):
+            bind(node.arg)
+        elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            bind(node.name)
+        elif isinstance(node, ast.alias):
+            bind((node.asname or node.name).split(".")[0])
+        elif isinstance(node, (ast.ExceptHandler, ast.MatchAs, ast.MatchStar)) and node.name:
+            bind(node.name)
+        elif isinstance(node, ast.MatchMapping) and node.rest:
+            bind(node.rest)
+        elif isinstance(node, (ast.Global, ast.Nonlocal)):
+            for name in node.names:
+                bind(name)
+    once = {
+        node.targets[0].id: node.value
         for node in tree.body
         if isinstance(node, ast.Assign)
         and len(node.targets) == 1
         and isinstance(node.targets[0], ast.Name)
-        and stores.count(node.targets[0].id) == 1
-        and raw_slice(node.value)
+        and bindings[node.targets[0].id] == 1
     }
+    paper = {name for name in PAPER_NAMES if name in once}
+    raw = set()
+
+    def raw_slice(value):
+        if isinstance(value, ast.IfExp):
+            return raw_slice(value.body) and isinstance(value.orelse, ast.Constant) and value.orelse.value == ""
+        if not (isinstance(value, ast.Call) and isinstance(value.func, ast.Name) and value.func.id in RAW_SLICERS):
+            return False
+        position = RAW_SLICERS[value.func.id]
+        if len(value.args) > position + 1 or any(isinstance(arg, ast.Starred) for arg in value.args):
+            return False
+        texts = value.args[position:]
+        for keyword in value.keywords:
+            if keyword.arg is None:
+                return False
+            if keyword.arg == "text":
+                texts.append(keyword.value)
+        return all(isinstance(each, ast.Name) and each.id in paper | raw for each in texts)
+
+    while True:
+        grown = {name for name, value in once.items() if raw_slice(value)}
+        if grown == raw:
+            break
+        raw = grown
+    calls = [
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "stated"
+    ]
+    direct = {id(node.func) for node in calls}
     return [
         f"line {node.lineno}: {ast.unparse(node)}"
+        for node in calls
+        if not (len(node.args) > 1 and isinstance(node.args[1], ast.Name) and node.args[1].id in raw)
+    ] + [
+        f"line {node.lineno}: stated used other than in a direct call"
         for node in ast.walk(tree)
-        if isinstance(node, ast.Call)
-        and ast.unparse(node.func) == "stated"
-        and not (len(node.args) > 1 and isinstance(node.args[1], ast.Name) and node.args[1].id in raw)
+        if isinstance(node, ast.Name) and node.id == "stated" and isinstance(node.ctx, ast.Load) and id(node) not in direct
     ]
 
 
@@ -3610,11 +3695,13 @@ class SectionSourceTests(unittest.TestCase):
         self.assertEqual(self.failures, [])
 
     def test_each_failure_names_its_heading(self):
-        """Each way a slice can fail empties it and records one failure
-        that names the heading."""
+        """Each way a slice can fail, at its start or its end heading,
+        empties it and records one failure that names the heading."""
         cases = (
             ("# A", "# B", "x\n# B\n", "paper section heading not unique: '# A' occurs 0 times"),
             ("# A", "# B", "# A\n# A\n# B\n", "paper section heading not unique: '# A' occurs 2 times"),
+            ("# A", "# B", "# A\nbody\n", "paper section heading not unique: '# B' occurs 0 times"),
+            ("# A", "# B", "# A\nx\n# B\ny\n# B\n", "paper section heading not unique: '# B' occurs 2 times"),
             ("# A", "# B", "# B\nx\n# A\n", "paper sections out of order: '# A' before '# B'"),
             ("# A", "# B", "# Ab\n# B\n", "paper section heading runs into the text after it: '# A'"),
             ("# A", "# B", "# A\nbody# B\n", "paper section text runs into the heading after it: '# B'"),
@@ -3626,6 +3713,14 @@ class SectionSourceTests(unittest.TestCase):
                 self.failures.clear()
                 self.assertEqual(self.section_source(start, end, text), "")
                 self.assertEqual(self.failures, [failure])
+
+    def test_a_heading_that_bounds_two_slices_fails_once(self):
+        """A repeated heading that ends one slice and starts the next
+        records one failure."""
+        text = "# A\nx\n# B\ny\n# B\nz\n# C\n"
+        self.assertEqual(self.section_source("# A", "# B", text), "")
+        self.assertEqual(self.section_source("# B", "# C", text), "")
+        self.assertEqual(self.failures, ["paper section heading not unique: '# B' occurs 2 times"])
 
 
 class PinnedLinksTests(unittest.TestCase):
@@ -3750,9 +3845,12 @@ class GuardSourceTests(unittest.TestCase):
         """Each listed form trips the raw-text check, and reads of names
         bound once to a raw slice don't."""
         base = (
+            'QMD = (REPO / "paper" / "index.qmd").read_text()\n'
             'NOWCAST_SOURCE = section_source("# A", "## B")\n'
+            'NOTE_SOURCE = section_source("### C", "### D", NOWCAST_SOURCE)\n'
             'ABSTRACT_SOURCE = front_matter_source("abstract") if ABSTRACT else ""\n'
             'check("x", stated("3.2 percent", NOWCAST_SOURCE, "y"))\n'
+            'check("x", stated("0.98", NOTE_SOURCE))\n'
             'check("x", stated("2.29", ABSTRACT_SOURCE))\n'
         )
         self.assertEqual(stated_reads_off_raw_text(base), [])
@@ -3765,6 +3863,13 @@ class GuardSourceTests(unittest.TestCase):
             'WIDE_SOURCE = section_source("# A", "## B") if X else QMD\ncheck("x", stated("3.2", WIDE_SOURCE))',
             "NOWCAST_SOURCE = normalized(NOWCAST_SOURCE)",
             "for NOWCAST_SOURCE in (QMD,):\n    pass",
+            'WIDE_SOURCE = section("# A", "## B") if X else ""\ncheck("x", stated("3.2", WIDE_SOURCE))',
+            'WIDE_TEXT = section("# A", "## C")\nNESTED_SOURCE = section_source("# A", "## B", WIDE_TEXT)\n'
+            'check("x", stated("3.2", NESTED_SOURCE))',
+            'NESTED_SOURCE = section_source("# A", "## B", text=normalized(QMD))\ncheck("x", stated("3.2", NESTED_SOURCE))',
+            "def stated_in(literal, NOWCAST_SOURCE):\n    return stated(literal, NOWCAST_SOURCE)",
+            'say = stated\ncheck("x", say("3.2", normalized(NOWCAST_SOURCE)))',
+            "import NOWCAST_SOURCE",
         ):
             with self.subTest(form=form):
                 self.assertNotEqual(stated_reads_off_raw_text(base + form + "\n"), [])
