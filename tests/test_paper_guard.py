@@ -2149,7 +2149,17 @@ class PaperGuardTests(unittest.TestCase):
                 with self.subTest(host=host, name=name):
                     result = self.run_abstract_mutation(pattern, replacement, decoy, host)
                     self.assertNotEqual(result.returncode, 0)
-                    self.assertEqual(sorted(failure_lines(result.stdout)), sorted(labels))
+                    expected = labels
+                    if host == "abstract":
+                        # A copy inside the abstract keeps the original figure
+                        # there, so the ties that only look for it pass, and
+                        # the ties that require every stated rate to match fail.
+                        expected = tuple(
+                            label
+                            for label in labels
+                            if not label.startswith("current projection prose")
+                        )
+                    self.assertEqual(sorted(failure_lines(result.stdout)), sorted(expected))
         self.install_article()
 
     def test_abstract_ties_ignore_the_introduction_heading(self):
