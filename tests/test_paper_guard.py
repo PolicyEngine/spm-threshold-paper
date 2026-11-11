@@ -1,6 +1,7 @@
 """Mutation tests run the real guard in independent temporary Git clones."""
 
 import hashlib
+import importlib.util
 import json
 import math
 import os
@@ -505,8 +506,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "swapped benefits in the difference",
         "section",
-        r"Rental(\s+)assistance(\s+)supplies(.*?)and(\s+)school(\s+)lunch",
-        r"School\1lunch\2supplies\3and\4rental\5assistance",
+        r"rental(\s+)assistance(\s+)supplies(.*?)and(\s+)school(\s+)lunch",
+        r"school\1lunch\2supplies\3and\4rental\5assistance",
         "difference in rises by benefit",
     ),
     (
@@ -951,13 +952,36 @@ INKIND_PROSE_MUTATIONS = (
 def reflect_replicates(uncertainty, year):
     """Mirror each of one year's replicate thresholds around its full-sample
     value, with and without the benefits, in both runs. Every squared
-    deviation, and so every standard error, stays the same."""
+    deviation, and so every threshold's standard error, stays the same. The
+    lift is a ratio of thresholds, so reflection moves its variance; reseal
+    the recorded lift as a forger would."""
+    inkind = load_inkind_module()
     for run in uncertainty["runs"].values():
         replicates = run["years"][year]["replicates"]
         series = list(replicates["without_in_kind"].values())
         series += [draw for draws in replicates["with_in_kind"].values() for draw in draws]
         for values in series:
             values[1:] = [2 * values[0] - value for value in values[1:]]
+        for tenure, without in replicates["without_in_kind"].items():
+            lifts = [
+                [inkind._growth(w, v) for w, v in zip(without, draw)]
+                for draw in replicates["with_in_kind"][tenure]
+            ]
+            run["years"][year]["in_kind_lift_percent"][tenure].update(inkind._rubin(lifts))
+
+
+def load_inkind_module():
+    """Load scripts/inkind_inputs.py for its growth and Rubin helpers."""
+    spec = importlib.util.spec_from_file_location(
+        "paper_guard_inkind_inputs", REPO / "scripts/inkind_inputs.py"
+    )
+    module = importlib.util.module_from_spec(spec)
+    sys.path.insert(0, str(REPO / "scripts"))
+    try:
+        spec.loader.exec_module(module)
+    finally:
+        sys.path.pop(0)
+    return module
 
 
 def excluded_diagnostic(path):
