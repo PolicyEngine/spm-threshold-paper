@@ -469,8 +469,8 @@ identities within \$0.00001 in every year from 2019 to 2025.
 Between the 2022 and 2025 thresholds, BLS's imputed benefits rose from
 \$855 to \$1,257 per unit in its band, and we estimate that ours rose
 from \$1,027 to \$1,173, a rise of \$146 with a standard error of \$191
-(@tbl-inkind-amounts). Rental assistance supplies \$169 of the \$256
-difference between the two rises and school lunch \$94, and the other
+(@tbl-inkind-amounts). Of the \$256 difference between the two rises,
+rental assistance supplies \$169 and school lunch \$94, and the other
 three benefits narrow it by \$7. From the 2019 to the 2022 thresholds, BLS's rental
 assistance per renter rose 17 percent, and we estimate that ours rose 20
 percent (@tbl-inkind-series). For the 2019–2023
@@ -515,8 +515,8 @@ its FCSUti index, and 2.5 to 2.9 points to newer CE data and changes in
 BLS's code for imputing in-kind benefits. We use CPI-U's official annual
 averages. BLS's 2025 thresholds page uses a twelve-month 2025 average
 with October interpolated, 138.289 against the official 138.198 (2013 =
-100), which puts CPI-U's 2022–2025 growth at 10.08 percent
-[@bls2025thresholds]. We estimate that the imputed benefits
+100) [@bls2025thresholds], which puts CPI-U's 2022–2025 growth at 10.08
+percent. We estimate that the imputed benefits
 change the replication's growth by +0.06 points for owners with
 mortgages, +0.91 for owners without mortgages, and −0.62 for renters,
 each within one standard error of zero (@sec-inkind-uncertainty). When
@@ -546,8 +546,8 @@ shelter, utilities, and food definitions of @garner2021.
 BLS's shares, its FCSUti index, and CPI-U split each threshold's growth
 beyond CPI-U into three parts (@tbl-inkind-accounting). For owners with
 mortgages, BLS's threshold outgrew CPI-U by 11.61 points of its 2022
-level. The FCSUti index outgrew CPI-U by 4.18 points, which supplies
-4.11 points on the threshold's out-of-pocket terms. Growth in the
+level. The FCSUti index outgrew CPI-U by 4.18 points, which, on the
+threshold's out-of-pocket terms, supplies 4.11 points. Growth in the
 imputed benefits' terms beyond CPI-U supplies 0.57 points, and growth in
 out-of-pocket spending beyond BLS's index supplies the remaining 6.92.
 The three parts supply 4.10, 0.81, and 5.72 of 10.63 points for owners
@@ -556,7 +556,9 @@ Imputed benefits therefore supply 4.9, 7.6, and 12.9 percent of BLS's
 growth beyond CPI-U, and we estimate 2.2, 2.8, and 2.0 percent for ours.
 We compute each share as $(I_{2025}-\pi I_{2022})/(B_{2025}-\pi
 B_{2022})$, where $I$ sums the imputed benefits' terms in threshold $B$
-and $\pi$ denotes CPI-U's growth factor. The split takes each year's
+and $\pi$ denotes CPI-U's growth factor. If we apply the index's lead to
+the benefits' terms as well, out-of-pocket spending keeps its part and
+the benefits supply 4.3, 6.8, and 11.7 percent. The split takes each year's
 band means as BLS's shares give them, so it leaves out how the benefits
 change which units fall in the band; in our replication, that re-ranking
 moves 2022–2025 growth by −0.01, +0.82, and −0.34 points. The
@@ -640,9 +642,9 @@ keeps units that receive rent as pay. Our school lunch donors report free or red
 Census also values paid lunches and, for respondents who report EBT
 benefits but no SNAP, summer EBT [@spmtechnical]. BLS says it values school lunches by the
 traditional method before and after the COVID-19 period [@blsspmhome],
-and we use Census's SPM-unit values for every reference year from 2018,
-which from reference year 2023 Census estimates with its fall 2022
-method [@spmtechnical]. Census accounts for Pandemic EBT in its
+and we use Census's SPM-unit values for every reference year from 2018;
+from reference year 2023, Census estimates those values with its fall
+2022 method [@spmtechnical]. Census accounts for Pandemic EBT in its
 2020 and 2021 values, and states paid those benefits on EBT cards; under
 BLS's reasoning for SNAP, reported food spending may already include
 them. We value WIC at USDA's national average food cost, while Census uses

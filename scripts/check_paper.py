@@ -1493,8 +1493,8 @@ inkind_pins = (
         rise_gap["rental_assistance"] > rise_gap["nslp"] > 0 > other_gap
         and math.isclose(sum(rise_gap.values()), bls_total[2] - our_total[2], abs_tol=1e-6)
         and has_number(
-            f"Rental assistance supplies {dollars(rise_gap['rental_assistance'])} of the "
-            f"{dollars(sum(rise_gap.values()))} difference between the two rises and school lunch "
+            f"Of the {dollars(sum(rise_gap.values()))} difference between the two rises, rental assistance "
+            f"supplies {dollars(rise_gap['rental_assistance'])} and school lunch "
             f"{dollars(rise_gap['nslp'])}, and the other {count_word(len(rise_gap) - 2)} benefits narrow it by "
             f"{dollars(-other_gap)}",
             text=INKIND_TEXT,
@@ -1680,8 +1680,8 @@ inkind_pins = (
         and has_ordered(
             [
                 f"BLS's threshold outgrew CPI-U by {accounting[0]['excess']:.2f} points of its {GROWTH_FIRST} level",
-                f"The FCSUti index outgrew CPI-U by {price_beyond_cpi:.2f} points, which supplies "
-                f"{accounting[0]['prices']:.2f} points on the threshold's out-of-pocket terms",
+                f"The FCSUti index outgrew CPI-U by {price_beyond_cpi:.2f} points, which, on the threshold's "
+                f"out-of-pocket terms, supplies {accounting[0]['prices']:.2f} points",
                 f"Growth in the imputed benefits' terms beyond CPI-U supplies {accounting[0]['benefits']:.2f} points",
                 f"supplies the remaining {accounting[0]['out_of_pocket']:.2f}",
                 f"The three parts supply {accounting[1]['prices']:.2f}, {accounting[1]['benefits']:.2f}, and "
@@ -1697,6 +1697,24 @@ inkind_pins = (
         ),
     ),
     (
+        "accounting with the index's lead on the benefits' terms",
+        all(
+            math.isclose(sum(part["index_on_benefits_shares"].values()), 100, abs_tol=1e-9)
+            and math.isclose(
+                part["index_on_benefits_shares"]["out_of_pocket"], part["shares"]["out_of_pocket"], abs_tol=1e-9
+            )
+            and 0 < part["index_on_benefits_shares"]["benefits"] < part["shares"]["benefits"]
+            for part in accounting
+        )
+        and has_number(
+            "If we apply the index's lead to the benefits' terms as well, out-of-pocket spending keeps its part "
+            "and the benefits supply "
+            + ", ".join(f"{part['index_on_benefits_shares']['benefits']:.1f}" for part in accounting[:-1])
+            + f", and {accounting[-1]['index_on_benefits_shares']['benefits']:.1f} percent",
+            text=GROWTH_TEXT,
+        ),
+    ),
+    (
         "re-ranking left out of the accounting",
         has_number(
             f"that re-ranking moves {GROWTH_FIRST}–{GROWTH_LAST} growth by {signed(rank_shift[0])}, "
@@ -1708,7 +1726,8 @@ inkind_pins = (
         "CPI-U vintage on BLS's 2025 page",
         cpi_vintage_ok
         and has_number(
-            f"{BLS_2025_CPI_U_INTERPOLATED:.3f} against the official {OFFICIAL_2025_CPI_U:.3f} (2013 = 100), which "
+            f"{BLS_2025_CPI_U_INTERPOLATED:.3f} against the official {OFFICIAL_2025_CPI_U:.3f} (2013 = 100) "
+            "[@bls2025thresholds], which "
             f"puts CPI-U's {GROWTH_FIRST}–{GROWTH_LAST} growth at {inkind['cpi_u_growth_bls_vintage']:.2f} percent",
             text=GROWTH_TEXT,
         )

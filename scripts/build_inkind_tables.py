@@ -108,7 +108,7 @@ def accounting_table(figures: dict) -> str:
     accounting = figures["accounting"]
     rows = [["Threshold growth beyond CPI-U", *(f"{accounting[t]['excess']:.2f}" for t in TENURES)]]
     for part, label in (
-        ("prices", "FCSUti index beyond CPI-U"),
+        ("prices", "FCSUti index beyond CPI-U, on out-of-pocket terms"),
         ("benefits", "Imputed benefits"),
         ("out_of_pocket", "Out-of-pocket spending beyond the index"),
     ):

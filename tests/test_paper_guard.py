@@ -359,6 +359,13 @@ INKIND_PROSE_MUTATIONS = (
         "stage changes in tenure order, each within one standard error",
     ),
     (
+        "benefits' share with the index's lead on their terms",
+        "section",
+        r"benefits(\s+)supply(\s+)4\.3,(\s+)6\.8,",
+        r"benefits\1supply\g<2>6.8,\g<3>4.3,",
+        "accounting with the index's lead on the benefits' terms",
+    ),
+    (
         "rental assistance per renter 2019-2022 growth",
         "section",
         r"renter(\s+)rose(\s+)17(\s+)percent",
@@ -1795,9 +1802,9 @@ class PaperGuardTests(unittest.TestCase):
 
     def test_inkind_pins_reject_a_figure_borrowed_from_another_section(self):
         cases = (
-            ("rental assistance share", (("\\$169 of the \\$256", "\\$196 of the \\$256"),),
+            ("rental assistance share", (("supplies \\$169 and school", "supplies \\$196 and school"),),
              "difference in rises by benefit",
-             "Rental assistance supplies \\$169 of the \\$256 difference between the two rises and school "
+             "Of the \\$256 difference between the two rises, rental assistance supplies \\$169 and school "
              "lunch \\$94, and the other three benefits narrow it by \\$7."),
             ("renter split", (("5.71 percent, 0.62", "5.71 percent, 0.66"),),
              "BLS 2024-2025 renter growth without its imputed terms",

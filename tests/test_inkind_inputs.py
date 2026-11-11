@@ -491,6 +491,30 @@ class GrowthAccountingProperties(unittest.TestCase):
                 self.assertTrue(math.isclose(sum(part["shares"].values()), 100, rel_tol=1e-9))
                 self.assertTrue(all(value > 0 for value in part["shares"].values()))
 
+    def test_index_on_the_benefits_moves_only_the_index_lead_on_their_terms(self):
+        """Applying the index's lead to the benefits' terms too keeps the
+        sum and the out-of-pocket part, and moves exactly
+        (phi - pi) I22 / B22 from the benefits' part to the prices' part."""
+        rng = random.Random(20261112)
+        for _ in range(DRAWS):
+            figures, components, cpi, price = self.synthetic(rng)
+            split = INKIND._growth_accounting(figures, components, cpi, price)
+            for tenure in TENURES:
+                part = split[tenure]
+                alt = part["index_on_benefits_shares"]
+                b22 = components["bls"]["years"]["2022"]["published_thresholds"][tenure]
+                i22 = components["bls"]["growth_2022_2025"]["by_tenure"][tenure]["imputed_term_dollars"]["2022"]
+                moved = 100 * 100 * (price - cpi) * i22 / b22 / part["excess"]
+                self.assertTrue(math.isclose(sum(alt.values()), 100, rel_tol=1e-9))
+                self.assertTrue(
+                    math.isclose(alt["out_of_pocket"], part["shares"]["out_of_pocket"], rel_tol=1e-9, abs_tol=1e-9)
+                )
+                self.assertTrue(math.isclose(part["shares"]["benefits"] - alt["benefits"], moved, abs_tol=1e-9))
+                self.assertTrue(math.isclose(alt["prices"] - part["shares"]["prices"], moved, abs_tol=1e-9))
+                self.assertTrue(
+                    math.isclose(alt["prices"], 100 * 100 * (price - cpi) / part["excess"], rel_tol=1e-9)
+                )
+
     def test_split_does_not_depend_on_the_dollar_unit(self):
         rng = random.Random(7)
         for _ in range(200):

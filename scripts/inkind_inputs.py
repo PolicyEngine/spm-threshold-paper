@@ -619,10 +619,26 @@ def _growth_accounting(figures: dict, components: dict, cpi_ratio: float, price:
             f"accounting's benefit share {tenure}",
         )
         _require(all(value > 0 for value in parts.values()), f"accounting parts positive {tenure}")
+        # The same split with the index's lead on the whole threshold, the
+        # benefits' terms included: (phi - pi) for prices and
+        # (I25 - phi I22) / B22 for the benefits; out-of-pocket is unchanged.
+        index_on_benefits = {
+            "prices": 100 * (price - cpi_ratio),
+            "benefits": 100 * (i25 - price * i22) / b22,
+            "out_of_pocket": parts["out_of_pocket"],
+        }
+        _close(
+            sum(index_on_benefits.values()),
+            excess,
+            f"growth accounting with the index on the benefits sums to growth beyond CPI-U {tenure}",
+        )
         out[tenure] = {
             "excess": excess,
             **parts,
             "shares": {name: 100 * value / excess for name, value in parts.items()},
+            "index_on_benefits_shares": {
+                name: 100 * value / excess for name, value in index_on_benefits.items()
+            },
         }
     return out
 
