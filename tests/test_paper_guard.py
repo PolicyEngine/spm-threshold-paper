@@ -216,9 +216,9 @@ INKIND_PROSE_MUTATIONS = (
     (
         "BLS imputed renter points",
         "section",
-        r"0\.62(\s+)of(\s+)the",
-        r"0.66\1of\2the",
-        "BLS 2024-2025 renter split",
+        r"5\.71(\s+)percent,(\s+)0\.62",
+        r"5.71\1percent,\g<2>0.66",
+        "BLS 2024-2025 renter growth without its imputed terms",
     ),
     (
         "written-definition lower bound",
@@ -250,11 +250,11 @@ INKIND_PROSE_MUTATIONS = (
         "abstract stage changes under one point per tenure",
     ),
     (
-        "abstract rental assistance share",
+        "abstract accounting share",
         "abstract",
-        r"about(\s+)two-thirds",
-        r"about\1three-quarters",
-        "abstract rental assistance share of the difference",
+        r"supply(\s+)5(\s+)to(\s+)13(\s+)percent",
+        r"supply\g<1>5\2to\g<3>12\4percent",
+        "abstract and discussion: the accounting's shares",
     ),
     ("identity tolerance", "section", r"0\.00001", "0.000001", "BLS identity tolerance"),
     (
@@ -267,8 +267,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "evaluation renter points",
         "evaluation",
-        r"supply 0\.62 points",
-        "supply 0.72 points",
+        r"falls(\s+)by(\s+)0\.62(\s+)points",
+        r"falls\1by\g<2>0.72\3points",
         "evaluation section cites BLS's imputed renter points",
     ),
     (
@@ -281,8 +281,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "appendix standard-error commit",
         "appendix",
-        r"`a581c113dd4319fc0f6f9ebd6db5c3697f4a94fa`",
-        "`a581c113dd4319fc0f6f9ebd6db5c3697f4a94fb`",
+        r"`b542f3fa4598ed4e83c8081a5ce06d803d6820f1`",
+        "`b542f3fa4598ed4e83c8081a5ce06d803d6820f2`",
         "appendix names the recorded calculator commits",
     ),
     (
@@ -382,11 +382,11 @@ INKIND_PROSE_MUTATIONS = (
         "replication with benefits exceeds BLS in every cell",
     ),
     (
-        "BLS rise comparison direction",
+        "rental assistance level gap direction",
         "section",
-        r"BLS's(\s+)rise(\s+)exceeds",
-        r"BLS's\1rise\2trails",
-        "BLS and replication imputed totals",
+        r"71(\s+)to(\s+)80(\s+)percent(\s+)above",
+        r"71\1to\g<2>80\3percent\4below",
+        "rental assistance per renter: level gap before 2024",
     ),
     (
         "mean absolute deviation direction",
@@ -412,16 +412,16 @@ INKIND_PROSE_MUTATIONS = (
     (
         "swapped share tenures",
         "section",
-        r"7\.6(\s+)against(\s+)2\.8(.*?)12\.9(\s+)against(\s+)2\.0",
-        r"12.9\1against\g<2>2.0\g<3>7.6\4against\g<5>2.8",
-        "imputed shares of growth beyond CPI-U",
+        r"supply(\s+)4\.9,(\s+)7\.6,(\s+)and(\s+)12\.9",
+        r"supply\g<1>12.9,\g<2>7.6,\3and\g<4>4.9",
+        "three-part accounting of BLS's growth beyond CPI-U",
     ),
     (
         "swapped BLS and replication shares",
         "section",
-        r"4\.9(\s+)percent(\s+)of(\s+)BLS's(.*?)2\.2(\s+)percent(\s+)of(\s+)ours",
-        r"2.2\1percent\2of\3BLS's\g<4>4.9\5percent\6of\7ours",
-        "imputed shares of growth beyond CPI-U",
+        r"percent(\s+)of(\s+)BLS's(\s+)growth(\s+)beyond(\s+)CPI-U,(\s+)and(\s+)we(\s+)estimate",
+        r"percent\1of\2our\3growth\4beyond\5CPI-U,\6and\7BLS\8estimates",
+        "three-part accounting of BLS's growth beyond CPI-U",
     ),
     (
         "share formula operator",
@@ -452,11 +452,11 @@ INKIND_PROSE_MUTATIONS = (
         "method constants read from fingerprinted calculator code",
     ),
     (
-        "discussion comparison direction",
+        "discussion accounting parts swapped",
         "discussion",
-        r"rise(\s+)faster(\s+)than(\s+)ours",
-        r"rise\1more\2slowly\3than ours",
-        "BLS's imputed benefits rise faster than ours",
+        r"FCSUti(\s+)index(\s+)supplies(\s+)33(\s+)to(\s+)39(\s+)percent(.*?)benefits(\s+)5(\s+)to(\s+)13",
+        r"FCSUti\1index\2supplies\g<3>5\4to\g<5>13\6percent\7benefits\g<8>33\9to\g<10>39",
+        "abstract and discussion: the accounting's shares",
     ),
     # Round 2: the verb or label beside each figure, and the method facts
     # the section quotes, each changed while every figure stays put.
@@ -484,8 +484,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "swapped stages in the 2024-2025 renter growth",
         "section",
-        r"With(\s+)our(\s+)imputed(\s+)benefits,(\s+)we(\s+)estimate(\s+)renter(\s+)growth(.*?)without(\s+)them",
-        r"Without\1our\2imputed\3benefits,\4we\5estimate\6renter\7growth\8with\9them",
+        r"With(\s+)our(\s+)imputed(\s+)benefits,(\s+)we(\s+)estimate(\s+)the(\s+)retrospective(.*?)without(\s+)them",
+        r"Without\1our\2imputed\3benefits,\4we\5estimate\6the\7retrospective\8with\9them",
         "replication 2024-2025 renter growth with and without benefits",
     ),
     (
@@ -498,16 +498,16 @@ INKIND_PROSE_MUTATIONS = (
     (
         "swapped owners of the imputed totals",
         "section",
-        r"BLS's(\s+)imputed(\s+)benefits(\s+)rose(\s+)from(.*?)and(\s+)ours(\s+)from",
-        r"our\1imputed\2benefits\3rose\4from\5and\6BLS's\7from",
+        r"BLS's(\s+)imputed(\s+)benefits(\s+)rose(\s+)from(.*?)that(\s+)ours(\s+)rose",
+        r"our\1imputed\2benefits\3rose\4from\5that\6BLS's\7rose",
         "BLS and replication imputed totals",
     ),
     (
-        "implicate rise price index",
+        "standard error of our rise",
         "section",
-        r"across(\s+)the(\s+)two(\s+)price(\s+)indexes",
-        r"under\1the\2composite\3CPI",
-        "implicate rise range",
+        r"standard(\s+)error(\s+)of(\s+)\\\$191",
+        r"standard\1error\2of\3\\$119",
+        "BLS and replication imputed totals",
     ),
     (
         "swapped price series",
@@ -547,16 +547,16 @@ INKIND_PROSE_MUTATIONS = (
     (
         "BLS 2024-2025 renter split source",
         "section",
-        r"of(\s+)them(\s+)from(\s+)rental(\s+)assistance",
-        r"of\1them\2from\3school\4lunch",
-        "BLS 2024-2025 renter split",
+        r"and(\s+)rental(\s+)assistance(\s+)alone(\s+)accounts",
+        r"and\1school\2lunch\3alone\4accounts",
+        "BLS 2024-2025 renter growth without its imputed terms",
     ),
     (
         "owner of the 2024-2025 rental assistance per renter",
         "section",
         r"BLS's(\s+)rental(\s+)assistance(\s+)per(\s+)renter(\s+)rose(\s+)from",
         r"Our\1rental\2assistance\3per\4renter\5rose\6from",
-        "BLS 2024-2025 renter split",
+        "BLS 2024-2025 renter growth without its imputed terms",
     ),
     (
         "renters' utilities rule",
@@ -617,8 +617,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "Census school lunch first year",
         "section",
-        r"include(\s+)from(\s+)reference(\s+)year(\s+)2018",
-        r"include\1from\2reference\3year\g<4>2019",
+        r"From(\s+)reference(\s+)year(\s+)2018,",
+        r"From\1reference\2year\g<3>2019,",
         "Census school lunch values from their first reference year",
     ),
     (
@@ -668,13 +668,13 @@ INKIND_PROSE_MUTATIONS = (
         "section",
         r"For(\s+)renters(\s+)from(\s+)2024(\s+)to(\s+)2025,",
         r"For\1owners with mortgages\2from\g<3>2024\4to\g<5>2025,",
-        "BLS 2024-2025 renter split",
+        "BLS 2024-2025 renter growth without its imputed terms",
     ),
     (
         "survey holding Census lunch values",
         "section",
-        r"which(\s+)the(\s+)CPS(\s+)ASEC(\s+)files(\s+)include",
-        r"which\1the\2CE\4files\5include",
+        r"which(\s+)the(\s+)public(\s+)CPS(\s+)ASEC(\s+)person(\s+)files",
+        r"which\1the\2public\3CE\5person\6files",
         "Census school lunch values from their first reference year",
     ),
     (
@@ -711,6 +711,211 @@ INKIND_PROSE_MUTATIONS = (
         r"price(\s+)factors(\s+)do(\s+)not(\s+)vary",
         r"price\1factors\2vary",
         "FCSUti price factors held fixed across replicates",
+    ),
+    # Round 3 (the r4 review): the accounting, the level gap, the new
+    # standard errors and the method facts read from code.
+    (
+        "written-definition stage change",
+        "section",
+        r"by(\s+)\+0\.09,(\s+)−1\.51,",
+        r"by\1+0.09,\2−1.15,",
+        "written definitions with the composite CPI",
+    ),
+    (
+        "abstract names the CE summaries",
+        "abstract",
+        r"with(\s+)the(\s+)CE's(\s+)spending(\s+)summaries",
+        r"with\1the\2written\3shelter\4definitions",
+        "written definitions with the composite CPI",
+    ),
+    (
+        'internet share of thresholds',
+        'section',
+        '1\\.85(\\s+)to(\\s+)2\\.55',
+        '1.85\\1to\\g<2>2.65',
+        "home internet's share of BLS's thresholds",
+    ),
+    (
+        'common-component gap',
+        'section',
+        '0\\.83(\\s+)to(\\s+)3\\.80',
+        '0.83\\1to\\g<2>3.90',
+        'thresholds on the components both series hold',
+    ),
+    (
+        'common-component definitions swapped',
+        'section',
+        'under(\\s+)the(\\s+)written(\\s+)definitions(\\s+)and(\\s+)by(.*?)with(\\s+)the(\\s+)CE(\\s+)summaries',
+        'with\\1the\\2CE\\3summaries\\4and\\5by\\6under\\7the\\8written\\9definitions',
+        'thresholds on the components both series hold',
+    ),
+    (
+        'BLS 2025 rental assistance per renter',
+        'section',
+        '\\\\\\$1,243(\\s+)in(\\s+)2025',
+        '\\\\$1,234\\1in\\g<2>2025',
+        "rental assistance per renter: BLS's 2024 and 2025 rise",
+    ),
+    (
+        'standard error of our rental rise',
+        'section',
+        'with(\\s+)a(\\s+)standard(\\s+)error(\\s+)of(\\s+)\\\\\\$444',
+        'with\\1a\\2standard\\3error\\4of\\5\\\\$404',
+        "rental assistance per renter: BLS's 2024 and 2025 rise",
+    ),
+    (
+        'accounting excess',
+        'section',
+        'outgrew(\\s+)CPI-U(\\s+)by(\\s+)11\\.61',
+        'outgrew\\1CPI-U\\2by\\g<3>11.16',
+        "three-part accounting of BLS's growth beyond CPI-U",
+    ),
+    (
+        'index beyond CPI-U',
+        'section',
+        'by(\\s+)4\\.18(\\s+)points',
+        'by\\g<1>4.81\\2points',
+        "three-part accounting of BLS's growth beyond CPI-U",
+    ),
+    (
+        'renter benefits part',
+        'section',
+        '4\\.04,(\\s+)1\\.57,',
+        '4.04,\\g<1>1.75,',
+        "three-part accounting of BLS's growth beyond CPI-U",
+    ),
+    (
+        're-ranking sign',
+        'section',
+        '−0\\.01,(\\s+)\\+0\\.82,',
+        '−0.01,\\1−0.82,',
+        're-ranking left out of the accounting',
+    ),
+    (
+        "CPI-U growth at BLS's vintage",
+        'section',
+        'growth(\\s+)at(\\s+)10\\.08',
+        'growth\\1at\\g<2>10.01',
+        "CPI-U vintage on BLS's 2025 page",
+    ),
+    (
+        'interpolated 2025 CPI-U in the price section',
+        'price',
+        'average(\\s+)of(\\s+)138\\.289',
+        'average\\1of\\g<2>138.298',
+        "CPI-U vintage on BLS's 2025 page",
+    ),
+    (
+        "Schild's inflation points",
+        'section',
+        'attributes(\\s+)7\\.21',
+        'attributes\\g<1>7.12',
+        "Schild's attribution of the 2021-2022 rise",
+    ),
+    (
+        'school lunch rise standard error',
+        'section',
+        '\\\\\\$50(\\s+)for(\\s+)school(\\s+)lunch',
+        '\\\\$55\\1for\\2school\\3lunch',
+        'standard errors of the rises in band amounts',
+    ),
+    (
+        'lift standard errors',
+        'section',
+        '0\\.31(\\s+)to(\\s+)0\\.61',
+        '0.31\\1to\\g<2>0.71',
+        "standard errors of the benefits' lifts",
+    ),
+    (
+        'lift years within 1.5 standard errors',
+        'section',
+        'the(\\s+)2021–2025(\\s+)lifts',
+        'the\\g<1>2020–2025\\2lifts',
+        "standard errors of the benefits' lifts",
+    ),
+    (
+        'lift standard-error multiple',
+        'section',
+        'exceed(\\s+)five(\\s+)standard(\\s+)errors',
+        'exceed\\1six\\2standard\\3errors',
+        "standard errors of the benefits' lifts",
+    ),
+    (
+        "owners' rented-dwelling spending",
+        'section',
+        '\\\\\\$64(\\s+)to(\\s+)\\\\\\$683',
+        '\\\\$64\\1to\\2\\\\$638',
+        "written definitions keep owners' rented-dwelling spending",
+    ),
+    (
+        'abstract uncertainty',
+        'abstract',
+        'each(\\s+)change(\\s+)within(\\s+)one(\\s+)standard',
+        'each\\1change\\2within\\3half a\\4standard',
+        'abstract and discussion: each change within one standard error',
+    ),
+    (
+        'discussion uncertainty',
+        'discussion',
+        'points,(\\s+)each(\\s+)within(\\s+)one',
+        'points,\\1each\\2within\\3half a',
+        'abstract and discussion: each change within one standard error',
+    ),
+    (
+        'reference-year rule',
+        'section',
+        'interviews(\\s+)to(\\s+)the(\\s+)year(\\s+)before',
+        'interviews\\1to\\2the\\3year\\4after',
+        'method constants read from fingerprinted calculator code',
+    ),
+    (
+        'ridge penalty',
+        'section',
+        'ridge(\\s+)penalty(\\s+)of(\\s+)one',
+        'ridge\\1penalty\\2of\\3two',
+        'method constants read from fingerprinted calculator code',
+    ),
+    (
+        'school lunch cell ladder',
+        'section',
+        'then(\\s+)across(\\s+)numbers(\\s+)of(\\s+)children,(\\s+)then(\\s+)across(\\s+)regions',
+        'then\\1across\\2regions,\\5then\\6across\\7numbers of children',
+        'method constants read from fingerprinted calculator code',
+    ),
+    (
+        'children top-code',
+        'section',
+        'top-coded(\\s+)at(\\s+)four',
+        'top-coded\\1at\\2three',
+        'method constants read from fingerprinted calculator code',
+    ),
+    (
+        'first CPS ASEC file with Census lunch values',
+        'section',
+        'from(\\s+)the(\\s+)2019(\\s+)file(\\s+)onward',
+        'from\\1the\\g<2>2018\\3file\\4onward',
+        'Census school lunch values from their first reference year',
+    ),
+    (
+        'research-file years',
+        'section',
+        'For(\\s+)reference(\\s+)years(\\s+)2014–2017,',
+        'For\\1reference\\2years\\g<3>2015–2017,',
+        'Census school lunch values from their first reference year',
+    ),
+    (
+        'our 2024-2025 rental assistance per renter',
+        'section',
+        'ours(\\s+)rose(\\s+)from(\\s+)\\\\\\$1,258',
+        'ours\\1rose\\2from\\3\\\\$1,285',
+        'BLS 2024-2025 renter growth without its imputed terms',
+    ),
+    (
+        'BLS renter growth without imputed terms',
+        'section',
+        'grows(\\s+)5\\.71',
+        'grows\\g<1>5.17',
+        'BLS 2024-2025 renter growth without its imputed terms',
     ),
 )
 
@@ -1413,8 +1618,8 @@ class PaperGuardTests(unittest.TestCase):
         original = readme.read_text()
         cases = (
             ("receipt count", "uses three receipts", "uses two receipts"),
-            ("commit", "`a581c113dd4319fc0f6f9ebd6db5c3697f4a94fa`", "`a581c11`"),
-            ("tag", "`paper-inkind-se-a581c11`", "`paper-inkind-se-7d8e3c8`"),
+            ("commit", "`b542f3fa4598ed4e83c8081a5ce06d803d6820f1`", "`b542f3f`"),
+            ("tag", "`paper-inkind-se-b542f3f`", "`paper-inkind-se-a581c11`"),
         )
         for name, old, new in cases:
             with self.subTest(name=name):
@@ -1430,21 +1635,27 @@ class PaperGuardTests(unittest.TestCase):
     def test_bibliography_cites_the_recorded_calculator_commits(self):
         bib = self.repo / "bibliography/references.bib"
         original = bib.read_text()
-        components, stale_components = "8f632e31b4e48bbc735161d24665a8182dc0d9d6", "8b6766cbfcb7cc3b79451b3b5822425a2cc6590d"
-        uncertainty, stale_uncertainty = "a581c113dd4319fc0f6f9ebd6db5c3697f4a94fa", "7d8e3c8309492b4d760e8eb2131a94dbf78b95b1"
+        # Both receipts come from one calculator commit, so the cases edit one
+        # entry at a time; a swap of the two entries would change nothing.
+        components = uncertainty = "b542f3fa4598ed4e83c8081a5ce06d803d6820f1"
+        stale_components = "8f632e31b4e48bbc735161d24665a8182dc0d9d6"
+        stale_uncertainty = "a581c113dd4319fc0f6f9ebd6db5c3697f4a94fa"
         replication = "4778dfab2d109515b6a14e63da63011dd7feb884"
         note = f"Imputation at commit {replication}; comparison with BLS components at commit {components}"
+        inkind = original.index("@misc{spmcalculator2026inkind")
+        inkind = (inkind, original.index("\n}\n", inkind) + 3)
+        se = original.index("@misc{spmcalculator2026se")
+        se = (se, original.index("\n}\n", se) + 3)
+
+        def in_entry(entry, old, new):
+            start, end = entry
+            return original[:start] + original[start:end].replace(old, new) + original[end:]
+
         cases = (
-            ("stale components commit", original.replace(components, stale_components)),
-            ("stale standard-error commit", original.replace(uncertainty, stale_uncertainty)),
-            (
-                "stale components link",
-                original.replace(f"blob/{components}/", f"blob/{stale_components}/"),
-            ),
-            (
-                "swapped entries",
-                original.replace(components, "<swap>").replace(uncertainty, components).replace("<swap>", uncertainty),
-            ),
+            ("stale components commit", in_entry(inkind, components, stale_components)),
+            ("stale standard-error commit", in_entry(se, uncertainty, stale_uncertainty)),
+            ("stale components link", in_entry(inkind, f"blob/{components}/", f"blob/{stale_components}/")),
+            ("stale standard-error link", in_entry(se, f"blob/{uncertainty}/", f"blob/{stale_uncertainty}/")),
             (
                 "commits swapped inside the in-kind note",
                 original.replace(
@@ -1454,15 +1665,16 @@ class PaperGuardTests(unittest.TestCase):
             ),
             (
                 "in-kind link to a fork",
-                original.replace(
-                    f"https://github.com/PolicyEngine/spm-calculator/blob/{components}/",
-                    f"https://github.com/MaxGhenis/spm-calculator/blob/{components}/",
+                in_entry(
+                    inkind,
+                    "https://github.com/PolicyEngine/spm-calculator/blob/",
+                    "https://github.com/MaxGhenis/spm-calculator/blob/",
                 ),
             ),
         )
         self.assertEqual(original.count(note), 1)
-        self.assertEqual(original.count(components), 2)
-        self.assertEqual(original.count(uncertainty), 2)
+        self.assertEqual(original[inkind[0] : inkind[1]].count(components), 2)
+        self.assertEqual(original[se[0] : se[1]].count(uncertainty), 2)
         for name, edited in cases:
             with self.subTest(name=name):
                 self.assertNotEqual(edited, original)
@@ -1540,6 +1752,10 @@ class PaperGuardTests(unittest.TestCase):
             ),
             "discussion": (text.index(DISCUSSION_HEADING), text.index("# Appendix A: replication benchmark")),
             "appendix": (text.index("# Appendix B: reproducibility"), len(text)),
+            "price": (
+                text.index("## Validation of the price comparator"),
+                text.index("# Conditional forecasts beyond available microdata"),
+            ),
         }
         start, end = bounds[where]
         body, count = re.subn(pattern, replacement, text[start:end], count=1, flags=re.S)
@@ -1558,10 +1774,13 @@ class PaperGuardTests(unittest.TestCase):
 
     def test_inkind_pins_reject_a_figure_borrowed_from_another_section(self):
         cases = (
-            ("rental assistance share", (("\\$169 of the difference", "\\$196 of the difference"),),
-             "difference in rises by benefit", "Rental assistance supplies \\$169 of the difference."),
-            ("renter split", (("supplied 0.62 of the 6.33", "supplied 0.66 of the 6.33"),),
-             "BLS 2024-2025 renter split", "BLS's imputed benefits supplied 0.62 of the 6.33 points."),
+            ("rental assistance share", (("\\$169 of the \\$256", "\\$196 of the \\$256"),),
+             "difference in rises by benefit",
+             "Rental assistance supplies \\$169 of the \\$256 difference between the two rises and school "
+             "lunch \\$94, and the other three benefits narrow it by \\$7."),
+            ("renter split", (("5.71 percent, 0.62", "5.71 percent, 0.66"),),
+             "BLS 2024-2025 renter growth without its imputed terms",
+             "With its imputed benefits' terms removed from both years, it grows 5.71 percent, 0.62 points less."),
         )
         for name, edits, label, decoy in cases:
             with self.subTest(name=name):

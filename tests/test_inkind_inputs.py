@@ -391,6 +391,14 @@ class UncertaintyReceiptTests(unittest.TestCase):
                 series += [draw for draws in replicates["with_in_kind"].values() for draw in draws]
                 for values in series:
                     values[1:] = [2 * values[0] - value for value in values[1:]]
+                # The lift is a ratio of thresholds, so reflection moves its
+                # variance; reseal the recorded lift as a forger would.
+                for tenure, without in replicates["without_in_kind"].items():
+                    lifts = [
+                        [INKIND._growth(w, v) for w, v in zip(without, draw)]
+                        for draw in replicates["with_in_kind"][tenure]
+                    ]
+                    run["years"]["2019"]["in_kind_lift_percent"][tenure].update(INKIND._rubin(lifts))
             (data / INKIND.UNCERTAINTY).write_text(json.dumps(uncertainty))
             digest = hashlib.sha256((data / INKIND.UNCERTAINTY).read_bytes()).hexdigest()
             provenance = json.loads((data / INKIND.PROVENANCE).read_text())
@@ -407,6 +415,16 @@ class UncertaintyReceiptTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, f"{INKIND.UNCERTAINTY} matches the SHA-256 pinned"):
                 INKIND.check_receipt_pins(data)
 
+    def test_reflected_replicates_without_a_resealed_lift_fail(self):
+        inputs = self.fresh_inputs()
+        replicates = inputs["uncertainty"]["runs"]["package"]["years"]["2019"]["replicates"]
+        series = list(replicates["without_in_kind"].values())
+        series += [draw for draws in replicates["with_in_kind"].values() for draw in draws]
+        for values in series:
+            values[1:] = [2 * values[0] - value for value in values[1:]]
+        with self.assertRaisesRegex(ValueError, "lift package 2019"):
+            INKIND.uncertainty_figures(inputs, self.published)
+
     def test_growth_replicates_pair_the_same_replicate_weight(self):
         """Pairing replicate r of 2022 with replicate r + 1 of 2025 changes
         the growth standard error, so the recorded value pins the pairing."""
@@ -420,6 +438,181 @@ class UncertaintyReceiptTests(unittest.TestCase):
         # growth pairing changes.
         with self.assertRaisesRegex(ValueError, "stage change package 2022-2025 renter"):
             INKIND.uncertainty_figures(inputs, self.published)
+
+
+class GrowthAccountingProperties(unittest.TestCase):
+    """The split of BLS's 2022-2025 growth beyond CPI-U into the FCSUti
+    index's part, the imputed benefits' part and out-of-pocket spending's
+    part, checked on random thresholds and on the committed receipts."""
+
+    @staticmethod
+    def synthetic(rng, cpi=None, price=None):
+        cpi = rng.uniform(1.0, 1.2) if cpi is None else cpi
+        price = cpi + rng.uniform(0.001, 0.1) if price is None else price
+        b22, b25, i22, i25 = {}, {}, {}, {}
+        for tenure in TENURES:
+            b22[tenure] = rng.uniform(20_000, 50_000)
+            i22[tenure] = rng.uniform(0, 0.1 * b22[tenure])
+            i25[tenure] = cpi * i22[tenure] + rng.uniform(1, 800)
+            b25[tenure] = price * (b22[tenure] - i22[tenure]) + rng.uniform(1, 6000) + i25[tenure]
+        components = {
+            "bls": {
+                "years": {"2022": {"published_thresholds": b22}, "2025": {"published_thresholds": b25}},
+                "growth_2022_2025": {
+                    "by_tenure": {
+                        t: {"imputed_term_dollars": {"2022": i22[t], "2025": i25[t]}} for t in TENURES
+                    }
+                },
+            }
+        }
+        figures = {
+            "bls": {
+                t: {"imputed_share_beyond_cpi_u": 100 * (i25[t] - cpi * i22[t]) / (b25[t] - cpi * b22[t])}
+                for t in TENURES
+            }
+        }
+        return figures, components, cpi, price
+
+    def test_parts_sum_to_growth_beyond_cpi(self):
+        rng = random.Random(20261111)
+        for _ in range(DRAWS):
+            figures, components, cpi, price = self.synthetic(rng)
+            split = INKIND._growth_accounting(figures, components, cpi, price)
+            for tenure in TENURES:
+                part = split[tenure]
+                b22 = components["bls"]["years"]["2022"]["published_thresholds"][tenure]
+                b25 = components["bls"]["years"]["2025"]["published_thresholds"][tenure]
+                self.assertTrue(math.isclose(part["excess"], 100 * (b25 / b22 - cpi), rel_tol=1e-9))
+                self.assertTrue(
+                    math.isclose(
+                        part["prices"] + part["benefits"] + part["out_of_pocket"], part["excess"], rel_tol=1e-9
+                    )
+                )
+                self.assertTrue(math.isclose(sum(part["shares"].values()), 100, rel_tol=1e-9))
+                self.assertTrue(all(value > 0 for value in part["shares"].values()))
+
+    def test_split_does_not_depend_on_the_dollar_unit(self):
+        rng = random.Random(7)
+        for _ in range(200):
+            figures, components, cpi, price = self.synthetic(rng)
+            scale = rng.uniform(0.01, 100)
+            scaled = json.loads(json.dumps(components))
+            for year in ("2022", "2025"):
+                for tenure in TENURES:
+                    scaled["bls"]["years"][year]["published_thresholds"][tenure] *= scale
+                    scaled["bls"]["growth_2022_2025"]["by_tenure"][tenure]["imputed_term_dollars"][year] *= scale
+            base = INKIND._growth_accounting(figures, components, cpi, price)
+            other = INKIND._growth_accounting(figures, scaled, cpi, price)
+            for tenure in TENURES:
+                for name in ("excess", "prices", "benefits", "out_of_pocket"):
+                    self.assertTrue(math.isclose(base[tenure][name], other[tenure][name], rel_tol=1e-9))
+
+    def test_a_misstated_share_is_rejected(self):
+        figures, components, cpi, price = self.synthetic(random.Random(3))
+        figures["bls"]["renter"]["imputed_share_beyond_cpi_u"] += 0.01
+        with self.assertRaisesRegex(ValueError, "accounting's benefit share renter"):
+            INKIND._growth_accounting(figures, components, cpi, price)
+
+    def test_a_part_below_zero_is_rejected(self):
+        figures, components, cpi, price = self.synthetic(random.Random(4))
+        terms = components["bls"]["growth_2022_2025"]["by_tenure"]["renter"]["imputed_term_dollars"]
+        terms["2025"] = 0.5 * cpi * terms["2022"]
+        b22 = components["bls"]["years"]["2022"]["published_thresholds"]["renter"]
+        b25 = components["bls"]["years"]["2025"]["published_thresholds"]["renter"]
+        figures["bls"]["renter"]["imputed_share_beyond_cpi_u"] = (
+            100 * (terms["2025"] - cpi * terms["2022"]) / (b25 - cpi * b22)
+        )
+        with self.assertRaisesRegex(ValueError, "accounting parts positive renter"):
+            INKIND._growth_accounting(figures, components, cpi, price)
+
+    def test_committed_split_matches_the_receipts_directly(self):
+        """A second reading of the receipts, with no code shared with the
+        module beyond loading them, gives the same parts."""
+        inputs = INKIND.load_inkind(REPO / "data/inkind", REPO / "data/current")
+        figures = INKIND.inkind_figures(inputs)
+        components = inputs["components"]
+        cpi = components["inputs"]["cpi"]["cpi_u_ratio_2022_2025"]
+        price = inputs["replication"]["decompositions"]["2022-2025"]["bls_price_factor"]
+        for tenure in TENURES:
+            b22 = components["bls"]["years"]["2022"]["published_thresholds"][tenure]
+            b25 = components["bls"]["years"]["2025"]["published_thresholds"][tenure]
+            terms = components["bls"]["growth_2022_2025"]["by_tenure"][tenure]["imputed_term_dollars"]
+            out_of_pocket_growth = (b25 - terms["2025"]) / (b22 - terms["2022"])
+            part = figures["accounting"][tenure]
+            self.assertTrue(
+                math.isclose(part["out_of_pocket"], 100 * (out_of_pocket_growth - price) * (1 - terms["2022"] / b22))
+            )
+            self.assertTrue(math.isclose(part["prices"] / (1 - terms["2022"] / b22), 100 * (price - cpi)))
+            self.assertTrue(
+                math.isclose(part["shares"]["benefits"], figures["bls"][tenure]["imputed_share_beyond_cpi_u"])
+            )
+
+
+class ReceiptTieProperties(unittest.TestCase):
+    """The new figures tie to other fields of the same receipts, and a
+    changed field breaks the tie."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.inputs = INKIND.load_inkind(REPO / "data/inkind", REPO / "data/current")
+        cls.published = INKIND.published_standard_errors(REPO / "data")
+
+    def components_copy(self):
+        return json.loads(json.dumps(self.inputs["components"]))
+
+    def test_rank_shift_is_the_stage_change_less_the_band_fixed_effect(self):
+        components = self.components_copy()
+        shifts = INKIND._rank_shift(components)
+        for tenure in TENURES:
+            row = components["runs"]["package"]["growth_2022_2025"]["by_tenure"][tenure]
+            self.assertTrue(
+                math.isclose(
+                    shifts[tenure],
+                    row["stage_change_points"] - (row["growth_with_stage"] - row["growth_without_imputed_terms"]),
+                    abs_tol=1e-9,
+                )
+            )
+        components["runs"]["package"]["growth_2022_2025"]["by_tenure"]["renter"]["rank_shift_points"] += 0.01
+        with self.assertRaisesRegex(ValueError, "rank shift renter"):
+            INKIND._rank_shift(components)
+
+    def test_internet_share_ties_to_the_level_decomposition(self):
+        components = self.components_copy()
+        levels = INKIND._internet_and_levels(components)
+        low, high = levels["bls_internet_share_range"]
+        self.assertTrue(0 < low < high < 5)
+        for run, (gap_low, gap_high) in levels["gap_with_bls_internet"].items():
+            self.assertTrue(0 < gap_low < gap_high, run)
+        terms = components["runs"]["package"]["years"]["2023"]["level_gap_percent_of_bls"]["renter"]["terms"]
+        terms["internet"] += 0.01
+        with self.assertRaisesRegex(ValueError, "BLS internet term package 2023 renter"):
+            INKIND._internet_and_levels(components)
+
+    def test_amount_rises_pair_the_same_replicate_weight(self):
+        """Rotating 2025's replicates keeps that year's own standard error
+        but changes the rise's, so the recorded rise pins the pairing."""
+        inputs = {**self.inputs, "uncertainty": json.loads(json.dumps(self.inputs["uncertainty"]))}
+        years = inputs["uncertainty"]["runs"]["package"]["years"]
+        for draws in years["2025"]["replicates"]["amounts"]["rental_assistance_per_renter"]:
+            draws[1:] = draws[2:] + draws[1:2]
+        with self.assertRaisesRegex(ValueError, "rental_assistance_per_renter rise package"):
+            INKIND.uncertainty_figures(inputs, self.published)
+
+    def test_lifts_and_rises_have_positive_standard_errors(self):
+        figures = INKIND.uncertainty_figures(self.inputs, self.published)
+        for run in INKIND.UNCERTAINTY_RUNS:
+            entry = figures["runs"][run]
+            for name, rise in entry["amount_rises"].items():
+                self.assertGreater(rise["standard_error"], 0, f"{run} {name}")
+            for tenure in TENURES:
+                for year, lift in entry["lifts"][tenure].items():
+                    self.assertGreater(lift["standard_error"], 0, f"{run} {tenure} {year}")
+                    self.assertGreater(lift["estimate"], 0, f"{run} {tenure} {year}")
+
+    def test_cpi_vintage_matches_bls_page(self):
+        INKIND.check_cpi_vintage(2.699)
+        with self.assertRaisesRegex(ValueError, "BLS's page growth for 2025 CPI-U"):
+            INKIND.check_cpi_vintage(2.70)
 
 
 if __name__ == "__main__":

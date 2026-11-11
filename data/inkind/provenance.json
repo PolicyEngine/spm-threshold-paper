@@ -1,7 +1,7 @@
 {
   "artifacts": {
     "data/inkind/ce_inkind_bls_components_2019_2025.json": {
-      "calculator_commit": "8f632e31b4e48bbc735161d24665a8182dc0d9d6",
+      "calculator_commit": "b542f3fa4598ed4e83c8081a5ce06d803d6820f1",
       "calculator_path": "spm_calculator/data/current/ce_inkind_bls_components_2019_2025.json",
       "code_sha256": {
         "scripts/compare_ce_inkind_bls_shares.py": "2fe9f2413005d3a5dccfd5eeedaec233eb3eb5aaa603a622a9c6fa056a36917a",
@@ -38,7 +38,7 @@
       "sha256": "22e62cee945028faf063df553d41ed3e64a26d1f82e4dd4ef82aa1da830b3dcb"
     },
     "data/inkind/ce_replicate_uncertainty_2019_2025.json": {
-      "calculator_commit": "a581c113dd4319fc0f6f9ebd6db5c3697f4a94fa",
+      "calculator_commit": "b542f3fa4598ed4e83c8081a5ce06d803d6820f1",
       "calculator_path": "spm_calculator/data/current/ce_replicate_uncertainty_2019_2025.json",
       "code_sha256": {
         "scripts/estimate_ce_replicate_uncertainty.py": "743667482af0f505e4e5c85fad8a601f650713c76bd80a8eaa0a6345e58de20c",
@@ -63,5 +63,5 @@
   "classification": "current_retrospective_research",
   "covered_by_original_timestamp": false,
   "frozen_commitments_modified": false,
-  "recorded_on": "2026-11-08"
+  "recorded_on": "2026-11-11"
 }

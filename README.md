@@ -54,13 +54,17 @@ version 0.5.0 at commit
 
 The in-kind benefit experiment uses three receipts from spm-calculator, which
 we keep in [`data/inkind`](data/inkind) with their provenance and checksums:
-the imputation at commit `4778dfab2d109515b6a14e63da63011dd7feb884`, the
-comparison with BLS's components at commit
-`8f632e31b4e48bbc735161d24665a8182dc0d9d6`, and the replicate-weight standard
-errors at commit `a581c113dd4319fc0f6f9ebd6db5c3697f4a94fa`. Tags
-`paper-inkind-components-8f632e3` and `paper-inkind-se-a581c11` in
-spm-calculator point at the components and standard-error commits, so a
-default clone holds both. The guard
+the imputation at commit `4778dfab2d109515b6a14e63da63011dd7feb884`, and
+the comparison with BLS's components and the replicate-weight standard
+errors, both at commit `b542f3fa4598ed4e83c8081a5ce06d803d6820f1`. Tags
+`paper-inkind-components-b542f3f` and `paper-inkind-se-b542f3f` in
+spm-calculator point at that commit, so a default clone holds it. To regenerate the receipts, run these scripts in
+spm-calculator at the recorded commits: `scripts/replicate_ce_inkind.py`
+writes the imputation receipt, `scripts/compare_ce_inkind_bls_shares.py` the
+comparison with BLS's components, and `scripts/estimate_ce_replicate_uncertainty.py`
+the standard errors. The calculator's
+[in-kind page](https://github.com/PolicyEngine/spm-calculator/blob/b542f3fa4598ed4e83c8081a5ce06d803d6820f1/docs/ce-inkind-imputation.md)
+lists the inputs each script needs. The guard
 recomputes every in-kind estimate and standard error in the tables and text
 and checks that the out-of-pocket run reproduces the retrospective
 replication artifact. It also checks each receipt against the SHA-256 and

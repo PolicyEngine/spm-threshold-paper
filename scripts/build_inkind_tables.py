@@ -1,8 +1,10 @@
 """Build the in-kind benefit tables from the receipts in data/inkind.
 
-Writes paper/tables/inkind_growth.md, inkind_amounts.md and inkind_levels.md
-under --output-root. Every value comes from ``inkind_inputs.inkind_figures``,
-which recomputes it from the receipts' thresholds and band means.
+Writes paper/tables/inkind_growth.md, inkind_amounts.md, inkind_series.md,
+inkind_accounting.md and inkind_levels.md under --output-root. Every value
+comes from ``inkind_inputs.inkind_figures``, which recomputes it from the
+receipts' thresholds and band means, or from ``uncertainty_figures``, which
+recomputes each standard error from the stored replicates.
 """
 
 from __future__ import annotations
@@ -10,7 +12,14 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from inkind_inputs import TENURES, YEARS, inkind_figures, load_inkind
+from inkind_inputs import (
+    TENURES,
+    YEARS,
+    inkind_figures,
+    load_inkind,
+    published_standard_errors,
+    uncertainty_figures,
+)
 
 REPO = Path(__file__).resolve().parents[1]
 SERIES_LABELS = {
@@ -61,7 +70,7 @@ def growth_tables(figures: dict) -> str:
     return markdown_table(headers, rows)
 
 
-def amount_table(figures: dict) -> str:
+def amount_table(figures: dict, errors: dict) -> str:
     headers = ["Benefit", "Series", "2022", "2025", "Change"]
     rows = []
     for name, label in AMOUNT_LABELS.items():
@@ -69,9 +78,43 @@ def amount_table(figures: dict) -> str:
             (("bls", "BLS"), ("package", "Replication"), ("fcsuti", "Replication, FCSUti index"))
         ):
             start, end, rise = figures["amounts"][series][name]
-            rows.append(
-                [label if index == 0 else "", series_label, dollars(start), dollars(end), dollar_change(rise)]
-            )
+            change = dollar_change(rise)
+            if series != "bls":
+                change += f" ({errors['runs'][series]['amount_rises'][name]['standard_error']:,.0f})"
+            rows.append([label if index == 0 else "", series_label, dollars(start), dollars(end), change])
+    return markdown_table(headers, rows)
+
+
+def series_table(figures: dict, errors: dict) -> str:
+    headers = ["Threshold year", "All, BLS", "All, replication", "Rental, BLS", "Rental, replication"]
+    rows = []
+    for year in YEARS:
+        row = figures["year_table"]["years"][year]
+        se = errors["runs"]["package"]["amounts"][year]
+        rows.append(
+            [
+                year,
+                dollars(row["bls_total"]),
+                f"{dollars(row['total'])} ({se['imputed_total']['standard_error']:,.0f})",
+                dollars(row["bls_rent"]),
+                f"{dollars(row['rent'])} ({se['rental_assistance_per_renter']['standard_error']:,.0f})",
+            ]
+        )
+    return markdown_table(headers, rows)
+
+
+def accounting_table(figures: dict) -> str:
+    headers = ["Part", "With mortgage", "Without mortgage", "Renter"]
+    accounting = figures["accounting"]
+    rows = [["Threshold growth beyond CPI-U", *(f"{accounting[t]['excess']:.2f}" for t in TENURES)]]
+    for part, label in (
+        ("prices", "FCSUti index beyond CPI-U"),
+        ("benefits", "Imputed benefits"),
+        ("out_of_pocket", "Out-of-pocket spending beyond the index"),
+    ):
+        rows.append(
+            [label, *(f"{accounting[t][part]:.2f} ({accounting[t]['shares'][part]:.1f}%)" for t in TENURES)]
+        )
     return markdown_table(headers, rows)
 
 
@@ -92,9 +135,13 @@ def main() -> None:
     args = parser.parse_args()
     output = args.output_root / "paper" / "tables"
     output.mkdir(parents=True, exist_ok=True)
-    figures = inkind_figures(load_inkind(REPO / "data" / "inkind", REPO / "data" / "current"))
+    inputs = load_inkind(REPO / "data" / "inkind", REPO / "data" / "current")
+    figures = inkind_figures(inputs)
+    errors = uncertainty_figures(inputs, published_standard_errors(REPO / "data"))
     (output / "inkind_growth.md").write_text(growth_tables(figures))
-    (output / "inkind_amounts.md").write_text(amount_table(figures))
+    (output / "inkind_amounts.md").write_text(amount_table(figures, errors))
+    (output / "inkind_series.md").write_text(series_table(figures, errors))
+    (output / "inkind_accounting.md").write_text(accounting_table(figures))
     (output / "inkind_levels.md").write_text(level_table(figures))
 
 

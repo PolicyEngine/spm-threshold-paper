@@ -62,13 +62,16 @@ from rolling_inputs import (
 )
 from verify_commitments import verify_commitments
 from inkind_inputs import (
+    BLS_2025_CPI_U_INTERPOLATED,
     BLS_IDENTITY_TOLERANCE_DOLLARS,
     COMPONENTS,
     INKIND_FILES,
     REPLICATES,
     REPLICATION,
     UNCERTAINTY,
+    OFFICIAL_2025_CPI_U,
     YEARS,
+    check_cpi_vintage,
     check_receipt_pins,
     inkind_figures,
     load_inkind,
@@ -104,6 +107,8 @@ EXPECTED_TABLES = {
     "inkind_growth.md",
     "inkind_amounts.md",
     "inkind_levels.md",
+    "inkind_series.md",
+    "inkind_accounting.md",
 }
 ARCHIVED_TABLES = {
     "correction.md",
@@ -1121,6 +1126,9 @@ GROWTH_TEXT = section(
     f"## Threshold growth, {GROWTH_FIRST}–{GROWTH_LAST}", "## Uncertainty and limitations {#sec-inkind-uncertainty}"
 )
 README_TEXT = " ".join((REPO / "README.md").read_text().split())
+PRICE_VALIDATION_TEXT = section(
+    "## Validation of the price comparator", "# Conditional forecasts beyond available microdata {#sec-rolling}"
+)
 inkind_method = json.loads((DATA / "inkind" / "ce_inkind_replication_2019_2025.json").read_text())[
     "in_kind_methodology"
 ]
@@ -1163,14 +1171,11 @@ written_with = written_run["gap_range"]["with_in_kind"]
 internet_low, internet_high = inkind["bls_internet_range"]
 bls_total = inkind["amounts"]["bls"]["imputed_total"]
 our_total = inkind["amounts"]["package"]["imputed_total"]
-rise_low, rise_high = inkind["imputed_total_rise_implicate_range"]
 rise_gap = {
     name: inkind["pooled_rise"]["bls"][name] - inkind["pooled_rise"]["package"][name]
     for name in inkind["pooled_rise"]["bls"]
 }
 other_gap = sum(value for name, value in rise_gap.items() if name not in ("rental_assistance", "nslp"))
-rent_growth = inkind["rental_assistance_per_renter_growth"]
-our_rent_growth = sorted((rent_growth["package"], rent_growth["fcsuti"]))
 bls_growth = [inkind["bls"][t]["growth"] for t in TENURES]
 stage_changes = [package_run["growth"][t]["stage_change"] for t in TENURES]
 deflator = list(inkind["deflator_points"].values())
@@ -1189,6 +1194,31 @@ implicate_shares = [
 ]
 recent = inkind["bls_2024_2025"]["renter"]
 rent_2024, rent_2025 = inkind["bls_rental_assistance_per_renter_2024_2025"]
+our_rent_2024, our_rent_2025 = inkind["rental_assistance_per_renter_2024_2025"]
+bls_rent = inkind["amounts"]["bls"]["rental_assistance_per_renter"]
+our_rent = inkind["amounts"]["package"]["rental_assistance_per_renter"]
+rise_ses = {name: entry["standard_error"] for name, entry in package_se["amount_rises"].items()}
+year_table = inkind["year_table"]
+accounting = [inkind["accounting"][t] for t in TENURES]
+rank_shift = [inkind["rank_shift"][t] for t in TENURES]
+price_beyond_cpi = inkind["fcsuti_price_growth"] - inkind["cpi_u_growth"]
+price_shares = [part["shares"]["prices"] for part in accounting]
+internet_share_low, internet_share_high = inkind["bls_internet_share_range"]
+common_gaps = inkind["gap_with_bls_internet"]
+owner_rent_low, owner_rent_high = inkind["written_owner_rent_range"]
+# The benefits' lift to each year's threshold and its standard error. The
+# owner tenures with mortgages and renters stay far from zero; the lift for
+# owners without mortgages falls within 1.5 standard errors from some year on.
+lift_errors = {t: package_se["lifts"][t] for t in TENURES}
+lift_ratios = {t: {y: e["estimate"] / e["standard_error"] for y, e in lift_errors[t].items()} for t in TENURES}
+tight_lift_ses = [lift_errors[t][y]["standard_error"] for t in (TENURES[0], TENURES[2]) for y in YEARS]
+loose_lift_ses = [lift_errors[TENURES[1]][y]["standard_error"] for y in YEARS]
+loose_lift_years = [y for y in YEARS if lift_ratios[TENURES[1]][y] < 1.5]
+try:
+    check_cpi_vintage(bls_cpiu_2025)
+    cpi_vintage_ok = True
+except ValueError:
+    cpi_vintage_ok = False
 
 # The section displays the share formula. We evaluate the formula as
 # printed against BLS's receipt, so a changed operator or subscript fails
@@ -1274,6 +1304,18 @@ INKIND_METHOD_CONSTANTS = (
     "For the 2025 thresholds, as BLS does, we also let the WIC model assign participation to CE units that "
     "have a child under 5 but no woman aged 15 or older",
     "midpoint of its three-month reference period",  # 1.5 months in _wic_ebt_complete
+    # reference_year = year where quarter >= 2, else year - 1
+    "We assign each CE interview to its collection year, and first-quarter interviews to the year before",
+    # _weighted_logit and the amount and Tobit fits: w = weight / weight.mean(),
+    # _penalty puts InKindConfig.ridge (1.0) on every slope and none on the intercept
+    "We scale the survey weights to average one and add a ridge penalty of one to every slope",
+    # the school lunch hot-deck: n_5_18_cell = clip(n_5_18, 0, 4), and the
+    # ladder (state, snap, income, children) -> (region, ...) -> (region,
+    # snap, income) -> (snap, income) -> all donors; a CE unit without a
+    # state matches no state cell
+    "number of school-age children, top-coded at four",
+    "When a cell has fewer than five donors, or the CE withholds the unit's state, we widen it in steps: from "
+    "state to region, then across numbers of children, then across regions, and last to all donors",
     "twelve times the difference",  # 12.0 * benefit in the rental stage
     # income reads FINCBTXM, which BLS's PUMD dictionary defines as the
     # mean of five imputations
@@ -1287,7 +1329,7 @@ INKIND_THRESHOLD_SOURCE = (
 )
 INKIND_THRESHOLD_CONSTANTS = ("mean imputed benefits per consumer unit in the 47th–53rd percentile band",)
 # Rules the section quotes from spm_calculator/ce_bls_shares.py at this
-# fingerprint (calculator commit 8f632e3): the written-definition runs and
+# fingerprint (calculator commit 8f632e3, unchanged at b542f3f): the written-definition runs and
 # the reading of BLS's internet rows.
 INKIND_DEFINITION_SOURCE = (
     "spm_calculator/ce_bls_shares.py",
@@ -1352,7 +1394,7 @@ internet_rows = [inkind_inputs["components"]["bls"]["years"][year]["checks"]["in
 oop_internet_years = internet_rows.count("internet_oop_row")
 in_kind_components = inkind_method["components"]
 # The programs the participation models cover, as the section names them.
-PARTICIPATION_NAMES = {"nslp": "school lunch", "wic": "WIC", "liheap": "LIHEAP", "broadband": "broadband subsidies"}
+PARTICIPATION_NAMES = {"nslp": "free or reduced-price school lunch", "wic": "WIC", "liheap": "LIHEAP", "broadband": "broadband subsidies"}
 participation_programs = [PARTICIPATION_NAMES.get(c) for c in in_kind_components if c != "rental_assistance"]
 inkind_pins = (
     (
@@ -1437,41 +1479,54 @@ inkind_pins = (
         ),
     ),
     (
-        "BLS and replication imputed totals",
+        "BLS and replication imputed totals, with our rise's standard error",
         has_number(
             f"Between the {GROWTH_FIRST} and {GROWTH_LAST} thresholds, BLS's imputed benefits rose from "
-            f"{dollars(bls_total[0])} to {dollars(bls_total[1])} per unit in its band, and ours from "
-            f"{dollars(our_total[0])} to {dollars(our_total[1])}",
-            text=INKIND_TEXT,
-        )
-        and bls_total[2] > rise_high
-        and has_number("BLS's rise exceeds the rise in each of our implicates", text=INKIND_TEXT),
-    ),
-    (
-        "implicate rise range",
-        has_number(
-            f"BLS's rise exceeds the rise in each of our implicates, which ranges from {dollars(rise_low)} to "
-            f"{dollars(rise_high)} across the two price indexes",
+            f"{dollars(bls_total[0])} to {dollars(bls_total[1])} per unit in its band, and we estimate that ours "
+            f"rose from {dollars(our_total[0])} to {dollars(our_total[1])}, a rise of {dollars(our_total[2])} with "
+            f"a standard error of {dollars(rise_ses['imputed_total'])}",
             text=INKIND_TEXT,
         ),
     ),
     (
         "difference in rises by benefit",
         rise_gap["rental_assistance"] > rise_gap["nslp"] > 0 > other_gap
+        and math.isclose(sum(rise_gap.values()), bls_total[2] - our_total[2], abs_tol=1e-6)
         and has_number(
-            f"Rental assistance supplies {dollars(rise_gap['rental_assistance'])} of the difference and school "
-            f"lunch {dollars(rise_gap['nslp'])}, and the other {count_word(len(rise_gap) - 2)} benefits narrow it "
-            f"by {dollars(-other_gap)}",
+            f"Rental assistance supplies {dollars(rise_gap['rental_assistance'])} of the "
+            f"{dollars(sum(rise_gap.values()))} difference between the two rises and school lunch "
+            f"{dollars(rise_gap['nslp'])}, and the other {count_word(len(rise_gap) - 2)} benefits narrow it by "
+            f"{dollars(-other_gap)}",
             text=INKIND_TEXT,
         ),
     ),
     (
-        "rental assistance per renter growth",
-        has_number(
-            f"rose {rent_growth['bls']:.0f} percent in BLS's band and {our_rent_growth[0]:.0f} to "
-            f"{our_rent_growth[1]:.0f} percent in ours",
+        "rental assistance per renter: level gap before 2024",
+        year_table["rent_excess_2019_2023"][0] > 0
+        and has_number(
+            f"For the 2019–2023 thresholds, we estimate rental assistance per renter "
+            f"{year_table['rent_excess_2019_2023'][0]:.0f} to {year_table['rent_excess_2019_2023'][1]:.0f} percent "
+            f"above BLS's, {dollars(year_table['years'][GROWTH_FIRST]['rent'])} against "
+            f"{dollars(year_table['years'][GROWTH_FIRST]['bls_rent'])} in {GROWTH_FIRST}",
             text=INKIND_TEXT,
         ),
+    ),
+    (
+        "rental assistance per renter: BLS's 2024 and 2025 rise",
+        has_number(
+            f"BLS's amount then rose to {dollars(year_table['years']['2024']['bls_rent'])} in 2024 and "
+            f"{dollars(year_table['years']['2025']['bls_rent'])} in 2025, where we estimate "
+            f"{dollars(year_table['years']['2025']['rent'])}",
+            text=INKIND_TEXT,
+        )
+        and has_number(
+            f"From {GROWTH_FIRST} to {GROWTH_LAST}, BLS's amount rose by {dollars(bls_rent[2])}, and we estimate "
+            f"that ours rose by {dollars(our_rent[2])}, with a standard error of "
+            f"{dollars(rise_ses['rental_assistance_per_renter'])}",
+            text=INKIND_TEXT,
+        )
+        and our_rent[2] < bls_rent[2]
+        and "(@tbl-inkind-series)" in INKIND_TEXT,
     ),
     (
         "price and BLS threshold growth",
@@ -1556,10 +1611,24 @@ inkind_pins = (
         has_number(f"{signed(min(stage_changes))} to {signed(max(stage_changes))} points", text=DISCUSSION_TEXT),
     ),
     (
-        "BLS's imputed benefits rise faster than ours",
-        bls_total[2] > our_total[2]
-        and has_number("while BLS's imputed benefits rise faster than ours", text=DISCUSSION_TEXT)
-        and "BLS's imputed benefits grow faster than ours over those years" in ABSTRACT,
+        "abstract and discussion: each change within one standard error",
+        all(ratio < 1 for ratio in stage_ratios)
+        and "each change within one standard error of zero" in ABSTRACT
+        and has_number("points, each within one standard error of zero", text=DISCUSSION_TEXT),
+    ),
+    (
+        "abstract and discussion: the accounting's shares",
+        has_number(
+            f"its imputed benefits supply {min(bls_shares):.0f} to {max(bls_shares):.0f} percent of its "
+            "thresholds' growth beyond CPI-U",
+            text=ABSTRACT,
+        )
+        and has_number(
+            f"BLS's FCSUti index supplies {min(price_shares):.0f} to {max(price_shares):.0f} percent of its "
+            f"thresholds' growth beyond CPI-U, its imputed benefits {min(bls_shares):.0f} to "
+            f"{max(bls_shares):.0f} percent, and out-of-pocket spending the rest",
+            text=DISCUSSION_TEXT,
+        ),
     ),
     (
         "deflator effect exceeds the stage in every tenure",
@@ -1571,20 +1640,79 @@ inkind_pins = (
         and all(d > abs(c) for d, c in zip(deflator, stage_changes)),
     ),
     (
+        "written definitions with the composite CPI: the benefits' change to growth",
+        has_number(
+            "With the written definitions and the replication's composite CPI, we estimate that the benefits "
+            f"change growth by {signed(written_run['growth'][TENURES[0]]['stage_change'])}, "
+            f"{signed(written_run['growth'][TENURES[1]]['stage_change'])}, and "
+            f"{signed(written_run['growth'][TENURES[2]]['stage_change'])} points",
+            text=GROWTH_TEXT,
+        )
+        and "change 2022–2025 growth by less than one point per tenure with the CE's spending summaries" in ABSTRACT,
+    ),
+    (
         "written definitions with BLS's index come within 0.8 points",
         max(abs(g) for g in written_index_gaps) < 0.8 and has_number("within 0.8 points", text=INKIND_TEXT),
     ),
     (
-        "imputed shares of growth beyond CPI-U",
-        has_ordered(
+        "three-part accounting of BLS's growth beyond CPI-U",
+        all(
+            math.isclose(
+                part["prices"] + part["benefits"] + part["out_of_pocket"], part["excess"], abs_tol=1e-9
+            )
+            and math.isclose(part["shares"]["benefits"], share, rel_tol=1e-9)
+            for part, share in zip(accounting, bls_shares, strict=True)
+        )
+        and has_ordered(
             [
-                f"{bls_shares[0]:.1f} percent of BLS's threshold growth beyond CPI-U for owners with "
-                f"mortgages, against {our_shares[0]:.1f} percent of ours",
-                f"{bls_shares[1]:.1f} against {our_shares[1]:.1f} percent for owners without mortgages",
-                f"{bls_shares[2]:.1f} against {our_shares[2]:.1f} percent for renters",
+                f"BLS's threshold outgrew CPI-U by {accounting[0]['excess']:.2f} points of its {GROWTH_FIRST} level",
+                f"The FCSUti index outgrew CPI-U by {price_beyond_cpi:.2f} points, which supplies "
+                f"{accounting[0]['prices']:.2f} points on the threshold's out-of-pocket terms",
+                f"Growth in the imputed benefits' terms beyond CPI-U supplies {accounting[0]['benefits']:.2f} points",
+                f"supplies the remaining {accounting[0]['out_of_pocket']:.2f}",
+                f"The three parts supply {accounting[1]['prices']:.2f}, {accounting[1]['benefits']:.2f}, and "
+                f"{accounting[1]['out_of_pocket']:.2f} of {accounting[1]['excess']:.2f} points for owners without "
+                f"mortgages, and {accounting[2]['prices']:.2f}, {accounting[2]['benefits']:.2f}, and "
+                f"{accounting[2]['out_of_pocket']:.2f} of {accounting[2]['excess']:.2f} points for renters",
+                f"Imputed benefits therefore supply {bls_shares[0]:.1f}, {bls_shares[1]:.1f}, and "
+                f"{bls_shares[2]:.1f} percent of BLS's growth beyond CPI-U, and we estimate {our_shares[0]:.1f}, "
+                f"{our_shares[1]:.1f}, and {our_shares[2]:.1f} percent for ours",
             ],
-            window=40,
-            text=INKIND_TEXT,
+            window=200,
+            text=GROWTH_TEXT,
+        ),
+    ),
+    (
+        "re-ranking left out of the accounting",
+        has_number(
+            f"that re-ranking moves {GROWTH_FIRST}–{GROWTH_LAST} growth by {signed(rank_shift[0])}, "
+            f"{signed(rank_shift[1])}, and {signed(rank_shift[2])} points",
+            text=GROWTH_TEXT,
+        ),
+    ),
+    (
+        "CPI-U vintage on BLS's 2025 page",
+        cpi_vintage_ok
+        and has_number(
+            f"{BLS_2025_CPI_U_INTERPOLATED:.3f} against the official {OFFICIAL_2025_CPI_U:.3f} (2013 = 100), which "
+            f"puts CPI-U's {GROWTH_FIRST}–{GROWTH_LAST} growth at {inkind['cpi_u_growth_bls_vintage']:.2f} percent",
+            text=GROWTH_TEXT,
+        )
+        and has_number(
+            f"a 2025 average of {BLS_2025_CPI_U_INTERPOLATED:.3f} against the official eleven-month average of "
+            f"{OFFICIAL_2025_CPI_U:.3f}",
+            text=PRICE_VALIDATION_TEXT,
+        ),
+    ),
+    (
+        "Schild's attribution of the 2021-2022 rise, quoted from Schild (2023)",
+        # Schild 2023, p. 1: inflation accounts for 7.21 points; the data
+        # update and imputation code for 2.54 (renters) to 2.85 (owners with
+        # mortgages); p. 3: 7.21 percent equals the FCSUti index's change.
+        has_number(
+            "attributes 7.21 points of the 2021–2022 rise in the thresholds BLS first published to its FCSUti "
+            "index, and 2.5 to 2.9 points to newer CE data",
+            text=GROWTH_TEXT,
         ),
     ),
     (
@@ -1603,30 +1731,35 @@ inkind_pins = (
         and renter["less_bls"] < renter["less_bls_without_imputed_terms"] < 0,
     ),
     (
-        "BLS 2024-2025 renter split",
-        has_number(
-            "For renters from 2024 to 2025, where the 2025 nowcast missed most (@sec-evaluation), BLS's imputed "
-            f"benefits supplied {recent['imputed_points']:.2f} of the {recent['growth']:.2f} points of threshold "
-            f"growth, {recent['rental_assistance_points']:.2f} of them from rental assistance",
+        "BLS 2024-2025 renter growth without its imputed terms",
+        math.isclose(recent["growth"] - recent["growth_without_imputed_terms"], recent["imputed_points"], abs_tol=1e-9)
+        and 0 < recent["rental_assistance_points"] < recent["imputed_points"]
+        and has_number(
+            "For renters from 2024 to 2025, where the 2025 nowcast missed most (@sec-evaluation), BLS's threshold "
+            f"grew {recent['growth']:.2f} percent. With its imputed benefits' terms removed from both years, it "
+            f"grows {recent['growth_without_imputed_terms']:.2f} percent, {recent['imputed_points']:.2f} points "
+            f"less, and rental assistance alone accounts for {recent['rental_assistance_points']:.2f} of those points",
             text=INKIND_TEXT,
         )
         and has_number(
             f"BLS's rental assistance per renter rose from {dollars(rent_2024)} to {dollars(rent_2025)} between "
-            "those thresholds",
+            f"those thresholds, and we estimate that ours rose from {dollars(our_rent_2024)} to "
+            f"{dollars(our_rent_2025)}",
             text=INKIND_TEXT,
         ),
     ),
     (
         "replication 2024-2025 renter growth with and without benefits",
         has_number(
-            f"With our imputed benefits, we estimate renter growth of {recent['replication_with_stage']:.2f} "
-            f"percent, against {recent['replication_without_stage']:.2f} percent without them",
+            "With our imputed benefits, we estimate the retrospective replication's renter growth at "
+            f"{recent['replication_with_stage']:.2f} percent, against {recent['replication_without_stage']:.2f} "
+            "percent without them",
             text=INKIND_TEXT,
         ),
     ),
     (
         "evaluation section cites BLS's imputed renter points and our change",
-        has_number(f"{recent['imputed_points']:.2f} points", text=EVALUATION_TEXT)
+        has_number(f"that renter growth falls by {recent['imputed_points']:.2f} points", text=EVALUATION_TEXT)
         and has_number(
             f"{signed(recent['replication_with_stage'] - recent['replication_without_stage'])} points",
             text=EVALUATION_TEXT,
@@ -1638,9 +1771,56 @@ inkind_pins = (
         and "growth by less than one point per tenure" in ABSTRACT,
     ),
     (
-        "abstract rental assistance share of the difference",
-        abs(rise_gap["rental_assistance"] / sum(rise_gap.values()) - 2 / 3) < 0.05
-        and "rental assistance accounts for about two-thirds of the difference" in ABSTRACT,
+        "home internet's share of BLS's thresholds",
+        has_number(
+            f"supplies {internet_share_low:.2f} to {internet_share_high:.2f} percent of each BLS threshold",
+            text=INKIND_TEXT,
+        ),
+    ),
+    (
+        "thresholds on the components both series hold",
+        min(common_gaps["package_bls_definition"][0], common_gaps["package"][0]) > 0
+        and has_number(
+            "we estimate thresholds that exceed BLS's in every tenure and year, by "
+            f"{common_gaps['package_bls_definition'][0]:.2f} to {common_gaps['package_bls_definition'][1]:.2f} "
+            f"percent under the written definitions and by {common_gaps['package'][0]:.2f} to "
+            f"{common_gaps['package'][1]:.2f} percent with the CE summaries",
+            text=INKIND_TEXT,
+        ),
+    ),
+    (
+        "written definitions keep owners' rented-dwelling spending",
+        has_number(
+            f"which averages {dollars(owner_rent_low)} to {dollars(owner_rent_high)} per owner without a mortgage "
+            "in the band",
+            text=UNCERTAINTY_TEXT,
+        ),
+    ),
+    (
+        "standard errors of the rises in band amounts",
+        has_number(
+            f"we estimate standard errors of {dollars(rise_ses['imputed_total'])} for all imputed benefits, "
+            f"{dollars(rise_ses['rental_assistance_per_renter'])} for rental assistance per renter, and "
+            f"{dollars(rise_ses['school_lunch'])} for school lunch",
+            text=UNCERTAINTY_TEXT,
+        ),
+    ),
+    (
+        "standard errors of the benefits' lifts",
+        all(lift_ratios[t][y] > 5 for t in (TENURES[0], TENURES[2]) for y in YEARS)
+        and bool(loose_lift_years)
+        and loose_lift_years == list(YEARS[YEARS.index(loose_lift_years[0]) :])
+        and has_number(
+            f"we estimate standard errors of {min(tight_lift_ses):.2f} to {max(tight_lift_ses):.2f} points for "
+            "owners with mortgages and renters, whose lifts exceed five standard errors in every year",
+            text=UNCERTAINTY_TEXT,
+        )
+        and has_number(
+            f"For owners without mortgages, we estimate standard errors of {min(loose_lift_ses):.2f} to "
+            f"{max(loose_lift_ses):.2f} points, and the {loose_lift_years[0]}–{loose_lift_years[-1]} lifts each "
+            "fall within 1.5 standard errors of zero",
+            text=UNCERTAINTY_TEXT,
+        ),
     ),
     (
         "BLS identity tolerance",
@@ -1689,7 +1869,14 @@ inkind_pins = (
         == ["usda_formula"] * (len(lunch_sources) - len(census_lunch_years))
         + ["census_spm_schlunch"] * len(census_lunch_years)
         and has_number(
-            f"which the CPS ASEC files include from reference year {census_lunch_years[0]}", text=INKIND_TEXT
+            f"From reference year {census_lunch_years[0]}, we use the value Census assigns each SPM unit, which "
+            f"the public CPS ASEC person files carry from the {int(census_lunch_years[0]) + 1} file onward",
+            text=INKIND_TEXT,
+        )
+        and has_number(
+            f"For reference years {lunch_years[0]}–{int(census_lunch_years[0]) - 1}, Census publishes SPM-unit "
+            "values",
+            text=INKIND_TEXT,
         ),
     ),
     (

@@ -89,11 +89,11 @@ RECEIPT_PINS = {
     ),
     COMPONENTS: (
         "4a08c13e94abb567607a6a1f8e4fba45a049b345ec10f054dae503383f3557be",
-        "8f632e31b4e48bbc735161d24665a8182dc0d9d6",
+        "b542f3fa4598ed4e83c8081a5ce06d803d6820f1",
     ),
     UNCERTAINTY: (
         "50a67fab352df9d385ccdc1c70c49794f4e2fc0a7addf013fde27fcfd04af3d2",
-        "a581c113dd4319fc0f6f9ebd6db5c3697f4a94fa",
+        "b542f3fa4598ed4e83c8081a5ce06d803d6820f1",
     ),
 }
 # The growth window whose standard errors the section reports.
@@ -556,7 +556,160 @@ def inkind_figures(inputs: dict) -> dict:
         bls_years["2024"]["band"]["by_tenure"]["renter"]["rental_assistance"],
         bls_years["2025"]["band"]["by_tenure"]["renter"]["rental_assistance"],
     )
+    package_years = components["runs"]["package"]["years"]
+    figures["rental_assistance_per_renter_2024_2025"] = tuple(
+        mean(package_years[year]["with_in_kind"]["rental_assistance_per_renter_by_implicate"])
+        for year in ("2024", "2025")
+    )
+    figures["accounting"] = _growth_accounting(figures, components, cpi_ratio, price)
+    figures["rank_shift"] = _rank_shift(components)
+    figures.update(_internet_and_levels(components))
+    figures["year_table"] = _year_table(components, figures)
+    figures["cpi_u_growth_bls_vintage"] = _growth(1, cpi_ratio * BLS_2025_CPI_U_INTERPOLATED / OFFICIAL_2025_CPI_U)
     return figures
+
+
+# BLS's 2025 thresholds page (last modified September 24, 2026; read in a
+# browser on 2026-11-11) gives 2025 CPI-U as a twelve-month average with
+# October 2025 interpolated, 138.289 (2013 = 100), against the official
+# eleven-month average of 138.198, and 2024-2025 growth of 2.699 percent
+# against 2.631. ``check_cpi_vintage`` ties the two index values to those
+# growth rates and the first rate to the paper's record of the page.
+BLS_2025_CPI_U_INTERPOLATED = 138.289
+OFFICIAL_2025_CPI_U = 138.198
+BLS_2025_CPI_U_GROWTH = (2.699, 2.631)
+
+
+def check_cpi_vintage(recorded_growth: float) -> None:
+    interpolated, official = BLS_2025_CPI_U_GROWTH
+    _require(
+        abs(BLS_2025_CPI_U_INTERPOLATED / OFFICIAL_2025_CPI_U - (1 + interpolated / 100) / (1 + official / 100))
+        < 1e-5,
+        "BLS's interpolated and official 2025 CPI-U agree with its two growth rates",
+    )
+    _require(abs(recorded_growth - interpolated) < 1e-9, "BLS's page growth for 2025 CPI-U")
+
+
+def _growth_accounting(figures: dict, components: dict, cpi_ratio: float, price: float) -> dict:
+    """Split each BLS threshold's 2022-2025 growth beyond CPI-U into three
+    parts, in points of its 2022 level, with phi the FCSUti factor and pi
+    CPI-U's: the index's growth beyond CPI-U on the out-of-pocket terms,
+    (phi - pi)(B22 - I22) / B22; the imputed terms' growth beyond CPI-U,
+    (I25 - pi I22) / B22; and out-of-pocket growth beyond the index,
+    ((B25 - I25) - phi (B22 - I22)) / B22. The parts sum to
+    (B25 - pi B22) / B22 exactly, and the benefits' part over that sum is
+    the share ``share_beyond_cpi`` computes."""
+    bls_years = components["bls"]["years"]
+    out = {}
+    for tenure in TENURES:
+        b22 = bls_years["2022"]["published_thresholds"][tenure]
+        b25 = bls_years["2025"]["published_thresholds"][tenure]
+        terms = components["bls"]["growth_2022_2025"]["by_tenure"][tenure]["imputed_term_dollars"]
+        i22, i25 = terms["2022"], terms["2025"]
+        parts = {
+            "prices": 100 * (price - cpi_ratio) * (b22 - i22) / b22,
+            "benefits": 100 * (i25 - cpi_ratio * i22) / b22,
+            "out_of_pocket": 100 * ((b25 - i25) - price * (b22 - i22)) / b22,
+        }
+        excess = 100 * (b25 - cpi_ratio * b22) / b22
+        _close(sum(parts.values()), excess, f"growth accounting sums to growth beyond CPI-U {tenure}")
+        _close(
+            100 * parts["benefits"] / excess,
+            figures["bls"][tenure]["imputed_share_beyond_cpi_u"],
+            f"accounting's benefit share {tenure}",
+        )
+        _require(all(value > 0 for value in parts.values()), f"accounting parts positive {tenure}")
+        out[tenure] = {
+            "excess": excess,
+            **parts,
+            "shares": {name: 100 * value / excess for name, value in parts.items()},
+        }
+    return out
+
+
+def _rank_shift(components: dict) -> dict[str, float]:
+    """How much the benefits move our 2022-2025 growth by changing which
+    units fall in the band: the full with-and-without change less the
+    change with each year's band held as it stands."""
+    out = {}
+    for tenure in TENURES:
+        row = components["runs"]["package"]["growth_2022_2025"]["by_tenure"][tenure]
+        _close(
+            row["growth_with_stage"] - row["growth_without_imputed_terms"],
+            row["band_fixed_effect_points"],
+            f"band-fixed effect {tenure}",
+        )
+        _close(
+            row["stage_change_points"] - row["band_fixed_effect_points"],
+            row["rank_shift_points"],
+            f"rank shift {tenure}",
+        )
+        out[tenure] = row["rank_shift_points"]
+    return out
+
+
+def _internet_and_levels(components: dict) -> dict:
+    """BLS's home internet term as a percent of each of its thresholds,
+    s * 1.2 times the band mean of internet, and our level gaps once that
+    term joins our thresholds. Each matches the component receipt's own
+    level decomposition."""
+    bls_years = components["bls"]["years"]
+    shares = {}
+    for year in YEARS:
+        internet = bls_years[year]["band"]["pooled"]["internet"]
+        for tenure in TENURES:
+            share = 100 * ANCHOR_SHARE * 1.2 * internet / bls_years[year]["published_thresholds"][tenure]
+            for run in ("package", "package_bls_definition"):
+                entry = components["runs"][run]["years"][year]
+                recorded = entry["level_gap_percent_of_bls"][tenure]
+                _close(-recorded["terms"]["internet"], share, f"BLS internet term {run} {year} {tenure}")
+                _close(recorded["total"], entry["with_in_kind"]["gap_percent"][tenure], f"level terms total {run} {year} {tenure}")
+            shares[(year, tenure)] = share
+    gaps = {}
+    for run in ("package", "package_bls_definition"):
+        years = components["runs"][run]["years"]
+        values = [
+            years[year]["with_in_kind"]["gap_percent"][tenure] + shares[(year, tenure)]
+            for year in YEARS
+            for tenure in TENURES
+        ]
+        gaps[run] = (min(values), max(values))
+    # Owners' spending under the CE's rented-dwelling summary, which the
+    # written-definition runs keep: per owner without a mortgage in the band.
+    kept = [
+        components["runs"]["package_bls_definition"]["years"][year]["with_in_kind"]["band_pieces"][
+            "owner_without_mortgage"
+        ]["rent_and_rental_costs"]
+        for year in YEARS
+    ]
+    return {
+        "bls_internet_share_range": (min(shares.values()), max(shares.values())),
+        "gap_with_bls_internet": gaps,
+        "written_owner_rent_range": (min(kept), max(kept)),
+    }
+
+
+def _year_table(components: dict, figures: dict) -> dict:
+    """BLS's and our band means in every threshold year: all imputed
+    benefits per unit and rental assistance per renter."""
+    out = {}
+    for year in YEARS:
+        bls = components["bls"]["years"][year]
+        ours = components["runs"]["package"]["years"][year]["with_in_kind"]
+        _close(mean(ours["imputed_total_by_implicate"]), ours["imputed_total"], f"imputed total implicate mean {year}")
+        out[year] = {
+            "bls_total": bls["imputed_total"],
+            "bls_rent": bls["band"]["by_tenure"]["renter"]["rental_assistance"],
+            "total": ours["imputed_total"],
+            "rent": mean(ours["rental_assistance_per_renter_by_implicate"]),
+        }
+    for year, column in (("2022", 0), ("2025", 1)):
+        _close(out[year]["total"], figures["amounts"]["package"]["imputed_total"][column], f"year table total {year}")
+        _close(out[year]["rent"], figures["amounts"]["package"]["rental_assistance_per_renter"][column], f"year table rent {year}")
+        _close(out[year]["bls_rent"], figures["amounts"]["bls"]["rental_assistance_per_renter"][column], f"year table BLS rent {year}")
+    early = [out[year]["rent"] / out[year]["bls_rent"] - 1 for year in YEARS if int(year) <= 2023]
+    figures_range = (100 * min(early), 100 * max(early))
+    return {"years": out, "rent_excess_2019_2023": figures_range}
 
 
 def published_standard_errors(data_dir: Path) -> dict[str, dict[str, float]]:
@@ -672,12 +825,54 @@ def uncertainty_figures(inputs: dict, published_se: dict[str, dict[str, float]])
                 for stage, by_tenure in ratios.items()
             },
             "stage_change": stage_change,
+            **_amount_and_lift_errors(entry, run),
         }
     patterns = uncertainty["checks"]["half_sample_patterns"]["quarters_with_changes"]
     figures["half_sample_changes"] = {
         quarter: record["share_keeping_pattern"] for quarter, record in patterns.items()
     }
     return figures
+
+
+def _amount_and_lift_errors(entry: dict, run: str) -> dict:
+    """Standard errors of the band amounts in each year and of their
+    2022-2025 rises, and of the benefits' lift to each year's threshold,
+    from the stored replicates. Replicate r of every window shares one
+    replicate weight, so rises and lifts pair replicates index by index."""
+    first, last = GROWTH_WINDOW
+    amounts = {}
+    for year in YEARS:
+        record = entry["years"][year]
+        amounts[year] = {}
+        for name in AMOUNTS:
+            combined = _rubin(record["replicates"]["amounts"][name])
+            _check_combined(combined, record["amounts"][name], f"{name} {run} {year}")
+            amounts[year][name] = combined
+    rises = {}
+    for name in AMOUNTS:
+        series = [
+            [b - a for a, b in zip(early, late, strict=True)]
+            for early, late in zip(
+                entry["years"][first]["replicates"]["amounts"][name],
+                entry["years"][last]["replicates"]["amounts"][name],
+                strict=True,
+            )
+        ]
+        combined = _rubin(series)
+        _check_combined(combined, entry["amount_rise_2022_2025"][name], f"{name} rise {run}")
+        rises[name] = combined
+    lifts = {tenure: {} for tenure in TENURES}
+    for year in YEARS:
+        replicates = entry["years"][year]["replicates"]
+        for tenure in TENURES:
+            series = [
+                [_growth(w, v) for w, v in zip(replicates["without_in_kind"][tenure], draw, strict=True)]
+                for draw in replicates["with_in_kind"][tenure]
+            ]
+            combined = _rubin(series)
+            _check_combined(combined, entry["years"][year]["in_kind_lift_percent"][tenure], f"lift {run} {year} {tenure}")
+            lifts[tenure][year] = combined
+    return {"amounts": amounts, "amount_rises": rises, "lifts": lifts}
 
 
 def check_receipt_pins(data_dir: Path) -> None:
