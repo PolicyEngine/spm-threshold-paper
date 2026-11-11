@@ -2153,6 +2153,35 @@ INKIND_ABSTRACT_TIE_LABELS = (
 )
 
 
+# Each literal with a space in it that a tie searches a raw slice for: the
+# section the slice covers, the literal and the tie's label. Doubling a space
+# breaks the literal in the raw text and leaves the collapsed text as it was.
+RAW_PHRASES = (
+    ("sensitivity", "1.74 percent", "current tenure-sensitivity prose"),
+    ("benchmark", "1.9 percent", "signed CPI-U bias -1.9"),
+    ("benchmark", "four of five", "CPI-U understated four of five years"),
+    ("benchmark", "thirty percent", "composite removes ~thirty percent of CPI-U error"),
+    ("benchmark", "+0.5 to −0.3", "replication annual signed range +0.5 to −0.3"),
+    ("benchmark", "−0.1 to −1.4", "blend annual signed range −0.1 to −1.4"),
+    ("nowcast", "owners with", "committed estimate states the amended triple in tenure order"),
+    ("nowcast", "owners without", "committed estimate states the amended triple in tenure order"),
+    ("nowcast", "4.4 to 6.0", "replication growth 4.4 to 6.0"),
+    ("nowcast", "3.2 percent", "price growth 3.2"),
+    ("nowcast", "3.8 to 4.6", "blend growth 3.8 to 4.6"),
+    ("nowcast", "2.6 percent", "realized CPI-U 2025 growth 2.6"),
+    ("evaluation", "1.70 to 3.47 percent", "CPI-U 2025 understated every tenure by 1.70 to 3.47 percent"),
+    ("evaluation", "owners with", "BLS 2025 triple in tenure order"),
+    ("evaluation", "owners without", "BLS 2025 triple in tenure order"),
+    ("evaluation", "4.40 to 6.33", "BLS-stated 2025 growth 4.40-6.33 and per-tenure 5.33/4.40/6.33"),
+    ("evaluation", "2.4 standard errors", "owner misses within one SE; renter about 2.4 SE"),
+    ("price", "0.7 percentage point", "composite within 0.7pp of BLS FCSUti, mean gap 0.4"),
+    ("price", "0.4 point", "composite within 0.7pp of BLS FCSUti, mean gap 0.4"),
+    ("price", "2.70 percent", "BLS page 2025 CPI-U growth 2.70 quoted"),
+    ("appendix A", "1.5 to 2.1", "replication fidelity 1.5 to 2.1 vs corrected"),
+    ("appendix A", "1.0 to 1.6", "replication fidelity 1.0 to 1.6 vs published"),
+)
+
+
 def failure_lines(stdout):
     """The labels the guard lists as failures, one per line."""
     return [line[4:] for line in stdout.splitlines() if line.startswith("  - ")]
@@ -3465,6 +3494,48 @@ class PaperGuardTests(unittest.TestCase):
                     self.assertIn(label, failures)
         self.install_article()
 
+    def run_doubled_spaces(self, where, literal=None):
+        """Double each space between two words on the section's lines that
+        don't start with '#', or only inside each occurrence of the literal,
+        and run the guard."""
+        self.install_article()
+        article = self.repo / "paper/index.qmd"
+        text = article.read_text()
+        start, end = self.article_bounds(text)[where]
+        if literal is None:
+            body = "".join(
+                line if line.startswith("#") else re.sub(r"(?<=\S) (?=\S)", "  ", line)
+                for line in text[start:end].splitlines(keepends=True)
+            )
+        else:
+            body = text[start:end].replace(literal, literal.replace(" ", "  "))
+        self.assertNotEqual(body, text[start:end], f"nothing to double in {where}: {literal!r}")
+        article.write_text(text[:start] + body + text[end:])
+        return self.run_guard()
+
+    def test_each_raw_phrase_fails_only_its_tie_when_its_spaces_double(self):
+        """Doubling the spaces inside one literal in its section fails the tie
+        that searches the raw slice for it, and no other tie. A tie moved
+        onto collapsed text, by whatever route, passes this paper."""
+        for where, literal, label in RAW_PHRASES:
+            with self.subTest(where=where, literal=literal):
+                result = self.run_doubled_spaces(where, literal)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertEqual(failure_lines(result.stdout), [label])
+        self.install_article()
+
+    def test_doubled_spaces_fail_exactly_the_raw_phrase_ties(self):
+        """Doubling each space between two words in a section fails exactly
+        the ties RAW_PHRASES lists for it, so the list names every tie that
+        searches a raw slice for a literal with a space in it."""
+        for where in dict.fromkeys(where for where, _, _ in RAW_PHRASES):
+            with self.subTest(where=where):
+                result = self.run_doubled_spaces(where)
+                self.assertNotEqual(result.returncode, 0)
+                expected = {label for host, _, label in RAW_PHRASES if host == where}
+                self.assertEqual(sorted(failure_lines(result.stdout)), sorted(expected))
+        self.install_article()
+
     def test_rolling_prose_figures_drift_from_the_sealed_forecast(self):
         for label, edits, _, _, expected in ROLLING_PROSE_MUTATIONS:
             with self.subTest(figure=label):
@@ -4011,6 +4082,14 @@ class GuardSourceTests(unittest.TestCase):
             'sys.modules[__name__].__dict__["NOWCAST_SOURCE"] = ""',
             "def section_source(start, end=None, text=QMD):\n    return normalized(text)",
             "def stated(literal, source, *phrases):\n    return True",
+            "def normalized(text):\n    return text",
+            "def front_matter_source(key, text=QMD):\n    return normalized(text)",
+            "def f():\n    global NOWCAST_SOURCE",
+            "match []:\n    case [*NOWCAST_SOURCE]:\n        pass",
+            "async def NOWCAST_SOURCE():\n    pass",
+            'locals()["NOWCAST_SOURCE"] = ""',
+            'eval("NOWCAST_SOURCE")',
+            '__import__("sys").modules[__name__].NOWCAST_SOURCE = ""',
         ):
             with self.subTest(form=form):
                 self.assertNotEqual(stated_reads_off_raw_text(base + form + "\n"), [])
