@@ -2153,10 +2153,10 @@ INKIND_ABSTRACT_TIE_LABELS = (
 )
 
 
-# Each literal with a space in it that a tie searches a raw slice for: the
-# section the slice covers, the literal and the tie's label. Doubling a space
-# breaks the literal in the raw text and leaves the collapsed text as it was.
-RAW_PHRASES = (
+# Each literal with a space in it that a tie searches one of the six section
+# slices' raw text for: the section the slice covers, the literal and the
+# tie's label.
+RAW_LITERALS = (
     ("sensitivity", "1.74 percent", "current tenure-sensitivity prose"),
     ("benchmark", "1.9 percent", "signed CPI-U bias -1.9"),
     ("benchmark", "four of five", "CPI-U understated four of five years"),
@@ -2180,6 +2180,12 @@ RAW_PHRASES = (
     ("appendix A", "1.5 to 2.1", "replication fidelity 1.5 to 2.1 vs corrected"),
     ("appendix A", "1.0 to 1.6", "replication fidelity 1.0 to 1.6 vs published"),
 )
+
+
+# Whitespace that breaks a raw literal's single space and that normalized()
+# collapses back to one space: a doubled space, a line break and a no-break
+# space.
+SPACINGS = ("  ", "\n", "\u00a0")
 
 
 def failure_lines(stdout):
@@ -3494,46 +3500,54 @@ class PaperGuardTests(unittest.TestCase):
                     self.assertIn(label, failures)
         self.install_article()
 
-    def run_doubled_spaces(self, where, literal=None):
-        """Double each space between two words on the section's lines that
-        don't start with '#', or only inside each occurrence of the literal,
-        and run the guard."""
+    def run_respaced(self, where, spacing, literal=None):
+        """Put `spacing` in place of each space between two words on the
+        section's lines that don't start with '#', or only inside each
+        whole-token occurrence of the literal, and run the guard."""
         self.install_article()
         article = self.repo / "paper/index.qmd"
         text = article.read_text()
         start, end = self.article_bounds(text)[where]
         if literal is None:
             body = "".join(
-                line if line.startswith("#") else re.sub(r"(?<=\S) (?=\S)", "  ", line)
+                line if line.startswith("#") else re.sub(r"(?<=\S) (?=\S)", spacing, line)
                 for line in text[start:end].splitlines(keepends=True)
             )
         else:
-            body = text[start:end].replace(literal, literal.replace(" ", "  "))
-        self.assertNotEqual(body, text[start:end], f"nothing to double in {where}: {literal!r}")
+            body = re.sub(
+                rf"(?<!\w){re.escape(literal)}(?!\w)",
+                lambda match: match.group(0).replace(" ", spacing),
+                text[start:end],
+            )
+        self.assertNotEqual(body, text[start:end], f"nothing to respace in {where}: {literal!r}")
         article.write_text(text[:start] + body + text[end:])
         return self.run_guard()
 
-    def test_each_raw_phrase_fails_only_its_tie_when_its_spaces_double(self):
-        """Doubling the spaces inside one literal in its section fails the tie
-        that searches the raw slice for it, and no other tie. A tie moved
-        onto collapsed text, by whatever route, passes this paper."""
-        for where, literal, label in RAW_PHRASES:
-            with self.subTest(where=where, literal=literal):
-                result = self.run_doubled_spaces(where, literal)
-                self.assertNotEqual(result.returncode, 0)
-                self.assertEqual(failure_lines(result.stdout), [label])
+    def test_each_raw_literal_fails_only_its_tie_when_respaced(self):
+        """Each spacing in place of the spaces inside one literal fails the
+        tie that searches the raw slice for it, and no other tie. A tie that
+        maps that spacing back to a space, as normalized() does, passes the
+        paper, whatever code hands it that text."""
+        for where, literal, label in RAW_LITERALS:
+            for spacing in SPACINGS:
+                with self.subTest(where=where, literal=literal, spacing=spacing):
+                    result = self.run_respaced(where, spacing, literal)
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertEqual(failure_lines(result.stdout), [label])
         self.install_article()
 
-    def test_doubled_spaces_fail_exactly_the_raw_phrase_ties(self):
-        """Doubling each space between two words in a section fails exactly
-        the ties RAW_PHRASES lists for it, so the list names every tie that
-        searches a raw slice for a literal with a space in it."""
-        for where in dict.fromkeys(where for where, _, _ in RAW_PHRASES):
-            with self.subTest(where=where):
-                result = self.run_doubled_spaces(where)
-                self.assertNotEqual(result.returncode, 0)
-                expected = {label for host, _, label in RAW_PHRASES if host == where}
-                self.assertEqual(sorted(failure_lines(result.stdout)), sorted(expected))
+    def test_respaced_sections_fail_exactly_the_raw_literal_ties(self):
+        """Each spacing in place of every space between two words in a
+        section fails exactly the ties RAW_LITERALS lists for the section, so
+        the table names every tie that searches the section's raw slice for a
+        literal with a space in it."""
+        for where in dict.fromkeys(where for where, _, _ in RAW_LITERALS):
+            expected = sorted({label for host, _, label in RAW_LITERALS if host == where})
+            for spacing in SPACINGS:
+                with self.subTest(where=where, spacing=spacing):
+                    result = self.run_respaced(where, spacing)
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertEqual(sorted(failure_lines(result.stdout)), expected)
         self.install_article()
 
     def test_rolling_prose_figures_drift_from_the_sealed_forecast(self):
