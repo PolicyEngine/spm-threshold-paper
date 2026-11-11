@@ -1798,6 +1798,38 @@ SECTION_PROSE_MUTATIONS = (
         EVALUATION_BLEND,
     ),
     (
+        "sensitivity maximum split across two lines",
+        "sensitivity",
+        r"1\.74 percent",
+        "1.74\npercent",
+        ("current tenure-sensitivity prose",),
+        SENSITIVITY_SENTENCE,
+    ),
+    (
+        "benchmark year count split across two lines",
+        "benchmark",
+        r"in four of five years",
+        "in four\nof five years",
+        ("CPI-U understated four of five years",),
+        BENCHMARK_CPI_U,
+    ),
+    (
+        "comparator mean gap split across two lines",
+        "price",
+        r"gap of 0\.4 point",
+        "gap of 0.4\npoint",
+        ("composite within 0.7pp of BLS FCSUti, mean gap 0.4",),
+        COMPARATOR_GAPS,
+    ),
+    (
+        "fidelity range split across two lines",
+        "appendix A",
+        r"of 1\.5 to 2\.1 percent",
+        "of 1.5 to\n2.1 percent",
+        ("replication fidelity 1.5 to 2.1 vs corrected",),
+        APPENDIX_A_RANGES,
+    ),
+    (
         "owner-with-mortgage standard error",
         "evaluation",
         r"\\\$327",
@@ -3597,7 +3629,7 @@ def whole_paper_reads(source):
     """Each place in a guard's source that reads the paper outside a bounded
     slice: a load of QMD or QMD_RAW other than a slicer's default text, the
     guard's two scans for include directives and its search for a
-    metadata-files key; a slicer call that reads the paper without a literal end heading;
+    metadata-files key, each in its exact call; a slicer call that reads the paper without a literal end heading;
     and a path-like string, one without whitespace, that names a .qmd file
     outside the assignments of QMD and QMD_RAW."""
     tree = ast.parse(source)
@@ -3617,6 +3649,7 @@ def whole_paper_reads(source):
         elif (
             isinstance(node, ast.Call)
             and len(node.args) == 2
+            and not node.keywords
             and isinstance(node.args[0], ast.Constant)
             and (ast.unparse(node.func), node.args[0].value)
             in (("re.findall", INCLUDE_SCAN), ("re.findall", INCLUDE_TARGETS), ("re.search", METADATA_SCAN))
@@ -3670,15 +3703,21 @@ def guard_function(name, **namespace):
 
 # Each slicer that returns raw text, and the position of its text argument.
 RAW_SLICERS = {"section_source": 2, "front_matter_source": 1}
+# Functions the raw-text check relies on, which the guard must define once.
+RAW_TEXT_FUNCTIONS = ("stated", "section_source", "front_matter_source", "normalized")
+# Ways to bind a name that the check can't follow.
+DYNAMIC_BINDERS = ("globals", "vars", "locals", "exec", "eval", "setattr", "__import__")
 
 
 def stated_reads_off_raw_text(source):
     """Each stated() call in a guard's source that reads anything but a raw
-    slice of the paper, and each use of stated() other than a direct call.
-    A raw slice is a name the guard binds once in all its source, at module
-    level, to a section_source() or front_matter_source() call whose text is
-    the paper or another raw slice, alone or as a conditional whose other
-    branch is an empty string."""
+    slice of the paper, each use of stated() other than a direct call, each
+    second binding of stated, section_source, front_matter_source or
+    normalized, and each use of globals, vars, locals, exec, eval, setattr,
+    __import__ or __dict__. A raw slice is a name the guard binds once in all
+    its source, at module level, to a section_source() or
+    front_matter_source() call whose text is the paper or another raw slice,
+    alone or as a conditional whose other branch is an empty string."""
     tree = ast.parse(source)
     bindings = {}
 
@@ -3747,6 +3786,15 @@ def stated_reads_off_raw_text(source):
         f"line {node.lineno}: stated used other than in a direct call"
         for node in ast.walk(tree)
         if isinstance(node, ast.Name) and node.id == "stated" and isinstance(node.ctx, ast.Load) and id(node) not in direct
+    ] + [
+        f"{name} bound {bindings[name]} times"
+        for name in RAW_TEXT_FUNCTIONS
+        if bindings.get(name, 0) > 1
+    ] + [
+        f"line {node.lineno}: {ast.unparse(node)} can rebind a name out of the check's sight"
+        for node in ast.walk(tree)
+        if (isinstance(node, ast.Name) and node.id in DYNAMIC_BINDERS)
+        or (isinstance(node, ast.Attribute) and node.attr == "__dict__")
     ]
 
 
@@ -3900,6 +3948,7 @@ class GuardSourceTests(unittest.TestCase):
             'TEXT = front_matter_source("abstract", QMD)',
             'check("x", bool(re.findall(r"\\{\\{<\\s*include\\s+(.*?)\\s*>\\}\\}|1\\.17", QMD_RAW)))',
             'check("x", bool(re.search(r"\\{\\{<\\s*include\\s+(.*?)\\s*>\\}\\}", QMD_RAW)))',
+            f"INCLUDES = re.findall({INCLUDE_TARGETS!r}, QMD_RAW, flags=re.S)",
         ):
             with self.subTest(read=read):
                 self.assertNotEqual(whole_paper_reads(base + read + "\n"), [])
@@ -3918,6 +3967,10 @@ class GuardSourceTests(unittest.TestCase):
         bound once to a raw slice don't."""
         base = (
             'QMD = (REPO / "paper" / "index.qmd").read_text()\n'
+            "def normalized(text): ...\n"
+            "def section_source(start, end=None, text=QMD): ...\n"
+            "def front_matter_source(key, text=QMD): ...\n"
+            "def stated(literal, source, *phrases): ...\n"
             'NOWCAST_SOURCE = section_source("# A", "## B")\n'
             'NOTE_SOURCE = section_source("### C", "### D", NOWCAST_SOURCE)\n'
             'ABSTRACT_SOURCE = front_matter_source("abstract") if ABSTRACT else ""\n'
@@ -3942,6 +3995,22 @@ class GuardSourceTests(unittest.TestCase):
             "def stated_in(literal, NOWCAST_SOURCE):\n    return stated(literal, NOWCAST_SOURCE)",
             'say = stated\ncheck("x", say("3.2", normalized(NOWCAST_SOURCE)))',
             "import NOWCAST_SOURCE",
+            'HEADS = ("# A", "## B", normalized(NOWCAST_SOURCE))\nSTAR_SOURCE = section_source(*HEADS)\n'
+            'check("x", stated("3.2", STAR_SOURCE))',
+            'KW_SOURCE = section_source("# A", "## B", **{"text": normalized(NOWCAST_SOURCE)})\n'
+            'check("x", stated("3.2", KW_SOURCE))',
+            "match normalized(NOWCAST_SOURCE):\n    case NOWCAST_SOURCE:\n        pass",
+            "def NOWCAST_SOURCE():\n    pass",
+            "class NOWCAST_SOURCE:\n    pass",
+            "try:\n    pass\nexcept ValueError as NOWCAST_SOURCE:\n    pass",
+            "match {}:\n    case {**NOWCAST_SOURCE}:\n        pass",
+            'globals()["NOWCAST_SOURCE"] = normalized(NOWCAST_SOURCE)',
+            "vars().update(NOWCAST_SOURCE=normalized(NOWCAST_SOURCE))",
+            'setattr(sys.modules[__name__], "NOWCAST_SOURCE", normalized(NOWCAST_SOURCE))',
+            'exec("NOWCAST_SOURCE = normalized(NOWCAST_SOURCE)")',
+            'sys.modules[__name__].__dict__["NOWCAST_SOURCE"] = ""',
+            "def section_source(start, end=None, text=QMD):\n    return normalized(text)",
+            "def stated(literal, source, *phrases):\n    return True",
         ):
             with self.subTest(form=form):
                 self.assertNotEqual(stated_reads_off_raw_text(base + form + "\n"), [])
