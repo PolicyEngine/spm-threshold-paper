@@ -185,7 +185,7 @@ class BlockScalarSpanTests(unittest.TestCase):
                 'title: "Thresholds"\nnotes:\n  - >-\n    abstract: 9.99\n',
             ),
             "comment line": PAPER.replace(
-                'title: "Thresholds"\n', 'title: "Thresholds"\n# abstract: an old copy\n'
+                'title: "Thresholds"\n', 'title: "Thresholds"\n# old notes, abstract: 9.99\n'
             ),
         }.items():
             with self.subTest(case=name):
@@ -244,7 +244,12 @@ class BlockScalarSpanTests(unittest.TestCase):
         """A ``---`` line opens a metadata block only before a line with text
         and a later closing line, so a thematic break leaves the block
         readable."""
-        for insert in ("---\n", "---\n\nText after a break.\n", "Text.\n\n---\nMore."):
+        for insert in (
+            "---\n",
+            "---\n\nText after a break.\n",
+            "Text.\n\n---\nMore.",
+            "---\n\nText between two breaks.\n\n---\n",
+        ):
             with self.subTest(insert=insert):
                 self.assertEqual(block_lines(with_body(insert)), ABSTRACT_LINES)
 
@@ -429,7 +434,7 @@ class BlockWordsTests(unittest.TestCase):
         for lines, expected in (
             ("  First line, <!-- 9.99 percent --> second.\n", "First line, second."),
             ("  First line,\n  <!-- was: 9.99 percent\n  with the CPI -->\n  second.\n", "First line, second."),
-            ("  First<!-- x --> line.\n", "First line."),
+            ("  Fir<!-- x -->st line.\n", "First line."),
         ):
             with self.subTest(lines=lines):
                 self.assertEqual(block_words(with_lines(lines), "abstract"), expected)
@@ -820,6 +825,8 @@ EDGE_CASES = {
     "empty block, then a field": PAPER.replace("abstract: |\n", "abstract: |\nnote: |\n"),
     "HTML comment inside the block": with_lines("  First line, <!-- 9.99 percent --> second.\n"),
     "HTML comment line inside the block": with_lines(ABSTRACT_LINES + "  <!-- 9.99 percent -->\n"),
+    "HTML comment inside a word": with_lines("  Fir<!-- 9.99 -->st line.\n"),
+    "two thematic breaks in the body": with_body("---\n\nText between two breaks.\n\n---\n"),
     "no-break space on the first line": with_lines("   \u00a0\n    Four 1.11,\n   three 9.99.\n"),
     "key line outside any metadata block": with_body("abstract: |\n  Body copy 9.99.\n"),
     "metadata block in a code fence": with_body(
