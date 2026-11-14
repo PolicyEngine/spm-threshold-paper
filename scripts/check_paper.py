@@ -1304,9 +1304,11 @@ def displayed_shares() -> list[float] | None:
 
 # Method constants the section quotes from the calculator's code rather
 # than from a receipt. We read each from spm_calculator/ce_inkind.py at
-# this fingerprint (calculator commit 28740b5; every rule but the 2020 WIC
-# cutoff is unchanged since 4778dfa). A receipt rebuilt from changed code
-# fails the pin until someone rereads them.
+# this fingerprint (calculator commit 28740b5). Since 4778dfa, the file has
+# changed two rules: the 2020 WIC cutoff, quoted below, and the broadband
+# start (reference year 2022), which the receipt records and a pin below
+# reads. A receipt rebuilt from changed code fails the pin until someone
+# rereads them.
 INKIND_METHOD_SOURCE = (
     "spm_calculator/ce_inkind.py",
     "25f93fb8b996b5e623ab564d70e2eedfbc4daa11ff96850f06e76ef229aef0b8",
@@ -1330,6 +1332,12 @@ INKIND_METHOD_CONSTANTS = (
     "For the 2025 thresholds, as BLS does, we also let the WIC model assign participation to CE units that "
     "have a child under 5 but no woman aged 15 or older",
     "midpoint of its three-month reference period",  # 1.5 months in _wic_ebt_complete
+    # the comment on WIC_EBT_ALL_STATES_FROM_REFERENCE_YEAR: the deadline
+    # each WIC state agency had to implement EBT statewide, October 1, 2020,
+    # under 42 U.S.C. 1786(h)(12)(B)(i), which also allows the Secretary of
+    # Agriculture to grant exemptions
+    "Congress required every WIC state agency to implement EBT throughout the state by October 1, 2020, unless "
+    "the Secretary of Agriculture exempted it",
     # reference_year = year where quarter >= 2, else year - 1
     "We assign each CE interview to its collection year, and first-quarter interviews to the year before",
     # the same rule with the 1.5-month midpoint: reference year 2020 holds
@@ -1364,7 +1372,12 @@ INKIND_THRESHOLD_SOURCE = (
     "spm_calculator/ce_threshold.py",
     "4efbe2b03f6b1f4eb2911ab0f79f5151bd655cc1e5addf42f5c4540ace1f852f",
 )
-INKIND_THRESHOLD_CONSTANTS = ("mean imputed benefits per consumer unit in the 47th–53rd percentile band",)
+INKIND_THRESHOLD_CONSTANTS = (
+    "mean imputed benefits per consumer unit in the 47th–53rd percentile band",
+    # bls_quarter_window(2025) runs from 2020 Q2 to 2025 Q1, and ce_inkind
+    # assigns those interviews to reference years 2020 to 2024
+    "Every interview in our 2025 window references 2020 or later",
+)
 # Rules the section quotes from spm_calculator/ce_bls_shares.py at this
 # fingerprint (calculator commit 28740b5; every rule but the reading with the
 # Other share kept separate is unchanged since 8f632e3): the Garner–Munoz runs
@@ -1397,6 +1410,22 @@ INKIND_SHARES_CONSTANTS = (
     # "other_separate" gives broadband the tenure's own mean to match
     "With the Other share kept separate, we read BLS's home internet share for a tenure as that row less the "
     "tenure's own broadband row",
+)
+# The statewide WIC EBT dates the section quotes, from the calculator's copy
+# of FNS's status report (spm_calculator/data/inkind/usda_wic_ebt_statewide.csv)
+# at the hash the imputation receipt records. Its rows for the 50 states and
+# DC give six states statewide in 2020 before October 1 (HI 2020-06-15,
+# CA 2020-07-22, MO 2020-09-15, PA 2020-09-23, RI 2020-09-29, IL 2020-09-30)
+# and six states and DC after it (UT 2020-11-02, ND 2020-12-31,
+# MS 2021-06-11, ME 2021-06-22, DC 2022-04-27, NJ 2022-07-22, GA 2022-10-26).
+INKIND_WIC_DATES_SOURCE = (
+    "usda_wic_ebt_statewide.csv",
+    "6a61a4e0f1307f0a15e1c0a7c72a65e8be231a0fd1a6cdfb6c468c617a5d40f3",
+)
+INKIND_WIC_DATES_CONSTANTS = (
+    "six states that FNS dates statewide between June and September 2020, from Hawaii to Illinois",
+    "FNS dates six more states and the District of Columbia after the deadline, from Utah in November 2020 to "
+    "Georgia in October 2022",
 )
 replication_receipt = json.loads((DATA / "inkind" / "ce_inkind_replication_2019_2025.json").read_text())
 
@@ -1467,7 +1496,7 @@ def wic_by_state_pin() -> bool:
             for year in unmoved
         )
         and has_number(
-            f"we estimate that mean WIC per unit rises by \\${min(rise[y] for y in risen):.2f} to "
+            f"estimate that mean WIC per unit rises by \\${min(rise[y] for y in risen):.2f} to "
             f"\\${max(rise[y] for y in risen):.2f} in the windows behind the {risen[0]}–{risen[-1]} thresholds",
             text=INKIND_TEXT,
         )
@@ -1531,6 +1560,10 @@ lunch_years = sorted(replication_receipt["imputation_diagnostics"]["nslp"])
 census_lunch_years = [y for y, s in zip(lunch_years, lunch_sources) if s == "census_spm_schlunch"]
 internet_rows = [inkind_inputs["components"]["bls"]["years"][year]["checks"]["internet_row"] for year in YEARS]
 oop_internet_years = internet_rows.count("internet_oop_row")
+# The threshold years whose band, by BLS's published shares, carries broadband
+bls_broadband_years = [
+    year for year in YEARS if inkind_inputs["components"]["bls"]["years"][year]["band"]["pooled"]["broadband"] > 0
+]
 in_kind_components = inkind_method["components"]
 # The programs the participation models cover, as the section names them.
 PARTICIPATION_NAMES = {"nslp": "free or reduced-price school lunch", "wic": "WIC", "liheap": "LIHEAP", "broadband": "broadband subsidies"}
@@ -1777,8 +1810,8 @@ inkind_pins = (
             text=ABSTRACT,
         )
         and has_number(
-            "We give each benefit its part of the 1.2 multiplier in BLS's formula; when we leave that part in "
-            f"the Other share BLS publishes separately, the benefits supply {min(separate_shares):.1f} to "
+            "We give each benefit its part of the 1.2 multiplier in BLS's formula; by the share rows BLS "
+            f"publishes for them, with the Other share kept separate, the benefits supply {min(separate_shares):.1f} to "
             f"{max(separate_shares):.1f} percent",
             text=ABSTRACT,
         )
@@ -1788,7 +1821,8 @@ inkind_pins = (
             f"BLS's FCSUti index supplies {min(price_shares):.0f} to {max(price_shares):.0f} percent of its "
             f"thresholds' growth beyond CPI-U. Its imputed benefits supply {min(bls_shares):.1f} to "
             f"{max(bls_shares):.1f} percent when each carries its part of the Other share, and "
-            f"{min(separate_shares):.1f} to {max(separate_shares):.1f} percent when we keep that share separate",
+            f"{min(separate_shares):.1f} to {max(separate_shares):.1f} percent by the share rows BLS publishes for "
+            "them, with the Other share kept separate",
             text=DISCUSSION_TEXT,
         ),
     ),
@@ -1989,7 +2023,7 @@ inkind_pins = (
         "home internet's share of BLS's thresholds",
         has_number(
             f"supplies {internet_row_low:.2f} to {internet_row_high:.2f} percent of each BLS threshold by BLS's "
-            f"published shares, and {internet_share_low:.2f} to {internet_share_high:.2f} percent when we give it "
+            f"published shares (@sec-inkind-bls), and {internet_share_low:.2f} to {internet_share_high:.2f} percent when we give it "
             "its part of the 1.2 multiplier",
             text=INKIND_TEXT,
         ),
@@ -2075,7 +2109,7 @@ inkind_pins = (
         and all(has_number(constant, text=INKIND_TEXT) for constant in INKIND_METHOD_CONSTANTS),
     ),
     (
-        "percentile band read from fingerprinted calculator code",
+        "percentile band and windows read from fingerprinted calculator code",
         replication_receipt["code_sha256"].get(INKIND_THRESHOLD_SOURCE[0]) == INKIND_THRESHOLD_SOURCE[1]
         and all(has_number(constant, text=INKIND_TEXT) for constant in INKIND_THRESHOLD_CONSTANTS),
     ),
@@ -2106,6 +2140,11 @@ inkind_pins = (
             f"{YEARS[oop_internet_years]}",
             text=INKIND_TEXT,
         ),
+    ),
+    (
+        "WIC EBT dates from the calculator's FNS table",
+        inkind_method["parameter_files_sha256"].get(INKIND_WIC_DATES_SOURCE[0]) == INKIND_WIC_DATES_SOURCE[1]
+        and all(has_number(constant, text=INKIND_TEXT) for constant in INKIND_WIC_DATES_CONSTANTS),
     ),
     (
         "BLS internet reading from fingerprinted calculator code",
@@ -2208,6 +2247,15 @@ inkind_pins = (
         "broadband start and WIC cutoff from the imputation receipt",
         inkind_method["broadband_first_reference_year"] == 2022
         and inkind_method["wic_ebt_all_states_from_reference_year"] == 2020
+        and bool(bls_broadband_years)
+        and bls_broadband_years
+        == [str(year) for year in range(int(bls_broadband_years[0]), int(YEARS[-1]) + 1)]
+        and has_number(
+            f"BLS includes imputed broadband subsidies in its {bls_broadband_years[0]}–{bls_broadband_years[-1]} "
+            f"thresholds, from data that start in {int(bls_broadband_years[0]) - 1}",
+            text=INKIND_TEXT,
+        )
+        and int(bls_broadband_years[0]) - 1 == inkind_method["broadband_first_reference_year"]
         and has_number(
             f"We impute them from reference year {inkind_method['broadband_first_reference_year']} too, so they "
             f"first enter our {inkind_method['broadband_first_reference_year'] + 1} thresholds",

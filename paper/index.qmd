@@ -53,8 +53,8 @@ abstract: |
   percent of its thresholds' growth beyond CPI-U over those years, and
   that its price index and out-of-pocket spending supply the rest. We
   give each benefit its part of the 1.2 multiplier in BLS's formula;
-  when we leave that part in the Other share BLS publishes separately,
-  the benefits supply 3.5 to 11.8 percent. We evaluate prospective
+  by the share rows BLS publishes for them, with the Other share kept
+  separate, the benefits supply 3.5 to 11.8 percent. We evaluate prospective
   accuracy for 2025 only.
 ---
 
@@ -380,7 +380,9 @@ We count that mother only when the unit has a woman aged 15 or older, so
 in the units we add to the WIC universe for 2025, we count the children
 alone. If the unit has no child under 5, we count one pregnant woman. We
 give each participant twelve months of USDA's national average monthly
-food cost for the fiscal year that matches the unit's reference year. We add no WIC from reference year 2020, the year of the statutory deadline. Congress required every WIC state agency to implement EBT throughout the state by October 1, 2020, unless the Secretary of Agriculture exempted it [@usc1786]. We assign interviews from April 2020 to March 2021 to reference year 2020, and their reference periods center on mid-February 2020 to mid-January 2021. So we also drop WIC for reference periods before the deadline, including in six states that FNS dates statewide between June and September 2020, from Hawaii to Illinois [@fnswicebt2022]. FNS dates six more states and the District of Columbia after the deadline, from Utah in November 2020 to Georgia in October 2022. If we applied BLS's rule state by state, we would add WIC in each of those places until it finished. For earlier reference years, we take each state's statewide date from FNS and add no WIC when the unit's state had fully implemented WIC EBT by the midpoint of its three-month reference period. When the CE suppresses a unit's state, we draw that status with probability equal to the weighted share of known-state units in the same region and quarter whose states had done so. Every interview in our 2025 window references 2020 or later, so our 2025 thresholds include no WIC. If we use each state's own date in every reference year, we estimate that mean WIC per unit rises by \$1.94 to \$3.21 in the windows behind the 2021–2025 thresholds. Those thresholds move by −\$20 to +\$40 (−0.06 to +0.12 percent) as the added WIC reorders units in the band, and 2022–2025 growth changes by 0.03 points or less.
+food cost for the fiscal year that matches the unit's reference year.
+
+We add no WIC from reference year 2020, the year of the statutory deadline. Congress required every WIC state agency to implement EBT throughout the state by October 1, 2020, unless the Secretary of Agriculture exempted it [@usc1786]. We assign interviews from April 2020 to March 2021 to reference year 2020, and their reference periods center on mid-February 2020 to mid-January 2021. So we also drop WIC for reference periods before the deadline, including in six states that FNS dates statewide between June and September 2020, from Hawaii to Illinois [@fnswicebt2022]. FNS dates six more states and the District of Columbia after the deadline, from Utah in November 2020 to Georgia in October 2022. If we applied BLS's rule state by state, we would add WIC in each of them until its WIC agency had implemented EBT statewide. For earlier reference years, we take each state's statewide date from FNS and add no WIC when the unit's state had fully implemented WIC EBT by the midpoint of its three-month reference period. When the CE suppresses a unit's state, we draw that status with probability equal to the weighted share of known-state units in the same region and quarter whose states had done so. Every interview in our 2025 window references 2020 or later, so our 2025 thresholds include no WIC. If we use each state's own date in every reference year, some units in the 2025 window take WIC, including those we add to the WIC universe for 2025. We then estimate that mean WIC per unit rises by \$1.94 to \$3.21 in the windows behind the 2021–2025 thresholds. Those thresholds move by −\$20 to +\$40 (−0.06 to +0.12 percent) as the added WIC reorders units in the band, and 2022–2025 growth changes by 0.03 points or less.
 
 For rental assistance, BLS fits a limited dependent variable model that
 treats assisted renters' rents as censored from above, and it values the
@@ -420,7 +422,7 @@ BLS's for every tenure in every year, by 0.25 to 3.53 percent
 (@tbl-inkind-levels). We read the CE's shelter, utilities, and food summaries, and we omit
 home internet, which averages \$547 to \$878 per unit in BLS's band. It
 supplies 1.54 to 2.12 percent of each BLS threshold by BLS's published
-shares, and 1.85 to 2.55 percent when we give it its part of the 1.2
+shares (@sec-inkind-bls), and 1.85 to 2.55 percent when we give it its part of the 1.2
 multiplier. Those summaries include rent and meals received as pay,
 other lodging such as vacation homes and lodging on out-of-town trips
 [@ceglossary], and utilities for vacation homes [@cepumd]. Garner and
@@ -446,7 +448,7 @@ utilities, and food restrictions of @garner2021. We deflate both with the
 replication's composite CPI.
 :::
 
-## BLS's imputed amounts
+## BLS's imputed amounts {#sec-inkind-bls}
 
 BLS computes each component's share of each threshold from band means
 and publishes the shares, together with each tenure's share of the band
@@ -468,7 +470,7 @@ term $1.2\,s\,\overline{c}_E$ in $B_{T,h}$, and a shelter or utility
 component puts $s\,(\overline{c}_{E,h}+0.2\,\overline{c}_E)$, so the
 terms sum to the threshold. Besides its broadband subsidy row, BLS publishes two internet rows. We use the one that gives
 equal dollars across tenures: "OOP Internet" through 2024 and "Total
-Internet Share" in 2025. We treat that row as including broadband subsidies and subtract them to recover home internet spending. With the Other share kept separate, we read BLS's home internet share for a tenure as that row less the tenure's own broadband row. With these readings, BLS's published shares, thresholds, and tenure shares satisfy both identities within \$0.00001 in every year from 2019 to 2025. The terms with the Other share kept separate match every published share within the same bound.
+Internet Share" in 2025. We treat that row as including broadband subsidies and subtract them to recover home internet spending. With the Other share kept separate, we read BLS's home internet share for a tenure as that row less the tenure's own broadband row. With these readings, BLS's published shares, thresholds, and tenure shares satisfy both identities within \$0.00001 in every year from 2019 to 2025. The terms with the Other share kept separate match every published share we read within the same bound.
 
 Between the 2022 and 2025 thresholds, BLS's imputed benefits rose from
 \$855 to \$1,257 per unit in its band, and we estimate that ours rose
@@ -1078,7 +1080,8 @@ re-estimation reflects consumption changes that price adjustment alone
 omits, consistent with the measure’s quasi-relative construction. From 2022 to 2025, BLS's FCSUti index supplies 33 to 39 percent of its
 thresholds' growth beyond CPI-U. Its imputed benefits supply 4.9 to
 12.9 percent when each carries its part of the Other share, and 3.5 to
-11.8 percent when we keep that share separate, as BLS publishes it.
+11.8 percent by the share rows BLS publishes for them, with the Other
+share kept separate.
 Out-of-pocket spending supplies the rest, with the Other share in the
 second case; we do not split real spending from sample composition
 within that part (@sec-inkind). With the
@@ -1157,7 +1160,7 @@ digest is:
 
 For the in-kind experiment in @sec-inkind, we keep three receipts from
 spm-calculator, with their provenance and checksums, in the paper
-repository's [`data/inkind`](https://github.com/PolicyEngine/spm-threshold-paper/tree/inkind-section-2026-11/data/inkind) folder: the imputation, the comparison with BLS's components, and the
+repository's [`data/inkind`](https://github.com/PolicyEngine/spm-threshold-paper/tree/inkind-receipts-28740b5/data/inkind) folder: the imputation, the comparison with BLS's components, and the
 replicate-weight standard errors, all at commit
 `28740b5c7c6ba54af99c8631c955294b094ba239`. Before each render, we
 check that the out-of-pocket run reproduces the retrospective
@@ -1176,7 +1179,7 @@ provenance](https://github.com/PolicyEngine/spm-threshold-paper/blob/20bfbe1abcb
 and [forecast
 record](https://github.com/PolicyEngine/spm-threshold-paper/blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0/docs/forecast-record.md)
 identify the inputs and evidence of the earlier experiments, and
-[`data/inkind/provenance.json`](https://github.com/PolicyEngine/spm-threshold-paper/blob/inkind-section-2026-11/data/inkind/provenance.json)
+[`data/inkind/provenance.json`](https://github.com/PolicyEngine/spm-threshold-paper/blob/inkind-receipts-28740b5/data/inkind/provenance.json)
 those of the in-kind experiment.
 
 To verify the reported tables, clone the paper repository with its full

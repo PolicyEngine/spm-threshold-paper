@@ -641,7 +641,7 @@ INKIND_PROSE_MUTATIONS = (
         "section",
         r"consumer(\s+)unit(\s+)in(\s+)the(\s+)47th–53rd",
         r"consumer\1unit\2in\3the\g<4>45th–55th",
-        "percentile band read from fingerprinted calculator code",
+        "percentile band and windows read from fingerprinted calculator code",
     ),
     (
         "Census school lunch first year",
@@ -1150,6 +1150,62 @@ INKIND_PROSE_MUTATIONS = (
         r"drop(\s+)WIC(\s+)for(\s+)reference(\s+)periods(\s+)before(\s+)the(\s+)deadline",
         r"drop\1WIC\2for\3reference\4periods\5after\6the\7deadline",
         "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "WIC EBT deadline",
+        "section",
+        r"by(\s+)October(\s+)1,(\s+)2020,",
+        r"by\1October\g<2>1,\g<3>2021,",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "who grants WIC EBT exemptions",
+        "section",
+        r"Secretary(\s+)of(\s+)Agriculture(\s+)exempted",
+        r"Secretary\1of\2Commerce\3exempted",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "states statewide before the deadline",
+        "section",
+        r"including(\s+)in(\s+)six(\s+)states(\s+)that(\s+)FNS",
+        r"including\1in\2four\3states\4that\5FNS",
+        "WIC EBT dates from the calculator's FNS table",
+    ),
+    (
+        "first state statewide in 2020",
+        "section",
+        r"from(\s+)Hawaii(\s+)to(\s+)Illinois",
+        r"from\1California\2to\3Illinois",
+        "WIC EBT dates from the calculator's FNS table",
+    ),
+    (
+        "states statewide after the deadline",
+        "section",
+        r"FNS(\s+)dates(\s+)six(\s+)more(\s+)states",
+        r"FNS\1dates\2seven\3more\4states",
+        "WIC EBT dates from the calculator's FNS table",
+    ),
+    (
+        "last state statewide",
+        "section",
+        r"to(\s+)Georgia(\s+)in(\s+)October(\s+)2022",
+        r"to\1Georgia\2in\3October\g<4>2023",
+        "WIC EBT dates from the calculator's FNS table",
+    ),
+    (
+        "2025 window's reference years",
+        "section",
+        r"references(\s+)2020(\s+)or(\s+)later",
+        r"references\g<1>2019\2or\3later",
+        "percentile band and windows read from fingerprinted calculator code",
+    ),
+    (
+        "BLS's broadband thresholds",
+        "section",
+        r"in(\s+)its(\s+)2023–2025(\s+)thresholds,(\s+)from(\s+)data(\s+)that(\s+)start(\s+)in(\s+)2022",
+        r"in\1its\g<2>2022–2025\3thresholds,\4from\5data\6that\7start\8in\g<9>2021",
+        "broadband start and WIC cutoff from the imputation receipt",
     ),
     (
         "BLS's 2025 WIC band mean",
@@ -2004,7 +2060,7 @@ class PaperGuardTests(unittest.TestCase):
                 (
                     "threshold code",
                     fingerprint_changed("spm_calculator/ce_threshold.py"),
-                    ("percentile band read from fingerprinted calculator code",),
+                    ("percentile band and windows read from fingerprinted calculator code",),
                 ),
             )
         )
@@ -2027,6 +2083,16 @@ class PaperGuardTests(unittest.TestCase):
             )
         )
 
+    def test_wic_ebt_dates_follow_the_fns_table_the_receipt_hashes(self):
+        def change_the_fns_table(receipts):
+            receipts[INKIND_NAMES[1]]["in_kind_methodology"]["parameter_files_sha256"][
+                "usda_wic_ebt_statewide.csv"
+            ] = "0" * 64
+
+        self.assert_resealed_receipts_fail(
+            (("FNS table", change_the_fns_table, ("WIC EBT dates from the calculator's FNS table",)),)
+        )
+
     def test_paper_adds_no_2025_wic_only_while_the_receipt_adds_none(self):
         def lift_2025_renters_by_wic(receipts):
             receipts[INKIND_NAMES[1]]["results"]["2025"]["component_lift_percent"]["wic"]["renter"] = 0.01
@@ -2039,19 +2105,36 @@ class PaperGuardTests(unittest.TestCase):
         def sensitivity(receipts):
             return receipts[INKIND_NAMES[1]]["wic_ebt_by_state_sensitivity"]
 
+        # Each case below breaks one check of the pin and keeps the block's
+        # other ties, so deleting that check lets the case through.
+        def move_a_threshold(receipts, year, tenure, dollars):
+            """Move one rerun threshold by `dollars` and restate its change."""
+            targets = sensitivity(receipts)["by_target"]
+            base = receipts[INKIND_NAMES[1]]["results"][year]["with_in_kind"][tenure]
+            targets[year]["with_in_kind"][tenure] += dollars
+            targets[year]["change_dollars"][tenure] += dollars
+            targets[year]["change_percent"][tenure] = 100 * targets[year]["change_dollars"][tenure] / base
+
         def widen_the_largest_move(receipts):
+            # The largest move is in neither 2022 nor 2025, so growth holds.
             targets = sensitivity(receipts)["by_target"]
             year, tenure = max(
                 ((year, tenure) for year, target in targets.items() for tenure in target["change_dollars"]),
                 key=lambda key: targets[key[0]]["change_dollars"][key[1]],
             )
-            targets[year]["change_dollars"][tenure] += 10
+            self.assertNotIn(year, ("2022", "2025"))
+            move_a_threshold(receipts, year, tenure, 10)
 
         def move_an_unmoved_threshold(receipts):
             targets = sensitivity(receipts)["by_target"]
             unmoved = [year for year, target in sorted(targets.items()) if not any(target["change_dollars"].values())]
             self.assertTrue(unmoved, "every threshold moves")
-            targets[unmoved[0]]["change_dollars"]["renter"] = 1.0
+            self.assertNotIn(unmoved[0], ("2022", "2025"))
+            move_a_threshold(receipts, unmoved[0], "renter", 1.0)
+
+        def shift_a_threshold_off_its_change(receipts):
+            # A moved year outside 2022 and 2025, with its change left as is.
+            sensitivity(receipts)["by_target"]["2023"]["with_in_kind"]["renter"] += 1
 
         def raise_the_largest_wic_rise(receipts):
             targets = sensitivity(receipts)["by_target"]
@@ -2064,10 +2147,16 @@ class PaperGuardTests(unittest.TestCase):
             targets[year]["sample_mean_wic_threshold_year_dollars"] += 1
 
         def push_growth_past_the_stated_bound(receipts):
-            # 0.031 still rounds to the 0.03 the prose states.
+            # 0.031 still rounds to the 0.03 the prose states, and the 2025
+            # thresholds are restated to give it.
             growth = sensitivity(receipts)["growth_2022_2025_change_points"]
             tenure = max(growth, key=lambda tenure: abs(growth[tenure]))
-            growth[tenure] = math.copysign(0.031, growth[tenure])
+            set_growth_changes(receipts, {tenure: math.copysign(0.031, growth[tenure])})
+
+        def misstate_a_growth_change(receipts):
+            # The smallest change, so the largest stays the bound.
+            growth = sensitivity(receipts)["growth_2022_2025_change_points"]
+            growth[min(growth, key=lambda tenure: abs(growth[tenure]))] += 0.001
 
         def apply_the_all_states_cutoff(receipts):
             sensitivity(receipts)["wic_ebt_all_states_from_reference_year"] = 2020
@@ -2148,8 +2237,10 @@ class PaperGuardTests(unittest.TestCase):
                 ("an unmoved year's WIC falls", lower_an_unmoved_years_wic, label),
                 ("growth bound stated loosely", shrink_growth_well_below_the_stated_bound, label),
                 ("moved years not a run", break_the_run_of_moved_years, label),
+                ("threshold off its change", shift_a_threshold_off_its_change, label),
                 ("percent change off its dollars", misstate_a_percent, label),
                 ("growth off its thresholds", misstate_a_growth_level, label),
+                ("growth change off its thresholds", misstate_a_growth_change, label),
             )
         )
 
