@@ -12,6 +12,7 @@ import importlib.util
 import json
 import math
 import random
+import re
 import shutil
 import sys
 import tempfile
@@ -440,6 +441,99 @@ class UncertaintyReceiptTests(unittest.TestCase):
             INKIND.uncertainty_figures(inputs, self.published)
 
 
+class ComponentReceiptChecks(unittest.TestCase):
+    """load_inkind's checks on the component receipt's schema and on its
+    Other-separate terms, run on copies of the committed receipts that
+    reseal the edited component receipt with every hash that records it."""
+
+    SCHEMA_LABEL = re.escape("component receipt schema 2 with both accountings of the Other share")
+
+    @staticmethod
+    def load_edited(edit):
+        """Load a copy of data/inkind whose component receipt ``edit`` has
+        changed, with the manifest, the provenance record and the
+        uncertainty receipt's input hash updated to match."""
+        with tempfile.TemporaryDirectory(prefix="inkind-components-") as temp:
+            data = Path(temp)
+            for name in (*INKIND.INKIND_FILES, "SHA256SUMS"):
+                shutil.copyfile(REPO / "data/inkind" / name, data / name)
+            components = json.loads((data / INKIND.COMPONENTS).read_text())
+            edit(components)
+            (data / INKIND.COMPONENTS).write_text(json.dumps(components))
+            uncertainty = json.loads((data / INKIND.UNCERTAINTY).read_text())
+            uncertainty["inputs"]["components_receipt"]["sha256"] = hashlib.sha256(
+                (data / INKIND.COMPONENTS).read_bytes()
+            ).hexdigest()
+            (data / INKIND.UNCERTAINTY).write_text(json.dumps(uncertainty))
+            provenance = json.loads((data / INKIND.PROVENANCE).read_text())
+            for name in (INKIND.COMPONENTS, INKIND.UNCERTAINTY):
+                provenance["artifacts"][f"data/inkind/{name}"]["sha256"] = hashlib.sha256(
+                    (data / name).read_bytes()
+                ).hexdigest()
+            (data / INKIND.PROVENANCE).write_text(json.dumps(provenance))
+            (data / "SHA256SUMS").write_text(
+                "".join(
+                    f"{hashlib.sha256((data / name).read_bytes()).hexdigest()}  data/inkind/{name}\n"
+                    for name in INKIND.INKIND_FILES
+                )
+            )
+            return INKIND.load_inkind(data, REPO / "data/current")
+
+    @staticmethod
+    def share_error(dollars):
+        """The share gap that ``dollars`` of band mean makes in the largest
+        of BLS's 2024 thresholds: dollars times s over the threshold."""
+        components = json.loads((REPO / "data/inkind" / INKIND.COMPONENTS).read_text())
+        return dollars * 0.82 / max(components["bls"]["years"]["2024"]["published_thresholds"].values())
+
+    @staticmethod
+    def set_internet_share_error(error):
+        def edit(components):
+            components["bls"]["years"]["2024"]["checks"]["other_separate_share_error"]["internet"] = error
+
+        return edit
+
+    def test_module_reads_schema_2_with_both_accountings(self):
+        self.assertEqual(INKIND.COMPONENTS_SCHEMA, 2)
+        self.assertEqual(set(INKIND.ACCOUNTINGS), {"other_spread", "other_separate"})
+
+    def test_schema_1_is_rejected(self):
+        def edit(components):
+            components["schema_version"] = 1
+
+        with self.assertRaisesRegex(ValueError, self.SCHEMA_LABEL):
+            self.load_edited(edit)
+
+    def test_a_missing_accounting_is_rejected(self):
+        for accounting in ("other_spread", "other_separate"):
+            with self.subTest(accounting=accounting):
+
+                def edit(components):
+                    del components["accountings"][accounting]
+
+                with self.assertRaisesRegex(ValueError, self.SCHEMA_LABEL):
+                    self.load_edited(edit)
+
+    def test_an_other_separate_share_error_over_tolerance_is_rejected(self):
+        for sign in (1, -1):
+            with self.subTest(sign=sign):
+                error = self.share_error(sign * 1.01 * INKIND.BLS_IDENTITY_TOLERANCE_DOLLARS)
+                with self.assertRaisesRegex(
+                    ValueError,
+                    re.escape("the Other-separate terms reproduce each share BLS publishes within $0.00001 in 2024"),
+                ):
+                    self.load_edited(self.set_internet_share_error(error))
+
+    def test_an_other_separate_share_error_under_tolerance_is_accepted(self):
+        """An error just inside the bound, and larger than every other row's,
+        passes, so the bound and not some other check decides."""
+        error = self.share_error(0.99 * INKIND.BLS_IDENTITY_TOLERANCE_DOLLARS)
+        inputs = self.load_edited(self.set_internet_share_error(error))
+        errors = inputs["components"]["bls"]["years"]["2024"]["checks"]["other_separate_share_error"]
+        self.assertEqual(errors["internet"], error)
+        self.assertTrue(all(abs(value) < error for name, value in errors.items() if name != "internet"))
+
+
 class GrowthAccountingProperties(unittest.TestCase):
     """The split of BLS's 2022-2025 growth beyond CPI-U into the FCSUti
     index's part, the imputed benefits' part and out-of-pocket spending's
@@ -455,22 +549,24 @@ class GrowthAccountingProperties(unittest.TestCase):
             i22[tenure] = rng.uniform(0, 0.1 * b22[tenure])
             i25[tenure] = cpi * i22[tenure] + rng.uniform(1, 800)
             b25[tenure] = price * (b22[tenure] - i22[tenure]) + rng.uniform(1, 6000) + i25[tenure]
+        share = {t: 100 * (i25[t] - cpi * i22[t]) / (b25[t] - cpi * b22[t]) for t in TENURES}
         components = {
             "bls": {
                 "years": {"2022": {"published_thresholds": b22}, "2025": {"published_thresholds": b25}},
                 "growth_2022_2025": {
                     "by_tenure": {
-                        t: {"imputed_term_dollars": {"2022": i22[t], "2025": i25[t]}} for t in TENURES
+                        t: {
+                            "other_spread": {
+                                "imputed_term_dollars": {"2022": i22[t], "2025": i25[t]},
+                                "imputed_share_of_growth_beyond_cpi_u_percent": share[t],
+                            }
+                        }
+                        for t in TENURES
                     }
                 },
             }
         }
-        figures = {
-            "bls": {
-                t: {"imputed_share_beyond_cpi_u": 100 * (i25[t] - cpi * i22[t]) / (b25[t] - cpi * b22[t])}
-                for t in TENURES
-            }
-        }
+        figures = {"bls": {t: {"imputed_share_beyond_cpi_u": share[t]} for t in TENURES}}
         return figures, components, cpi, price
 
     def test_parts_sum_to_growth_beyond_cpi(self):
@@ -503,7 +599,8 @@ class GrowthAccountingProperties(unittest.TestCase):
                 part = split[tenure]
                 alt = part["index_on_benefits_shares"]
                 b22 = components["bls"]["years"]["2022"]["published_thresholds"][tenure]
-                i22 = components["bls"]["growth_2022_2025"]["by_tenure"][tenure]["imputed_term_dollars"]["2022"]
+                spread = components["bls"]["growth_2022_2025"]["by_tenure"][tenure]["other_spread"]
+                i22 = spread["imputed_term_dollars"]["2022"]
                 moved = 100 * 100 * (price - cpi) * i22 / b22 / part["excess"]
                 self.assertTrue(math.isclose(sum(alt.values()), 100, rel_tol=1e-9))
                 self.assertTrue(
@@ -524,7 +621,8 @@ class GrowthAccountingProperties(unittest.TestCase):
             for year in ("2022", "2025"):
                 for tenure in TENURES:
                     scaled["bls"]["years"][year]["published_thresholds"][tenure] *= scale
-                    scaled["bls"]["growth_2022_2025"]["by_tenure"][tenure]["imputed_term_dollars"][year] *= scale
+                    spread = scaled["bls"]["growth_2022_2025"]["by_tenure"][tenure]["other_spread"]
+                    spread["imputed_term_dollars"][year] *= scale
             base = INKIND._growth_accounting(figures, components, cpi, price)
             other = INKIND._growth_accounting(figures, scaled, cpi, price)
             for tenure in TENURES:
@@ -537,15 +635,28 @@ class GrowthAccountingProperties(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "accounting's benefit share renter"):
             INKIND._growth_accounting(figures, components, cpi, price)
 
+    def test_a_misstated_receipt_share_is_rejected(self):
+        """The benefits' share must also match the one the component receipt
+        records under ``other_spread``."""
+        figures, components, cpi, price = self.synthetic(random.Random(3))
+        components["bls"]["growth_2022_2025"]["by_tenure"]["renter"]["other_spread"][
+            "imputed_share_of_growth_beyond_cpi_u_percent"
+        ] += 0.01
+        with self.assertRaisesRegex(
+            ValueError, "accounting's benefit share matches the receipt's, Other spread renter"
+        ):
+            INKIND._growth_accounting(figures, components, cpi, price)
+
     def test_a_part_below_zero_is_rejected(self):
         figures, components, cpi, price = self.synthetic(random.Random(4))
-        terms = components["bls"]["growth_2022_2025"]["by_tenure"]["renter"]["imputed_term_dollars"]
+        spread = components["bls"]["growth_2022_2025"]["by_tenure"]["renter"]["other_spread"]
+        terms = spread["imputed_term_dollars"]
         terms["2025"] = 0.5 * cpi * terms["2022"]
         b22 = components["bls"]["years"]["2022"]["published_thresholds"]["renter"]
         b25 = components["bls"]["years"]["2025"]["published_thresholds"]["renter"]
-        figures["bls"]["renter"]["imputed_share_beyond_cpi_u"] = (
-            100 * (terms["2025"] - cpi * terms["2022"]) / (b25 - cpi * b22)
-        )
+        share = 100 * (terms["2025"] - cpi * terms["2022"]) / (b25 - cpi * b22)
+        figures["bls"]["renter"]["imputed_share_beyond_cpi_u"] = share
+        spread["imputed_share_of_growth_beyond_cpi_u_percent"] = share
         with self.assertRaisesRegex(ValueError, "accounting parts positive renter"):
             INKIND._growth_accounting(figures, components, cpi, price)
 
@@ -560,7 +671,7 @@ class GrowthAccountingProperties(unittest.TestCase):
         for tenure in TENURES:
             b22 = components["bls"]["years"]["2022"]["published_thresholds"][tenure]
             b25 = components["bls"]["years"]["2025"]["published_thresholds"][tenure]
-            terms = components["bls"]["growth_2022_2025"]["by_tenure"][tenure]["imputed_term_dollars"]
+            terms = components["bls"]["growth_2022_2025"]["by_tenure"][tenure]["other_spread"]["imputed_term_dollars"]
             out_of_pocket_growth = (b25 - terms["2025"]) / (b22 - terms["2022"])
             part = figures["accounting"][tenure]
             self.assertTrue(
@@ -585,7 +696,9 @@ class OtherSeparateAccountingProperties(unittest.TestCase):
         under the tenure mix, as BLS's workbook gives them, and thresholds
         from BLS's identity. Out-of-pocket spending grows 25 percent and
         each benefit 15 to 60 percent, so every part of either split is
-        positive."""
+        positive. The receipt block records both accountings: the terms
+        with the Other share spread, and the five rows with it kept
+        separate, each with its share of growth beyond CPI-U."""
         weights = [rng.random() + 1e-6 for _ in TENURES]
         mix = {tenure: weight / sum(weights) for tenure, weight in zip(TENURES, weights)}
         shared_oop = rng.uniform(5000, 20000)
@@ -597,7 +710,7 @@ class OtherSeparateAccountingProperties(unittest.TestCase):
             for tenure in TENURES
         }
         shared = {name: rng.uniform(0, 1500) for name in ("nslp", "wic")}
-        years, terms = {}, {tenure: {} for tenure in TENURES}
+        years, terms, rows = {}, {tenure: {} for tenure in TENURES}, {tenure: {} for tenure in TENURES}
         for year, oop_growth in (("2022", 1.0), ("2025", 1.25)):
             growth = {name: 1.0 if year == "2022" else rng.uniform(1.15, 1.6) for name in ALL_IMPUTED}
             tenure_means = {
@@ -613,16 +726,41 @@ class OtherSeparateAccountingProperties(unittest.TestCase):
             )
             for tenure, value in INKIND._imputed_terms(band, ALL_IMPUTED).items():
                 terms[tenure][year] = value
+                # BLS's five rows: s times school lunch and WIC at equal
+                # dollars and the tenure's own LIHEAP, rental assistance and
+                # broadband subsidy.
+                rows[tenure][year] = 0.82 * (
+                    pooled["nslp"]
+                    + pooled["wic"]
+                    + sum(tenure_means[tenure][name] for name in ("liheap", "rental_assistance", "broadband"))
+                )
             years[year] = {
                 "band": band,
                 "published_thresholds": published,
                 "imputed_total": sum(pooled[name] for name in ALL_IMPUTED),
             }
+
+        def accounting(dollars, tenure):
+            b22 = years["2022"]["published_thresholds"][tenure]
+            b25 = years["2025"]["published_thresholds"][tenure]
+            return {
+                "imputed_term_dollars": dollars,
+                "imputed_share_of_growth_beyond_cpi_u_percent": 100
+                * (dollars["2025"] - self.CPI * dollars["2022"])
+                / (b25 - self.CPI * b22),
+            }
+
         return {
             "bls": {
                 "years": years,
                 "growth_2022_2025": {
-                    "by_tenure": {tenure: {"imputed_term_dollars": terms[tenure]} for tenure in TENURES}
+                    "by_tenure": {
+                        tenure: {
+                            "other_spread": accounting(terms[tenure], tenure),
+                            "other_separate": accounting(rows[tenure], tenure),
+                        }
+                        for tenure in TENURES
+                    }
                 },
             }
         }
@@ -672,14 +810,16 @@ class OtherSeparateAccountingProperties(unittest.TestCase):
         rng = random.Random(20261115)
         for _ in range(DRAWS // 4):
             components = self.synthetic(rng)
+            by_tenure = components["bls"]["growth_2022_2025"]["by_tenure"]
+            terms = {tenure: by_tenure[tenure]["other_spread"]["imputed_term_dollars"] for tenure in TENURES}
             figures = {
                 "bls": {
                     tenure: {
                         "imputed_share_beyond_cpi_u": INKIND._three_parts(
                             components["bls"]["years"]["2022"]["published_thresholds"][tenure],
                             components["bls"]["years"]["2025"]["published_thresholds"][tenure],
-                            components["bls"]["growth_2022_2025"]["by_tenure"][tenure]["imputed_term_dollars"]["2022"],
-                            components["bls"]["growth_2022_2025"]["by_tenure"][tenure]["imputed_term_dollars"]["2025"],
+                            terms[tenure]["2022"],
+                            terms[tenure]["2025"],
                             self.CPI,
                             self.PRICE,
                             tenure,
@@ -701,9 +841,42 @@ class OtherSeparateAccountingProperties(unittest.TestCase):
             INKIND._growth_accounting_other_separate(components, self.CPI, self.PRICE)
 
     def test_a_changed_shared_row_is_rejected(self):
+        """A shared row moved in the band and in the receipt's
+        ``other_separate`` dollars alike, but not in its ``other_spread``
+        terms or imputed total, breaks the shortfall tie."""
         components = self.synthetic(random.Random(6))
         components["bls"]["years"]["2022"]["band"]["pooled"]["nslp"] += 1
+        for tenure in TENURES:
+            separate = components["bls"]["growth_2022_2025"]["by_tenure"][tenure]["other_separate"]
+            separate["imputed_term_dollars"]["2022"] += 0.82
         with self.assertRaisesRegex(ValueError, "benefit rows fall short of the benefits' terms by their Other share 2022"):
+            INKIND._growth_accounting_other_separate(components, self.CPI, self.PRICE)
+
+    def test_a_changed_shared_row_in_the_band_alone_is_rejected(self):
+        components = self.synthetic(random.Random(6))
+        components["bls"]["years"]["2022"]["band"]["pooled"]["nslp"] += 1
+        with self.assertRaisesRegex(ValueError, "benefit rows match the receipt's 2022 owner_with_mortgage"):
+            INKIND._growth_accounting_other_separate(components, self.CPI, self.PRICE)
+
+    def test_changed_receipt_rows_are_rejected(self):
+        """The ``other_separate`` dollars the receipt records must equal the
+        five rows rebuilt from its band."""
+        for year in ("2022", "2025"):
+            with self.subTest(year=year):
+                components = self.synthetic(random.Random(7))
+                separate = components["bls"]["growth_2022_2025"]["by_tenure"]["renter"]["other_separate"]
+                separate["imputed_term_dollars"][year] += 0.01
+                with self.assertRaisesRegex(ValueError, f"benefit rows match the receipt's {year} renter"):
+                    INKIND._growth_accounting_other_separate(components, self.CPI, self.PRICE)
+
+    def test_a_misstated_receipt_share_is_rejected(self):
+        components = self.synthetic(random.Random(8))
+        components["bls"]["growth_2022_2025"]["by_tenure"]["renter"]["other_separate"][
+            "imputed_share_of_growth_beyond_cpi_u_percent"
+        ] += 0.01
+        with self.assertRaisesRegex(
+            ValueError, "accounting's benefit share matches the receipt's, Other separate renter"
+        ):
             INKIND._growth_accounting_other_separate(components, self.CPI, self.PRICE)
 
     def test_committed_split_matches_the_receipt_directly(self):
@@ -726,6 +899,8 @@ class OtherSeparateAccountingProperties(unittest.TestCase):
                     + band["by_tenure"][tenure]["liheap"]
                     + band["by_tenure"][tenure]["rental_assistance"]
                 )
+                recorded = components["bls"]["growth_2022_2025"]["by_tenure"][tenure]["other_separate"]
+                self.assertTrue(math.isclose(rows[year], recorded["imputed_term_dollars"][year]), f"{year} {tenure}")
             b22 = years["2022"]["published_thresholds"][tenure]
             b25 = years["2025"]["published_thresholds"][tenure]
             part = figures["accounting_other_separate"][tenure]
@@ -740,11 +915,30 @@ class OtherSeparateAccountingProperties(unittest.TestCase):
             )
 
     def test_internet_row_is_its_term_without_the_other_share(self):
+        """BLS's internet row for a tenure is its term without internet's
+        part of 0.2 F, s I / T rather than 1.2 s I / T, plus s times the
+        band's broadband subsidy less the tenure's own over T, since the
+        row with the Other share kept separate gives broadband each
+        tenure's own mean."""
         inputs = INKIND.load_inkind(REPO / "data/inkind", REPO / "data/current")
-        levels = INKIND._internet_and_levels(inputs["components"])
-        term, row = levels["bls_internet_share_range"], levels["bls_internet_row_share_range"]
-        for t, r in zip(term, row):
-            self.assertTrue(math.isclose(t, 1.2 * r, rel_tol=1e-12))
+        components = inputs["components"]
+        levels = INKIND._internet_and_levels(components)
+        years = components["bls"]["years"]
+        terms, rows = [], []
+        for year in INKIND.YEARS:
+            band = years[year]["band"]
+            for tenure in TENURES:
+                threshold = years[year]["published_thresholds"][tenure]
+                term = 100 * 0.82 * 1.2 * band["pooled"]["internet"] / threshold
+                moved = 100 * 0.82 * (band["pooled"]["broadband"] - band["by_tenure"][tenure]["broadband"]) / threshold
+                terms.append(term)
+                rows.append(term / 1.2 + moved)
+        for recorded, cells in (
+            (levels["bls_internet_share_range"], terms),
+            (levels["bls_internet_row_share_range"], rows),
+        ):
+            for value, expected in zip(recorded, (min(cells), max(cells)), strict=True):
+                self.assertTrue(math.isclose(value, expected, rel_tol=1e-12))
 
 
 class ReceiptTieProperties(unittest.TestCase):
@@ -764,14 +958,16 @@ class ReceiptTieProperties(unittest.TestCase):
         shifts = INKIND._rank_shift(components)
         for tenure in TENURES:
             row = components["runs"]["package"]["growth_2022_2025"]["by_tenure"][tenure]
+            spread = row["other_spread"]
             self.assertTrue(
                 math.isclose(
                     shifts[tenure],
-                    row["stage_change_points"] - (row["growth_with_stage"] - row["growth_without_imputed_terms"]),
+                    row["stage_change_points"] - (row["growth_with_stage"] - spread["growth_without_imputed_terms"]),
                     abs_tol=1e-9,
                 )
             )
-        components["runs"]["package"]["growth_2022_2025"]["by_tenure"]["renter"]["rank_shift_points"] += 0.01
+        renter = components["runs"]["package"]["growth_2022_2025"]["by_tenure"]["renter"]
+        renter["other_spread"]["rank_shift_points"] += 0.01
         with self.assertRaisesRegex(ValueError, "rank shift renter"):
             INKIND._rank_shift(components)
 
@@ -782,10 +978,99 @@ class ReceiptTieProperties(unittest.TestCase):
         self.assertTrue(0 < low < high < 5)
         for run, (gap_low, gap_high) in levels["gap_with_bls_internet"].items():
             self.assertTrue(0 < gap_low < gap_high, run)
-        terms = components["runs"]["package"]["years"]["2023"]["level_gap_percent_of_bls"]["renter"]["terms"]
-        terms["internet"] += 0.01
-        with self.assertRaisesRegex(ValueError, "BLS internet term package 2023 renter"):
+        gaps = components["runs"]["package"]["years"]["2023"]["level_gap_percent_of_bls"]
+        gaps["other_spread"]["renter"]["terms"]["internet"] += 0.01
+        with self.assertRaisesRegex(ValueError, "BLS internet term, Other spread package 2023 renter"):
             INKIND._internet_and_levels(components)
+
+    def test_internet_row_ties_to_the_separate_level_decomposition(self):
+        """Our band holds no home internet, so the receipt's Other-separate
+        level gap for internet is our broadband part, s (b - b_h) / T, less
+        BLS's row; adding it back recovers the row, and a moved gap term
+        breaks the tie."""
+        components = self.components_copy()
+        levels = INKIND._internet_and_levels(components)
+        years = components["bls"]["years"]
+        rows = []
+        for year in INKIND.YEARS:
+            for tenure in TENURES:
+                threshold = years[year]["published_thresholds"][tenure]
+                recovered = []
+                for run in ("package", "package_bls_definition"):
+                    entry = components["runs"][run]["years"][year]
+                    ours = entry["with_in_kind"]["band"]
+                    self.assertEqual(ours["pooled"]["internet"], 0, f"{run} {year}")
+                    broadband = ours["pooled"]["broadband"] - ours["by_tenure"][tenure]["broadband"]
+                    ours_part = 100 * 0.82 * broadband / threshold
+                    gap = entry["level_gap_percent_of_bls"]["other_separate"][tenure]["terms"]["internet"]
+                    recovered.append(ours_part - gap)
+                self.assertTrue(math.isclose(recovered[0], recovered[1], rel_tol=1e-9), f"{year} {tenure}")
+                rows.append(recovered[0])
+        low, high = levels["bls_internet_row_share_range"]
+        self.assertTrue(math.isclose(low, min(rows), rel_tol=1e-9))
+        self.assertTrue(math.isclose(high, max(rows), rel_tol=1e-9))
+        for run in ("package", "package_bls_definition"):
+            with self.subTest(run=run):
+                moved = self.components_copy()
+                gaps = moved["runs"][run]["years"]["2023"]["level_gap_percent_of_bls"]
+                gaps["other_separate"]["renter"]["terms"]["internet"] += 0.01
+                with self.assertRaisesRegex(ValueError, f"BLS internet term, Other separate {run} 2023 renter"):
+                    INKIND._internet_and_levels(moved)
+
+    def test_level_gap_totals_tie_in_both_accountings(self):
+        for accounting in INKIND.ACCOUNTINGS:
+            with self.subTest(accounting=accounting):
+                components = self.components_copy()
+                gaps = components["runs"]["package"]["years"]["2023"]["level_gap_percent_of_bls"]
+                gaps[accounting]["renter"]["total"] += 0.01
+                with self.assertRaisesRegex(ValueError, f"level terms total, {accounting} package 2023 renter"):
+                    INKIND._internet_and_levels(components)
+
+    def test_benefit_rows_in_each_run_tie_to_its_band(self):
+        """Each run's ``other_separate`` dollars must equal the five benefit
+        rows rebuilt from that run's band, and its share of growth beyond
+        CPI-U must follow from them."""
+        cpi = self.inputs["components"]["inputs"]["cpi"]["cpi_u_ratio_2022_2025"]
+        for run, entry in self.inputs["components"]["runs"].items():
+            years = entry["years"]
+            for tenure in TENURES:
+                recorded = entry["growth_2022_2025"]["by_tenure"][tenure]["other_separate"]
+                rows = {}
+                for year in ("2022", "2025"):
+                    band = years[year]["with_in_kind"]["band"]
+                    own = band["by_tenure"][tenure]
+                    rows[year] = 0.82 * (
+                        band["pooled"]["nslp"]
+                        + band["pooled"]["wic"]
+                        + own["broadband"]
+                        + own["liheap"]
+                        + own["rental_assistance"]
+                    )
+                    self.assertTrue(
+                        math.isclose(rows[year], recorded["imputed_term_dollars"][year]), f"{run} {year} {tenure}"
+                    )
+                t22 = years["2022"]["with_in_kind"]["thresholds"][tenure]
+                t25 = years["2025"]["with_in_kind"]["thresholds"][tenure]
+                self.assertTrue(
+                    math.isclose(
+                        100 * (rows["2025"] - cpi * rows["2022"]) / (t25 - cpi * t22),
+                        recorded["imputed_share_of_growth_beyond_cpi_u_percent"],
+                        rel_tol=1e-9,
+                    ),
+                    f"{run} {tenure}",
+                )
+        for year in ("2022", "2025"):
+            with self.subTest(year=year):
+                components = self.components_copy()
+                separate = components["runs"]["package"]["growth_2022_2025"]["by_tenure"]["renter"]["other_separate"]
+                separate["imputed_term_dollars"][year] += 1
+                with self.assertRaisesRegex(ValueError, f"benefit rows {year} package renter"):
+                    INKIND.inkind_figures({**self.inputs, "components": components})
+        components = self.components_copy()
+        separate = components["runs"]["package"]["growth_2022_2025"]["by_tenure"]["renter"]["other_separate"]
+        separate["imputed_share_of_growth_beyond_cpi_u_percent"] += 0.01
+        with self.assertRaisesRegex(ValueError, "imputed share, Other separate package renter"):
+            INKIND.inkind_figures({**self.inputs, "components": components})
 
     def test_amount_rises_pair_the_same_replicate_weight(self):
         """Rotating 2025's replicates keeps that year's own standard error

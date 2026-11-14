@@ -192,26 +192,40 @@ INKIND_NAMES = (
     "ce_replicate_uncertainty_2019_2025.json",
     "provenance.json",
 )
+# The calculator commit the provenance record names for each receipt. The
+# fixtures that edit a named commit read it here, so they follow a repin of
+# the receipts rather than a literal.
+INKIND_COMMITS = {
+    Path(path).name: record["calculator_commit"]
+    for path, record in json.loads((REPO / "data/inkind/provenance.json").read_text())["artifacts"].items()
+}
+
+
+def last_digit_changed(commit):
+    """The commit with its last hex digit changed, a near miss of the real one."""
+    return commit[:-1] + ("1" if commit.endswith("0") else "0")
+
+
 REPLICATION_HEADING = "# Replication from public consumption data {#sec-replication}\n"
 
 # Each case drifts one in-kind figure where the paper states it. The lift
 # range also appears in the abstract and the discussion, so the first case
 # fails only because the pin reads the in-kind section itself.
 INKIND_PROSE_MUTATIONS = (
-    ("lift range", "section", r"1\.1(\s+)to(\s+)3\.8", r"1.2\1to\g<2>3.8", "in-kind lift range"),
-    ("abstract lift range", "abstract", r"1\.1(\s+)to(\s+)3\.8", r"1.1\1to\g<2>3.9", "abstract in-kind lift range"),
+    ("lift range", "section", r"0\.9(\s+)to(\s+)3\.8", r"1.0\1to\g<2>3.8", "in-kind lift range"),
+    ("abstract lift range", "abstract", r"0\.9(\s+)to(\s+)3\.8", r"0.9\1to\g<2>3.9", "abstract in-kind lift range"),
     (
         "swapped stage changes",
         "section",
-        r"\+0\.06(.*?)\+0\.91",
-        r"+0.91\1+0.06",
+        r"\+0\.06(.*?)\+1\.04",
+        r"+1.04\1+0.06",
         "stage changes in tenure order",
     ),
     (
         "rental assistance share of the difference",
         "section",
-        r"\\\$169",
-        r"\\$196",
+        r"\\\$162",
+        r"\\$126",
         "difference in rises by benefit",
     ),
     (
@@ -224,8 +238,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "Garner–Munoz lower bound",
         "section",
-        r"1\.71(\s+)percent(\s+)below",
-        r"1.72\1percent\2below",
+        r"1\.73(\s+)percent(\s+)below",
+        r"1.74\1percent\2below",
         "Garner–Munoz range with benefits",
     ),
     (
@@ -246,9 +260,9 @@ INKIND_PROSE_MUTATIONS = (
     (
         "abstract stage changes",
         "abstract",
-        r"less(\s+)than(\s+)one(\s+)point",
-        r"less\1than\2half\3a point",
-        "abstract stage changes under one point per tenure",
+        r"−0\.63(\s+)to(\s+)\+1\.04(\s+)points",
+        r"−0.63\1to\g<2>+1.40\3points",
+        "abstract stage-change range",
     ),
     (
         "abstract accounting share",
@@ -275,15 +289,15 @@ INKIND_PROSE_MUTATIONS = (
     (
         "appendix names the imputation's old commit",
         "appendix",
-        r"`53cb0fa08a0ca2fe1ea4b15a32ec77090ca8b91c`",
+        re.escape(f"`{INKIND_COMMITS[INKIND_NAMES[1]]}`"),
         "`4778dfab2d109515b6a14e63da63011dd7feb884`",
         "appendix names the recorded calculator commits",
     ),
     (
         "appendix standard-error commit",
         "appendix",
-        r"`53cb0fa08a0ca2fe1ea4b15a32ec77090ca8b91c`",
-        "`53cb0fa08a0ca2fe1ea4b15a32ec77090ca8b910`",
+        re.escape(f"`{INKIND_COMMITS[INKIND_NAMES[2]]}`"),
+        f"`{last_digit_changed(INKIND_COMMITS[INKIND_NAMES[2]])}`",
         "appendix names the recorded calculator commits",
     ),
     (
@@ -310,8 +324,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "stage-change standard error",
         "section",
-        r"2\.54(\s+)for",
-        r"2.45\1for",
+        r"2\.57(\s+)for",
+        r"2.75\1for",
         "standard errors of the stage change",
     ),
     ("replicate count", "section", r"CE's(\s+)44(\s+)replicate", r"CE's\g<1>40\2replicate", "standard errors of the stage change"),
@@ -325,7 +339,7 @@ INKIND_PROSE_MUTATIONS = (
     (
         "implicate variance share",
         "section",
-        r"17(\s+)to(\s+)46(\s+)percent",
+        r"17(\s+)to(\s+)44(\s+)percent",
         r"17\1to\g<2>45\3percent",
         "implicate share of the stage change's variance",
     ),
@@ -385,8 +399,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "swapped stage-change tenure labels",
         "section",
-        r"\+0\.06(\s+)points(\s+)for(\s+)owners(\s+)with(\s+)mortgages,(\s+)\+0\.91(\s+)for(\s+)owners(\s+)without",
-        r"+0.06\1points\2for\3owners\4without\5mortgages,\6+0.91\7for\8owners\9with",
+        r"\+0\.06(\s+)points(\s+)for(\s+)owners(\s+)with(\s+)mortgages,(\s+)\+1\.04(\s+)for(\s+)owners(\s+)without",
+        r"+0.06\1points\2for\3owners\4without\5mortgages,\6+1.04\7for\8owners\9with",
         "stage changes in tenure order",
     ),
     (
@@ -399,8 +413,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "rental assistance level gap direction",
         "section",
-        r"71(\s+)to(\s+)80(\s+)percent(\s+)above",
-        r"71\1to\g<2>80\3percent\4below",
+        r"70(\s+)to(\s+)81(\s+)percent(\s+)above",
+        r"70\1to\g<2>81\3percent\4below",
         "rental assistance per renter: level gap before 2024",
     ),
     (
@@ -520,8 +534,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "standard error of our rise",
         "section",
-        r"standard(\s+)error(\s+)of(\s+)\\\$191",
-        r"standard\1error\2of\3\\$119",
+        r"standard(\s+)error(\s+)of(\s+)\\\$196",
+        r"standard\1error\2of\3\\$169",
         "BLS and replication imputed totals",
     ),
     (
@@ -732,8 +746,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "Garner–Munoz stage change",
         "section",
-        r"by(\s+)\+0\.09,(\s+)−1\.51,",
-        r"by\1+0.09,\2−1.15,",
+        r"by(\s+)\+0\.08,(\s+)−1\.51,",
+        r"by\1+0.08,\2−1.15,",
         "Garner–Munoz restrictions with the composite CPI",
     ),
     (
@@ -741,7 +755,7 @@ INKIND_PROSE_MUTATIONS = (
         "abstract",
         r"with(\s+)the(\s+)CE's(\s+)spending(\s+)summaries",
         r"with\1the\2Garner–Munoz\3shelter\4restrictions",
-        "Garner–Munoz restrictions with the composite CPI",
+        "abstract stage-change range",
     ),
     (
         'internet share of thresholds',
@@ -753,8 +767,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         'common-component gap',
         'section',
-        '0\\.83(\\s+)to(\\s+)3\\.80',
-        '0.83\\1to\\g<2>3.90',
+        '0\\.81(\\s+)to(\\s+)3\\.80',
+        '0.81\\1to\\g<2>3.90',
         'thresholds on the components both series hold',
     ),
     (
@@ -774,8 +788,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         'standard error of our rental rise',
         'section',
-        'with(\\s+)a(\\s+)standard(\\s+)error(\\s+)of(\\s+)\\\\\\$444',
-        'with\\1a\\2standard\\3error\\4of\\5\\\\$404',
+        'with(\\s+)a(\\s+)standard(\\s+)error(\\s+)of(\\s+)\\\\\\$438',
+        'with\\1a\\2standard\\3error\\4of\\5\\\\$483',
         "rental assistance per renter: BLS's 2024 and 2025 rise",
     ),
     (
@@ -802,8 +816,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         're-ranking sign',
         'section',
-        '−0\\.01,(\\s+)\\+0\\.82,',
-        '−0.01,\\1−0.82,',
+        '−0\\.01,(\\s+)\\+0\\.94,',
+        '−0.01,\\1−0.94,',
         're-ranking left out of the accounting',
     ),
     (
@@ -837,8 +851,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         'lift standard errors',
         'section',
-        '0\\.31(\\s+)to(\\s+)0\\.61',
-        '0.31\\1to\\g<2>0.71',
+        '0\\.31(\\s+)to(\\s+)0\\.60',
+        '0.31\\1to\\g<2>0.70',
         "standard errors of the benefits' lifts",
     ),
     (
@@ -858,8 +872,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "owners' rented-dwelling spending",
         'section',
-        '\\\\\\$64(\\s+)to(\\s+)\\\\\\$683',
-        '\\\\$64\\1to\\2\\\\$638',
+        '\\\\\\$64(\\s+)to(\\s+)\\\\\\$684',
+        '\\\\$64\\1to\\2\\\\$648',
         "Garner–Munoz restrictions keep owners' rented-dwelling spending",
     ),
     (
@@ -935,8 +949,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         'our 2024-2025 rental assistance per renter',
         'section',
-        'ours(\\s+)rose(\\s+)from(\\s+)\\\\\\$1,258',
-        'ours\\1rose\\2from\\3\\\\$1,285',
+        'ours(\\s+)rose(\\s+)from(\\s+)\\\\\\$1,285',
+        'ours\\1rose\\2from\\3\\\\$1,258',
         'BLS 2024-2025 renter growth without its imputed terms',
     ),
     (
@@ -1004,18 +1018,20 @@ INKIND_PROSE_MUTATIONS = (
         r"with\1their\2rows,\3and\4with\5their\6terms",
         "accounting with the index's lead on the benefits' terms",
     ),
+    # The high end with the pooled broadband row, the reading before each
+    # tenure's own broadband row: 2.13 where BLS's shares give 2.12.
     (
         "internet's share row",
         "section",
-        r"1\.54(\s+)to(\s+)2\.13",
-        r"1.54\1to\g<2>2.12",
+        r"1\.54(\s+)to(\s+)2\.12",
+        r"1.54\1to\g<2>2.13",
         "home internet's share of BLS's thresholds",
     ),
     (
         "internet's two readings swapped",
         "section",
-        r"supplies(\s+)1\.54(\s+)to(\s+)2\.13(.*?)and(\s+)1\.85(\s+)to(\s+)2\.55",
-        r"supplies\g<1>1.85\2to\g<3>2.55\4and\g<5>1.54\6to\g<7>2.13",
+        r"supplies(\s+)1\.54(\s+)to(\s+)2\.12(.*?)and(\s+)1\.85(\s+)to(\s+)2\.55",
+        r"supplies\g<1>1.85\2to\g<3>2.55\4and\g<5>1.54\6to\g<7>2.12",
         "home internet's share of BLS's thresholds",
     ),
     (
@@ -1089,6 +1105,107 @@ INKIND_PROSE_MUTATIONS = (
         r"and(\s+)13(\s+)percent(\s+)at(\s+)the(\s+)linear",
         r"and\g<1>31\2percent\3at\4the\5linear",
         "rent sensitivities",
+    ),
+    # Round 5: broadband's start, the 2020 WIC cutoff, its by-state
+    # sensitivity, and the reading of the internet row with the Other share
+    # kept separate.
+    (
+        "broadband start year",
+        "section",
+        r"We(\s+)impute(\s+)them(\s+)from(\s+)reference(\s+)year(\s+)2022(\s+)too",
+        r"We\1impute\2them\3from\4reference\5year\g<6>2021\7too",
+        "broadband start and WIC cutoff from the imputation receipt",
+    ),
+    (
+        "broadband's first thresholds",
+        "section",
+        r"first(\s+)enter(\s+)our(\s+)2023(\s+)thresholds",
+        r"first\1enter\2our\g<3>2022\4thresholds",
+        "broadband start and WIC cutoff from the imputation receipt",
+    ),
+    (
+        "WIC cutoff year",
+        "section",
+        r"We(\s+)add(\s+)no(\s+)WIC(\s+)from(\s+)reference(\s+)year(\s+)2020",
+        r"We\1add\2no\3WIC\4from\5reference\6year\g<7>2021",
+        "broadband start and WIC cutoff from the imputation receipt",
+    ),
+    (
+        "reference year 2020's interviews",
+        "section",
+        r"from(\s+)April(\s+)2020(\s+)to(\s+)March(\s+)2021",
+        r"from\1January\g<2>2020\3to\4December\g<5>2020",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "reference year 2020's reference periods",
+        "section",
+        r"center(\s+)on(\s+)mid-February(\s+)2020",
+        r"center\1on\2mid-May\g<3>2020",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "the cutoff's reach before the deadline",
+        "section",
+        r"drop(\s+)WIC(\s+)for(\s+)reference(\s+)periods(\s+)before(\s+)the(\s+)deadline",
+        r"drop\1WIC\2for\3reference\4periods\5after\6the\7deadline",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "BLS's 2025 WIC band mean",
+        "section",
+        r"WIC(\s+)of(\s+)\\\$1\.80",
+        r"WIC\1of\2\\$1.08",
+        "BLS's 2025 WIC band mean against our none",
+    ),
+    (
+        "our 2025 WIC",
+        "section",
+        r"where(\s+)we(\s+)add(\s+)none",
+        r"where\1we\2add\3less",
+        "BLS's 2025 WIC band mean against our none",
+    ),
+    (
+        "by-state WIC rise",
+        "section",
+        r"\\\$1\.94(\s+)to(\s+)\\\$3\.21",
+        r"\\$1.94\1to\2\\$3.12",
+        "WIC by-state sensitivity from the imputation receipt",
+    ),
+    (
+        "by-state WIC thresholds",
+        "section",
+        r"behind(\s+)the(\s+)2021–2025(\s+)thresholds",
+        r"behind\1the\g<2>2020–2025\3thresholds",
+        "WIC by-state sensitivity from the imputation receipt",
+    ),
+    (
+        "by-state WIC threshold moves in dollars",
+        "section",
+        r"move(\s+)by(\s+)−\\\$20(\s+)to",
+        r"move\1by\2+\\$20\3to",
+        "WIC by-state sensitivity from the imputation receipt",
+    ),
+    (
+        "by-state WIC threshold moves in percent",
+        "section",
+        r"\(−0\.06(\s+)to(\s+)\+0\.12(\s+)percent\)",
+        r"(−0.06\1to\g<2>+0.21\3percent)",
+        "WIC by-state sensitivity from the imputation receipt",
+    ),
+    (
+        "by-state WIC growth bound",
+        "section",
+        r"growth(\s+)changes(\s+)by(\s+)0\.03(\s+)points(\s+)or(\s+)less",
+        r"growth\1changes\2by\g<3>0.02\4points\5or\6less",
+        "WIC by-state sensitivity from the imputation receipt",
+    ),
+    (
+        "internet share less the tenure's own broadband",
+        "section",
+        r"less(\s+)the(\s+)tenure's(\s+)own(\s+)broadband(\s+)row",
+        r"less\1the\2pooled\4broadband\5row",
+        "BLS internet reading from fingerprinted calculator code",
     ),
 )
 
@@ -1630,6 +1747,60 @@ class PaperGuardTests(unittest.TestCase):
         self.assertEqual(text.count(before), 1, "uncertainty digest not pinned once")
         pins.write_text(text.replace(before, after))
 
+    def reseal_and_repin_receipts(self, edit):
+        """Edit any of the three receipts, reseal each in turn with the
+        digests of the receipts it records, copy their code fingerprints into
+        the provenance record, and pin all three new digests in the copy's
+        inkind_inputs.py, so only the drift checks can reject the edit. The
+        rent sensitivity receipt records the imputation receipt's digest, so
+        its pin fails too."""
+        inkind = self.repo / "data/inkind"
+        pins = self.repo / "scripts/inkind_inputs.py"
+        names = INKIND_NAMES[:3]
+        before = {name: hashlib.sha256((inkind / name).read_bytes()).hexdigest() for name in names}
+        receipts = {name: json.loads((inkind / name).read_text()) for name in names}
+        edit(receipts)
+        components, replication, uncertainty = (receipts[name] for name in names)
+        replication_digest = self.reseal_inkind(INKIND_NAMES[1], replication)
+        components["inputs"]["replication_receipt"]["sha256"] = replication_digest
+        components_digest = self.reseal_inkind(INKIND_NAMES[0], components)
+        uncertainty["inputs"]["replication_receipt"]["sha256"] = replication_digest
+        uncertainty["inputs"]["components_receipt"]["sha256"] = components_digest
+        self.reseal_inkind(INKIND_NAMES[2], uncertainty)
+        provenance_path = inkind / "provenance.json"
+        provenance = json.loads(provenance_path.read_text())
+        for name in names:
+            provenance["artifacts"][f"data/inkind/{name}"]["code_sha256"] = receipts[name]["code_sha256"]
+        provenance_path.write_text(json.dumps(provenance))
+        self.refresh_inkind_manifest()
+        text = pins.read_text()
+        for name in names:
+            self.assertEqual(text.count(before[name]), 1, f"{name} digest not pinned once")
+            text = text.replace(before[name], hashlib.sha256((inkind / name).read_bytes()).hexdigest())
+        pins.write_text(text)
+
+    def restore_inkind(self):
+        """Put the copy's receipts, provenance, manifest and pins back to the
+        checkout's, between subtests that reseal them."""
+        for name in (*INKIND_NAMES, "SHA256SUMS"):
+            shutil.copyfile(REPO / "data/inkind" / name, self.repo / "data/inkind" / name)
+        shutil.copyfile(REPO / "scripts/inkind_inputs.py", self.repo / "scripts/inkind_inputs.py")
+
+    def assert_resealed_receipts_fail(self, cases):
+        """Each case edits the receipts, which are then resealed and repinned
+        from the checkout's; the guard must reach the drift checks and fail
+        every pin the case names."""
+        for name, edit, labels in cases:
+            with self.subTest(name=name):
+                self.restore_inkind()
+                self.reseal_and_repin_receipts(edit)
+                result = self.run_guard()
+                self.assertNotEqual(result.returncode, 0)
+                for label in labels:
+                    self.assertIn(f"in-kind prose: {label}", result.stdout)
+                self.assertNotIn("generators were not run", result.stdout)
+        self.restore_inkind()
+
     def inkind_uncertainty(self):
         return json.loads((self.repo / "data/inkind" / INKIND_NAMES[2]).read_text())
 
@@ -1783,6 +1954,205 @@ class PaperGuardTests(unittest.TestCase):
         self.assertIn("in-kind prose: Garner–Munoz runs keep the vacation-home fuel codes", result.stdout)
         self.assertNotIn("generators were not run", result.stdout)
 
+    def test_resealed_and_repinned_receipts_reach_the_drift_checks(self):
+        """Control for the tests below: all three receipts resealed and
+        repinned with unchanged content fail no pin but the rent sensitivity
+        receipt's, which records the imputation receipt's digest."""
+        self.reseal_and_repin_receipts(lambda receipts: None)
+        result = self.run_guard()
+        self.assertNotIn("generators were not run", result.stdout)
+        # A guard that crashes prints no failures at all, so require its verdict.
+        self.assertNotIn("Traceback", result.stderr, result.stderr)
+        self.assertTrue(
+            "PAPER DRIFT CHECK FAILED:" in result.stdout or result.returncode == 0,
+            result.stdout + result.stderr,
+        )
+        failures = {line for line in result.stdout.splitlines() if line.startswith("  - ")}
+        self.assertLessEqual(
+            failures,
+            {"  - in-kind prose: rent sensitivity receipt matches its pin, its script and the imputation receipt"},
+            result.stdout + result.stderr,
+        )
+
+    def test_fingerprinted_rules_fail_when_their_code_changes(self):
+        def fingerprint_changed(path):
+            # Every receipt that fingerprints a file must carry one hash
+            # for it, so the edit changes it in each.
+            def edit(receipts):
+                carriers = [receipt for receipt in receipts.values() if path in receipt["code_sha256"]]
+                self.assertTrue(carriers, path)
+                for receipt in carriers:
+                    receipt["code_sha256"][path] = "0" * 64
+
+            return edit
+
+        self.assert_resealed_receipts_fail(
+            (
+                (
+                    "imputation code",
+                    fingerprint_changed("spm_calculator/ce_inkind.py"),
+                    ("method constants read from fingerprinted calculator code",),
+                ),
+                (
+                    "BLS shares code",
+                    fingerprint_changed("spm_calculator/ce_bls_shares.py"),
+                    (
+                        "Garner–Munoz restrictions read from fingerprinted calculator code",
+                        "BLS internet reading from fingerprinted calculator code",
+                    ),
+                ),
+                (
+                    "threshold code",
+                    fingerprint_changed("spm_calculator/ce_threshold.py"),
+                    ("percentile band read from fingerprinted calculator code",),
+                ),
+            )
+        )
+
+    def test_broadband_start_and_wic_cutoff_follow_the_imputation_receipt(self):
+        def methodology(receipts):
+            return receipts[INKIND_NAMES[1]]["in_kind_methodology"]
+
+        def start_broadband_a_year_earlier(receipts):
+            methodology(receipts)["broadband_first_reference_year"] -= 1
+
+        def end_wic_a_year_later(receipts):
+            methodology(receipts)["wic_ebt_all_states_from_reference_year"] += 1
+
+        label = ("broadband start and WIC cutoff from the imputation receipt",)
+        self.assert_resealed_receipts_fail(
+            (
+                ("broadband start", start_broadband_a_year_earlier, label),
+                ("WIC cutoff", end_wic_a_year_later, label),
+            )
+        )
+
+    def test_paper_adds_no_2025_wic_only_while_the_receipt_adds_none(self):
+        def lift_2025_renters_by_wic(receipts):
+            receipts[INKIND_NAMES[1]]["results"]["2025"]["component_lift_percent"]["wic"]["renter"] = 0.01
+
+        self.assert_resealed_receipts_fail(
+            (("2025 renter WIC lift", lift_2025_renters_by_wic, ("BLS's 2025 WIC band mean against our none",)),)
+        )
+
+    def test_wic_by_state_sentences_follow_the_imputation_receipt(self):
+        def sensitivity(receipts):
+            return receipts[INKIND_NAMES[1]]["wic_ebt_by_state_sensitivity"]
+
+        def widen_the_largest_move(receipts):
+            targets = sensitivity(receipts)["by_target"]
+            year, tenure = max(
+                ((year, tenure) for year, target in targets.items() for tenure in target["change_dollars"]),
+                key=lambda key: targets[key[0]]["change_dollars"][key[1]],
+            )
+            targets[year]["change_dollars"][tenure] += 10
+
+        def move_an_unmoved_threshold(receipts):
+            targets = sensitivity(receipts)["by_target"]
+            unmoved = [year for year, target in sorted(targets.items()) if not any(target["change_dollars"].values())]
+            self.assertTrue(unmoved, "every threshold moves")
+            targets[unmoved[0]]["change_dollars"]["renter"] = 1.0
+
+        def raise_the_largest_wic_rise(receipts):
+            targets = sensitivity(receipts)["by_target"]
+            results = receipts[INKIND_NAMES[1]]["results"]
+            year = max(
+                targets,
+                key=lambda year: targets[year]["sample_mean_wic_threshold_year_dollars"]
+                - results[year]["sample_mean_in_kind_threshold_year_dollars"]["wic"],
+            )
+            targets[year]["sample_mean_wic_threshold_year_dollars"] += 1
+
+        def push_growth_past_the_stated_bound(receipts):
+            # 0.031 still rounds to the 0.03 the prose states.
+            growth = sensitivity(receipts)["growth_2022_2025_change_points"]
+            tenure = max(growth, key=lambda tenure: abs(growth[tenure]))
+            growth[tenure] = math.copysign(0.031, growth[tenure])
+
+        def apply_the_all_states_cutoff(receipts):
+            sensitivity(receipts)["wic_ebt_all_states_from_reference_year"] = 2020
+
+        def drop_a_target_year(receipts):
+            del sensitivity(receipts)["by_target"][min(sensitivity(receipts)["by_target"])]
+
+        def lower_an_unmoved_years_wic(receipts):
+            targets = sensitivity(receipts)["by_target"]
+            unmoved = [year for year, target in sorted(targets.items()) if not any(target["change_dollars"].values())]
+            self.assertTrue(unmoved, "every threshold moves")
+            targets[unmoved[0]]["sample_mean_wic_threshold_year_dollars"] -= 1
+
+        def set_growth_changes(receipts, changes):
+            """Give the rerun's 2025 thresholds the 2022–2025 growth changes
+            asked for, and restate every figure that follows from them, so
+            the block stays consistent and its quoted extremes stay put."""
+            block = sensitivity(receipts)
+            targets = block["by_target"]
+            results = receipts[INKIND_NAMES[1]]["results"]
+            for tenure, change in changes.items():
+                base_growth = 100 * (
+                    results["2025"]["with_in_kind"][tenure] / results["2022"]["with_in_kind"][tenure] - 1
+                )
+                level = targets["2022"]["with_in_kind"][tenure] * (1 + (base_growth + change) / 100)
+                moved = level - results["2025"]["with_in_kind"][tenure]
+                targets["2025"]["with_in_kind"][tenure] = level
+                targets["2025"]["change_dollars"][tenure] = moved
+                targets["2025"]["change_percent"][tenure] = 100 * moved / results["2025"]["with_in_kind"][tenure]
+                block["growth_2022_2025_percent_with"][tenure] = base_growth + change
+                block["growth_2022_2025_change_points"][tenure] = change
+
+        def shrink_growth_well_below_the_stated_bound(receipts):
+            # The prose's "0.03 points or less" must be the bound, not a loose one.
+            growth = sensitivity(receipts)["growth_2022_2025_change_points"]
+            set_growth_changes(receipts, {tenure: math.copysign(0.004, growth[tenure]) for tenure in growth})
+
+        def break_the_run_of_moved_years(receipts):
+            # 2022 stops moving while 2021 and 2023–2025 still do, so the
+            # prose's "2021–2025" would cover a year with no change. 2022's
+            # moves are no extreme the prose quotes, and the 2025 thresholds
+            # are restated so that 2022–2025 growth changes as before.
+            targets = sensitivity(receipts)["by_target"]
+            results = receipts[INKIND_NAMES[1]]["results"]
+            growth = dict(sensitivity(receipts)["growth_2022_2025_change_points"])
+            targets["2022"]["sample_mean_wic_threshold_year_dollars"] = results["2022"][
+                "sample_mean_in_kind_threshold_year_dollars"
+            ]["wic"]
+            for tenure in targets["2022"]["change_dollars"]:
+                targets["2022"]["change_dollars"][tenure] = 0.0
+                targets["2022"]["change_percent"][tenure] = 0.0
+                targets["2022"]["with_in_kind"][tenure] = results["2022"]["with_in_kind"][tenure]
+            set_growth_changes(receipts, growth)
+
+        def misstate_a_percent(receipts):
+            # Dollars unchanged, so only the percent's tie to them can fail.
+            targets = sensitivity(receipts)["by_target"]
+            year = max(targets)
+            targets[year]["change_percent"]["renter"] += 0.001
+
+        def misstate_a_growth_level(receipts):
+            block = sensitivity(receipts)
+            block["growth_2022_2025_percent_with"]["renter"] += 0.001
+
+        def drop_the_sensitivity(receipts):
+            del receipts[INKIND_NAMES[1]]["wic_ebt_by_state_sensitivity"]
+
+        label = ("WIC by-state sensitivity from the imputation receipt",)
+        self.assert_resealed_receipts_fail(
+            (
+                ("largest threshold move", widen_the_largest_move, label),
+                ("unmoved threshold moves", move_an_unmoved_threshold, label),
+                ("largest WIC rise", raise_the_largest_wic_rise, label),
+                ("growth change past 0.03", push_growth_past_the_stated_bound, label),
+                ("sensitivity keeps the all-states cutoff", apply_the_all_states_cutoff, label),
+                ("sensitivity missing", drop_the_sensitivity, label),
+                ("a target year missing", drop_a_target_year, label),
+                ("an unmoved year's WIC falls", lower_an_unmoved_years_wic, label),
+                ("growth bound stated loosely", shrink_growth_well_below_the_stated_bound, label),
+                ("moved years not a run", break_the_run_of_moved_years, label),
+                ("percent change off its dollars", misstate_a_percent, label),
+                ("growth off its thresholds", misstate_a_growth_level, label),
+            )
+        )
+
     def test_reflected_replicates_fail_only_the_pinned_digest(self):
         """A resealed receipt whose 2019 replicates mirror the committed ones
         passes every consistency check; the digest pinned outside data/inkind
@@ -1812,10 +2182,11 @@ class PaperGuardTests(unittest.TestCase):
     def test_readme_counts_the_receipts_and_names_their_commits(self):
         readme = self.repo / "README.md"
         original = readme.read_text()
+        commit = INKIND_COMMITS[INKIND_NAMES[2]]
         cases = (
             ("receipt count", "uses three receipts", "uses two receipts"),
-            ("commit", "`53cb0fa08a0ca2fe1ea4b15a32ec77090ca8b91c`", "`53cb0fa`"),
-            ("tag", "`paper-inkind-se-53cb0fa`", "`paper-inkind-se-a581c11`"),
+            ("commit", f"`{commit}`", f"`{commit[:7]}`"),
+            ("tag", f"`paper-inkind-se-{commit[:7]}`", "`paper-inkind-se-a581c11`"),
         )
         for name, old, new in cases:
             with self.subTest(name=name):
@@ -1833,7 +2204,8 @@ class PaperGuardTests(unittest.TestCase):
         original = bib.read_text()
         # All three receipts come from one calculator commit, so the cases
         # edit one entry at a time; a swap of two commits would change nothing.
-        components = uncertainty = replication = "53cb0fa08a0ca2fe1ea4b15a32ec77090ca8b91c"
+        components, replication, uncertainty = (INKIND_COMMITS[name] for name in INKIND_NAMES[:3])
+        self.assertEqual({components, replication, uncertainty}, {components})
         stale_components = "8f632e31b4e48bbc735161d24665a8182dc0d9d6"
         stale_uncertainty = "a581c113dd4319fc0f6f9ebd6db5c3697f4a94fa"
         stale_replication = "4778dfab2d109515b6a14e63da63011dd7feb884"
@@ -1956,6 +2328,8 @@ class PaperGuardTests(unittest.TestCase):
         start, end = bounds[where]
         body, count = re.subn(pattern, replacement, text[start:end], count=1, flags=re.S)
         self.assertEqual(count, 1, f"fixture pattern missing: {pattern}")
+        # A replacement that restates the matched text tests nothing.
+        self.assertNotEqual(body, text[start:end], f"fixture replacement changes nothing: {pattern}")
         article.write_text(text[:start] + body + text[end:])
 
     def test_inkind_prose_figures_drift_from_the_receipts(self):
@@ -1970,10 +2344,10 @@ class PaperGuardTests(unittest.TestCase):
 
     def test_inkind_pins_reject_a_figure_borrowed_from_another_section(self):
         cases = (
-            ("rental assistance share", (("supplies \\$169 and school", "supplies \\$196 and school"),),
+            ("rental assistance share", (("supplies \\$162 and school", "supplies \\$126 and school"),),
              "difference in rises by benefit",
-             "Of the \\$256 difference between the two rises, rental assistance supplies \\$169 and school "
-             "lunch \\$94, and the other three benefits narrow it by \\$7."),
+             "Of the \\$251 difference between the two rises, rental assistance supplies \\$162 and school "
+             "lunch \\$97, and the other three benefits narrow it by \\$8."),
             ("renter split", (("5.71 percent, 0.62", "5.71 percent, 0.66"),),
              "BLS 2024-2025 renter growth without its imputed terms",
              "With its imputed benefits' terms removed from both years, it grows 5.71 percent, 0.62 points less."),
@@ -1988,10 +2362,11 @@ class PaperGuardTests(unittest.TestCase):
         """Apply exact single-occurrence prose edits, optionally restating the
         original figure under another heading."""
         path = self.repo / "paper/index.qmd"
-        prose = path.read_text()
+        prose = original = path.read_text()
         for old, new in edits:
             self.assertEqual(prose.count(old), 1, f"ambiguous fixture edit: {old!r}")
             prose = prose.replace(old, new)
+        self.assertNotEqual(prose, original, f"fixture edits change nothing: {edits!r}")
         if host is not None:
             self.assertEqual(prose.count(host), 1, f"ambiguous fixture host: {host!r}")
             prose = prose.replace(host, f"{host}\n{decoy}\n")

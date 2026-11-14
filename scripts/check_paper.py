@@ -1287,7 +1287,7 @@ def displayed_shares() -> list[float] | None:
     bls_years = components["bls"]["years"]
     shares = []
     for tenure in TENURES:
-        dollars_by_year = components["bls"]["growth_2022_2025"]["by_tenure"][tenure]["imputed_term_dollars"]
+        dollars_by_year = components["bls"]["growth_2022_2025"]["by_tenure"][tenure]["other_spread"]["imputed_term_dollars"]
         names = {
             "i22": dollars_by_year["2022"],
             "i25": dollars_by_year["2025"],
@@ -1304,11 +1304,12 @@ def displayed_shares() -> list[float] | None:
 
 # Method constants the section quotes from the calculator's code rather
 # than from a receipt. We read each from spm_calculator/ce_inkind.py at
-# this fingerprint (calculator commit 4778dfa, unchanged at 53cb0fa); a receipt rebuilt from
-# changed code fails the pin until someone rereads them.
+# this fingerprint (calculator commit 28740b5; every rule but the 2020 WIC
+# cutoff is unchanged since 4778dfa). A receipt rebuilt from changed code
+# fails the pin until someone rereads them.
 INKIND_METHOD_SOURCE = (
     "spm_calculator/ce_inkind.py",
-    "c23e6f26ef32328ef0952d90edca9b382e7fa6e5e029d530a7a0beb9e1d10724",
+    "25f93fb8b996b5e623ab564d70e2eedfbc4daa11ff96850f06e76ef229aef0b8",
 )
 INKIND_METHOD_CONSTANTS = (
     "over 179 school days",  # NSLP_SCHOOL_DAYS
@@ -1331,6 +1332,13 @@ INKIND_METHOD_CONSTANTS = (
     "midpoint of its three-month reference period",  # 1.5 months in _wic_ebt_complete
     # reference_year = year where quarter >= 2, else year - 1
     "We assign each CE interview to its collection year, and first-quarter interviews to the year before",
+    # the same rule with the 1.5-month midpoint: reference year 2020 holds
+    # the 2020 Q2-Q4 and 2021 Q1 interviews, April 2020 to March 2021, whose
+    # midpoints run from 2020-02-15 to 2021-01-15; WIC_EBT_ALL_STATES_FROM_
+    # REFERENCE_YEAR (2020) applies to all of them
+    "We assign interviews from April 2020 to March 2021 to reference year 2020, and their reference periods "
+    "center on mid-February 2020 to mid-January 2021",
+    "So we also drop WIC for reference periods before the deadline",
     # load_ce_unit_inputs: rent_paid_monthly sums the unit's RNT QRT3MCMX and
     # divides by 3; tests/test_ce_inkind.py matches the sum to UCC 210110
     "We take each unit's monthly rent paid as one third of its three-month rent total in the CE's RNT file, "
@@ -1358,11 +1366,12 @@ INKIND_THRESHOLD_SOURCE = (
 )
 INKIND_THRESHOLD_CONSTANTS = ("mean imputed benefits per consumer unit in the 47th–53rd percentile band",)
 # Rules the section quotes from spm_calculator/ce_bls_shares.py at this
-# fingerprint (calculator commit 8f632e3, unchanged at 53cb0fa): the Garner–Munoz runs and
-# the reading of BLS's internet rows.
+# fingerprint (calculator commit 28740b5; every rule but the reading with the
+# Other share kept separate is unchanged since 8f632e3): the Garner–Munoz runs
+# and the reading of BLS's internet rows.
 INKIND_DEFINITION_SOURCE = (
     "spm_calculator/ce_bls_shares.py",
-    "c6ef2d751feb5b97ead6e4ed74bb03bae6d584d96783033c031d88980b13accf",
+    "44c9de8cbff5b323978cfbaabf95215e07dfdbc14924ffaee7a0b9c32c6ed938",
 )
 INKIND_DEFINITION_CONSTANTS = (
     # _vacation_utilities takes both vacation-home utility summaries from
@@ -1383,12 +1392,98 @@ INKIND_SHARES_CONSTANTS = (
     "We use the one that gives equal dollars across tenures",
     # pooled["internet"] = internet_total - pooled["broadband"]
     "We treat that row as including broadband subsidies and subtract them to recover home internet spending",
+    # separate_share_errors: published["internet"] = published[internet_row]
+    # - published["broadband"], the tenure's own rows; threshold_terms under
+    # "other_separate" gives broadband the tenure's own mean to match
+    "With the Other share kept separate, we read BLS's home internet share for a tenure as that row less the "
+    "tenure's own broadband row",
 )
 replication_receipt = json.loads((DATA / "inkind" / "ce_inkind_replication_2019_2025.json").read_text())
+
+
+def wic_by_state_pin() -> bool:
+    """The by-state WIC sensitivity sentences match the imputation receipt.
+
+    The receipt reruns the stage with each state's own statewide WIC EBT
+    date in every reference year. The thresholds it moves are the ones whose
+    mean WIC rises; every other threshold must stay exactly as it is. Each
+    change must also follow from the rerun's thresholds and the imputation's
+    own, so the figures the prose quotes cannot drift from the block's levels.
+    """
+    block = replication_receipt.get("wic_ebt_by_state_sensitivity")
+    if not block or block.get("wic_ebt_all_states_from_reference_year") is not None:
+        return False
+    targets = block["by_target"]
+    results = replication_receipt["results"]
+    if sorted(targets) != sorted(results):
+        return False
+    rise = {
+        year: targets[year]["sample_mean_wic_threshold_year_dollars"]
+        - results[year]["sample_mean_in_kind_threshold_year_dollars"]["wic"]
+        for year in targets
+    }
+    risen = [year for year in sorted(targets) if rise[year] > 1e-9]
+    if not risen or risen != [str(y) for y in range(int(risen[0]), int(risen[-1]) + 1)]:
+        return False
+    unmoved = [year for year in targets if year not in risen]
+    moved_dollars = [targets[year]["change_dollars"][tenure] for year in risen for tenure in TENURES]
+    moved_percent = [targets[year]["change_percent"][tenure] for year in risen for tenure in TENURES]
+    growth = max(abs(value) for value in block["growth_2022_2025_change_points"].values())
+
+    def growth_2022_2025(series: dict, tenure: str) -> float:
+        return 100 * (series["2025"]["with_in_kind"][tenure] / series["2022"]["with_in_kind"][tenure] - 1)
+
+    levels_follow = all(
+        abs(targets[year]["with_in_kind"][tenure] - results[year]["with_in_kind"][tenure] - targets[year]["change_dollars"][tenure])
+        < 1e-6
+        and abs(
+            100 * targets[year]["change_dollars"][tenure] / results[year]["with_in_kind"][tenure]
+            - targets[year]["change_percent"][tenure]
+        )
+        < 1e-9
+        for year in targets
+        for tenure in TENURES
+    )
+    growth_follows = all(
+        abs(growth_2022_2025(targets, tenure) - block["growth_2022_2025_percent_with"][tenure]) < 1e-9
+        and abs(
+            growth_2022_2025(targets, tenure)
+            - growth_2022_2025(results, tenure)
+            - block["growth_2022_2025_change_points"][tenure]
+        )
+        < 1e-9
+        for tenure in TENURES
+    )
+
+    def signed_dollars(value: float) -> str:
+        return f"{'−' if value < 0 else '+'}\\${abs(value):,.0f}"
+
+    return (
+        levels_follow
+        and growth_follows
+        and all(
+            abs(rise[year]) < 1e-9
+            and all(targets[year]["change_dollars"][tenure] == 0 for tenure in TENURES)
+            for year in unmoved
+        )
+        and has_number(
+            f"we estimate that mean WIC per unit rises by \\${min(rise[y] for y in risen):.2f} to "
+            f"\\${max(rise[y] for y in risen):.2f} in the windows behind the {risen[0]}–{risen[-1]} thresholds",
+            text=INKIND_TEXT,
+        )
+        and has_number(
+            f"Those thresholds move by {signed_dollars(min(moved_dollars))} to {signed_dollars(max(moved_dollars))} "
+            f"({signed(min(moved_percent))} to {signed(max(moved_percent))} percent)",
+            text=INKIND_TEXT,
+        )
+        and growth <= 0.03
+        and round(growth, 2) == 0.03
+        and has_number("2022–2025 growth changes by 0.03 points or less", text=INKIND_TEXT)
+    )
 # The rental-assistance sensitivities: scripts/rent_sensitivity.py writes this
 # receipt, so replacing it takes an edit here.
 RENT_SENSITIVITY = DATA / "rent_sensitivity" / "rent_model_sensitivity_2022.json"
-RENT_SENSITIVITY_SHA256 = "ac23155ebbd26e8fec70c39e91bcdb3cbbda09e566ca774ed0b40206b6b9c496"
+RENT_SENSITIVITY_SHA256 = "d18d7f57a539053285d42645af8f69e58b2cdfd33daaf7fc01fd3805d9547635"
 rent_sensitivity = json.loads(RENT_SENSITIVITY.read_text())
 rent_variants = {
     name: row["percent_vs_base"] for name, row in rent_sensitivity["variants"].items()
@@ -1714,8 +1809,7 @@ inkind_pins = (
             f"{signed(written_run['growth'][TENURES[1]]['stage_change'])}, and "
             f"{signed(written_run['growth'][TENURES[2]]['stage_change'])} points",
             text=GROWTH_TEXT,
-        )
-        and "change 2022–2025 growth by less than one point per tenure with the CE's spending summaries" in ABSTRACT,
+        ),
     ),
     (
         "Garner–Munoz restrictions with BLS's index come within 0.8 points",
@@ -1884,15 +1978,16 @@ inkind_pins = (
         ),
     ),
     (
-        "abstract stage changes under one point per tenure",
-        max(abs(change) for change in stage_changes) < 1
-        and "growth by less than one point per tenure" in ABSTRACT,
+        "abstract stage-change range",
+        has_number(
+            f"change 2022–2025 growth by {signed(min(stage_changes))} to {signed(max(stage_changes))} points per "
+            "tenure with the CE's spending summaries",
+            text=ABSTRACT,
+        ),
     ),
     (
         "home internet's share of BLS's thresholds",
-        math.isclose(internet_share_low, 1.2 * internet_row_low, rel_tol=1e-12)
-        and math.isclose(internet_share_high, 1.2 * internet_row_high, rel_tol=1e-12)
-        and has_number(
+        has_number(
             f"supplies {internet_row_low:.2f} to {internet_row_high:.2f} percent of each BLS threshold by BLS's "
             f"published shares, and {internet_share_low:.2f} to {internet_share_high:.2f} percent when we give it "
             "its part of the 1.2 multiplier",
@@ -2108,6 +2203,37 @@ inkind_pins = (
             f"we keep {count_word(len(inkind_provenance['artifacts']))} receipts from spm-calculator",
             text=APPENDIX_B_TEXT,
         ),
+    ),
+    (
+        "broadband start and WIC cutoff from the imputation receipt",
+        inkind_method["broadband_first_reference_year"] == 2022
+        and inkind_method["wic_ebt_all_states_from_reference_year"] == 2020
+        and has_number(
+            f"We impute them from reference year {inkind_method['broadband_first_reference_year']} too, so they "
+            f"first enter our {inkind_method['broadband_first_reference_year'] + 1} thresholds",
+            text=INKIND_TEXT,
+        )
+        and has_number(
+            f"We add no WIC from reference year {inkind_method['wic_ebt_all_states_from_reference_year']}",
+            text=INKIND_TEXT,
+        ),
+    ),
+    (
+        "BLS's 2025 WIC band mean against our none",
+        all(
+            replication_receipt["results"]["2025"]["component_lift_percent"]["wic"][tenure] == 0
+            for tenure in TENURES
+        )
+        and has_number(
+            "From BLS's 2025 shares, we compute WIC of "
+            f"\\${inkind_inputs['components']['bls']['years']['2025']['band']['pooled']['wic']:.2f} per unit in its "
+            "band, where we add none",
+            text=INKIND_TEXT,
+        ),
+    ),
+    (
+        "WIC by-state sensitivity from the imputation receipt",
+        wic_by_state_pin(),
     ),
     (
         "README counts the receipts and names the commits and tags",

@@ -9,7 +9,11 @@ provenance record and a checksum manifest:
 - ``ce_inkind_bls_components_2019_2025.json`` recovers BLS's in-band
   component means from its published threshold shares and compares them with
   the replication's, under the CE summary definitions and under the shelter,
-  utilities and food restrictions in Garner and Munoz (2021).
+  utilities and food restrictions in Garner and Munoz (2021). Its schema 2
+  records each threshold's imputed terms in two accountings of the 0.2 F
+  term BLS publishes as its Other share: ``other_spread`` gives each
+  component its part of that term, and ``other_separate`` keeps it apart, as
+  BLS's shares workbook does.
 - ``ce_replicate_uncertainty_2019_2025.json`` reruns both price-index runs
   under each of the CE's 44 replicate weights and stores every replicate's
   thresholds, for each implicate.
@@ -57,10 +61,14 @@ RUNS = {
     "fcsuti_bls_definition": ("fcsuti", True),
 }
 AMOUNTS = ("imputed_total", "rental_assistance_per_renter", "school_lunch")
+# The component receipt's schema and its two accountings of the Other share.
+COMPONENTS_SCHEMA = 2
+ACCOUNTINGS = ("other_spread", "other_separate")
 # BLS's threshold for tenure h is s * (C + SU_h + 0.2 F), with F = C + sum_h
 # P_h SU_h. School lunch, WIC and broadband enter the shared term C; LIHEAP
-# and rental assistance enter SU_h. ``_imputed_terms`` checks this split
-# against the component receipt's own imputed-term dollars.
+# and rental assistance enter SU_h. ``_imputed_terms`` gives each benefit its
+# part of 0.2 F, the component receipt's ``other_spread`` accounting, and
+# checks the split against that accounting's imputed-term dollars.
 ANCHOR_SHARE = 0.82
 SHARED_IMPUTED = ("nslp", "wic", "broadband")
 SHELTER_UTILITY_IMPUTED = ("liheap", "rental_assistance")
@@ -84,16 +92,16 @@ BLS_REVISED_SEGMENT = "revised_2019_2024"
 # path>`` in PolicyEngine/spm-calculator when we copied the receipt here.
 RECEIPT_PINS = {
     REPLICATION: (
-        "8cbfd872d972f42bd2f7b9a89a2409eb581d81d8446fc96e23b8768632acd168",
-        "53cb0fa08a0ca2fe1ea4b15a32ec77090ca8b91c",
+        "221e79fa439509a574a020ccc155a0971f74d230c686046a0de6f69b7d492173",
+        "28740b5c7c6ba54af99c8631c955294b094ba239",
     ),
     COMPONENTS: (
-        "429cd862c4809fe712163017e8fb89ace6e38bccc19ecdad51d0ce463717cbe4",
-        "53cb0fa08a0ca2fe1ea4b15a32ec77090ca8b91c",
+        "fa203592f1d79f723e357122088474047096a1b29d4cc47d3f8b8037dd713ae2",
+        "28740b5c7c6ba54af99c8631c955294b094ba239",
     ),
     UNCERTAINTY: (
-        "fb0e3ab77200464b9ca4d10d9460b5ed5c82952755ed0dc7e0a91177118df8cc",
-        "53cb0fa08a0ca2fe1ea4b15a32ec77090ca8b91c",
+        "1f348cb6a52bc4cace5fcf1a91647c188ef1169838504c3123639528bd0af767",
+        "28740b5c7c6ba54af99c8631c955294b094ba239",
     ),
 }
 # The growth window whose standard errors the section reports.
@@ -197,6 +205,11 @@ def load_inkind(data_dir: Path, current_dir: Path) -> dict:
         and archived["zero_in_kind_thresholds_identical"] is True,
         "out-of-pocket run reproduces data/current's replication artifact",
     )
+    _require(
+        components.get("schema_version") == COMPONENTS_SCHEMA
+        and tuple(sorted(components.get("accountings", ()))) == tuple(sorted(ACCOUNTINGS)),
+        f"component receipt schema {COMPONENTS_SCHEMA} with both accountings of the Other share",
+    )
     for run, (deflator, written) in RUNS.items():
         entry = components["runs"][run]
         _require(
@@ -214,6 +227,18 @@ def load_inkind(data_dir: Path, current_dir: Path) -> dict:
                 for error in checks["threshold_error_dollars"].values()
             ),
             f"BLS's shares reproduce its thresholds and FCSUti within "
+            f"${BLS_IDENTITY_TOLERANCE_DOLLARS:.5f} in {year}",
+        )
+        # The largest gap, across tenures, between each published share and
+        # the receipt's Other-separate term over the threshold, in dollars of
+        # band mean: the share gap times the threshold, over s.
+        largest = max(components["bls"]["years"][year]["published_thresholds"].values())
+        _require(
+            all(
+                abs(error) * largest / ANCHOR_SHARE < BLS_IDENTITY_TOLERANCE_DOLLARS
+                for error in checks["other_separate_share_error"].values()
+            ),
+            f"the Other-separate terms reproduce each share BLS publishes within "
             f"${BLS_IDENTITY_TOLERANCE_DOLLARS:.5f} in {year}",
         )
     for year in YEARS:
@@ -327,7 +352,8 @@ def _check_uncertainty_receipt(uncertainty: dict, replication: dict, components:
 
 
 def _imputed_terms(band: dict, components: tuple[str, ...]) -> dict[str, float]:
-    """Dollars the named imputed components add to each tenure's threshold."""
+    """Dollars the named imputed components add to each tenure's threshold,
+    each with its part of 0.2 F (the ``other_spread`` accounting)."""
     mix, pooled = band["tenure_mix"], band["pooled"]
     shared = sum(pooled[name] for name in SHARED_IMPUTED if name in components)
 
@@ -377,17 +403,18 @@ def inkind_figures(inputs: dict) -> dict:
         t25 = bls_years["2025"]["published_thresholds"][tenure]
         growth = _growth(t22, t25)
         row = bls_span["by_tenure"][tenure]
-        c22, c25 = row["imputed_term_dollars"]["2022"], row["imputed_term_dollars"]["2025"]
+        spread = row["other_spread"]
+        c22, c25 = spread["imputed_term_dollars"]["2022"], spread["imputed_term_dollars"]["2025"]
         for year, recorded in (("2022", c22), ("2025", c25)):
             rebuilt = _imputed_terms(bls_years[year]["band"], SHARED_IMPUTED + SHELTER_UTILITY_IMPUTED)
             _close(rebuilt[tenure], recorded, f"BLS imputed terms {year} {tenure}")
         _close(growth, span["published_growth_percent"][tenure], f"BLS growth {tenure}")
         _close(growth, row["growth"], f"BLS receipt growth {tenure}")
         without = _growth(t22 - c22, t25 - c25)
-        _close(without, row["growth_without_imputed_terms"], f"BLS growth without imputed terms {tenure}")
-        _close(growth - without, row["band_fixed_effect_points"], f"BLS imputed points {tenure}")
+        _close(without, spread["growth_without_imputed_terms"], f"BLS growth without imputed terms {tenure}")
+        _close(growth - without, spread["band_fixed_effect_points"], f"BLS imputed points {tenure}")
         share = share_beyond_cpi(c22, c25, t22, t25)
-        _close(share, row["imputed_share_of_growth_beyond_cpi_u_percent"], f"BLS imputed share {tenure}")
+        _close(share, spread["imputed_share_of_growth_beyond_cpi_u_percent"], f"BLS imputed share {tenure}")
         figures["bls"][tenure] = {
             "growth": growth,
             "growth_deflated_by_fcsuti": _growth(price, 1 + growth / 100),
@@ -424,16 +451,31 @@ def inkind_figures(inputs: dict) -> dict:
             for index, (draw, recorded) in enumerate(zip(draws, row["stage_change_by_implicate"], strict=True)):
                 _close(draw, recorded, f"stage change implicate {index} {label}")
             _close(stdev(draws), row["stage_change_between_implicate_sd"], f"stage change SD {label}")
-            c22, c25 = row["imputed_term_dollars"]["2022"], row["imputed_term_dollars"]["2025"]
+            spread, separate = row["other_spread"], row["other_separate"]
+            c22, c25 = spread["imputed_term_dollars"]["2022"], spread["imputed_term_dollars"]["2025"]
             share = share_beyond_cpi(c22, c25, with22, with25)
-            _close(share, row["imputed_share_of_growth_beyond_cpi_u_percent"], f"imputed share {label}")
+            _close(share, spread["imputed_share_of_growth_beyond_cpi_u_percent"], f"imputed share {label}")
+            for year in ("2022", "2025"):
+                _close(
+                    _benefit_rows(years[year]["with_in_kind"]["band"])[tenure],
+                    separate["imputed_term_dollars"][year],
+                    f"benefit rows {year} {label}",
+                )
+            share_separate = separate["imputed_share_of_growth_beyond_cpi_u_percent"]
+            _close(
+                share_beyond_cpi(
+                    separate["imputed_term_dollars"]["2022"], separate["imputed_term_dollars"]["2025"], with22, with25
+                ),
+                share_separate,
+                f"imputed share, Other separate {label}",
+            )
             without_terms = _growth(with22 - c22, with25 - c25)
-            _close(without_terms, row["growth_without_imputed_terms"], f"growth without imputed terms {label}")
+            _close(without_terms, spread["growth_without_imputed_terms"], f"growth without imputed terms {label}")
             bls_row = figures["bls"][tenure]
             _close(with_stage - bls_row["growth"], row["growth_less_bls_points"], f"growth less BLS {label}")
             _close(
                 without_terms - bls_row["growth_without_imputed_terms"],
-                row["growth_without_imputed_terms_less_bls_points"],
+                spread["growth_without_imputed_terms_less_bls_points"],
                 f"growth without imputed terms less BLS {label}",
             )
             out[tenure] = {
@@ -442,6 +484,7 @@ def inkind_figures(inputs: dict) -> dict:
                 "stage_change": with_stage - without,
                 "stage_change_sd": stdev(draws),
                 "imputed_share_beyond_cpi_u": share,
+                "imputed_share_beyond_cpi_u_other_separate": share_separate,
                 "less_bls": with_stage - bls_row["growth"],
                 "less_bls_without_imputed_terms": without_terms - bls_row["growth_without_imputed_terms"],
             }
@@ -539,7 +582,11 @@ def inkind_figures(inputs: dict) -> dict:
         everything = SHARED_IMPUTED + SHELTER_UTILITY_IMPUTED
         all24 = _imputed_terms(bls_years["2024"]["band"], everything)[tenure]
         all25 = _imputed_terms(bls_years["2025"]["band"], everything)[tenure]
-        _close(all25, bls_span["by_tenure"][tenure]["imputed_term_dollars"]["2025"], f"BLS imputed terms 2025 {tenure}")
+        _close(
+            all25,
+            bls_span["by_tenure"][tenure]["other_spread"]["imputed_term_dollars"]["2025"],
+            f"BLS imputed terms 2025 {tenure}",
+        )
         rent24 = _imputed_terms(bls_years["2024"]["band"], ("rental_assistance",))[tenure]
         rent25 = _imputed_terms(bls_years["2025"]["band"], ("rental_assistance",))[tenure]
         without = _growth(t24 - all24, t25 - all25)
@@ -630,21 +677,27 @@ def _three_parts(b22: float, b25: float, i22: float, i25: float, cpi_ratio: floa
 
 def _growth_accounting(figures: dict, components: dict, cpi_ratio: float, price: float) -> dict:
     """The three-part split of each BLS threshold's 2022-2025 growth beyond
-    CPI-U, with I the imputed benefits' terms: each benefit's band mean
-    times s, with its part of the Other share, 0.2 F. The benefits' part
-    over the growth beyond CPI-U is the share ``share_beyond_cpi``
-    computes."""
+    CPI-U, with I the imputed benefits' terms the component receipt records
+    under ``other_spread``: each benefit's band mean times s, with its part
+    of the Other share, 0.2 F. The benefits' part over the growth beyond
+    CPI-U must equal the share the receipt records for that accounting."""
     bls_years = components["bls"]["years"]
     out = {}
     for tenure in TENURES:
         b22 = bls_years["2022"]["published_thresholds"][tenure]
         b25 = bls_years["2025"]["published_thresholds"][tenure]
-        terms = components["bls"]["growth_2022_2025"]["by_tenure"][tenure]["imputed_term_dollars"]
+        spread = components["bls"]["growth_2022_2025"]["by_tenure"][tenure]["other_spread"]
+        terms = spread["imputed_term_dollars"]
         split = _three_parts(b22, b25, terms["2022"], terms["2025"], cpi_ratio, price, tenure)
         _close(
             split["shares"]["benefits"],
             figures["bls"][tenure]["imputed_share_beyond_cpi_u"],
             f"accounting's benefit share {tenure}",
+        )
+        _close(
+            split["shares"]["benefits"],
+            spread["imputed_share_of_growth_beyond_cpi_u_percent"],
+            f"accounting's benefit share matches the receipt's, Other spread {tenure}",
         )
         out[tenure] = split
     return out
@@ -672,11 +725,13 @@ def _growth_accounting_other_separate(components: dict, cpi_ratio: float, price:
     """The same split with the Other share kept separate, as BLS's shares
     workbook reports it: I counts only the benefits' five rows, and the
     Other share, the benefits' 0.2 included, joins the rest of the
-    threshold. A tenure's rows fall short of its terms by
-    s (0.2 A + b - b_h), with A the band's mean imputed benefits, b its
-    mean broadband subsidy and b_h tenure h's, which ties the rows to the
-    terms the component receipt records. Each tenure-specific row's band
-    mean must also pool to the band's mean under BLS's tenure mix."""
+    threshold. I is the dollars the component receipt records under
+    ``other_separate``, which must equal the five rows rebuilt from the
+    band, and the benefits' part of the growth must equal the share it
+    records there. A tenure's rows fall short of its ``other_spread`` terms
+    by s (0.2 A + b - b_h), with A the band's mean imputed benefits, b its
+    mean broadband subsidy and b_h tenure h's. Each tenure-specific row's
+    band mean must also pool to the band's mean under BLS's tenure mix."""
     bls_years = components["bls"]["years"]
     for year in ("2022", "2025"):
         band = bls_years[year]["band"]
@@ -686,14 +741,17 @@ def _growth_accounting_other_separate(components: dict, cpi_ratio: float, price:
                 sum(band["tenure_mix"][tenure] * band["by_tenure"][tenure][name] for tenure in TENURES),
                 f"band mean of {name} pools the tenures' means {year}",
             )
-    rows = {year: _benefit_rows(bls_years[year]["band"]) for year in ("2022", "2025")}
+    rebuilt = {year: _benefit_rows(bls_years[year]["band"]) for year in ("2022", "2025")}
     out = {}
     for tenure in TENURES:
-        terms = components["bls"]["growth_2022_2025"]["by_tenure"][tenure]["imputed_term_dollars"]
+        row = components["bls"]["growth_2022_2025"]["by_tenure"][tenure]
+        terms = row["other_spread"]["imputed_term_dollars"]
+        rows = row["other_separate"]["imputed_term_dollars"]
         for year in ("2022", "2025"):
             band = bls_years[year]["band"]
+            _close(rebuilt[year][tenure], rows[year], f"benefit rows match the receipt's {year} {tenure}")
             _close(
-                terms[year] - rows[year][tenure],
+                terms[year] - rows[year],
                 ANCHOR_SHARE
                 * (
                     0.2 * bls_years[year]["imputed_total"]
@@ -702,15 +760,21 @@ def _growth_accounting_other_separate(components: dict, cpi_ratio: float, price:
                 ),
                 f"benefit rows fall short of the benefits' terms by their Other share {year} {tenure}",
             )
-        out[tenure] = _three_parts(
+        split = _three_parts(
             bls_years["2022"]["published_thresholds"][tenure],
             bls_years["2025"]["published_thresholds"][tenure],
-            rows["2022"][tenure],
-            rows["2025"][tenure],
+            rows["2022"],
+            rows["2025"],
             cpi_ratio,
             price,
             f"{tenure}, Other separate",
         )
+        _close(
+            split["shares"]["benefits"],
+            row["other_separate"]["imputed_share_of_growth_beyond_cpi_u_percent"],
+            f"accounting's benefit share matches the receipt's, Other separate {tenure}",
+        )
+        out[tenure] = split
     return out
 
 
@@ -721,39 +785,61 @@ def _rank_shift(components: dict) -> dict[str, float]:
     out = {}
     for tenure in TENURES:
         row = components["runs"]["package"]["growth_2022_2025"]["by_tenure"][tenure]
+        spread = row["other_spread"]
         _close(
-            row["growth_with_stage"] - row["growth_without_imputed_terms"],
-            row["band_fixed_effect_points"],
+            row["growth_with_stage"] - spread["growth_without_imputed_terms"],
+            spread["band_fixed_effect_points"],
             f"band-fixed effect {tenure}",
         )
         _close(
-            row["stage_change_points"] - row["band_fixed_effect_points"],
-            row["rank_shift_points"],
+            row["stage_change_points"] - spread["band_fixed_effect_points"],
+            spread["rank_shift_points"],
             f"rank shift {tenure}",
         )
-        out[tenure] = row["rank_shift_points"]
+        out[tenure] = spread["rank_shift_points"]
     return out
 
 
 def _internet_and_levels(components: dict) -> dict:
     """BLS's home internet term as a percent of each of its thresholds,
-    s * 1.2 times the band mean of internet; its share row in BLS's
-    workbook, s times that mean, which leaves internet's part of the 0.2 F
-    term in the Other share; and our level gaps once the term joins our
-    thresholds. Each matches the component receipt's own
-    level decomposition."""
+    in the component receipt's two accountings: with the Other share
+    spread, s * 1.2 times the band mean of internet; with it kept separate,
+    as BLS's workbook publishes it, s times that mean plus the band's mean
+    broadband subsidy less the tenure's own, which leaves internet's part
+    of 0.2 F in the Other share. Our band holds no home internet, so the
+    receipt's level gap for internet is our broadband part less BLS's
+    term, and each figure here must match it. Also our level gaps once the
+    spread term joins our thresholds."""
     bls_years = components["bls"]["years"]
+
+    def separate_row(band: dict, tenure: str, threshold: float) -> float:
+        pooled = band["pooled"]
+        return 100 * ANCHOR_SHARE * (pooled["internet"] + pooled["broadband"] - band["by_tenure"][tenure]["broadband"]) / threshold
+
     shares, rows = {}, {}
     for year in YEARS:
         internet = bls_years[year]["band"]["pooled"]["internet"]
         for tenure in TENURES:
-            row = 100 * ANCHOR_SHARE * internet / bls_years[year]["published_thresholds"][tenure]
-            share = 1.2 * row
+            threshold = bls_years[year]["published_thresholds"][tenure]
+            share = 100 * ANCHOR_SHARE * 1.2 * internet / threshold
+            row = separate_row(bls_years[year]["band"], tenure, threshold)
             for run in ("package", "package_bls_definition"):
                 entry = components["runs"][run]["years"][year]
-                recorded = entry["level_gap_percent_of_bls"][tenure]
-                _close(-recorded["terms"]["internet"], share, f"BLS internet term {run} {year} {tenure}")
-                _close(recorded["total"], entry["with_in_kind"]["gap_percent"][tenure], f"level terms total {run} {year} {tenure}")
+                gaps = entry["level_gap_percent_of_bls"]
+                ours = entry["with_in_kind"]["band"]
+                _require(ours["pooled"]["internet"] == 0, f"our band holds no home internet {run} {year}")
+                _close(-gaps["other_spread"][tenure]["terms"]["internet"], share, f"BLS internet term, Other spread {run} {year} {tenure}")
+                _close(
+                    separate_row(ours, tenure, threshold) - gaps["other_separate"][tenure]["terms"]["internet"],
+                    row,
+                    f"BLS internet term, Other separate {run} {year} {tenure}",
+                )
+                for accounting in ACCOUNTINGS:
+                    _close(
+                        gaps[accounting][tenure]["total"],
+                        entry["with_in_kind"]["gap_percent"][tenure],
+                        f"level terms total, {accounting} {run} {year} {tenure}",
+                    )
             shares[(year, tenure)] = share
             rows[(year, tenure)] = row
     gaps = {}
