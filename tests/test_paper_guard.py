@@ -1074,36 +1074,36 @@ INKIND_PROSE_MUTATIONS = (
     (
         "next-interview rent change",
         "section",
-        r"rises(\s+)0\.8(\s+)percent;",
-        r"rises\g<1>1.8\2percent;",
+        r"rises(\s+)0\.8(\s+)percent\.",
+        r"rises\g<1>1.8\2percent.",
         "rent sensitivities",
     ),
     (
         "linked renters",
         "section",
-        r"3,120(\s+)of(\s+)the(\s+)6,159",
-        r"3,210\1of\2the\g<3>6,159",
+        r"6,159(\s+)renters,(\s+)3,120",
+        r"6,159\1renters,\g<2>3,210",
         "rent sensitivities",
     ),
     (
         "part-period bounds",
         "section",
-        r"is(\s+)25(\s+)to(\s+)75(\s+)percent(\s+)of(\s+)its(\s+)rent",
-        r"is\g<1>20\2to\g<3>80\4percent\5of\6its\7rent",
+        r"is(\s+)25(\s+)to(\s+)75(\s+)percent(\s+)of(\s+)the(\s+)second",
+        r"is\g<1>20\2to\g<3>80\4percent\5of\6the\7second",
         "rent sensitivities",
     ),
     (
         "predicted median and mean swapped",
         "section",
-        r"falls(\s+)30(\s+)percent(.*?)median,(\s+)16(\s+)percent",
-        r"falls\g<1>16\2percent\3median,\g<4>30\5percent",
+        r"falls(\s+)30(\s+)percent(.*?)median(\s+)and(\s+)16(\s+)percent",
+        r"falls\g<1>16\2percent\3median\4and\g<5>30\6percent",
         "rent sensitivities",
     ),
     (
         "linear prediction change",
         "section",
-        r"and(\s+)13(\s+)percent(\s+)at(\s+)the(\s+)linear",
-        r"and\g<1>31\2percent\3at\4the\5linear",
+        r"it(\s+)falls(\s+)13(\s+)percent\.",
+        r"it\1falls\g<2>31\3percent.",
         "rent sensitivities",
     ),
     # Round 5: broadband's start, the 2020 WIC cutoff, its by-state
@@ -1168,8 +1168,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "states statewide before the deadline",
         "section",
-        r"including(\s+)in(\s+)six(\s+)states(\s+)where(\s+)FNS",
-        r"including\1in\2four\3states\4where\5FNS",
+        r"including(\s+)in(\s+)six(\s+)states(\s+)whose",
+        r"including\1in\2four\3states\4whose",
         "WIC EBT dates from the calculator's FNS table",
     ),
     (
@@ -1182,8 +1182,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "states statewide after the deadline",
         "section",
-        r"statewide(\s+)in(\s+)six(\s+)more(\s+)states",
-        r"statewide\1in\2seven\3more\4states",
+        r"agencies(\s+)of(\s+)six(\s+)more(\s+)states",
+        r"agencies\1of\2seven\3more\4states",
         "WIC EBT dates from the calculator's FNS table",
     ),
     (
@@ -1218,22 +1218,22 @@ INKIND_PROSE_MUTATIONS = (
     (
         "by-state WIC mean over CE units",
         "section",
-        r"WIC(\s+)per(\s+)CE(\s+)unit(\s+)rises",
-        r"WIC\1per\2band\3unit\4rises",
+        r"unit(\s+)with(\s+)children(\s+)rises",
+        r"unit\1with\2adults\3rises",
         "WIC by-state sensitivity from the imputation receipt",
     ),
     (
         "common-component gaps' accounting",
         "section",
-        r"internet's(\s+)term,(\s+)with(\s+)its(\s+)part",
-        r"internet's\1term,\2without\3its\4part",
+        r"band(\s+)to(\s+)our(\s+)thresholds",
+        r"band\1from\2our\3thresholds",
         "thresholds on the components both series hold",
     ),
     (
-        "separate-Other terms match all but the unused internet row",
+        "separate-Other terms match each component row and Other",
         "section",
-        r"every(\s+)published(\s+)share(\s+)row(\s+)but",
-        r"every\1published\2share\3row\4and",
+        r"for(\s+)each(\s+)component(\s+)and(\s+)for(\s+)Other",
+        r"for\1each\2component\3but\4not\5Other",
         "BLS internet reading from fingerprinted calculator code",
     ),
     (
@@ -1246,8 +1246,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "renters who take the next interview's rent",
         "section",
-        r"and(\s+)156(\s+)of(\s+)those",
-        r"and\g<1>165\2of\3those",
+        r"of(\s+)156(\s+)of(\s+)those",
+        r"of\g<1>165\2of\3those",
         "rent sensitivities",
     ),
     (
@@ -1260,8 +1260,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "point-fit variants' parameters",
         "section",
-        r"in(\s+)our(\s+)base(\s+)we(\s+)draw(\s+)new",
-        r"in\1our\2base\3we\4fix\5new",
+        r"each(\s+)with(\s+)newly(\s+)drawn",
+        r"each\1with\2the\3fitted",
         "rent sensitivities",
     ),
     (

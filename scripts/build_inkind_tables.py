@@ -148,9 +148,9 @@ def accounting_table(figures: dict) -> str:
 def level_table(figures: dict) -> str:
     headers = ["Target year", "With mortgage", "Without mortgage", "Renter"]
     summaries = figures["runs"]["package"]["gaps"]["with_in_kind"]
-    written = figures["runs"]["package_bls_definition"]["gaps"]["with_in_kind"]
+    garner_munoz = figures["runs"]["package_bls_definition"]["gaps"]["with_in_kind"]
     rows = [
-        [year, *(f"{summaries[year][t]:+.2f}% / {written[year][t]:+.2f}%" for t in TENURES)]
+        [year, *(f"{summaries[year][t]:+.2f}% / {garner_munoz[year][t]:+.2f}%" for t in TENURES)]
         for year in YEARS
     ]
     return markdown_table(headers, rows)
