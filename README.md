@@ -70,6 +70,16 @@ replication artifact. It also checks each receipt against the SHA-256 and
 calculator commit that `scripts/inkind_inputs.py` pins, so replacing a receipt
 takes a matching edit there.
 
+The rental-assistance sensitivities come from
+[`scripts/rent_sensitivity.py`](scripts/rent_sensitivity.py), which reruns the
+calculator's rental model at that commit for reference year 2022 and writes
+[`data/rent_sensitivity/rent_model_sensitivity_2022.json`](data/rent_sensitivity/rent_model_sensitivity_2022.json).
+It needs an export of spm-calculator at that commit and the CE Interview
+bundles for 2022 and 2023, and it checks both against the imputation receipt.
+Its docstring gives the command. The guard checks the receipt's SHA-256, that
+the committed script wrote it, and that its base case reproduces the
+imputation receipt's 2022 rental assistance per assisted renter.
+
 ## Separate 2025 poverty-rate prediction
 
 The [September 11 prediction](data/predictions/2025-spm-poverty-rates-2026-09-11.json)

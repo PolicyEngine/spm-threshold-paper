@@ -396,8 +396,13 @@ logistic regression for paying market rent, then, among the renters who
 do, a regression of log rent on building characteristics and the first
 step's Mills ratio, with state and year effects. They predict a market
 rent for each assisted unit and count a subsidy where that rent exceeds
-the rent paid. We fit a weighted Tobit model of log monthly rent on CE
-renters in each reference year, and treat the rents of units that report
+the rent paid. We take each unit's monthly rent paid as one third of
+its three-month rent total in the CE's RNT file, which matches its
+spending on rent of the dwelling (UCC 210110). The CE Interview's 2015
+questionnaire asks for each month's rent [@cecapi2015], but the public
+files give only the three-month total, which the monthly expenditure
+file splits evenly across the months. We fit a weighted Tobit model of
+log monthly rent on CE renters in each reference year, and treat the rents of units that report
 government-reduced rent or public housing as censored from above at the
 rent they pay. We condition on bedrooms, bathrooms, building type,
 urbanicity, population size, state or region, and interview quarter. We
@@ -658,7 +663,19 @@ step on program participation and household characteristics, and assign
 each assisted unit its predicted rent; we fit each reference year
 separately on unit characteristics and draw each market rent. The public
 files do not identify rent-controlled units, and our market-rent sample
-keeps units that receive rent as pay. Our school lunch donors report free or reduced-price lunches, while
+keeps units that receive rent as pay. We test two of these choices on
+reference year 2022, for which we estimate rental assistance of
+\$10,809 per assisted renter across the CE. A unit that paid rent for
+only part of the three months shows a low monthly rent. If each renter
+whose rent paid is 25 to 75 percent of its rent at the next interview
+takes the later rent, the amount rises 0.8 percent; 3,120 of the 6,159
+renters report rent at a next interview. If we instead give each assisted unit
+its predicted market rent, as Garner and Gudrais [-@garnergudrais2018]
+do, and set negative benefits to zero, the amount falls 30 percent at
+the log model's median, 16 percent at its mean, and 13 percent at the
+linear prediction of the same model fitted to rent in dollars.
+
+Our school lunch donors report free or reduced-price lunches, while
 Census also values paid lunches and, for respondents who report EBT
 benefits but no SNAP, summer EBT [@spmtechnical]. BLS says it values school lunches by the
 traditional method before and after the COVID-19 period [@blsspmhome],
@@ -1170,7 +1187,12 @@ replicate-weight standard errors, all at commit
 check that the out-of-pocket run reproduces the retrospective
 replication artifact exactly. We then recompute every in-kind estimate
 in the tables and text from the receipts' thresholds, band means, and
-replicate thresholds.
+replicate thresholds. For the rental-assistance sensitivities in
+@sec-inkind-uncertainty, `scripts/rent_sensitivity.py` reruns the
+calculator's rental model at that commit for reference year 2022 and
+writes `data/rent_sensitivity/rent_model_sensitivity_2022.json`. Its base
+case reproduces the imputation receipt's 2022 rental assistance per
+assisted renter.
 
 The input manifests record exact source and release identities. The
 [data

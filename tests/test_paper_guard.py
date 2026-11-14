@@ -1040,6 +1040,56 @@ INKIND_PROSE_MUTATIONS = (
         r"We\1keep\2telephone\3in\4utilities",
         "Garner–Munoz restrictions read from fingerprinted calculator code",
     ),
+    # Round 4: rent paid and the two rental-assistance sensitivities.
+    (
+        "rent paid share of the three-month total",
+        "section",
+        r"as(\s+)one(\s+)third(\s+)of",
+        r"as\1one\2quarter\3of",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "rent sensitivity base amount",
+        "section",
+        r"\\\$10,809(\s+)per(\s+)assisted",
+        r"\\$10,890\1per\2assisted",
+        "rent sensitivities",
+    ),
+    (
+        "next-interview rent change",
+        "section",
+        r"rises(\s+)0\.8(\s+)percent;",
+        r"rises\g<1>1.8\2percent;",
+        "rent sensitivities",
+    ),
+    (
+        "linked renters",
+        "section",
+        r"3,120(\s+)of(\s+)the(\s+)6,159",
+        r"3,210\1of\2the\g<3>6,159",
+        "rent sensitivities",
+    ),
+    (
+        "part-period bounds",
+        "section",
+        r"is(\s+)25(\s+)to(\s+)75(\s+)percent(\s+)of(\s+)its(\s+)rent",
+        r"is\g<1>20\2to\g<3>80\4percent\5of\6its\7rent",
+        "rent sensitivities",
+    ),
+    (
+        "predicted median and mean swapped",
+        "section",
+        r"falls(\s+)30(\s+)percent(.*?)median,(\s+)16(\s+)percent",
+        r"falls\g<1>16\2percent\3median,\g<4>30\5percent",
+        "rent sensitivities",
+    ),
+    (
+        "linear prediction change",
+        "section",
+        r"and(\s+)13(\s+)percent(\s+)at(\s+)the(\s+)linear",
+        r"and\g<1>31\2percent\3at\4the\5linear",
+        "rent sensitivities",
+    ),
 )
 
 

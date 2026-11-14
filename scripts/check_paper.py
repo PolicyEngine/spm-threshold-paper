@@ -1331,6 +1331,10 @@ INKIND_METHOD_CONSTANTS = (
     "midpoint of its three-month reference period",  # 1.5 months in _wic_ebt_complete
     # reference_year = year where quarter >= 2, else year - 1
     "We assign each CE interview to its collection year, and first-quarter interviews to the year before",
+    # load_ce_unit_inputs: rent_paid_monthly sums the unit's RNT QRT3MCMX and
+    # divides by 3; tests/test_ce_inkind.py matches the sum to UCC 210110
+    "We take each unit's monthly rent paid as one third of its three-month rent total in the CE's RNT file, "
+    "which matches its spending on rent of the dwelling (UCC 210110)",
     # _weighted_logit and the amount and Tobit fits: w = weight / weight.mean(),
     # _penalty puts InKindConfig.ridge (1.0) on every slope and none on the intercept
     "We scale the survey weights to average one and add a ridge penalty of one to every slope",
@@ -1381,6 +1385,18 @@ INKIND_SHARES_CONSTANTS = (
     "We treat that row as including broadband subsidies and subtract them to recover home internet spending",
 )
 replication_receipt = json.loads((DATA / "inkind" / "ce_inkind_replication_2019_2025.json").read_text())
+# The rental-assistance sensitivities: scripts/rent_sensitivity.py writes this
+# receipt, so replacing it takes an edit here.
+RENT_SENSITIVITY = DATA / "rent_sensitivity" / "rent_model_sensitivity_2022.json"
+RENT_SENSITIVITY_SHA256 = "ac23155ebbd26e8fec70c39e91bcdb3cbbda09e566ca774ed0b40206b6b9c496"
+rent_sensitivity = json.loads(RENT_SENSITIVITY.read_text())
+rent_variants = {
+    name: row["percent_vs_base"] for name, row in rent_sensitivity["variants"].items()
+}
+rent_base = rent_sensitivity["variants"]["base"]["dollars_per_assisted_renter"]
+rent_recorded = replication_receipt["imputation_diagnostics"]["rental_assistance"][
+    str(rent_sensitivity["reference_year"])
+]
 
 
 def previous_quarter(quarter: str) -> str:
@@ -2037,6 +2053,54 @@ inkind_pins = (
             f"`{record['calculator_commit']}`" in APPENDIX_B_TEXT
             for record in inkind_provenance["artifacts"].values()
         ),
+    ),
+    (
+        "rent sensitivity receipt matches its pin, its script and the imputation receipt",
+        hashlib.sha256(RENT_SENSITIVITY.read_bytes()).hexdigest() == RENT_SENSITIVITY_SHA256
+        and rent_sensitivity["script_sha256"]
+        == hashlib.sha256((REPO / rent_sensitivity["generated_by"]).read_bytes()).hexdigest()
+        and rent_sensitivity["replication_receipt"]["sha256"]
+        == hashlib.sha256((DATA / "inkind" / REPLICATION).read_bytes()).hexdigest()
+        and math.isclose(rent_base, rent_recorded["ce_mean_amount_per_participant"], rel_tol=1e-9)
+        and all(
+            math.isclose(
+                row["percent_vs_base"], 100 * (row["dollars_per_assisted_renter"] / rent_base - 1), abs_tol=1e-9
+            )
+            for row in rent_sensitivity["variants"].values()
+        ),
+    ),
+    (
+        "rent sensitivities",
+        has_number(
+            f"We test two of these choices on reference year {rent_sensitivity['reference_year']}, for which we "
+            f"estimate rental assistance of {dollars(rent_base)} per assisted renter across the CE",
+            text=UNCERTAINTY_TEXT,
+        )
+        and rent_variants["next_interview_rent"] > 0
+        and has_number(
+            "If each renter whose rent paid is "
+            f"{100 * rent_sensitivity['part_period_bounds'][0]:.0f} to "
+            f"{100 * rent_sensitivity['part_period_bounds'][1]:.0f} percent of its rent at the next interview "
+            f"takes the later rent, the amount rises {rent_variants['next_interview_rent']:.1f} percent; "
+            f"{rent_sensitivity['sample']['renters_with_next_interview_rent']:,} of the "
+            f"{rent_sensitivity['sample']['renters']:,} renters report rent at a next interview",
+            text=UNCERTAINTY_TEXT,
+        )
+        and all(rent_variants[name] < 0 for name in ("predicted_median", "predicted_mean", "levels_predicted"))
+        and has_number(
+            f"the amount falls {-rent_variants['predicted_median']:.0f} percent at the log model's median, "
+            f"{-rent_variants['predicted_mean']:.0f} percent at its mean, and "
+            f"{-rent_variants['levels_predicted']:.0f} percent at the linear prediction of the same model fitted "
+            "to rent in dollars",
+            text=UNCERTAINTY_TEXT,
+        ),
+    ),
+    (
+        "appendix names the rent sensitivity script and receipt",
+        "`scripts/rent_sensitivity.py` reruns" in APPENDIX_B_TEXT
+        and "`data/rent_sensitivity/rent_model_sensitivity_2022.json`" in APPENDIX_B_TEXT
+        and "(scripts/rent_sensitivity.py)" in README_TEXT
+        and "(data/rent_sensitivity/rent_model_sensitivity_2022.json)" in README_TEXT,
     ),
     (
         "appendix counts the receipts",
