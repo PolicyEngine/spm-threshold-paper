@@ -49,10 +49,13 @@ abstract: |
   and change 2022–2025 growth by less than one point per tenure with
   the CE's spending summaries, each change within one standard error of
   zero. From BLS's published
-  shares, we compute that its imputed benefits supply 5 to 13 percent
-  of its thresholds' growth beyond CPI-U over those years, and that its
-  price index and out-of-pocket spending supply the rest. We evaluate
-  prospective accuracy for 2025 only.
+  shares, we compute that its imputed benefits supply 4.9 to 12.9
+  percent of its thresholds' growth beyond CPI-U over those years, and
+  that its price index and out-of-pocket spending supply the rest. We
+  give each benefit its part of the 1.2 multiplier in BLS's formula;
+  when we leave that part in the Other share BLS publishes separately,
+  the benefits supply 3.5 to 11.8 percent. We evaluate prospective
+  accuracy for 2025 only.
 ---
 
 # Introduction
@@ -416,23 +419,25 @@ We estimate that the imputed benefits raise the replicated thresholds
 by 1.1 to 3.8 percent. With them, we estimate thresholds that exceed
 BLS's for every tenure in every year, by 0.26 to 3.53 percent
 (@tbl-inkind-levels). We read the CE's shelter, utilities, and food summaries, and we omit
-home internet, which averages \$547 to \$878 per unit in BLS's band and
-supplies 1.85 to 2.55 percent of each BLS threshold. Those summaries include rent and meals received as pay,
+home internet, which averages \$547 to \$878 per unit in BLS's band. It
+supplies 1.54 to 2.13 percent of each BLS threshold by BLS's published
+shares, and 1.85 to 2.55 percent when we give it its part of the 1.2
+multiplier. Those summaries include rent and meals received as pay,
 other lodging such as vacation homes and lodging on out-of-town trips
 [@ceglossary], and utilities for vacation homes [@cepumd]. Garner and
 Munoz [-@garner2021] restrict shelter to the primary residence and leave
 out rent and meals received as pay. They count owners' utilities for the
 primary residence only, and renters' utilities for any property but a
-rented vacation home. When we follow their written definitions, we
-remove those amounts and the vacation-home mortgage principal we add to
+rented vacation home. When we apply only these restrictions from their
+paper, we remove those amounts and the vacation-home mortgage principal we add to
 shelter. We then estimate that the out-of-pocket replication trails BLS
 by 1.98 to 4.20 percent. When we also add the imputed benefits, we estimate
 thresholds between 1.71 percent below and 1.47 percent above BLS's, and
 the mean absolute deviation falls from 3.14 to 0.72 percent. That fit
 relies on the internet we omit. On the components both series hold, we
 estimate thresholds that exceed BLS's in every tenure and year, by 0.83
-to 3.80 percent under the written definitions and by 2.34 to 5.86
-percent with the CE summaries.
+to 3.80 percent under the Garner–Munoz restrictions and by 2.34 to
+5.86 percent with the CE summaries.
 
 ::: {#tbl-inkind-levels}
 {{< include tables/inkind_levels.md >}}
@@ -440,7 +445,7 @@ percent with the CE summaries.
 We report the signed deviation of the replication with imputed in-kind
 benefits from each published national threshold. In each cell, we give
 the deviation with the CE summaries first, then with the shelter,
-utilities, and food definitions of @garner2021. We deflate both with the
+utilities, and food restrictions of @garner2021. We deflate both with the
 replication's composite CPI.
 :::
 
@@ -459,7 +464,12 @@ B_{T,h}/s=\overline{C}_E+\overline{SU}_{E,h}+0.2\,\overline{FCSUti}_E,
 $$
 
 and a component's share times $B_{T,h}/s$ gives its band mean in
-dollars. Besides its broadband subsidy row, BLS publishes two internet rows. We use the one that gives
+dollars. BLS publishes the share of the last term,
+$0.2\,\overline{FCSUti}_E$, as a separate Other share. We give each
+component its part of it: a component $c$ common to every tenure puts the
+term $1.2\,s\,\overline{c}_E$ in $B_{T,h}$, and a shelter or utility
+component puts $s\,(\overline{c}_{E,h}+0.2\,\overline{c}_E)$, so the
+terms sum to the threshold. Besides its broadband subsidy row, BLS publishes two internet rows. We use the one that gives
 equal dollars across tenures: "OOP Internet" through 2024 and "Total
 Internet Share" in 2025. We treat that row as including broadband
 subsidies and subtract them to recover home internet spending. With that reading,
@@ -512,7 +522,8 @@ FCSUti price index 14.19 percent, and BLS's thresholds 20.63 to 22.15
 percent (@tbl-inkind-growth). Schild [-@schild2023] attributes 7.21
 points of the 2021–2022 rise in the thresholds BLS first published to
 its FCSUti index, and 2.5 to 2.9 points to newer CE data and changes in
-BLS's code for imputing in-kind benefits. We use CPI-U's official annual
+BLS's code for imputing in-kind benefits. We start our split from the
+2022 thresholds and shares BLS reissued in July 2026. We use CPI-U's official annual
 averages. BLS's 2025 thresholds page uses a twelve-month 2025 average
 with October interpolated, 138.289 against the official 138.198 (2013 =
 100) [@bls2025thresholds], which puts CPI-U's 2022–2025 growth at 10.08
@@ -524,9 +535,9 @@ we deflate with
 BLS's FCSUti index instead of the replication's composite CPI, growth
 rises by 0.9 to 2.0 points, more in every tenure than the benefits move
 it. Under the
-written definitions and BLS's index, growth with the benefits comes
-within 0.8 points of BLS's for every tenure. With the written
-definitions and the replication's composite CPI, we estimate that the
+Garner–Munoz restrictions and BLS's index, growth with the benefits comes
+within 0.8 points of BLS's for every tenure. With the same restrictions
+and the replication's composite CPI, we estimate that the
 benefits change growth by +0.09, −1.51, and −0.05 points.
 
 ```{=latex}
@@ -540,7 +551,7 @@ We report national threshold growth from 2022 to 2025. Each replication
 row reports growth without imputed benefits, and the row below it
 reports growth with them, followed by the between-implicate standard
 deviation of the change in points. In the final two rows, we apply the
-shelter, utilities, and food definitions of @garner2021.
+shelter, utilities, and food restrictions of @garner2021.
 :::
 
 BLS's shares, its FCSUti index, and CPI-U split each threshold's growth
@@ -556,9 +567,15 @@ Imputed benefits therefore supply 4.9, 7.6, and 12.9 percent of BLS's
 growth beyond CPI-U, and we estimate 2.2, 2.8, and 2.0 percent for ours.
 We compute each share as $(I_{2025}-\pi I_{2022})/(B_{2025}-\pi
 B_{2022})$, where $I$ sums the imputed benefits' terms in threshold $B$
-and $\pi$ denotes CPI-U's growth factor. If we apply the index's lead to
-the benefits' terms as well, out-of-pocket spending keeps its part and
-the benefits supply 4.3, 6.8, and 11.7 percent. The split takes each year's
+and $\pi$ denotes CPI-U's growth factor. When we keep the Other share
+separate, as BLS publishes it, $I$ sums the benefits' five share rows
+times $B$, and we count the Other share with out-of-pocket spending. The
+benefits then supply 3.5, 5.8, and 11.8 percent of BLS's growth beyond
+CPI-U, and out-of-pocket spending and the Other share beyond the index
+supply 60.9, 55.4, and 54.8 percent. If we apply the index's lead to
+the benefits as well, out-of-pocket spending keeps its part in either
+accounting. The benefits' part falls to 4.3, 6.8, and 11.7 percent with
+their terms, and to 3.0, 5.2, and 10.7 percent with their rows. The split takes each year's
 band means as BLS's shares give them, so it leaves out how the benefits
 change which units fall in the band; in our replication, that re-ranking
 moves 2022–2025 growth by −0.01, +0.82, and −0.34 points. The
@@ -576,7 +593,10 @@ both series, the replication's renter shortfall narrows from 2.40 to 0.94 points
 
 We split BLS's 2022–2025 threshold growth beyond CPI-U into three
 parts, in points of the 2022 threshold, from its published shares, its
-FCSUti index, and CPI-U. Parentheses give each part's share of that
+FCSUti index, and CPI-U. In the upper rows, each component's term
+carries its part of BLS's Other share. In the lower rows, we keep the
+Other share separate, as BLS publishes it, and count it with
+out-of-pocket spending. Parentheses give each part's share of that
 growth.
 :::
 
@@ -651,8 +671,9 @@ them. We value WIC at USDA's national average food cost, while Census uses
 state averages [@spmtechnical] and BLS assigns the WIC values Census
 staff supply [@blsspmhome]. BLS adds broadband subsidies
 from the 2023 thresholds [@bls2025thresholds], and we impute them from
-reference year 2021, so they also enter our 2022 thresholds. In the written-definition runs, we follow @garner2021 with two
-exceptions. We keep spending under two codes for other fuels in vacation
+reference year 2021, so they also enter our 2022 thresholds. With the Garner–Munoz restrictions, we depart from @garner2021 in three
+ways. We keep telephone out of utilities, as BLS now does
+[@blsspmhome], where @garner2021 count it as a utility. We keep spending under two codes for other fuels in vacation
 homes, which the FMLI summaries of vacation-home utilities leave out
 [@cepumd]. We also keep owners' spending under the CE's rented-dwelling
 summary, which averages \$64 to \$683 per owner without a mortgage in
@@ -1062,9 +1083,12 @@ In the periods examined, consumption-based growth improves on CPI-U
 adjustment as a predictor of published SPM thresholds. Annual
 re-estimation reflects consumption changes that price adjustment alone
 omits, consistent with the measure’s quasi-relative construction. From 2022 to 2025, BLS's FCSUti index supplies 33 to 39 percent of its
-thresholds' growth beyond CPI-U, its imputed benefits 5 to 13 percent,
-and out-of-pocket spending the rest; we do not separate real spending
-from sample composition within that last part (@sec-inkind). With the
+thresholds' growth beyond CPI-U. Its imputed benefits supply 4.9 to
+12.9 percent when each carries its part of the Other share, and 3.5 to
+11.8 percent when we keep that share separate, as BLS publishes it.
+Out-of-pocket spending supplies the rest, with the Other share in the
+second case; we do not split real spending from sample composition
+within that part (@sec-inkind). With the
 CE's spending summaries, we estimate that imputing in-kind benefits
 changes our 2022–2025 growth by −0.62 to +0.91 points, each within one
 standard error of zero. Price-indexed
