@@ -341,7 +341,7 @@ model covers the CPS ASEC WIC universe as BLS defines it: households
 with a woman aged 15 to 45, or with a child under 5 and a woman aged 15
 or older [@blsspmhome]. For the 2025 thresholds, as BLS does, we also let the WIC model assign participation
 to CE units that have a child under 5 but no woman aged 15 or older
-[@blsspmhome].
+[@blsspmhome]. Because we add no WIC from reference year 2020, these units take none.
 
 We assign LIHEAP and broadband amounts by predictive mean matching. We
 run a weighted regression of log amounts on the covariates among CPS
@@ -382,7 +382,7 @@ alone. If the unit has no child under 5, we count one pregnant woman. We
 give each participant twelve months of USDA's national average monthly
 food cost for the fiscal year that matches the unit's reference year.
 
-We add no WIC from reference year 2020, the year of the statutory deadline. Congress required every WIC state agency to implement EBT throughout the state by October 1, 2020, unless the Secretary of Agriculture exempted it [@usc1786]. We assign interviews from April 2020 to March 2021 to reference year 2020, and their reference periods center on mid-February 2020 to mid-January 2021. So we also drop WIC for reference periods before the deadline, including in six states that FNS dates statewide between June and September 2020, from Hawaii to Illinois [@fnswicebt2022]. FNS dates six more states and the District of Columbia after the deadline, from Utah in November 2020 to Georgia in October 2022. If we applied BLS's rule state by state, we would add WIC in each of them until its WIC agency had implemented EBT statewide. For earlier reference years, we take each state's statewide date from FNS and add no WIC when the unit's state had fully implemented WIC EBT by the midpoint of its three-month reference period. When the CE suppresses a unit's state, we draw that status with probability equal to the weighted share of known-state units in the same region and quarter whose states had done so. Every interview in our 2025 window references 2020 or later, so our 2025 thresholds include no WIC. If we use each state's own date in every reference year, some units in the 2025 window take WIC, including those we add to the WIC universe for 2025. We then estimate that mean WIC per unit rises by \$1.94 to \$3.21 in the windows behind the 2021–2025 thresholds. Those thresholds move by −\$20 to +\$40 (−0.06 to +0.12 percent) as the added WIC reorders units in the band, and 2022–2025 growth changes by 0.03 points or less.
+We add no WIC from reference year 2020, the year of the statutory deadline. Congress required every WIC state agency to implement EBT throughout the state by October 1, 2020, unless the Secretary of Agriculture exempted it [@usc1786]. We assign interviews from April 2020 to March 2021 to reference year 2020, and their reference periods center on mid-February 2020 to mid-January 2021. So we also drop WIC for reference periods before the deadline, including in six states where FNS reports that WIC EBT went statewide between June and September 2020, from Hawaii to Illinois [@fnswicebt2022]. FNS reports that WIC EBT went statewide in six more states and the District of Columbia after the deadline, from Utah in November 2020 to Georgia in October 2022. If we applied BLS's rule state by state, we would add WIC in each of them until its WIC agency had implemented EBT statewide. For earlier reference years, we take each state's statewide date from FNS and add no WIC when the unit's state had fully implemented WIC EBT by the midpoint of its three-month reference period. When the CE suppresses a unit's state, we draw that status with probability equal to the weighted share of known-state units in the same region and quarter whose states had done so. Every interview in our 2025 window references 2020 or later, so our 2025 thresholds include no WIC. If we use each state's own date in every reference year, some units in the 2025 window take WIC. We then estimate that mean WIC per CE unit rises by \$1.94 to \$3.21 in the windows behind the 2021–2025 thresholds. Those thresholds move by −\$20 to +\$40 (−0.06 to +0.12 percent) as the added WIC enters the band and reorders units in it, and 2022–2025 growth changes by 0.03 points or less.
 
 For rental assistance, BLS fits a limited dependent variable model that
 treats assisted renters' rents as censored from above, and it values the
@@ -394,10 +394,10 @@ step's Mills ratio, with state and year effects. They predict a market
 rent for each assisted unit and count a subsidy where that rent exceeds
 the rent paid. We take each unit's monthly rent paid as one third of
 its three-month rent total in the CE's RNT file, which matches its
-spending on rent of the dwelling (UCC 210110). The CE Interview's 2015
-questionnaire asks for each month's rent [@cecapi2015], but the public
-files give only the three-month total, which the monthly expenditure
-file splits evenly across the months. We fit a weighted Tobit model of
+spending on rent of the dwelling (UCC 210110). In its 2015 CE Interview
+questionnaire, BLS asks for each month's rent [@cecapi2015], but it
+publishes only the three-month total, which it splits evenly across the
+months in the monthly expenditure file. We fit a weighted Tobit model of
 log monthly rent on CE renters in each reference year, and treat the rents of units that report
 government-reduced rent or public housing as censored from above at the
 rent they pay. We condition on bedrooms, bathrooms, building type,
@@ -430,12 +430,12 @@ Munoz [-@garner2021] restrict shelter to the primary residence and leave
 out rent and meals received as pay. They count owners' utilities for the
 primary residence only, and renters' utilities for any property but a
 rented vacation home. When we apply only these restrictions from their
-paper, we remove those amounts and the vacation-home mortgage principal we add to
+paper, which we call the Garner–Munoz restrictions, we remove those amounts and the vacation-home mortgage principal we add to
 shelter. We then estimate that the out-of-pocket replication trails BLS
 by 1.98 to 4.20 percent. When we also add the imputed benefits, we estimate
 thresholds between 1.73 percent below and 1.47 percent above BLS's, and
 the mean absolute deviation falls from 3.14 to 0.73 percent. That fit
-relies on the internet we omit. On the components both series hold, we
+relies on the internet we omit. We take home internet's term, with its part of the 1.2 multiplier, out of BLS's thresholds to compare the components both series hold. On those, we
 estimate thresholds that exceed BLS's in every tenure and year, by 0.81 to 3.80 percent under the Garner–Munoz restrictions and by 2.32 to 5.86 percent with the CE summaries.
 
 ::: {#tbl-inkind-levels}
@@ -470,7 +470,7 @@ term $1.2\,s\,\overline{c}_E$ in $B_{T,h}$, and a shelter or utility
 component puts $s\,(\overline{c}_{E,h}+0.2\,\overline{c}_E)$, so the
 terms sum to the threshold. Besides its broadband subsidy row, BLS publishes two internet rows. We use the one that gives
 equal dollars across tenures: "OOP Internet" through 2024 and "Total
-Internet Share" in 2025. We treat that row as including broadband subsidies and subtract them to recover home internet spending. With the Other share kept separate, we read BLS's home internet share for a tenure as that row less the tenure's own broadband row. With these readings, BLS's published shares, thresholds, and tenure shares satisfy both identities within \$0.00001 in every year from 2019 to 2025. The terms with the Other share kept separate match every published share we read within the same bound.
+Internet Share" in 2025. We treat that row as including broadband subsidies and subtract them to recover home internet spending. With the Other share kept separate, we read BLS's home internet share for a tenure as that row less the tenure's own broadband row. With these readings, BLS's published shares, thresholds, and tenure shares satisfy both identities within \$0.00001 in every year from 2019 to 2025. With the Other share kept separate, the terms match every published share row but the internet row we do not use, within the same bound.
 
 Between the 2022 and 2025 thresholds, BLS's imputed benefits rose from
 \$855 to \$1,257 per unit in its band, and we estimate that ours rose
@@ -517,7 +517,7 @@ percent (@tbl-inkind-growth). Schild [-@schild2023] attributes 7.21
 points of the 2021–2022 rise in the thresholds BLS first published to
 its FCSUti index, and 2.5 to 2.9 points to newer CE data and changes in
 BLS's code for imputing in-kind benefits. We start our split from the
-2022 thresholds and shares BLS reissued in July 2026. We use CPI-U's official annual
+2022 thresholds BLS reissued in July 2026 and the shares that reproduce them. We use CPI-U's official annual
 averages. BLS's 2025 thresholds page uses a twelve-month 2025 average
 with October interpolated, 138.289 against the official 138.198 (2013 =
 100) [@bls2025thresholds], which puts CPI-U's 2022–2025 growth at 10.08
@@ -568,8 +568,8 @@ CPI-U, and out-of-pocket spending and the Other share beyond the index
 supply 60.9, 55.4, and 54.8 percent. If we apply the index's lead to
 the benefits as well, out-of-pocket spending keeps its part in either
 accounting. The benefits' part falls to 4.3, 6.8, and 11.7 percent with
-their terms, and to 3.0, 5.2, and 10.7 percent with their rows. The split takes each year's
-band means as BLS's shares give them, so it leaves out how the benefits
+their terms, and to 3.0, 5.2, and 10.7 percent with their rows. We take each year's
+band means as BLS's shares give them, so we leave out how the benefits
 change which units fall in the band; in our replication, that re-ranking
 moves 2022–2025 growth by −0.01, +0.94, and −0.37 points. The
 out-of-pocket part combines real spending growth with changes in the
@@ -653,11 +653,11 @@ reference year 2022, for which we estimate rental assistance of
 only part of the three months shows a low monthly rent. If each renter
 whose rent paid is 25 to 75 percent of its rent at the next interview
 takes the later rent, the amount rises 0.8 percent; 3,120 of the 6,159
-renters report rent at a next interview. If we instead give each assisted unit
+renters report rent at a next interview, and 156 of those, including 29 assisted renters, take that rent. If we instead give each assisted unit
 its predicted market rent, as Garner and Gudrais [-@garnergudrais2018]
 do, and set negative benefits to zero, the amount falls 30 percent at
 the log model's median, 16 percent at its mean, and 13 percent at the
-linear prediction of the same model fitted to rent in dollars.
+linear prediction of the same model fitted to rent in dollars. For these three, we use the model's fitted parameters, while in our base we draw new parameters for each implicate.
 
 Our school lunch donors report free or reduced-price lunches, while
 Census also values paid lunches and, for respondents who report EBT
@@ -670,7 +670,7 @@ from reference year 2023, Census estimates those values with its fall
 BLS's reasoning for SNAP, reported food spending may already include
 them. For the reference years before 2020, we value WIC at USDA's national average food cost, while Census uses state averages [@spmtechnical] and BLS assigns the WIC values Census staff supply [@blsspmhome]. From BLS's 2025 shares, we compute WIC of \$1.80 per unit in its band, where we add none. With the Garner–Munoz restrictions, we depart from @garner2021 in three
 ways. We keep telephone out of utilities, as BLS now does
-[@blsspmhome], where @garner2021 count it as a utility. We keep spending under two codes for other fuels in vacation
+[@blsspmshares], where @garner2021 count it as a utility. We keep spending under two codes for other fuels in vacation
 homes, which the FMLI summaries of vacation-home utilities leave out
 [@cepumd]. We also keep owners' spending under the CE's rented-dwelling
 summary, which averages \$64 to \$684 per owner without a mortgage in

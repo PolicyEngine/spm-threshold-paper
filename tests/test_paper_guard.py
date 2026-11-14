@@ -1156,20 +1156,20 @@ INKIND_PROSE_MUTATIONS = (
         "section",
         r"by(\s+)October(\s+)1,(\s+)2020,",
         r"by\1October\g<2>1,\g<3>2021,",
-        "method constants read from fingerprinted calculator code",
+        "WIC EBT deadline quoted from 42 U.S.C. 1786(h)(12)(B)(i)",
     ),
     (
         "who grants WIC EBT exemptions",
         "section",
         r"Secretary(\s+)of(\s+)Agriculture(\s+)exempted",
         r"Secretary\1of\2Commerce\3exempted",
-        "method constants read from fingerprinted calculator code",
+        "WIC EBT deadline quoted from 42 U.S.C. 1786(h)(12)(B)(i)",
     ),
     (
         "states statewide before the deadline",
         "section",
-        r"including(\s+)in(\s+)six(\s+)states(\s+)that(\s+)FNS",
-        r"including\1in\2four\3states\4that\5FNS",
+        r"including(\s+)in(\s+)six(\s+)states(\s+)where(\s+)FNS",
+        r"including\1in\2four\3states\4where\5FNS",
         "WIC EBT dates from the calculator's FNS table",
     ),
     (
@@ -1182,8 +1182,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "states statewide after the deadline",
         "section",
-        r"FNS(\s+)dates(\s+)six(\s+)more(\s+)states",
-        r"FNS\1dates\2seven\3more\4states",
+        r"statewide(\s+)in(\s+)six(\s+)more(\s+)states",
+        r"statewide\1in\2seven\3more\4states",
         "WIC EBT dates from the calculator's FNS table",
     ),
     (
@@ -1206,6 +1206,63 @@ INKIND_PROSE_MUTATIONS = (
         r"in(\s+)its(\s+)2023–2025(\s+)thresholds,(\s+)from(\s+)data(\s+)that(\s+)start(\s+)in(\s+)2022",
         r"in\1its\g<2>2022–2025\3thresholds,\4from\5data\6that\7start\8in\g<9>2021",
         "broadband start and WIC cutoff from the imputation receipt",
+    ),
+    # Round 6: the 38bf21b review.
+    (
+        "the 2025 WIC universe's units under the cutoff",
+        "section",
+        r"these(\s+)units(\s+)take(\s+)none",
+        r"these\1units\2take\3little",
+        "broadband start and WIC cutoff from the imputation receipt",
+    ),
+    (
+        "by-state WIC mean over CE units",
+        "section",
+        r"WIC(\s+)per(\s+)CE(\s+)unit(\s+)rises",
+        r"WIC\1per\2band\3unit\4rises",
+        "WIC by-state sensitivity from the imputation receipt",
+    ),
+    (
+        "common-component gaps' accounting",
+        "section",
+        r"internet's(\s+)term,(\s+)with(\s+)its(\s+)part",
+        r"internet's\1term,\2without\3its\4part",
+        "thresholds on the components both series hold",
+    ),
+    (
+        "separate-Other terms match all but the unused internet row",
+        "section",
+        r"every(\s+)published(\s+)share(\s+)row(\s+)but",
+        r"every\1published\2share\3row\4and",
+        "BLS internet reading from fingerprinted calculator code",
+    ),
+    (
+        "telephone split's source",
+        "section",
+        r"as(\s+)BLS(\s+)now(\s+)does(\s+)\[@blsspmshares\]",
+        r"as\1BLS\2now\3does\4[@blsspmhome]",
+        "Garner–Munoz restrictions read from fingerprinted calculator code",
+    ),
+    (
+        "renters who take the next interview's rent",
+        "section",
+        r"and(\s+)156(\s+)of(\s+)those",
+        r"and\g<1>165\2of\3those",
+        "rent sensitivities",
+    ),
+    (
+        "assisted renters who take the next interview's rent",
+        "section",
+        r"including(\s+)29(\s+)assisted",
+        r"including\g<1>92\2assisted",
+        "rent sensitivities",
+    ),
+    (
+        "point-fit variants' parameters",
+        "section",
+        r"in(\s+)our(\s+)base(\s+)we(\s+)draw(\s+)new",
+        r"in\1our\2base\3we\4fix\5new",
+        "rent sensitivities",
     ),
     (
         "BLS's 2025 WIC band mean",
@@ -2047,7 +2104,10 @@ class PaperGuardTests(unittest.TestCase):
                 (
                     "imputation code",
                     fingerprint_changed("spm_calculator/ce_inkind.py"),
-                    ("method constants read from fingerprinted calculator code",),
+                    (
+                        "method constants read from fingerprinted calculator code",
+                        "percentile band and windows read from fingerprinted calculator code",
+                    ),
                 ),
                 (
                     "BLS shares code",
@@ -2075,11 +2135,16 @@ class PaperGuardTests(unittest.TestCase):
         def end_wic_a_year_later(receipts):
             methodology(receipts)["wic_ebt_all_states_from_reference_year"] += 1
 
+        def add_wic_to_the_2025_window(receipts):
+            # The 2025 universe's added units can take WIC only if the window does.
+            receipts[INKIND_NAMES[1]]["results"]["2025"]["sample_mean_in_kind_threshold_year_dollars"]["wic"] = 0.5
+
         label = ("broadband start and WIC cutoff from the imputation receipt",)
         self.assert_resealed_receipts_fail(
             (
                 ("broadband start", start_broadband_a_year_earlier, label),
                 ("WIC cutoff", end_wic_a_year_later, label),
+                ("WIC in the 2025 window", add_wic_to_the_2025_window, label),
             )
         )
 
@@ -2107,11 +2172,19 @@ class PaperGuardTests(unittest.TestCase):
 
         # Each case below breaks one check of the pin and keeps the block's
         # other ties, so deleting that check lets the case through.
+        def set_threshold(targets, year, tenure, level):
+            """Set one rerun threshold and shift each of its implicates by as
+            much, so the threshold stays its implicates' mean."""
+            shift = level - targets[year]["with_in_kind"][tenure]
+            targets[year]["with_in_kind"][tenure] = level
+            for run in targets[year]["with_in_kind_by_implicate"]:
+                run[tenure] += shift
+
         def move_a_threshold(receipts, year, tenure, dollars):
             """Move one rerun threshold by `dollars` and restate its change."""
             targets = sensitivity(receipts)["by_target"]
             base = receipts[INKIND_NAMES[1]]["results"][year]["with_in_kind"][tenure]
-            targets[year]["with_in_kind"][tenure] += dollars
+            set_threshold(targets, year, tenure, targets[year]["with_in_kind"][tenure] + dollars)
             targets[year]["change_dollars"][tenure] += dollars
             targets[year]["change_percent"][tenure] = 100 * targets[year]["change_dollars"][tenure] / base
 
@@ -2134,7 +2207,12 @@ class PaperGuardTests(unittest.TestCase):
 
         def shift_a_threshold_off_its_change(receipts):
             # A moved year outside 2022 and 2025, with its change left as is.
-            sensitivity(receipts)["by_target"]["2023"]["with_in_kind"]["renter"] += 1
+            targets = sensitivity(receipts)["by_target"]
+            set_threshold(targets, "2023", "renter", targets["2023"]["with_in_kind"]["renter"] + 1)
+
+        def move_an_implicate_off_its_threshold(receipts):
+            # The threshold and its change stay, so only the mean's tie fails.
+            sensitivity(receipts)["by_target"]["2023"]["with_in_kind_by_implicate"][0]["renter"] += 5
 
         def raise_the_largest_wic_rise(receipts):
             targets = sensitivity(receipts)["by_target"]
@@ -2183,7 +2261,7 @@ class PaperGuardTests(unittest.TestCase):
                 )
                 level = targets["2022"]["with_in_kind"][tenure] * (1 + (base_growth + change) / 100)
                 moved = level - results["2025"]["with_in_kind"][tenure]
-                targets["2025"]["with_in_kind"][tenure] = level
+                set_threshold(targets, "2025", tenure, level)
                 targets["2025"]["change_dollars"][tenure] = moved
                 targets["2025"]["change_percent"][tenure] = 100 * moved / results["2025"]["with_in_kind"][tenure]
                 block["growth_2022_2025_percent_with"][tenure] = base_growth + change
@@ -2208,7 +2286,7 @@ class PaperGuardTests(unittest.TestCase):
             for tenure in targets["2022"]["change_dollars"]:
                 targets["2022"]["change_dollars"][tenure] = 0.0
                 targets["2022"]["change_percent"][tenure] = 0.0
-                targets["2022"]["with_in_kind"][tenure] = results["2022"]["with_in_kind"][tenure]
+                set_threshold(targets, "2022", tenure, results["2022"]["with_in_kind"][tenure])
             set_growth_changes(receipts, growth)
 
         def misstate_a_percent(receipts):
@@ -2238,6 +2316,7 @@ class PaperGuardTests(unittest.TestCase):
                 ("growth bound stated loosely", shrink_growth_well_below_the_stated_bound, label),
                 ("moved years not a run", break_the_run_of_moved_years, label),
                 ("threshold off its change", shift_a_threshold_off_its_change, label),
+                ("threshold off its implicates", move_an_implicate_off_its_threshold, label),
                 ("percent change off its dollars", misstate_a_percent, label),
                 ("growth off its thresholds", misstate_a_growth_level, label),
                 ("growth change off its thresholds", misstate_a_growth_change, label),

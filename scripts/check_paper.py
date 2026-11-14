@@ -1172,13 +1172,13 @@ def dollars(value: float) -> str:
 
 
 package_run = inkind["runs"]["package"]
-written_run = inkind["runs"]["package_bls_definition"]
-written_index_run = inkind["runs"]["fcsuti_bls_definition"]
+garner_munoz_run = inkind["runs"]["package_bls_definition"]
+garner_munoz_index_run = inkind["runs"]["fcsuti_bls_definition"]
 lift_low, lift_high = inkind["in_kind_lift_range"]
 lift_literal = f"{lift_low:.1f} to {lift_high:.1f}"
 gap_low, gap_high = package_run["gap_range"]["with_in_kind"]
-written_without = written_run["gap_range"]["without_in_kind"]
-written_with = written_run["gap_range"]["with_in_kind"]
+garner_munoz_without = garner_munoz_run["gap_range"]["without_in_kind"]
+garner_munoz_with = garner_munoz_run["gap_range"]["with_in_kind"]
 internet_low, internet_high = inkind["bls_internet_range"]
 bls_total = inkind["amounts"]["bls"]["imputed_total"]
 our_total = inkind["amounts"]["package"]["imputed_total"]
@@ -1190,7 +1190,7 @@ other_gap = sum(value for name, value in rise_gap.items() if name not in ("renta
 bls_growth = [inkind["bls"][t]["growth"] for t in TENURES]
 stage_changes = [package_run["growth"][t]["stage_change"] for t in TENURES]
 deflator = list(inkind["deflator_points"].values())
-written_index_gaps = [written_index_run["growth"][t]["less_bls"] for t in TENURES]
+garner_munoz_index_gaps = [garner_munoz_index_run["growth"][t]["less_bls"] for t in TENURES]
 bls_shares = [inkind["bls"][t]["imputed_share_beyond_cpi_u"] for t in TENURES]
 our_shares = [package_run["growth"][t]["imputed_share_beyond_cpi_u"] for t in TENURES]
 renter = package_run["growth"]["renter"]
@@ -1230,7 +1230,7 @@ TERM_COEFFICIENTS = re.findall(
     section("## BLS's imputed amounts", "## Threshold growth, 2022–2025"),
 )
 common_gaps = inkind["gap_with_bls_internet"]
-owner_rent_low, owner_rent_high = inkind["written_owner_rent_range"]
+owner_rent_low, owner_rent_high = inkind["garner_munoz_owner_rent_range"]
 # The benefits' lift to each year's threshold and its standard error. The
 # owner tenures with mortgages and renters stay far from zero; the lift for
 # owners without mortgages falls within 1.5 standard errors from some year on.
@@ -1332,12 +1332,6 @@ INKIND_METHOD_CONSTANTS = (
     "For the 2025 thresholds, as BLS does, we also let the WIC model assign participation to CE units that "
     "have a child under 5 but no woman aged 15 or older",
     "midpoint of its three-month reference period",  # 1.5 months in _wic_ebt_complete
-    # the comment on WIC_EBT_ALL_STATES_FROM_REFERENCE_YEAR: the deadline
-    # each WIC state agency had to implement EBT statewide, October 1, 2020,
-    # under 42 U.S.C. 1786(h)(12)(B)(i), which also allows the Secretary of
-    # Agriculture to grant exemptions
-    "Congress required every WIC state agency to implement EBT throughout the state by October 1, 2020, unless "
-    "the Secretary of Agriculture exempted it",
     # reference_year = year where quarter >= 2, else year - 1
     "We assign each CE interview to its collection year, and first-quarter interviews to the year before",
     # the same rule with the 1.5-month midpoint: reference year 2020 holds
@@ -1372,10 +1366,20 @@ INKIND_THRESHOLD_SOURCE = (
     "spm_calculator/ce_threshold.py",
     "4efbe2b03f6b1f4eb2911ab0f79f5151bd655cc1e5addf42f5c4540ace1f852f",
 )
+# The statute behind the 2020 cutoff, 42 U.S.C. 1786(h)(12)(B)(i): every WIC
+# state agency had to implement EBT statewide by October 1, 2020, unless the
+# Secretary of Agriculture granted an exemption. The calculator's comment on
+# WIC_EBT_ALL_STATES_FROM_REFERENCE_YEAR gives the deadline but not the
+# exemption, so this pin checks the prose against the statute's text alone.
+INKIND_STATUTE_CONSTANTS = (
+    "Congress required every WIC state agency to implement EBT throughout the state by October 1, 2020, unless "
+    "the Secretary of Agriculture exempted it [@usc1786]",
+)
 INKIND_THRESHOLD_CONSTANTS = (
     "mean imputed benefits per consumer unit in the 47th–53rd percentile band",
     # bls_quarter_window(2025) runs from 2020 Q2 to 2025 Q1, and ce_inkind
-    # assigns those interviews to reference years 2020 to 2024
+    # assigns those interviews to reference years 2020 to 2024 (reference_year
+    # = year where quarter >= 2, else year - 1), so its pin checks both files
     "Every interview in our 2025 window references 2020 or later",
 )
 # Rules the section quotes from spm_calculator/ce_bls_shares.py at this
@@ -1393,11 +1397,13 @@ INKIND_DEFINITION_CONSTANTS = (
     "but a rented vacation home",
     # _REMOVED_PAIRS["vacation_home_principal"] zeroes MRTPRNOP and MRTPRNOC,
     # which unit_components adds to shelter
-    "When we apply only these restrictions from their paper, we remove those amounts and the vacation-home "
-    "mortgage principal we add to shelter",
+    "When we apply only these restrictions from their paper, which we call the Garner–Munoz restrictions, we "
+    "remove those amounts and the vacation-home mortgage principal we add to shelter",
     # unit_components puts telephone with food and clothing and takes it out
-    # of utilities, and apply_bls_paper_definition leaves that split alone
-    "We keep telephone out of utilities, as BLS now does [@blsspmhome], where @garner2021 count it as a utility",
+    # of utilities, and apply_bls_paper_definition leaves that split alone; BLS's
+    # shares workbook publishes "OOP Utilities (no telephone)" and "Total
+    # Telephone Share" as separate rows (_ROWS)
+    "We keep telephone out of utilities, as BLS now does [@blsspmshares], where @garner2021 count it as a utility",
 )
 INKIND_SHARES_CONSTANTS = (
     # bls_band_components keeps the internet row whose dollars spread least
@@ -1410,6 +1416,10 @@ INKIND_SHARES_CONSTANTS = (
     # "other_separate" gives broadband the tenure's own mean to match
     "With the Other share kept separate, we read BLS's home internet share for a tenure as that row less the "
     "tenure's own broadband row",
+    # separate_share_errors matches every row of _ROWS but the internet row
+    # bls_band_components passes over, which it never reads
+    "With the Other share kept separate, the terms match every published share row but the internet row we do "
+    "not use, within the same bound",
 )
 # The statewide WIC EBT dates the section quotes, from the calculator's copy
 # of FNS's status report (spm_calculator/data/inkind/usda_wic_ebt_statewide.csv)
@@ -1423,9 +1433,10 @@ INKIND_WIC_DATES_SOURCE = (
     "6a61a4e0f1307f0a15e1c0a7c72a65e8be231a0fd1a6cdfb6c468c617a5d40f3",
 )
 INKIND_WIC_DATES_CONSTANTS = (
-    "six states that FNS dates statewide between June and September 2020, from Hawaii to Illinois",
-    "FNS dates six more states and the District of Columbia after the deadline, from Utah in November 2020 to "
-    "Georgia in October 2022",
+    "six states where FNS reports that WIC EBT went statewide between June and September 2020, from Hawaii to "
+    "Illinois",
+    "FNS reports that WIC EBT went statewide in six more states and the District of Columbia after the deadline, "
+    "from Utah in November 2020 to Georgia in October 2022",
 )
 replication_receipt = json.loads((DATA / "inkind" / "ce_inkind_replication_2019_2025.json").read_text())
 
@@ -1436,8 +1447,9 @@ def wic_by_state_pin() -> bool:
     The receipt reruns the stage with each state's own statewide WIC EBT
     date in every reference year. The thresholds it moves are the ones whose
     mean WIC rises; every other threshold must stay exactly as it is. Each
-    change must also follow from the rerun's thresholds and the imputation's
-    own, so the figures the prose quotes cannot drift from the block's levels.
+    rerun threshold must be the mean of its implicates, and each change must
+    follow from the rerun's thresholds and the imputation's own, so the
+    figures the prose quotes cannot drift from the block's levels.
     """
     block = replication_receipt.get("wic_ebt_by_state_sensitivity")
     if not block or block.get("wic_ebt_all_states_from_reference_year") is not None:
@@ -1464,6 +1476,12 @@ def wic_by_state_pin() -> bool:
 
     levels_follow = all(
         abs(targets[year]["with_in_kind"][tenure] - results[year]["with_in_kind"][tenure] - targets[year]["change_dollars"][tenure])
+        < 1e-6
+        and abs(
+            sum(run[tenure] for run in targets[year]["with_in_kind_by_implicate"])
+            / len(targets[year]["with_in_kind_by_implicate"])
+            - targets[year]["with_in_kind"][tenure]
+        )
         < 1e-6
         and abs(
             100 * targets[year]["change_dollars"][tenure] / results[year]["with_in_kind"][tenure]
@@ -1496,7 +1514,7 @@ def wic_by_state_pin() -> bool:
             for year in unmoved
         )
         and has_number(
-            f"estimate that mean WIC per unit rises by \\${min(rise[y] for y in risen):.2f} to "
+            f"estimate that mean WIC per CE unit rises by \\${min(rise[y] for y in risen):.2f} to "
             f"\\${max(rise[y] for y in risen):.2f} in the windows behind the {risen[0]}–{risen[-1]} thresholds",
             text=INKIND_TEXT,
         )
@@ -1599,18 +1617,18 @@ inkind_pins = (
     ),
     (
         "Garner–Munoz out-of-pocket range",
-        written_without[1] < 0
+        garner_munoz_without[1] < 0
         and has_number(
-            f"the out-of-pocket replication trails BLS by {-written_without[1]:.2f} to {-written_without[0]:.2f}",
+            f"the out-of-pocket replication trails BLS by {-garner_munoz_without[1]:.2f} to {-garner_munoz_without[0]:.2f}",
             text=INKIND_TEXT,
         ),
     ),
     (
         "Garner–Munoz range with benefits",
-        written_with[0] < 0 < written_with[1]
+        garner_munoz_with[0] < 0 < garner_munoz_with[1]
         and has_number(
-            f"When we also add the imputed benefits, we estimate thresholds between {-written_with[0]:.2f} "
-            f"percent below and {written_with[1]:.2f} percent above",
+            f"When we also add the imputed benefits, we estimate thresholds between {-garner_munoz_with[0]:.2f} "
+            f"percent below and {garner_munoz_with[1]:.2f} percent above",
             text=INKIND_TEXT,
         ),
     ),
@@ -1643,10 +1661,10 @@ inkind_pins = (
     ),
     (
         "Garner–Munoz mean absolute deviation",
-        written_run["mean_absolute_gap"]["with_in_kind"] < written_run["mean_absolute_gap"]["without_in_kind"]
+        garner_munoz_run["mean_absolute_gap"]["with_in_kind"] < garner_munoz_run["mean_absolute_gap"]["without_in_kind"]
         and has_number(
-            f"mean absolute deviation falls from {written_run['mean_absolute_gap']['without_in_kind']:.2f} to "
-            f"{written_run['mean_absolute_gap']['with_in_kind']:.2f} percent",
+            f"mean absolute deviation falls from {garner_munoz_run['mean_absolute_gap']['without_in_kind']:.2f} to "
+            f"{garner_munoz_run['mean_absolute_gap']['with_in_kind']:.2f} percent",
             text=INKIND_TEXT,
         ),
     ),
@@ -1839,15 +1857,15 @@ inkind_pins = (
         "Garner–Munoz restrictions with the composite CPI: the benefits' change to growth",
         has_number(
             "With the same restrictions and the replication's composite CPI, we estimate that the benefits "
-            f"change growth by {signed(written_run['growth'][TENURES[0]]['stage_change'])}, "
-            f"{signed(written_run['growth'][TENURES[1]]['stage_change'])}, and "
-            f"{signed(written_run['growth'][TENURES[2]]['stage_change'])} points",
+            f"change growth by {signed(garner_munoz_run['growth'][TENURES[0]]['stage_change'])}, "
+            f"{signed(garner_munoz_run['growth'][TENURES[1]]['stage_change'])}, and "
+            f"{signed(garner_munoz_run['growth'][TENURES[2]]['stage_change'])} points",
             text=GROWTH_TEXT,
         ),
     ),
     (
         "Garner–Munoz restrictions with BLS's index come within 0.8 points",
-        max(abs(g) for g in written_index_gaps) < 0.8 and has_number("within 0.8 points", text=INKIND_TEXT),
+        max(abs(g) for g in garner_munoz_index_gaps) < 0.8 and has_number("within 0.8 points", text=INKIND_TEXT),
     ),
     (
         "three-part accounting of BLS's growth beyond CPI-U",
@@ -2032,7 +2050,9 @@ inkind_pins = (
         "thresholds on the components both series hold",
         min(common_gaps["package_bls_definition"][0], common_gaps["package"][0]) > 0
         and has_number(
-            "we estimate thresholds that exceed BLS's in every tenure and year, by "
+            "We take home internet's term, with its part of the 1.2 multiplier, out of BLS's thresholds to compare "
+            "the components both series hold. On those, we estimate thresholds that exceed BLS's in every tenure and "
+            "year, by "
             f"{common_gaps['package_bls_definition'][0]:.2f} to {common_gaps['package_bls_definition'][1]:.2f} "
             f"percent under the Garner–Munoz restrictions and by {common_gaps['package'][0]:.2f} to "
             f"{common_gaps['package'][1]:.2f} percent with the CE summaries",
@@ -2111,6 +2131,7 @@ inkind_pins = (
     (
         "percentile band and windows read from fingerprinted calculator code",
         replication_receipt["code_sha256"].get(INKIND_THRESHOLD_SOURCE[0]) == INKIND_THRESHOLD_SOURCE[1]
+        and replication_receipt["code_sha256"].get(INKIND_METHOD_SOURCE[0]) == INKIND_METHOD_SOURCE[1]
         and all(has_number(constant, text=INKIND_TEXT) for constant in INKIND_THRESHOLD_CONSTANTS),
     ),
     (
@@ -2140,6 +2161,10 @@ inkind_pins = (
             f"{YEARS[oop_internet_years]}",
             text=INKIND_TEXT,
         ),
+    ),
+    (
+        "WIC EBT deadline quoted from 42 U.S.C. 1786(h)(12)(B)(i)",
+        all(has_number(constant, text=INKIND_TEXT) for constant in INKIND_STATUTE_CONSTANTS),
     ),
     (
         "WIC EBT dates from the calculator's FNS table",
@@ -2217,7 +2242,22 @@ inkind_pins = (
             f"{100 * rent_sensitivity['part_period_bounds'][1]:.0f} percent of its rent at the next interview "
             f"takes the later rent, the amount rises {rent_variants['next_interview_rent']:.1f} percent; "
             f"{rent_sensitivity['sample']['renters_with_next_interview_rent']:,} of the "
-            f"{rent_sensitivity['sample']['renters']:,} renters report rent at a next interview",
+            f"{rent_sensitivity['sample']['renters']:,} renters report rent at a next interview, and "
+            f"{rent_sensitivity['sample']['part_period_renters']:,} of those, including "
+            f"{rent_sensitivity['sample']['part_period_assisted']:,} assisted renters, take that rent",
+            text=UNCERTAINTY_TEXT,
+        )
+        and 0
+        < rent_sensitivity["sample"]["part_period_assisted"]
+        <= rent_sensitivity["sample"]["part_period_renters"]
+        <= rent_sensitivity["sample"]["renters_with_next_interview_rent"]
+        <= rent_sensitivity["sample"]["renters"]
+        and "The point-prediction variants use the fitted parameters, not parameter draws"
+        in rent_sensitivity["limitations"]
+        and inkind_method["parameter_draws"] is True
+        and has_number(
+            "For these three, we use the model's fitted parameters, while in our base we draw new parameters for "
+            "each implicate",
             text=UNCERTAINTY_TEXT,
         )
         and all(rent_variants[name] < 0 for name in ("predicted_median", "predicted_mean", "levels_predicted"))
@@ -2263,6 +2303,12 @@ inkind_pins = (
         )
         and has_number(
             f"We add no WIC from reference year {inkind_method['wic_ebt_all_states_from_reference_year']}",
+            text=INKIND_TEXT,
+        )
+        and replication_receipt["results"]["2025"]["sample_mean_in_kind_threshold_year_dollars"]["wic"] == 0
+        and has_number(
+            f"Because we add no WIC from reference year {inkind_method['wic_ebt_all_states_from_reference_year']}, "
+            "these units take none",
             text=INKIND_TEXT,
         ),
     ),

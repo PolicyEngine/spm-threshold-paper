@@ -514,6 +514,24 @@ class ComponentReceiptChecks(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, self.SCHEMA_LABEL):
                     self.load_edited(edit)
 
+    def test_a_row_missing_an_accounting_is_rejected(self):
+        """A growth row or level gap without one accounting fails with the
+        schema message, not a KeyError from a later reader."""
+        rows = {
+            "BLS growth row": lambda c: c["bls"]["growth_2022_2025"]["by_tenure"]["renter"],
+            "run growth row": lambda c: c["runs"]["package"]["growth_2022_2025"]["by_tenure"]["renter"],
+            "run level gaps": lambda c: c["runs"]["package_bls_definition"]["years"]["2024"]["level_gap_percent_of_bls"],
+        }
+        for name, row in rows.items():
+            for accounting in ("other_spread", "other_separate"):
+                with self.subTest(row=name, accounting=accounting):
+
+                    def edit(components):
+                        del row(components)[accounting]
+
+                    with self.assertRaisesRegex(ValueError, self.SCHEMA_LABEL):
+                        self.load_edited(edit)
+
     def test_an_other_separate_share_error_over_tolerance_is_rejected(self):
         for sign in (1, -1):
             with self.subTest(sign=sign):

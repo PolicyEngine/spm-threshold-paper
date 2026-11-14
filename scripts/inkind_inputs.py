@@ -210,6 +210,19 @@ def load_inkind(data_dir: Path, current_dir: Path) -> dict:
         and tuple(sorted(components.get("accountings", ()))) == tuple(sorted(ACCOUNTINGS)),
         f"component receipt schema {COMPONENTS_SCHEMA} with both accountings of the Other share",
     )
+    growth_rows = [components["bls"]["growth_2022_2025"]["by_tenure"]] + [
+        components["runs"][run]["growth_2022_2025"]["by_tenure"] for run in RUNS
+    ]
+    level_rows = [
+        components["runs"][run]["years"][year]["level_gap_percent_of_bls"]
+        for run in ("package", "package_bls_definition")
+        for year in YEARS
+    ]
+    _require(
+        all(set(ACCOUNTINGS) <= set(rows.get(tenure, ())) for rows in growth_rows for tenure in TENURES)
+        and all(set(ACCOUNTINGS) <= set(gaps) for gaps in level_rows),
+        f"component receipt schema {COMPONENTS_SCHEMA} with both accountings of the Other share",
+    )
     for run, (deflator, written) in RUNS.items():
         entry = components["runs"][run]
         _require(
@@ -863,7 +876,7 @@ def _internet_and_levels(components: dict) -> dict:
         "bls_internet_share_range": (min(shares.values()), max(shares.values())),
         "bls_internet_row_share_range": (min(rows.values()), max(rows.values())),
         "gap_with_bls_internet": gaps,
-        "written_owner_rent_range": (min(kept), max(kept)),
+        "garner_munoz_owner_rent_range": (min(kept), max(kept)),
     }
 
 
