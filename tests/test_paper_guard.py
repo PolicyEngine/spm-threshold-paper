@@ -1,5 +1,6 @@
 """Mutation tests run the real guard in independent temporary Git clones."""
 
+import ast
 import hashlib
 import importlib.util
 import json
@@ -1372,6 +1373,14 @@ INKIND_PROSE_MUTATIONS = (
         r"we\1draw\2each\3model's\4parameters",
         "rent sensitivities",
     ),
+    # Round 8: the 4a23997 delta check.
+    (
+        "compound count of matching neighbors with a non-breaking hyphen",
+        "section",
+        r"of(\s+)one(\s+)of(\s+)the(\s+)five(\s+)recipients",
+        "of\\1twenty\u2011one\\2of\\3the\\4five\\5recipients",
+        "implicate, matching-neighbor and cell-donor counts",
+    ),
 )
 
 
@@ -1413,6 +1422,45 @@ def load_inkind_module():
 def excluded_diagnostic(path):
     """Do not read or copy private worker diagnostics into test fixtures."""
     return str(path).endswith((".err", ".lane.log"))
+
+
+def load_bounded():
+    """Extract bounded() from scripts/check_paper.py, which runs its checks
+    at import, so the test can call it on text it constructs."""
+    tree = ast.parse((REPO / "scripts/check_paper.py").read_text())
+    function = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "bounded")
+    namespace = {"re": re}
+    exec(compile(ast.Module([function], []), "check_paper.bounded", "exec"), namespace)
+    return namespace["bounded"]
+
+
+class BoundedLiteralTests(unittest.TestCase):
+    """bounded() keeps a pin's literal from matching inside a longer token."""
+
+    CASES = (
+        ("six states whose", "including in six states whose", True),
+        ("six states whose", "including in twenty-six states whose", False),
+        ("six states whose", "including in twenty\u2010six states whose", False),
+        ("six states whose", "including in twenty\u2011six states whose", False),
+        ("one of the five recipients", "the amount of one of the five recipients", True),
+        ("one of the five recipients", "the amount of none of the five recipients", False),
+        ("one of the five recipients", "the amount of twenty-one of the five recipients", False),
+        ("five", "twenty\u2011five", False),
+        ("five", "\u00e9five", False),
+        ("in 2025", "\u00e9in 2025", False),
+        ("in 2025", "units in 2025.", True),
+        ("Garner", "the Garner–Munoz restrictions", True),
+        ("1.9 percent", "an error of 11.9 percent", False),
+        ("error of −1.9 percent", "a mean error of +1.9 percent", False),
+        ('"Total Internet Share"', 'and "Total Internet Share" in 2025', True),
+        ("(@sec-inkind-bls)", "as we report (@sec-inkind-bls).", True),
+    )
+
+    def test_literals_match_only_whole_tokens(self):
+        bounded = load_bounded()
+        for literal, text, expected in self.CASES:
+            with self.subTest(literal=literal, text=text):
+                self.assertEqual(bool(re.search(bounded(literal), text)), expected)
 
 
 class PaperGuardTests(unittest.TestCase):
@@ -1789,6 +1837,15 @@ class PaperGuardTests(unittest.TestCase):
         result = self.run_guard()
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("current projection prose replication_ratio", result.stdout)
+
+    def test_signed_cpi_u_bias_pins_its_sign(self):
+        path = self.repo / "paper/index.qmd"
+        text = path.read_text()
+        self.assertEqual(text.count("error of −1.9 percent"), 1)
+        path.write_text(text.replace("error of −1.9 percent", "error of +1.9 percent"))
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("signed CPI-U bias -1.9", result.stdout)
 
     def test_evaluation_range_rounds_from_saved_errors(self):
         path = self.repo / "paper/index.qmd"

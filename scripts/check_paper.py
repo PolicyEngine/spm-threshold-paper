@@ -135,18 +135,22 @@ def check(label: str, ok: bool) -> None:
 def bounded(literal: str) -> str:
     """A literal that cannot match inside a longer token: numeric-token
     boundaries for figures, word boundaries for spelled-out counts. A literal
-    that starts or ends with a letter also refuses a letter or hyphen beside
-    that edge, so "six states" fails on "twenty-six states" and "one of the"
-    on "none of the", whether or not the literal holds a figure."""
+    that starts or ends with a letter also refuses a letter (in any script)
+    or a hyphen (ASCII, U+2010 or U+2011) beside that edge, so "six states"
+    fails on "twenty-six states" and "one of the" on "none of the", whether
+    or not the literal holds a figure. A literal without a figure takes a
+    word boundary only at an edge that is a word character, so one that
+    starts or ends with a quote or bracket can still match."""
     pattern = re.escape(literal)
     if any(character.isdigit() for character in literal):
         left, right = r"(?<![\d.,])", r"(?![\d]|[.,]\d)"
     else:
-        left, right = r"\b", r"\b"
+        left = r"\b" if re.match(r"\w", literal[:1]) else ""
+        right = r"\b" if re.match(r"\w", literal[-1:]) else ""
     if literal[:1].isalpha():
-        left += r"(?<![A-Za-z-])"
+        left += r"(?<![^\W\d_])(?<![-‐‑])"
     if literal[-1:].isalpha():
-        right = r"(?![A-Za-z-])" + right
+        right = r"(?![^\W\d_])(?![-‐‑])" + right
     return left + pattern + right
 
 
@@ -637,7 +641,8 @@ def mae(rule: str) -> float:
 signed_mean = sum(signed_by_rule["cpi_u"]) / len(signed_by_rule["cpi_u"])
 check(
     "signed CPI-U bias -1.9",
-    has_number("1.9 percent") and abs(signed_mean - (-0.019)) < 0.002,
+    has_number(f"error of {100 * signed_mean:+.1f} percent".replace("-", "−"))
+    and abs(signed_mean - (-0.019)) < 0.002,
 )
 cpiu_low_years = sum(1 for m in annual_signed["cpi_u"] if m < 0)
 check(
