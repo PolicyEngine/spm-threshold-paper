@@ -660,7 +660,7 @@ class BlockScalarSpanTests(unittest.TestCase):
             ),
             "markup": (
                 with_lines("  First *line*.\n"),
-                "the abstract may hold only letters, digits, spaces, dashes and . , ; : ( ) ' \" ? ! /, "
+                "the abstract may hold only letters, digits, spaces, dashes and . , ; : ( ) ' \" ? ! / +, "
                 "and holds '*'",
             ),
         }.items():
@@ -669,20 +669,20 @@ class BlockScalarSpanTests(unittest.TestCase):
         self.assertIsNone(block_problem(PAPER, "abstract"))
 
     def test_only_plain_prose_reads(self):
-        """Every character outside letters, ASCII digits, spaces, dashes and
-        sentence punctuation fails the abstract closed, so no markup, symbol
-        or invisible character reaches a tie."""
-        for character in "*_`<>[]{}\\&$#|~^@=+%\u2248\u00a7\u00a9\u2026\u200b\u00ad\ufeff\u0661":
+        """Every character outside letters, ASCII digits, spaces, dashes, plus
+        signs and sentence punctuation fails the abstract closed, so no
+        markup, symbol or invisible character reaches a tie."""
+        for character in "*_`<>[]{}\\&$#|~^@=%\u2248\u00a7\u00a9\u2026\u200b\u00ad\ufeff\u0661":
             with self.subTest(character=repr(character)):
                 text = with_lines(f"  First{character}line 9.99.\n")
                 self.assertIsNotNone(block_scalar_span(text, "abstract"))
                 self.assertIsNone(block_words(text, "abstract"))
                 self.assertEqual(
                     block_problem(text, "abstract"),
-                    "the abstract may hold only letters, digits, spaces, dashes and . , ; : ( ) ' \" ? ! /, "
+                    "the abstract may hold only letters, digits, spaces, dashes and . , ; : ( ) ' \" ? ! / +, "
                     f"and holds {character!r}",
                 )
-        for character in "\u00e9\u00df\u4e2d.,;:()'\"?!/\u2013\u2014\u2212\u2018\u2019\u201c\u201d\u00a0":
+        for character in "\u00e9\u00df\u4e2d.,;:()'\"?!/+\u2013\u2014\u2212\u2018\u2019\u201c\u201d\u00a0":
             with self.subTest(character=repr(character)):
                 text = with_lines(f"  First{character}line 9.99.\n")
                 self.assertIsNotNone(block_words(text, "abstract"))
@@ -729,6 +729,87 @@ class BlockWordsTests(unittest.TestCase):
             with self.subTest(lines=lines):
                 self.assertIsNotNone(block_scalar_span(with_lines(lines), "abstract"))
                 self.assertIsNone(block_words(with_lines(lines), "abstract"))
+
+    def test_markers_that_open_other_blocks_fail_closed(self):
+        """pandoc reads a list marker that opens a paragraph, a line of
+        hyphens or plus signs and a colon that opens a line as a list, a
+        heading, a rule, a table or a definition, and renders other text than
+        the parser reads. Each fails closed with a reason. Mid-paragraph, a
+        list marker renders as typed, as does a signed number."""
+        for name, (lines, reason) in {
+            "bullet after a blank line": (
+                "  First line.\n\n  - 9.99 percent\n",
+                "line 11, in the abstract, opens a paragraph with '-', which pandoc reads as a list marker",
+            ),
+            "plus bullet on the first line": (
+                "  + 9.99 percent\n",
+                "line 9, in the abstract, opens a paragraph with '+', which pandoc reads as a list marker",
+            ),
+            "year as an ordered marker": (
+                "  2025. The rate was 9.99 percent.\n",
+                "line 9, in the abstract, opens a paragraph with '2025.', which pandoc reads as a list marker",
+            ),
+            "parenthesized number": (
+                "  First line.\n\n  (1) 9.99 percent\n",
+                "line 11, in the abstract, opens a paragraph with '(1)', which pandoc reads as a list marker",
+            ),
+            "letter": (
+                "  First line.\n\n  b) 9.99 percent\n",
+                "line 11, in the abstract, opens a paragraph with 'b)', which pandoc reads as a list marker",
+            ),
+            "roman numeral": (
+                "  First line.\n\n  iv. 9.99 percent\n",
+                "line 11, in the abstract, opens a paragraph with 'iv.', which pandoc reads as a list marker",
+            ),
+            "bullet after an indented code block": (
+                "  First line.\n\n      code\n  - 9.99 percent\n",
+                "line 12, in the abstract, opens a paragraph with '-', which pandoc reads as a list marker",
+            ),
+            "bullet after a tab-indented code block": (
+                "  First line.\n\n  \tcode\n  - 9.99 percent\n",
+                "line 12, in the abstract, opens a paragraph with '-', which pandoc reads as a list marker",
+            ),
+            "setext underline": (
+                "  9.99 percent\n  ---\n  First line.\n",
+                "line 10, in the abstract, holds only hyphens or plus signs, which pandoc reads "
+                "as a heading's underline, a rule, a table's border or a list item",
+            ),
+            "one-hyphen underline": (
+                "  9.99 percent\n  -\n",
+                "line 10, in the abstract, holds only hyphens or plus signs, which pandoc reads "
+                "as a heading's underline, a rule, a table's border or a list item",
+            ),
+            "simple table border": (
+                "  First line.\n\n  ---- ----\n  9.99 1.00\n  ---- ----\n",
+                "line 11, in the abstract, holds only hyphens or plus signs, which pandoc reads "
+                "as a heading's underline, a rule, a table's border or a list item",
+            ),
+            "lone plus before text": (
+                "  First line.\n\n  +\n  9.99 percent\n",
+                "line 11, in the abstract, holds only hyphens or plus signs, which pandoc reads "
+                "as a heading's underline, a rule, a table's border or a list item",
+            ),
+            "definition": (
+                "  First line\n  : 9.99 percent\n",
+                "line 10, in the abstract, opens with ':', which pandoc reads as a definition list marker",
+            ),
+        }.items():
+            with self.subTest(case=name):
+                text = with_lines(lines)
+                self.assertIsNotNone(block_scalar_span(text, "abstract"))
+                self.assertIsNone(block_words(text, "abstract"))
+                self.assertEqual(block_problem(text, "abstract"), reason)
+        for lines in (
+            "  First line, then\n  - 9.99 percent.\n",
+            "  First line, then\n  + 9.99 percent.\n",
+            "  First line, then\n  2025. was 9.99 percent.\n",
+            "  +1.04 points and\n  -0.63 points, or \u22120.63.\n",
+            "  1.17 percent, e.g. this.\n\n  U.S. rates: 9.99.\n",
+            "  First line.\n  \u2013\u2013\n",
+            "  Rates: 9.99 to 10.00\n  :not a marker.\n",
+        ):
+            with self.subTest(lines=lines):
+                self.assertIsNotNone(block_words(with_lines(lines), "abstract"))
 
     def test_edge_cases_read_or_fail_closed_as_pinned(self):
         """A change that newly fails closed on an edge case, or newly reads
@@ -1361,6 +1442,16 @@ EDGE_CASES = {
     "nested sequence block with shallow text": PAPER.replace(
         "format:\n", "notes:\n- - |\n  shallow\nformat:\n"
     ),
+    "bullet opening a paragraph": with_lines("  First line.\n\n  - 9.99 percent.\n"),
+    "bullet after an indented code block": with_lines("  First line.\n\n      code\n  - 9.99 percent.\n"),
+    "ordered marker opening the block": with_lines("  2025. The rate was 9.99 percent.\n"),
+    "setext underline in the block": with_lines("  9.99 percent\n  ---\n"),
+    "definition in the block": with_lines("  First line\n  : 9.99 percent\n"),
+    "bullet and number mid-paragraph": with_lines(
+        "  First line, then\n  - 9.99 percent and\n  + 1.00 and\n  2025. was 9.99.\n"
+    ),
+    "signed figures opening paragraphs": with_lines("  +1.04 points.\n\n  -0.63 points and \u22120.63.\n"),
+    "en dash line and inner colon": with_lines("  Rates: 9.99\n  \u2013\u2013\n  :not a marker.\n"),
 }
 
 # The edge cases from which the parser reads an abstract; it fails closed on
@@ -1397,6 +1488,9 @@ EDGE_CASES_READ = frozenset(
         "quoted flow list with an escape",
         "emphasis continuing a plain value",
         "double-quoted line ending in a backslash",
+        "bullet and number mid-paragraph",
+        "signed figures opening paragraphs",
+        "en dash line and inner colon",
     )
 )
 

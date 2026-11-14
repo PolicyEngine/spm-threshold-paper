@@ -2317,10 +2317,11 @@ class PaperGuardTests(unittest.TestCase):
 
     def test_abstract_markup_fails_every_abstract_tie(self):
         """Quarto renders emphasis, an HTML comment, a code fence, a
-        shortcode, raw content, TeX, an entity or a div in the abstract as
-        other text or none, so each fails every tie that reads the abstract,
-        even when it restates the abstract's own wording, and the guard names
-        the first character outside plain prose."""
+        shortcode, raw content, TeX, an entity, a div, a list, a heading's
+        underline or a definition in the abstract as other text or none, so
+        each fails every tie that reads the abstract, even when it restates
+        the abstract's own wording, and the guard names the first character
+        outside plain prose or the line that opens the other block."""
         decoy = ABSTRACT_PROSE_MUTATIONS[0][4]
         for name, line, reason in (
             ("emphasis", f"*{decoy}*", "holds '*'"),
@@ -2333,6 +2334,9 @@ class PaperGuardTests(unittest.TestCase):
             ("TeX conditional", f"\\iffalse\n{decoy}\n\\fi", "holds '\\\\'"),
             ("HTML entity", "&minus;2.29 percent", "holds '&'"),
             ("div", f"::: hidden\n{decoy}\n:::", "holds ':::'"),
+            ("list", f"\n- {decoy}", "opens a paragraph with '-'"),
+            ("heading underline", "---", "holds only hyphens or plus signs"),
+            ("definition", f": {decoy}", "opens with ':'"),
         ):
             with self.subTest(case=name):
                 self.install_article()

@@ -95,14 +95,25 @@ CONTAINER = re.compile(r"[ \t>]+|(?:[-*+:~]|\(?(?:[0-9A-Za-z#]{1,9}|@[\w-]*)[.)]
 GRID_BORDER = re.compile(r"\+[-=:]+\+(?:[-=:]*\+)*$").search
 
 # Characters the abstract may hold besides letters and ASCII digits:
-# whitespace, sentence punctuation, quotes and dashes. Markdown, HTML and TeX
-# each need one of the others (* _ ` [ ] { } < > & \ $ ^ ~ # | @ = % +), so
-# text made of these renders as typed, with no part hidden or replaced.
+# whitespace, sentence punctuation, quotes, dashes and plus signs. Inline
+# markup in Markdown, HTML and TeX needs one of the others
+# (* _ ` [ ] { } < > & \ $ ^ ~ # | @ = %). Some lines made of these still
+# open a block that pandoc renders as other text, and _marker_problem rejects
+# those.
 PROSE_MARKS = frozenset(
-    " \t\n\r\xa0\u202f.,;:()'\"\u2018\u2019\u201c\u201d?!/"
+    " \t\n\r\xa0\u202f.,;:()'\"\u2018\u2019\u201c\u201d?!/+"
     "\u2010\u2011\u2012\u2013\u2014\u2015\u2212\ufe58\ufe63\uff0d-"
 )
-PROSE_LIST = "letters, digits, spaces, dashes and . , ; : ( ) ' \" ? ! /"
+PROSE_LIST = "letters, digits, spaces, dashes and . , ; : ( ) ' \" ? ! / +"
+# A list marker: pandoc reads "-", "+", a number, a letter or a roman numeral
+# followed by "." or ")", or one wrapped in parentheses, as a list item when
+# it opens a paragraph and a space or the line's end follows it.
+LIST_MARKER = re.compile(r"(?:[-+]|\(?(?:[0-9]+|[A-Za-z]|[ivxlcdm]+|[IVXLCDM]+)[.)])(?=\s|$)").match
+# A line of hyphens and plus signs, which pandoc reads as a heading's
+# underline, a rule, a table's border or an empty list item.
+RULE_LINE = re.compile(r"[-+\s]*$").match
+# A colon that opens a line, which pandoc reads as a definition list marker.
+DEFINITION_MARKER = re.compile(r":(?=\s|$)").match
 
 
 def _bare(line: str) -> str:
@@ -188,7 +199,7 @@ def block_problem(text: str, key: str) -> str | None:
     span, reason = _scan(text, key)
     if span is None:
         return reason
-    return _prose_problem(text[span[0] : span[1]], key)
+    return _prose_problem(text[span[0] : span[1]], key, text.count("\n", 0, span[0]) + 1)
 
 
 def block_words(text: str, key: str) -> str | None:
@@ -205,13 +216,52 @@ def block_words(text: str, key: str) -> str | None:
     return " ".join(block.split())
 
 
-def _prose_problem(block: str, key: str) -> str | None:
-    """Why the block's text is not plain prose, or None."""
+def _prose_problem(block: str, key: str, first: int = 1) -> str | None:
+    """Why the block's text is not plain prose, or None. ``first`` numbers
+    the block's first line in the reasons."""
     for character in block:
         if not (character.isalpha() or character in "0123456789" or character in PROSE_MARKS):
             return f"the {key} may hold only {PROSE_LIST}, and holds {character!r}"
     if ":::" in block:
         return f"the {key} holds ':::', which opens a div that Quarto can hide"
+    return _marker_problem(block, key, first)
+
+
+def _marker_problem(block: str, key: str, first: int) -> str | None:
+    """Why a line of the block opens a list, a definition, a rule or a
+    table, or None.
+
+    A list marker counts only where a paragraph opens: at the block's first
+    line with text, after a line of whitespace, or after a line indented four
+    or more columns past the block's own indentation, which ends an indented
+    code block. Mid-paragraph, pandoc renders a list marker as typed. Python's
+    whitespace includes characters, such as a no-break space, that pandoc
+    reads as text, so these checks open more paragraphs and strip more
+    indentation than pandoc does, never fewer."""
+    indent = None
+    opens = True
+    for number, line in enumerate(block.split("\n"), first):
+        text = line.strip()
+        if not text:
+            opens = True
+            continue
+        lead = re.match(r"[ \t]*", line).group()
+        if indent is None:
+            indent = len(lead) - len(lead.lstrip(" "))
+        if RULE_LINE(text):
+            return (
+                f"line {number}, in the {key}, holds only hyphens or plus signs, which pandoc "
+                "reads as a heading's underline, a rule, a table's border or a list item"
+            )
+        if DEFINITION_MARKER(text):
+            return f"line {number}, in the {key}, opens with ':', which pandoc reads as a definition list marker"
+        marker = LIST_MARKER(text)
+        if opens and marker is not None:
+            return (
+                f"line {number}, in the {key}, opens a paragraph with {marker.group()!r}, "
+                "which pandoc reads as a list marker"
+            )
+        opens = len(lead[indent:].expandtabs(4)) >= 4
     return None
 
 
