@@ -31,17 +31,20 @@ push to master and every pull request. It fails when:
     error rate the abstract quotes from the front matter's ``abstract: |``
     block alone, as Quarto and pandoc read it, beside the rule it scores.
     Every statement of that rule's wording must hold a rate the guard
-    reads, and every such rate must equal the registered value. A copy in
-    other metadata, in a comment, in the body or inside the abstract cannot
-    rescue a drifted figure, a flipped sign or a range, and a swap between
-    rules fails. A key that could set the abstract elsewhere, such as under
-    ``format: html:``, YAML syntax the parser does not resolve, a quoted
-    value left open, an HTML comment or code fence elsewhere in the front
-    matter, or a metadata block in the body fails every abstract tie, and
-    so does an HTML comment, code fence, shortcode or raw content inside the
-    block. A project or directory metadata file that names the abstract or
-    more metadata files, a paper that names more, or an include outside
-    ``tables/`` fails too;
+    reads, and every such rate must equal the registered value. Every
+    decimal the abstract states must be one of its tied figures, written
+    as a bare number, so a drifted figure, a flipped sign or a range fails
+    even beside a correct copy, and a swap between rules fails. The guard
+    fails every abstract tie, and says why, when it cannot read the block:
+    the front matter steps outside the plain YAML the parser reads, sets the
+    abstract other than in one top-level block, or holds an HTML comment or
+    code fence; the body holds a line that could set the abstract, a
+    metadata block or a grid table; a line ends in a carriage return without
+    a line feed or holds a Unicode line separator; or the abstract holds
+    anything but plain prose. A project
+    or directory metadata file that names the abstract or more metadata
+    files, a paper that names more, or an include other than a generated
+    table fails too;
 (e) the README miscounts the in-kind receipts or omits a calculator
     commit that their provenance records.
 
@@ -92,7 +95,7 @@ from inkind_inputs import (
     published_standard_errors,
     uncertainty_figures,
 )
-from paper_text import block_scalar_span, block_words, stated_values
+from paper_text import block_problem, block_words, stated_values
 
 REPO = Path(__file__).resolve().parent.parent
 DATA = REPO / "data"
@@ -101,8 +104,13 @@ FORECAST_RECORD = REPO / "docs" / "forecast-record.md"
 QMD = (REPO / "paper" / "index.qmd").read_text()
 # The paper as stored, line endings included: read_text() turns a lone
 # carriage return into a line feed, and the abstract's parser fails closed on
-# one, since Quarto and pandoc read it differently.
-QMD_RAW = (REPO / "paper" / "index.qmd").read_bytes().decode()
+# one, since Quarto and pandoc read it differently. Quarto and pandoc skip a
+# byte-order mark, so the guard does too.
+QMD_RAW = (REPO / "paper" / "index.qmd").read_bytes().decode("utf-8-sig")
+# The files the paper includes, quotes removed, as Quarto reads the paths.
+INCLUDES = [name.strip("\"'") for name in re.findall(r"\{\{<\s*include\s+(.*?)\s*>\}\}", QMD_RAW)]
+# How the paper names a generated table it includes.
+TABLE_INCLUDE = re.compile(r"tables/[A-Za-z0-9_-]+\.md").fullmatch
 
 TENURES = ("owner_with_mortgage", "owner_without_mortgage", "renter")
 
@@ -151,6 +159,11 @@ def check(label: str, ok: bool) -> None:
         failures.append(label)
 
 
+# The start of the failure the guard reports when it cannot read the
+# abstract; the parser's reason follows it.
+ABSTRACT_UNREAD = "paper's abstract cannot be read:"
+
+
 def bounded(literal: str) -> str:
     """A literal that cannot match inside a longer token: numeric-token
     boundaries for figures, word boundaries for spelled-out counts."""
@@ -194,18 +207,14 @@ def section(start: str, end: str | None = None, text: str = QMD) -> str:
 def front_matter_block(key: str, text: str = QMD_RAW) -> str:
     """Whitespace-normalized words of the front matter's one ``key: |``
     literal block, read as Quarto and pandoc read it. Pins that read it see
-    no other metadata field, comment or body text. When ``block_words`` finds
-    no such block, finds another line that could set the key, or finds markup
-    in the block that renders as other text, the slice is empty, so every pin
-    inside it fails instead of reading other text."""
-    words = block_words(text, key)
-    if words is None:
-        if block_scalar_span(text, key) is None:
-            failures.append(f"paper must set {key} only in one {key}: | block of its front matter")
-        else:
-            failures.append(f"paper's {key} may not hold HTML comments, code fences, shortcodes or raw content")
+    no other metadata field, comment or body text. When the parser cannot
+    read the block, the guard records why and the slice is empty, so every
+    pin inside it fails instead of reading other text."""
+    problem = block_problem(text, key)
+    if problem is not None:
+        failures.append(f"{ABSTRACT_UNREAD} {problem}")
         return ""
-    return words
+    return block_words(text, key)
 
 
 COUNT_WORDS = (
@@ -433,7 +442,7 @@ with tempfile.TemporaryDirectory(prefix="spm-paper-check-") as tmp:
         )
 
 # (b) Every QMD include names an expected table.
-includes = set(re.findall(r"\{\{<\s*include\s+tables/([^\s>]+)\s*>\}\}", QMD))
+includes = {name.removeprefix("tables/") for name in INCLUDES if TABLE_INCLUDE(name)}
 check(
     f"qmd includes outside allowlist: {includes - ARTICLE_TABLES}",
     includes <= ARTICLE_TABLES,
@@ -771,40 +780,44 @@ check(
 # Figures in the abstract also appear in the body or its tables, so their
 # abstract ties read only the front matter's `abstract: |` block, as Quarto
 # and pandoc read it. Other metadata fields, comments and body text fall
-# outside it, so a copy there cannot rescue a drifted figure. A key that
-# could set the abstract anywhere else, such as under `format: html:`, any
-# metadata block in the body, or an HTML comment, code fence, shortcode or
-# raw content in the block fails every tie.
+# outside it, so a copy there cannot rescue a drifted figure. When the
+# parser cannot read the block (paper_text.block_scalar_span lists when),
+# every tie fails and the guard says why.
 ABSTRACT = front_matter_block("abstract")
 
 
 def abstract_states(template: str, literal: str) -> bool:
     """Whether the abstract states ``literal`` in ``template``'s slot at least
     once and nothing else there. Every statement of the template's wording
-    must hold a number the slot reads, so a rate the slot cannot read, such
-    as one in emphasis, fails rather than leaving the tie to a correct copy
-    elsewhere in the abstract. So does a swap between rules, a flipped sign or
-    a range."""
+    must hold a whole number the slot reads, so a rate glued to other text
+    fails rather than leaving the tie to a correct copy elsewhere in the
+    abstract. So does a swap between rules, a flipped sign or a range."""
     values = stated_values(template, ABSTRACT)
-    return set(values) == {literal} and len(values) == len(stated_values(template, ABSTRACT, r"\S+"))
+    tokens = [token.removeprefix("(") for token in stated_values(template, ABSTRACT, r"\S+")]
+    return set(values) == {literal} and values == tokens
+
+
 # Quarto merges the project's _quarto file, with its profile and .local
 # variants, paper/_metadata, and any metadata-files they or the paper name
 # into the paper's metadata, so an abstract set there could replace the block
 # the ties read. None of them, nor a _metadata file at the root, may name the
 # abstract or more metadata files.
+# Names match in any case, since macOS finds `_Metadata.yml` as Quarto looks
+# for `_metadata.yml`. The check reads the files' text, not their keys, so it
+# also fails on a comment or a key such as `abstract-title` that mentions the
+# abstract; set those in the paper's own front matter instead.
 METADATA_SOURCES = sorted(
     path
     for folder in (REPO, REPO / "paper")
-    for pattern in ("_quarto*.y*ml", "_quarto*.y*ml.local", "_metadata.y*ml")
-    for path in folder.glob(pattern)
+    for path in folder.iterdir()
+    if path.is_file() and re.fullmatch(r"_quarto.*\.ya?ml(?:\.local)?|_metadata\.ya?ml", path.name, re.I)
 )
 # Quarto also renders an included file's own front matter and metadata
 # blocks into the paper's metadata, so the paper may include only the
-# generated tables that (a) and (b) check.
-INCLUDES = re.findall(r"\{\{<\s*include\s+(.*?)\s*>\}\}", QMD_RAW)
+# generated tables that (a) and (b) check, each named as `tables/<name>.md`.
 check(
-    "paper/index.qmd may include only files under tables/",
-    all(name.strip("\"'").startswith("tables/") for name in INCLUDES),
+    "paper/index.qmd may include only the generated tables, as tables/<name>.md",
+    all(TABLE_INCLUDE(name) for name in INCLUDES),
 )
 check(
     "only paper/index.qmd may set the abstract or name metadata files",
@@ -2121,6 +2134,21 @@ inkind_pins = (
 )
 for label, ok in inkind_pins:
     check(f"in-kind prose: {label}", ok)
+
+# Every decimal the abstract states is one of the figures its ties check,
+# written as a bare number, so a changed figure, a sign, a range or an added
+# figure fails even beside a correct copy, and a statement whose wording
+# changed cannot hide a drifted figure from its tie.
+ABSTRACT_FIGURES = (
+    {f"{value:.2f}" for value in retrospective.values()}
+    | {"1.17", "0.75", "2.58"}
+    | set(lift_literal.split(" to "))
+)
+abstract_decimals = {token.strip("(),.;:") for token in re.findall(r"\S*\d\.\d\S*", ABSTRACT)}
+check(
+    "abstract states only its tied figures, each as a bare number",
+    bool(ABSTRACT) and abstract_decimals == ABSTRACT_FIGURES,
+)
 
 if failures:
     print("PAPER DRIFT CHECK FAILED:")

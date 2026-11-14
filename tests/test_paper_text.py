@@ -39,6 +39,7 @@ def load_paper_text():
 PAPER_TEXT = load_paper_text()
 block_scalar_span = PAPER_TEXT.block_scalar_span
 block_words = PAPER_TEXT.block_words
+block_problem = PAPER_TEXT.block_problem
 stated_values = PAPER_TEXT.stated_values
 
 MINUS = "\u2212"
@@ -140,7 +141,7 @@ class BlockScalarSpanTests(unittest.TestCase):
     def test_keys_that_share_the_prefix_do_not_count(self):
         extra = (
             'abstract-title: "Summary"\nabstracts: |\n  Another block.\n'
-            '"abstract-note": Another field.\n'
+            "abstract-note: Another field.\nabstract_2: A third.\n"
         )
         text = PAPER.replace('title: "Thresholds"\n', f'title: "Thresholds"\n{extra}')
         self.assertEqual(block_lines(text), ABSTRACT_LINES)
@@ -299,6 +300,7 @@ class BlockScalarSpanTests(unittest.TestCase):
             '"**Bold**, _italic_ and &amp;"',
             '"a, &b c: d"',
             "'It''s *done*: yes'",
+            '"A \\"quoted\\" word"',
             '["SPM", "Line\\nbreak"]',
             "&on true",
             "!!str style.css",
@@ -437,8 +439,15 @@ class BlockScalarSpanTests(unittest.TestCase):
     def test_the_first_line_with_text_sets_the_indentation(self):
         deeper = "  First line,\n    a deeper line,\n  and a third.\n"
         self.assertEqual(block_lines(with_lines(deeper)), deeper)
+        # YAML ends the block at the two-space line, which then sits deeper
+        # than the key and holds no key, so the parser fails closed on it.
         shallower = "    Four spaces,\n  then two.\n"
-        self.assertEqual(block_lines(with_lines(shallower)), "    Four spaces,\n")
+        self.assertIsNone(block_scalar_span(with_lines(shallower), "abstract"))
+        self.assertEqual(
+            block_problem(with_lines(shallower), "abstract"),
+            f"line {PAPER.count(chr(10), 0, PAPER.index('abstract: |')) + 3}, in the front matter, "
+            "is YAML the guard does not read",
+        )
         leading_blank = "\n" + ABSTRACT_LINES
         self.assertEqual(block_lines(with_lines(leading_blank)), leading_blank)
 
@@ -539,18 +548,28 @@ class BlockScalarSpanTests(unittest.TestCase):
         text = PAPER.replace("\n", "\r\n")
         self.assertEqual(block_lines(text), ABSTRACT_LINES.replace("\n", "\r\n"))
 
-    def test_a_lone_carriage_return_in_the_front_matter_fails_closed(self):
-        """pandoc drops a carriage return that no line feed follows, so the
-        parser fails closed rather than guess how the line reads."""
-        for name, text in {
-            "every line": PAPER.replace("\n", "\r"),
-            "inside the abstract": with_lines("  First line\rof the abstract.\n"),
-            "inside the title": PAPER.replace('"Thresholds"', '"Thresh\rolds"'),
+    def test_a_lone_carriage_return_fails_closed_anywhere(self):
+        """Quarto ends a line at a carriage return that no line feed follows,
+        which pandoc drops, so a body line "abstract: |" glued to the end of
+        another sets Quarto's abstract alone. The parser fails closed on such
+        a carriage return anywhere in the file and says on which line."""
+        for name, (text, number) in {
+            "every line": (PAPER.replace("\n", "\r"), 1),
+            "inside the abstract": (with_lines("  First line\rof the abstract.\n"), PAPER.count("\n", 0, PAPER.index("abstract: |")) + 2),
+            "inside the title": (PAPER.replace('"Thresholds"', '"Thresh\rolds"'), 2),
+            "in the body": (PAPER.replace("Body text.\n", "Body\rtext.\n"), PAPER.count("\n", 0, PAPER.index("Body text.")) + 1),
+            "a body key after it": (PAPER.replace("Body text.\n", "Body text.\rabstract: |\r  Other 9.99.\n"), PAPER.count("\n", 0, PAPER.index("Body text.")) + 1),
         }.items():
             with self.subTest(case=name):
                 self.assertIsNone(block_scalar_span(text, "abstract"))
-        body = PAPER.replace("Body text.\n", "Body\rtext.\n")
-        self.assertEqual(block_lines(body), ABSTRACT_LINES)
+                self.assertIsNone(block_words(text, "abstract"))
+                self.assertEqual(
+                    block_problem(text, "abstract"),
+                    f"line {number} holds a carriage return without a line feed or a Unicode line "
+                    "separator, where Quarto and pandoc end lines differently",
+                )
+        crlf = PAPER.replace("\n", "\r\n")
+        self.assertEqual(block_words(crlf, "abstract"), words(ABSTRACT_LINES))
 
     def test_windows_line_endings_keep_every_rule(self):
         """Each rule that fails closed on line feeds fails closed on carriage
@@ -569,22 +588,119 @@ class BlockScalarSpanTests(unittest.TestCase):
                 self.assertIsNone(block_scalar_span(text.replace("\n", "\r\n"), "abstract"))
 
     def test_only_line_feeds_end_lines(self):
-        """A form feed or Unicode line separator stays inside its line, so it
-        cannot end the block early."""
-        for separator in ("\u2028", "\u2029", "\x85", "\x0c", "\x0b"):
+        """A form feed or vertical tab stays inside its line, so it cannot
+        end the block early. Quarto's metadata search matches line starts and
+        ends at the Unicode line and paragraph separators and at a next-line
+        character, so each fails closed wherever it falls."""
+        for separator in ("\x0c", "\x0b"):
             with self.subTest(separator=repr(separator)):
                 lines = f"  First line,{separator}then more.\n  Second line.\n"
                 self.assertEqual(block_lines(with_lines(lines)), lines)
+        for separator in ("\u2028", "\u2029", "\x85"):
+            for name, text in {
+                "abstract": with_lines(f"  First line,{separator}then more.\n  Second line.\n"),
+                "body": PAPER.replace("Body text.\n", f"Body{separator}text.\n"),
+            }.items():
+                with self.subTest(separator=repr(separator), place=name):
+                    self.assertIsNone(block_scalar_span(text, "abstract"))
+                    self.assertIn("Unicode line separator", block_problem(text, "abstract"))
+
+    def test_reasons_name_the_line_and_the_problem(self):
+        """The guard prints the parser's reason, so each names the line, as
+        the file numbers it, and what the parser cannot read there."""
+        key_row = PAPER.count("\n", 0, PAPER.index("abstract: |")) + 1
+        for name, (text, reason) in {
+            "tab in indentation": (
+                with_lines(FOUR_SPACE_LINES + "  \tTabbed 9.99.\n"),
+                f"line {key_row + 3}, in the front matter, has a tab in its indentation",
+            ),
+            "anchored key": (
+                PAPER.replace("format:\n", "&k note: Text.\nformat:\n"),
+                "line 3, in the front matter, is YAML the guard does not read",
+            ),
+            "tagged key": (
+                PAPER.replace("format:\n", "!!str note: Text.\nformat:\n"),
+                "line 3, in the front matter, is YAML the guard does not read",
+            ),
+            "comment in the front matter": (
+                PAPER.replace("format:\n", "<!-- note -->\nformat:\n"),
+                "line 3, in the front matter, holds an HTML comment or a code fence, "
+                "which Quarto deletes before it reads the YAML",
+            ),
+            "key line with a comment": (
+                PAPER.replace("abstract: |\n", "abstract: | # note\n"),
+                f"line {key_row}, in the front matter, sets abstract other than on a top-level abstract: | line",
+            ),
+            "repeated key": (
+                PAPER.replace(CLOSE, f"abstract: |\n  Decoy 9.99.\n{CLOSE}"),
+                f"the front matter sets abstract on lines {key_row} and {key_row + 3}",
+            ),
+            "no key": (PAPER.replace("abstract: |\n", "summary: |\n"), "the front matter has no top-level abstract: | line"),
+            "empty block": (
+                PAPER.replace("abstract: |\n" + ABSTRACT_LINES, "abstract: |\nnote: |\n" + ABSTRACT_LINES),
+                "the abstract block holds no text",
+            ),
+            "quote left open": (
+                PAPER.replace('title: "Thresholds"\n', 'title: "Thresholds\n'),
+                "a quote opened on line 2 is still open at the front matter's end",
+            ),
+            "no front matter": ("# Introduction\n", "the file must open with front matter: a --- line, then a line with text"),
+            "front matter never closes": (
+                PAPER.replace(CLOSE, "# Introduction"),
+                "the front matter never closes with a --- or ... line",
+            ),
+            "body key": (
+                with_body("- abstract: Body copy 9.99.\n"),
+                f"line {PAPER.count(chr(10)) + 2}, in the body, could set abstract",
+            ),
+            "comment-glued body fences": (
+                with_body('<!-- -->---\n"\\x61bstract": Body copy 9.99.\n<!-- -->---\n'),
+                "once Quarto deletes HTML comments, a body line could open a metadata block, "
+                "which sets the paper's metadata",
+            ),
+            "markup": (
+                with_lines("  First *line*.\n"),
+                "the abstract may hold only letters, digits, spaces, dashes and . , ; : ( ) ' \" ? ! /, "
+                "and holds '*'",
+            ),
+        }.items():
+            with self.subTest(case=name):
+                self.assertEqual(block_problem(text, "abstract"), reason)
+        self.assertIsNone(block_problem(PAPER, "abstract"))
+
+    def test_only_plain_prose_reads(self):
+        """Every character outside letters, ASCII digits, spaces, dashes and
+        sentence punctuation fails the abstract closed, so no markup, symbol
+        or invisible character reaches a tie."""
+        for character in "*_`<>[]{}\\&$#|~^@=+%\u2248\u00a7\u00a9\u2026\u200b\u00ad\ufeff\u0661":
+            with self.subTest(character=repr(character)):
+                text = with_lines(f"  First{character}line 9.99.\n")
+                self.assertIsNotNone(block_scalar_span(text, "abstract"))
+                self.assertIsNone(block_words(text, "abstract"))
+                self.assertEqual(
+                    block_problem(text, "abstract"),
+                    "the abstract may hold only letters, digits, spaces, dashes and . , ; : ( ) ' \" ? ! /, "
+                    f"and holds {character!r}",
+                )
+        for character in "\u00e9\u00df\u4e2d.,;:()'\"?!/\u2013\u2014\u2212\u2018\u2019\u201c\u201d\u00a0":
+            with self.subTest(character=repr(character)):
+                text = with_lines(f"  First{character}line 9.99.\n")
+                self.assertIsNotNone(block_words(text, "abstract"))
 
     def test_the_key_matches_literally(self):
+        """The parser matches a key as written, never as a pattern, and reads
+        only keys named in letters, digits, "_" and "-"."""
         text = PAPER.replace("abstract: |\n", "abXtract: |\n")
         self.assertIsNone(block_scalar_span(text, "ab.tract"))
+        self.assertEqual(block_problem(text, "ab.tract"), "the front matter has no top-level ab.tract: | line")
         dotted = PAPER.replace("abstract: |\n", "ab.tract: |\n")
-        self.assertEqual(block_lines(dotted, "ab.tract"), ABSTRACT_LINES)
-        lookalike = dotted.replace(
-            'title: "Thresholds"\n', 'title: "Thresholds"\nabXtract: Other\n'
-        )
-        self.assertEqual(block_lines(lookalike, "ab.tract"), ABSTRACT_LINES)
+        self.assertIsNone(block_scalar_span(dotted, "ab.tract"))
+        hyphen = PAPER.replace("abstract: |\n", "ab-tract: |\n")
+        self.assertEqual(block_lines(hyphen, "ab-tract"), ABSTRACT_LINES)
+        lookalike = hyphen.replace(
+            'title: "Thresholds"\n', 'title: "Thresholds"\nab_tract: Other\nabXtract: Other\n'
+        ) + "\nabXtract: Body\n"
+        self.assertEqual(block_lines(lookalike, "ab-tract"), ABSTRACT_LINES)
 
 
 class BlockWordsTests(unittest.TestCase):
@@ -630,13 +746,25 @@ class StatedValuesTests(unittest.TestCase):
         self.assertEqual(stated_values(CPI_U, text), ["2.29"])
 
     def test_a_dash_signs_the_value_or_joins_a_range(self):
-        """A writer can type an en dash, a hyphen or another dash for a minus
-        sign or a range, spaced or not, and "to" for a range, so the slot reads
-        the dash as the value's sign and the range as one value, never as the
-        bare rate. A tie then fails even beside a correct copy of the rate. A
-        dash typed as punctuation before a rate reads as its sign too, so such
-        a statement fails its tie rather than pass a sign flip."""
+        """A writer can type an en dash, a hyphen, two hyphens or another dash
+        for a minus sign or a range, spaced or not, and a slash or a word such
+        as "to", "and" or "through" for a range, so the slot reads the dash as
+        the value's sign and the range as one value, never as the bare rate.
+        A tie then fails even beside a correct copy of the rate. A dash typed
+        as punctuation before a rate reads as its sign too, so such a
+        statement fails its tie rather than pass a sign flip."""
         for value in (
+            "--2.29",
+            "-- 2.29",
+            "2.20 and 2.29",
+            "2.20 or 2.29",
+            "2.20 through 2.29",
+            "2.20 thru 2.29",
+            "2.20 until 2.29",
+            "2.20 vs. 2.29",
+            "2.20 versus 2.29",
+            "2.20/2.29",
+            "2.20 / 2.29",
             "\u20132.29",
             "\u20112.29",
             "\u20142.29",
@@ -668,8 +796,22 @@ class StatedValuesTests(unittest.TestCase):
                 self.assertEqual(stated_values(CPI_U, text), [])
 
     def test_to_after_a_word_opens_no_range(self):
-        text = "errors fall to 2.29 percent with the Consumer Price Index"
-        self.assertEqual(stated_values(CPI_U, text), ["2.29"])
+        for joiner in ("to", "and", "through", "/"):
+            with self.subTest(joiner=joiner):
+                text = f"errors fall {joiner} 2.29 percent with the Consumer Price Index"
+                self.assertEqual(stated_values(CPI_U, text), ["2.29"])
+
+    def test_the_slot_starts_a_token(self):
+        """The slot starts only at a whitespace-separated token's start or
+        after "(", so a rate glued to other text reads as no rate."""
+        for text, expected in (
+            ("of x2.29 percent with the Consumer Price Index", []),
+            ("of US2.29 percent with the Consumer Price Index", []),
+            ("of (2.29 percent with the Consumer Price Index", ["2.29"]),
+            ("of\n2.29 percent with the Consumer Price Index", ["2.29"]),
+        ):
+            with self.subTest(text=text):
+                self.assertEqual(stated_values(CPI_U, text), expected)
 
     def test_template_words_match_whole_words(self):
         """Words added to the start or end of a template's wording, as in a
@@ -732,6 +874,17 @@ class StatedValuesTests(unittest.TestCase):
     def test_sentence_punctuation_ends_a_number(self):
         text = "an error of 1.17. Later, an error of 0.75, and then"
         self.assertEqual(stated_values("error of {}", text), ["1.17", "0.75"])
+
+    def test_a_point_or_comma_before_a_digit_continues_the_number(self):
+        """A point or comma followed by a digit belongs to a longer number,
+        so the slot reads none of it."""
+        for text in ("an error of 1.17.5", "an error of 1.17,5", "an error of 1.17.0 percent"):
+            with self.subTest(text=text):
+                self.assertEqual(stated_values("error of {}", text), [])
+
+    def test_template_words_need_whitespace_between_them(self):
+        text = "2.29 percentwith the Consumer Price Index"
+        self.assertEqual(stated_values(CPI_U, text), [])
 
 
 VOCABULARY = (
@@ -964,8 +1117,9 @@ def words(text):
 
 
 # Documents on which the parser and pandoc have disagreed, or could: comments
-# and tabs near the block, odd line endings, repeated keys, flow-style keys
-# and metadata blocks in the body.
+# and tabs near the block, odd line endings, repeated keys, flow-style keys,
+# keys hidden behind tags, anchors and quotes, markup in the abstract, and
+# metadata blocks and tables in the body.
 EDGE_CASES = {
     "fixture": PAPER,
     "comment at indent 0 after the block": with_lines(ABSTRACT_LINES + "# 9.99 percent\n"),
@@ -1087,13 +1241,134 @@ EDGE_CASES = {
         "format:\n",
         'format:\n  html:\n    pagetitle: "x\n  include-in-header: |\n    y"\n    abstract: "Format copy 9.99."\n',
     ),
+    # Round 7's counterexamples: an apostrophe or a quote in a plain value,
+    # which YAML reads as text, before a key that a tag, anchor, flow list
+    # or explicit block key hides from a quote-tracking parser.
+    "tagged key after an apostrophe": PAPER.replace(
+        "format:\n",
+        "subtitle: Rents in the 1980s, '90s and 2000s\nformat:\n  html:\n    !!str abstract: Hidden 9.99.\n",
+    ),
+    "tagged key after a stray double quote": PAPER.replace(
+        "format:\n",
+        'thanks: PolicyEngine, "a think tank\nformat:\n  html:\n    !!str abstract: Hidden 9.99.\n',
+    ),
+    "flow list as a key after an apostrophe": PAPER.replace(
+        "format:\n",
+        "subtitle: Rents in the 1980s, '90s and 2000s\nformat:\n  html:\n    [abstract]: Hidden 9.99.\n",
+    ),
+    "anchored key after an apostrophe": PAPER.replace(
+        "format:\n",
+        "subtitle: Rents in the 1980s, '90s and 2000s\nformat:\n  html:\n    &k abstract: Hidden 9.99.\n",
+    ),
+    "explicit block key after an apostrophe": PAPER.replace(
+        "format:\n",
+        "subtitle: Rents in the 1980s, '90s and 2000s\nformat:\n  html:\n"
+        "    ? |-\n      abstract\n    : Hidden 9.99.\n",
+    ),
+    "anchored quote over a block opener": PAPER.replace(
+        "format:\n",
+        'format:\n  html:\n    pagetitle: &p "x\n   y: |\n     z"\n    abstract: Hidden 9.99.\n',
+    ),
+    "anchored quote over the key line": PAPER.replace(
+        "abstract: |\n", '  html:\n    pagetitle: &p "x\nabstract: |\n'
+    ).replace(ABSTRACT_LINES, ABSTRACT_LINES.rstrip("\n") + '"\n    abstract: Hidden 9.99.\n'),
+    "carriage returns around a body metadata block": PAPER.replace(
+        "Body text.\n", "Body text.\r\r---\rabstract: Body copy 9.99.\r---\r\rMore.\n"
+    ),
+    "key after a sibling block in a sequence entry": PAPER.replace(
+        "format:\n", "notes:\n  - text: |\n      Note.\n    abstract: Hidden 9.99.\nformat:\n"
+    ),
+    "key line ending in a comment inside a sequence block": PAPER.replace(
+        "format:\n", "notes:\n  - text: | # note\n      abstract: not a key\n    other: value\nformat:\n"
+    ),
+    "block indicator with an indentation digit": PAPER.replace(
+        "format:\n", "note: |2\n    Indented note.\nformat:\n"
+    ),
+    "flow list over two lines": PAPER.replace(
+        "format:\n", 'keywords: [poverty,\n  "SPM thresholds"]\nformat:\n'
+    ),
+    "flow mapping as a value": PAPER.replace(
+        "format:\n", 'affiliation: {name: PolicyEngine, city: "Washington"}\nformat:\n'
+    ),
+    "abstract with strip chomping": PAPER.replace("abstract: |\n", "abstract: |-\n"),
+    "raw TeX in the abstract": with_lines("  First \\phantom{9.99 percent} second.\n"),
+    "div fence in the abstract": with_lines("  First line,\n  ::: {.hidden}\n  9.99 percent\n  :::\n  second.\n"),
+    "grid table holding a metadata block": with_body(
+        "+--------------------------+\n"
+        "| ---                      |\n"
+        "| abstract: Grid copy 9.99.|\n"
+        "| ---                      |\n"
+        "+--------------------------+\n"
+    ),
+    "grid table of text": with_body("+------+------+\n| Cell | Cell |\n+======+======+\n| 1.11 | 2.22 |\n+------+------+\n"),
+    "one-column pipe table": with_body("| Column |\n|--------|\n| 9.99   |\n"),
+    "thematic break, then a line, then dots": with_body("---\nText.\n\n...\n"),
+    "blank line inside another block": PAPER.replace(
+        "        \\usepackage{needspace}\n", "        \\usepackage{needspace}\n\n        \\usepackage{xcolor}\n"
+    ),
+    "tagged value in a sequence": PAPER.replace("format:\n", "css:\n  - !!str style.css\nformat:\n"),
+    "aliased value": PAPER.replace("format:\n", "toc-title: &t Contents\nlof-title: *t\nformat:\n"),
+    "quoted flow list with an escape": PAPER.replace(
+        "format:\n", 'keywords: ["SPM", "Line\\nbreak"]\nformat:\n'
+    ),
+    "emphasis continuing a plain value": PAPER.replace(
+        "format:\n", "subtitle: Public consumption data,\n  *rolling* forecasts\nformat:\n"
+    ),
+    "HTML comment inside another block": PAPER.replace(
+        "        \\usepackage{needspace}\n", "        \\usepackage{needspace}\n        <!-- note -->\n"
+    ),
+    "comment between a plain value and a deeper line": PAPER.replace(
+        "format:\n", "subtitle: Public data\n# note\n  continued\nformat:\n"
+    ),
+    "unindented line after a plain value": PAPER.replace(
+        "format:\n", "subtitle: Public data\ncontinued\nformat:\n"
+    ),
+    "div without braces in the abstract": with_lines(
+        "  First line,\n  ::: hidden\n  9.99 percent\n  :::\n  second.\n"
+    ),
+    # Quarto deletes HTML comments before it looks for metadata blocks, so
+    # a comment glued to each fence leaves "---" lines that Quarto reads.
+    "escaped key between fences glued to comments": with_body(
+        '<!-- -->---\n"\\x61bstract": Body copy 9.99.\n<!-- -->---\n'
+    ),
+    # Quarto deletes from a comment opener in an indented code block to the
+    # next closer, while pandoc reads the metadata block between them.
+    "metadata block after a comment opener in code": with_body(
+        '    <!--\n\n---\n"\\x61bstract": Body copy 9.99.\n---\n\n<!-- -->\n'
+    ),
+    "escaped key's metadata block in a grid table": with_body(
+        "+--------------------------------+\n"
+        "| ---                            |\n"
+        '| "\\x61bstract": Grid copy 9.99. |\n'
+        "| ---                            |\n"
+        "+--------------------------------+\n"
+    ),
+    "escaped key's metadata block in a list item": with_body(
+        '- ---\n  "\\x61bstract": List copy 9.99.\n  ---\n'
+    ),
+    "escaped key's metadata block closed by dots": with_body(
+        '---\n"\\x61bstract": Body copy 9.99.\n...\n'
+    ),
+    "text after a quote closes on a later line": PAPER.replace(
+        'title: "Thresholds"\n', 'title: "Thresholds\n  for the SPM" extra\n'
+    ),
+    "double-quoted line ending in a backslash": PAPER.replace(
+        'title: "Thresholds"\n', 'title: "Thresholds \\\n  for the SPM"\n'
+    ),
+    "flow list with a colon item": PAPER.replace("format:\n", "keywords: [a: b]\nformat:\n"),
+    "flow list holding a flow mapping": PAPER.replace("format:\n", "keywords: [{a: b}]\nformat:\n"),
+    "flow list holding braces": PAPER.replace("format:\n", "keywords: [{a}]\nformat:\n"),
+    "nested sequence block with shallow text": PAPER.replace(
+        "format:\n", "notes:\n- - |\n  shallow\nformat:\n"
+    ),
 }
 
 # The edge cases from which the parser reads an abstract; it fails closed on
-# every other one.
+# every other one. A "#" or a form feed in the abstract fails it as text
+# that is not plain prose, and a Unicode line separator anywhere fails the
+# file.
 EDGE_CASES_READ = frozenset(
     (
-        "U+2028 inside a line",
         "Windows line endings",
         "anchored value under format",
         "blank line, then a comment at indent 1",
@@ -1104,10 +1379,7 @@ EDGE_CASES_READ = frozenset(
         "comment at indent 3 after a 4-space block",
         "emphasis in a quoted subtitle",
         "fixture",
-        "form feed inside a line",
-        "hash line at the block's indentation",
         "leading blank line deeper than the text",
-        "line indented less than the first",
         "line indented more than the first",
         "no-break space on the first line",
         "quoted title wrapped over two lines",
@@ -1116,8 +1388,15 @@ EDGE_CASES_READ = frozenset(
         "tab after the first line's indentation",
         "tab line inside the block",
         "tab line, then a comment at indent 1",
-        "tab line, then a hash line at the block's indentation",
         "two thematic breaks in the body",
+        "key line ending in a comment inside a sequence block",
+        "one-column pipe table",
+        "blank line inside another block",
+        "tagged value in a sequence",
+        "aliased value",
+        "quoted flow list with an escape",
+        "emphasis continuing a plain value",
+        "double-quoted line ending in a backslash",
     )
 )
 

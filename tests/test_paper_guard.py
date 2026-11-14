@@ -961,58 +961,79 @@ INKIND_PROSE_MUTATIONS = (
     ),
 )
 
+# The guard's label when it cannot read the abstract, before its reason, and
+# the label of its check that every decimal in the abstract is a tied figure.
+ABSTRACT_UNREAD = "paper's abstract cannot be read:"
+ABSTRACT_INVENTORY = "abstract states only its tied figures, each as a bare number"
+
 # Each case drifts figures in the abstract alone: (name, pattern, replacement,
 # failing ties, decoy). The body or a generated table states every one of these
 # figures too. The decoy restates the original wording, and the tests place it
 # at each of ABSTRACT_DECOY_HOSTS, so a tie that settled for one correct copy,
-# or for the first or last rate it found, would pass the edited paper. A sign
-# typed as an en dash and a range, spaced or joined by "to", read whole, and
-# a rate in emphasis reads as no rate in a statement of the rule's wording,
-# so each fails beside a copy too; only ABSTRACT_RULE_RENAMES, which leave no
-# statement of the rule's wording, pass beside a copy inside the abstract. The wording-removal cases in
+# or for the first or last rate it found, would pass the edited paper. The
+# slot reads a sign typed as any dash and a range joined by a dash, a slash,
+# "to" or "and" whole, so each fails beside a copy too, as does the
+# inventory of the abstract's figures. Only ABSTRACT_RULE_RENAMES, which
+# leave no statement of the rule's wording, pass beside a copy inside the
+# abstract. The wording-removal cases in
 # test_abstract_ties_skip_wording_outside_the_block catch a tie that reads
-# past the block.
+# past the block, and test_abstract_markup_fails_every_abstract_tie covers
+# emphasis and other markup.
 ABSTRACT_PROSE_MUTATIONS = (
     (
         "2020-2025 CPI-U error",
         r"2\.29(\s+)percent",
         r"2.30\1percent",
-        ("abstract current projection cpi_u 2.29",),
+        ("abstract current projection cpi_u 2.29", ABSTRACT_INVENTORY),
         "We obtain 2.29 percent with the Consumer Price Index for All Urban Consumers (CPI-U).",
     ),
     (
         "2020-2025 CPI-U sign",
         r"2\.29(\s+)percent",
         "−2.29\\1percent",
-        ("abstract current projection cpi_u 2.29",),
+        ("abstract current projection cpi_u 2.29", ABSTRACT_INVENTORY),
         "We obtain 2.29 percent with the Consumer Price Index for All Urban Consumers (CPI-U).",
     ),
     (
         "2020-2025 CPI-U sign as an en dash",
         r"2\.29(\s+)percent",
         "\u20132.29\\1percent",
-        ("abstract current projection cpi_u 2.29",),
+        ("abstract current projection cpi_u 2.29", ABSTRACT_INVENTORY),
         "We obtain 2.29 percent with the Consumer Price Index for All Urban Consumers (CPI-U).",
     ),
     (
         "2020-2025 CPI-U as a spaced range",
         r"2\.29(\s+)percent",
         "2.20 \u2013 2.29\\1percent",
-        ("abstract current projection cpi_u 2.29",),
+        ("abstract current projection cpi_u 2.29", ABSTRACT_INVENTORY),
         "We obtain 2.29 percent with the Consumer Price Index for All Urban Consumers (CPI-U).",
     ),
     (
         "2020-2025 CPI-U as a range with to",
         r"2\.29(\s+)percent",
         r"2.20 to 2.29\1percent",
-        ("abstract current projection cpi_u 2.29",),
+        ("abstract current projection cpi_u 2.29", ABSTRACT_INVENTORY),
         "We obtain 2.29 percent with the Consumer Price Index for All Urban Consumers (CPI-U).",
     ),
     (
-        "2020-2025 CPI-U error in emphasis",
+        "2020-2025 CPI-U as a range with and",
         r"2\.29(\s+)percent",
-        r"*2.30*\1percent",
-        ("abstract current projection cpi_u 2.29",),
+        r"2.20 and 2.29\1percent",
+        ("abstract current projection cpi_u 2.29", ABSTRACT_INVENTORY),
+        "We obtain 2.29 percent with the Consumer Price Index for All Urban Consumers (CPI-U).",
+    ),
+    (
+        "2020-2025 CPI-U as a range with a slash",
+        r"2\.29(\s+)percent",
+        r"2.20/2.29\1percent",
+        ("abstract current projection cpi_u 2.29", ABSTRACT_INVENTORY),
+        "We obtain 2.29 percent with the Consumer Price Index for All Urban Consumers (CPI-U).",
+    ),
+    (
+        "2020-2025 CPI-U sign as two hyphens",
+        r"2\.29(\s+)percent",
+        r"--2.29\1percent",
+        ("abstract current projection cpi_u 2.29", ABSTRACT_INVENTORY),
         "We obtain 2.29 percent with the Consumer Price Index for All Urban Consumers (CPI-U).",
     ),
     (
@@ -1033,42 +1054,42 @@ ABSTRACT_PROSE_MUTATIONS = (
         "2020-2025 composite error",
         r"1\.65(\s+)percent",
         r"1.66\1percent",
-        ("abstract current projection fcsuti_cpi 1.65",),
+        ("abstract current projection fcsuti_cpi 1.65", ABSTRACT_INVENTORY),
         "We obtain 1.65 percent with a composite price index.",
     ),
     (
         "2020-2025 replication error",
         r"0\.51(\s+)percent",
         r"0.52\1percent",
-        ("abstract current projection replication_ratio 0.51",),
+        ("abstract current projection replication_ratio 0.51", ABSTRACT_INVENTORY),
         "We obtain 0.51 percent with replicated consumption growth.",
     ),
     (
         "2020-2025 blend error",
         r"0\.90(\s+)percent",
         r"0.91\1percent",
-        ("abstract current projection blend 0.90",),
+        ("abstract current projection blend 0.90", ABSTRACT_INVENTORY),
         "We obtain 0.90 percent with an equal blend of the latter two.",
     ),
     (
         "2025 blend error",
         r"1\.17(\s+)percent",
         r"1.18\1percent",
-        ("abstract evaluation amended MAE 1.17",),
+        ("abstract evaluation amended MAE 1.17", ABSTRACT_INVENTORY),
         "The blend yields a mean absolute error of 1.17 percent.",
     ),
     (
         "2025 CPI-U error",
         r"2\.58(\s+)percent",
         r"2.59\1percent",
-        ("abstract evaluation CPI-U MAE 2.58",),
+        ("abstract evaluation CPI-U MAE 2.58", ABSTRACT_INVENTORY),
         "We obtain 2.58 percent for CPI-U adjustment.",
     ),
     (
         "2025 replication error",
         r"0\.75(\s+)percent",
         r"0.74\1percent",
-        ("abstract evaluation replication MAE 0.75",),
+        ("abstract evaluation replication MAE 0.75", ABSTRACT_INVENTORY),
         "We obtain 0.75 percent for consumption growth alone.",
     ),
     (
@@ -2077,6 +2098,20 @@ class PaperGuardTests(unittest.TestCase):
         self.assertEqual(inside, host.startswith("abstract"), f"decoy misplaced at {host}")
         path.write_text(edited)
 
+    def assert_abstract_unread(self, result, reason):
+        """The guard failed every tie that reads the abstract, and its
+        inventory, and said once that it cannot read the abstract, with a
+        reason that holds `reason`."""
+        self.assertNotEqual(result.returncode, 0)
+        lines = failure_lines(result.stdout)
+        unread = [line for line in lines if line.startswith(ABSTRACT_UNREAD)]
+        self.assertEqual(len(unread), 1, lines)
+        self.assertIn(reason, unread[0])
+        self.assertEqual(
+            sorted(line for line in lines if line not in unread),
+            sorted((*ABSTRACT_TIE_LABELS, *INKIND_ABSTRACT_TIE_LABELS, ABSTRACT_INVENTORY)),
+        )
+
     def run_abstract_mutation(self, pattern, replacement, decoy=None, host="discussion"):
         self.install_article()
         self.mutate_article("abstract", pattern, replacement)
@@ -2141,7 +2176,8 @@ class PaperGuardTests(unittest.TestCase):
                 self.mutate_article("abstract", r"1\.17(\s+)percent", r"1.18\1percent")
                 drifted = self.run_guard()
                 self.assertEqual(
-                    failure_lines(drifted.stdout), ["abstract evaluation amended MAE 1.17"]
+                    sorted(failure_lines(drifted.stdout)),
+                    sorted([ABSTRACT_INVENTORY, "abstract evaluation amended MAE 1.17"]),
                 )
         self.install_article()
 
@@ -2191,91 +2227,112 @@ class PaperGuardTests(unittest.TestCase):
         self.install_article()
 
     def test_abstract_block_fails_closed_unless_one_key_sets_the_abstract(self):
-        """A folded, repeated, nested or relocated `abstract: |` key, a
-        metadata block in the body, or a lone carriage return in the front
-        matter empties the abstract slice, so every abstract tie fails
-        instead of reading text that the paper may not render as its
-        abstract."""
+        """A folded, repeated, nested, hidden or relocated `abstract: |` key, a
+        metadata block in the body or in a grid table's cell, or a carriage
+        return without a line feed empties the abstract slice. Every tie that
+        reads the abstract fails, instead of reading text that the paper may
+        not render as its abstract, and the guard says why."""
         prose = (self.repo / "paper/index.qmd").read_text()
         span = PAPER_TEXT.block_scalar_span(prose, "abstract")
         self.assertIsNotNone(span, "fixture has no abstract block")
         block = prose[span[0] : span[1]]
         key = "abstract: |\n"
+        other = "other than on a top-level abstract: | line"
+        unread = "is YAML the guard does not read"
+        lone = "holds a carriage return without a line feed"
         cases = (
-            ("folded abstract", ((key, "abstract: >\n"),)),
-            ("repeated abstract key", ((block, block + key + block),)),
+            ("folded abstract", ((key, "abstract: >\n"),), other),
+            ("key line with a comment", ((key, "abstract: | # summary\n"),), other),
+            ("repeated abstract key", ((block, block + key + block),), "the front matter sets abstract on lines"),
             (
                 "abstract key only in the body",
                 ((key, "summary: |\n"), ("\n# Introduction\n", f"\n{key}{block}\n# Introduction\n")),
+                "the front matter has no top-level abstract: | line",
             ),
-            ("quoted abstract key repeated", ((block, f'{block}"abstract": |\n{block}'),)),
+            ("quoted abstract key repeated", ((block, f'{block}"abstract": |\n{block}'),), unread),
             (
                 "body metadata block sets the abstract",
                 ((DISCUSSION_HEADING, f"---\n{key}{block}---\n\n{DISCUSSION_HEADING}"),),
+                "in the body, could set abstract",
             ),
             (
                 "format-level abstract",
                 (("    toc: true\n", "    toc: true\n    abstract: |\n      A copy for the web.\n"),),
+                other,
             ),
             (
                 "explicit key with a comment in a body block",
                 ((DISCUSSION_HEADING, f"---\n? abstract # set here\n: |\n  A copy.\n---\n\n{DISCUSSION_HEADING}"),),
+                "in the body, could set abstract",
             ),
             (
                 "escaped key in a body block",
                 ((DISCUSSION_HEADING, f'---\n"\\x61bstract": A copy.\n---\n\n{DISCUSSION_HEADING}'),),
+                "could open a metadata block",
             ),
             (
-                "lone carriage return in the front matter",
-                (("Supplemental Poverty\n", "Supplemental Poverty\r"),),
+                "grid table holding a metadata block",
+                (
+                    (
+                        DISCUSSION_HEADING,
+                        "+-------------------+\n| ---               |\n| abstract: A copy. |\n"
+                        f"| ---               |\n+-------------------+\n\n{DISCUSSION_HEADING}",
+                    ),
+                ),
+                "grid table's border",
+            ),
+            ("lone carriage return in the front matter", ((key, "toc-title: Contents\r" + key),), lone),
+            (
+                "lone carriage return before a body metadata block",
+                ((DISCUSSION_HEADING, f"Text.\r\r---\rabstract: A copy.\r---\r\r{DISCUSSION_HEADING}"),),
+                lone,
             ),
             (
                 "tagged format-level abstract",
                 (("    toc: true\n", "    toc: true\n    !!str abstract: A copy for the web.\n"),),
+                unread,
+            ),
+            (
+                "anchored format-level abstract after an apostrophe",
+                (("    toc: true\n", "    toc: true\n    subtitle: Rents in the '90s\n    &k abstract: A copy.\n"),),
+                unread,
             ),
             (
                 "quote left open over the key line",
                 (("    toc: true\n", "    toc: true\n    pagetitle: 'Thresholds\n"),),
+                unread,
             ),
             (
                 "comment glued to a format-level abstract",
                 (("    toc: true\n", "    toc: true\n    <!-- -->abstract: A copy for the web.\n"),),
+                "holds an HTML comment or a code fence",
             ),
         )
-        expected = sorted(
-            (
-                "paper must set abstract only in one abstract: | block of its front matter",
-                *ABSTRACT_TIE_LABELS,
-                *INKIND_ABSTRACT_TIE_LABELS,
-            )
-        )
-        for name, edits in cases:
+        for name, edits, reason in cases:
             with self.subTest(case=name):
                 self.install_article()
                 self.edit_article(edits)
-                result = self.run_guard()
-                self.assertNotEqual(result.returncode, 0)
-                self.assertEqual(sorted(failure_lines(result.stdout)), expected)
+                self.assert_abstract_unread(self.run_guard(), reason)
         self.install_article()
 
     def test_abstract_markup_fails_every_abstract_tie(self):
-        """Quarto renders an HTML comment, a code fence, a shortcode or raw
-        content in the abstract as other text or none, so each fails every tie
-        that reads the abstract, with its own message, even when it restates
-        the abstract's own wording."""
+        """Quarto renders emphasis, an HTML comment, a code fence, a
+        shortcode, raw content, TeX, an entity or a div in the abstract as
+        other text or none, so each fails every tie that reads the abstract,
+        even when it restates the abstract's own wording, and the guard names
+        the first character outside plain prose."""
         decoy = ABSTRACT_PROSE_MUTATIONS[0][4]
-        expected = sorted(
-            (
-                "paper's abstract may not hold HTML comments, code fences, shortcodes or raw content",
-                *ABSTRACT_TIE_LABELS,
-                *INKIND_ABSTRACT_TIE_LABELS,
-            )
-        )
-        for name, line in (
-            ("HTML comment", f"<!-- {decoy} -->"),
-            ("code fence", f"```\n{decoy}\n```"),
-            ("shortcode", "{{< meta title >}}"),
-            ("raw content", "`\\newpage`{=latex}"),
+        for name, line, reason in (
+            ("emphasis", f"*{decoy}*", "holds '*'"),
+            ("underscore emphasis", f"_{decoy}_", "holds '_'"),
+            ("HTML comment", f"<!-- {decoy} -->", "holds '<'"),
+            ("code fence", f"```\n{decoy}\n```", "holds '`'"),
+            ("shortcode", "{{< meta title >}}", "holds '{'"),
+            ("raw content", "`\\newpage`{=latex}", "holds '`'"),
+            ("TeX command", f"\\phantom{{{decoy}}}", "holds '\\\\'"),
+            ("TeX conditional", f"\\iffalse\n{decoy}\n\\fi", "holds '\\\\'"),
+            ("HTML entity", "&minus;2.29 percent", "holds '&'"),
+            ("div", f"::: hidden\n{decoy}\n:::", "holds ':::'"),
         ):
             with self.subTest(case=name):
                 self.install_article()
@@ -2286,9 +2343,7 @@ class PaperGuardTests(unittest.TestCase):
                 indent = re.search(r"^( +)\S", prose[span[0] : span[1]], re.M).group(1)
                 lines = "".join(f"{indent}{part}\n" for part in line.split("\n"))
                 path.write_text(prose[: span[1]] + lines + prose[span[1] :])
-                result = self.run_guard()
-                self.assertNotEqual(result.returncode, 0)
-                self.assertEqual(sorted(failure_lines(result.stdout)), expected)
+                self.assert_abstract_unread(self.run_guard(), reason)
         self.install_article()
 
     def test_abstract_comes_only_from_the_paper(self):
@@ -2328,15 +2383,34 @@ class PaperGuardTests(unittest.TestCase):
         self.install_article()
         # An included file's front matter would set the abstract too.
         (self.repo / "paper/notes.qmd").write_text("---\nabstract: |\n  A copy.\n---\n\nNotes.\n")
-        for directive in ("{{< include notes.qmd >}}", '{{< include "notes.qmd" >}}'):
+        for directive in (
+            "{{< include notes.qmd >}}",
+            '{{< include "notes.qmd" >}}',
+            '{{< include "tables/../notes.qmd" >}}',
+            "{{< include tables/../notes.qmd >}}",
+            "{{< include 'tables/sub/../../notes.qmd' >}}",
+        ):
             with self.subTest(case=directive):
                 self.install_article()
                 article = self.repo / "paper/index.qmd"
                 article.write_text(article.read_text() + "\n" + directive + "\n")
                 result = self.run_guard()
                 self.assertNotEqual(result.returncode, 0)
-                self.assertEqual(failure_lines(result.stdout), ["paper/index.qmd may include only files under tables/"])
+                self.assertEqual(
+                    failure_lines(result.stdout),
+                    ["paper/index.qmd may include only the generated tables, as tables/<name>.md"],
+                )
         (self.repo / "paper/notes.qmd").unlink()
+        self.install_article()
+
+    def test_abstract_reads_past_a_byte_order_mark(self):
+        """The guard reads the paper as UTF-8 and drops a byte order mark at
+        its start, so an editor that adds one leaves every tie passing."""
+        self.install_article()
+        path = self.repo / "paper/index.qmd"
+        path.write_bytes(b"\xef\xbb\xbf" + path.read_bytes())
+        result = self.run_guard()
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.install_article()
 
     def test_rolling_prose_figures_drift_from_the_sealed_forecast(self):
