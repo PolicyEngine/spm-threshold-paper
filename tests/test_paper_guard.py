@@ -222,25 +222,25 @@ INKIND_PROSE_MUTATIONS = (
         "BLS 2024-2025 renter growth without its imputed terms",
     ),
     (
-        "written-definition lower bound",
+        "Garner–Munoz lower bound",
         "section",
         r"1\.71(\s+)percent(\s+)below",
         r"1.72\1percent\2below",
-        "written-definition range with benefits",
+        "Garner–Munoz range with benefits",
     ),
     (
         "vacation-home utilities",
         "section",
         r"and(\s+)utilities(\s+)for(\s+)vacation(\s+)homes",
         r"and\1fuels\2for\3vacation\4homes",
-        "written-definition runs drop vacation-home utilities",
+        "Garner–Munoz runs drop vacation-home utilities",
     ),
     (
         "kept vacation-home fuel codes",
         "section",
         r"under(\s+)two(\s+)codes",
         r"under\1three\2codes",
-        "written-definition runs keep the vacation-home fuel codes",
+        "Garner–Munoz runs keep the vacation-home fuel codes",
     ),
     ("implicate count", "section", r"We draw five implicates", "We draw four implicates", "implicate, matching-neighbor"),
     (
@@ -253,8 +253,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "abstract accounting share",
         "abstract",
-        r"supply(\s+)5(\s+)to(\s+)13(\s+)percent",
-        r"supply\g<1>5\2to\g<3>12\4percent",
+        r"supply(\s+)4\.9(\s+)to(\s+)12\.9(\s+)percent",
+        r"supply\g<1>4.9\2to\g<3>12.8\4percent",
         "abstract and discussion: the accounting's shares",
     ),
     ("identity tolerance", "section", r"0\.00001", "0.000001", "BLS identity tolerance"),
@@ -362,8 +362,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "benefits' share with the index's lead on their terms",
         "section",
-        r"benefits(\s+)supply(\s+)4\.3,(\s+)6\.8,",
-        r"benefits\1supply\g<2>6.8,\g<3>4.3,",
+        r"falls(\s+)to(\s+)4\.3,(\s+)6\.8,",
+        r"falls\1to\g<2>6.8,\g<3>4.3,",
         "accounting with the index's lead on the benefits' terms",
     ),
     (
@@ -408,7 +408,7 @@ INKIND_PROSE_MUTATIONS = (
         "section",
         r"deviation(\s+)falls(\s+)from",
         r"deviation\1rises\2from",
-        "written-definition mean absolute deviation",
+        "Garner–Munoz mean absolute deviation",
     ),
     (
         "deflator direction",
@@ -469,8 +469,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "discussion accounting parts swapped",
         "discussion",
-        r"FCSUti(\s+)index(\s+)supplies(\s+)33(\s+)to(\s+)39(\s+)percent(.*?)benefits(\s+)5(\s+)to(\s+)13",
-        r"FCSUti\1index\2supplies\g<3>5\4to\g<5>13\6percent\7benefits\g<8>33\9to\g<10>39",
+        r"FCSUti(\s+)index(\s+)supplies(\s+)33(\s+)to(\s+)39(\s+)percent(.*?)supply(\s+)4\.9(\s+)to(\s+)12\.9",
+        r"FCSUti\1index\2supplies\g<3>4.9\4to\g<5>12.9\6percent\7supply\g<8>33\9to\g<10>39",
         "abstract and discussion: the accounting's shares",
     ),
     # Round 2: the verb or label beside each figure, and the method facts
@@ -539,18 +539,18 @@ INKIND_PROSE_MUTATIONS = (
         "growth table caption names the growth window",
     ),
     (
-        "written-definition stage without benefits",
+        "Garner–Munoz stage without benefits",
         "section",
         r"the(\s+)out-of-pocket(\s+)replication(\s+)trails",
         r"the\1replication\2with benefits\3trails",
-        "written-definition out-of-pocket range",
+        "Garner–Munoz out-of-pocket range",
     ),
     (
-        "written-definition stage with benefits",
+        "Garner–Munoz stage with benefits",
         "section",
         r"When(\s+)we(\s+)also(\s+)add(\s+)the(\s+)imputed(\s+)benefits",
         r"When\1we\2also\3remove\4the\5imputed\6benefits",
-        "written-definition range with benefits",
+        "Garner–Munoz range with benefits",
     ),
     (
         "share formula deflator",
@@ -578,14 +578,14 @@ INKIND_PROSE_MUTATIONS = (
         "section",
         r"renters'(\s+)utilities(\s+)for(\s+)any(\s+)property(\s+)but(\s+)a(\s+)rented(\s+)vacation(\s+)home",
         r"renters'\1utilities\2for\3the primary residence only",
-        "written definitions read from fingerprinted calculator code",
+        "Garner–Munoz restrictions read from fingerprinted calculator code",
     ),
     (
         "kept fuel codes' reason",
         "section",
         r"vacation-home(\s+)utilities(\s+)leave(\s+)out",
         r"vacation-home\1utilities\2include",
-        "written-definition runs keep the vacation-home fuel codes",
+        "Garner–Munoz runs keep the vacation-home fuel codes",
     ),
     (
         "WIC universe year",
@@ -704,7 +704,7 @@ INKIND_PROSE_MUTATIONS = (
         "section",
         r"amounts(\s+)and(\s+)the(\s+)vacation-home(\s+)mortgage",
         r"amounts\1but keep\2the\3vacation-home\4mortgage",
-        "written definitions read from fingerprinted calculator code",
+        "Garner–Munoz restrictions read from fingerprinted calculator code",
     ),
     (
         "internet row rule",
@@ -730,18 +730,18 @@ INKIND_PROSE_MUTATIONS = (
     # Round 3 (the r4 review): the accounting, the level gap, the new
     # standard errors and the method facts read from code.
     (
-        "written-definition stage change",
+        "Garner–Munoz stage change",
         "section",
         r"by(\s+)\+0\.09,(\s+)−1\.51,",
         r"by\1+0.09,\2−1.15,",
-        "written definitions with the composite CPI",
+        "Garner–Munoz restrictions with the composite CPI",
     ),
     (
         "abstract names the CE summaries",
         "abstract",
         r"with(\s+)the(\s+)CE's(\s+)spending(\s+)summaries",
-        r"with\1the\2written\3shelter\4definitions",
-        "written definitions with the composite CPI",
+        r"with\1the\2Garner–Munoz\3shelter\4restrictions",
+        "Garner–Munoz restrictions with the composite CPI",
     ),
     (
         'internet share of thresholds',
@@ -760,8 +760,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         'common-component definitions swapped',
         'section',
-        'under(\\s+)the(\\s+)written(\\s+)definitions(\\s+)and(\\s+)by(.*?)with(\\s+)the(\\s+)CE(\\s+)summaries',
-        'with\\1the\\2CE\\3summaries\\4and\\5by\\6under\\7the\\8written\\9definitions',
+        'under(\\s+)the(\\s+)Garner–Munoz(\\s+)restrictions(\\s+)and(\\s+)by(.*?)with(\\s+)the(\\s+)CE(\\s+)summaries',
+        'with\\1the\\2CE\\3summaries\\4and\\5by\\6under\\7the\\8Garner–Munoz\\9restrictions',
         'thresholds on the components both series hold',
     ),
     (
@@ -860,7 +860,7 @@ INKIND_PROSE_MUTATIONS = (
         'section',
         '\\\\\\$64(\\s+)to(\\s+)\\\\\\$683',
         '\\\\$64\\1to\\2\\\\$638',
-        "written definitions keep owners' rented-dwelling spending",
+        "Garner–Munoz restrictions keep owners' rented-dwelling spending",
     ),
     (
         'abstract uncertainty',
@@ -945,6 +945,150 @@ INKIND_PROSE_MUTATIONS = (
         'grows(\\s+)5\\.71',
         'grows\\g<1>5.17',
         'BLS 2024-2025 renter growth without its imputed terms',
+    ),
+    # Round 4: the split with the Other share kept separate, as BLS
+    # publishes it, beside ours, which gives each term its part of it.
+    (
+        "abstract share with the Other share kept separate",
+        "abstract",
+        r"supply(\s+)3\.5(\s+)to(\s+)11\.8",
+        r"supply\g<1>3.5\2to\g<3>11.9",
+        "abstract and discussion: the accounting's shares",
+    ),
+    (
+        "abstract accountings swapped",
+        "abstract",
+        r"supply(\s+)4\.9(\s+)to(\s+)12\.9(.*?)supply(\s+)3\.5(\s+)to(\s+)11\.8",
+        r"supply\g<1>3.5\2to\g<3>11.8\4supply\g<5>4.9\6to\g<7>12.9",
+        "abstract and discussion: the accounting's shares",
+    ),
+    (
+        "discussion share with the Other share kept separate",
+        "discussion",
+        r"and(\s+)3\.5(\s+)to(\s+)11\.8(\s+)percent",
+        r"and\g<1>3.6\2to\g<3>11.8\4percent",
+        "abstract and discussion: the accounting's shares",
+    ),
+    (
+        "benefits' rows with the Other share kept separate",
+        "section",
+        r"supply(\s+)3\.5,(\s+)5\.8,(\s+)and(\s+)11\.8",
+        r"supply\g<1>11.8,\g<2>5.8,\3and\g<4>3.5",
+        "accounting with the Other share kept separate",
+    ),
+    (
+        "out-of-pocket and Other with the Other share kept separate",
+        "section",
+        r"supply(\s+)60\.9,(\s+)55\.4,",
+        r"supply\g<1>60.9,\g<2>54.5,",
+        "accounting with the Other share kept separate",
+    ),
+    (
+        "Other share kept separate counted with the benefits",
+        "section",
+        r"count(\s+)the(\s+)Other(\s+)share(\s+)with(\s+)out-of-pocket(\s+)spending",
+        r"count\1the\2Other\3share\4with\5the\6benefits",
+        "accounting with the Other share kept separate",
+    ),
+    (
+        "benefits' rows with the index's lead on them",
+        "section",
+        r"3\.0,(\s+)5\.2,(\s+)and(\s+)10\.7",
+        r"3.0,\g<1>5.3,\2and\g<3>10.7",
+        "accounting with the index's lead on the benefits' terms",
+    ),
+    (
+        "terms and rows swapped with the index's lead on them",
+        "section",
+        r"with(\s+)their(\s+)terms,(\s+)and(.*?)with(\s+)their(\s+)rows",
+        r"with\1their\2rows,\3and\4with\5their\6terms",
+        "accounting with the index's lead on the benefits' terms",
+    ),
+    (
+        "internet's share row",
+        "section",
+        r"1\.54(\s+)to(\s+)2\.13",
+        r"1.54\1to\g<2>2.12",
+        "home internet's share of BLS's thresholds",
+    ),
+    (
+        "internet's two readings swapped",
+        "section",
+        r"supplies(\s+)1\.54(\s+)to(\s+)2\.13(.*?)and(\s+)1\.85(\s+)to(\s+)2\.55",
+        r"supplies\g<1>1.85\2to\g<3>2.55\4and\g<5>1.54\6to\g<7>2.13",
+        "home internet's share of BLS's thresholds",
+    ),
+    (
+        "shared component's term coefficient",
+        "section",
+        r"puts(\s+)the(\s+)term(\s+)\$1\.2",
+        r"puts\1the\2term\3$1.0",
+        "each component's term carries its part of the Other share",
+    ),
+    (
+        "shelter component's Other coefficient",
+        "section",
+        r"\+0\.2\\,\\overline\{c\}_E\)",
+        r"+0.4\\,\\overline{c}_E)",
+        "each component's term carries its part of the Other share",
+    ),
+    # Round 4: the Garner–Munoz runs keep BLS's current telephone split.
+    (
+        "telephone exception reversed",
+        "section",
+        r"We(\s+)keep(\s+)telephone(\s+)out(\s+)of(\s+)utilities",
+        r"We\1keep\2telephone\3in\4utilities",
+        "Garner–Munoz restrictions read from fingerprinted calculator code",
+    ),
+    # Round 4: rent paid and the two rental-assistance sensitivities.
+    (
+        "rent paid share of the three-month total",
+        "section",
+        r"as(\s+)one(\s+)third(\s+)of",
+        r"as\1one\2quarter\3of",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "rent sensitivity base amount",
+        "section",
+        r"\\\$10,809(\s+)per(\s+)assisted",
+        r"\\$10,890\1per\2assisted",
+        "rent sensitivities",
+    ),
+    (
+        "next-interview rent change",
+        "section",
+        r"rises(\s+)0\.8(\s+)percent;",
+        r"rises\g<1>1.8\2percent;",
+        "rent sensitivities",
+    ),
+    (
+        "linked renters",
+        "section",
+        r"3,120(\s+)of(\s+)the(\s+)6,159",
+        r"3,210\1of\2the\g<3>6,159",
+        "rent sensitivities",
+    ),
+    (
+        "part-period bounds",
+        "section",
+        r"is(\s+)25(\s+)to(\s+)75(\s+)percent(\s+)of(\s+)its(\s+)rent",
+        r"is\g<1>20\2to\g<3>80\4percent\5of\6its\7rent",
+        "rent sensitivities",
+    ),
+    (
+        "predicted median and mean swapped",
+        "section",
+        r"falls(\s+)30(\s+)percent(.*?)median,(\s+)16(\s+)percent",
+        r"falls\g<1>16\2percent\3median,\g<4>30\5percent",
+        "rent sensitivities",
+    ),
+    (
+        "linear prediction change",
+        "section",
+        r"and(\s+)13(\s+)percent(\s+)at(\s+)the(\s+)linear",
+        r"and\g<1>31\2percent\3at\4the\5linear",
+        "rent sensitivities",
     ),
 )
 
@@ -1577,7 +1721,7 @@ class PaperGuardTests(unittest.TestCase):
         self.reseal_and_repin_components(keep_2022_vacation_utilities)
         result = self.run_guard()
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("in-kind prose: written-definition runs drop vacation-home utilities", result.stdout)
+        self.assertIn("in-kind prose: Garner–Munoz runs drop vacation-home utilities", result.stdout)
         self.assertNotIn("generators were not run", result.stdout)
 
     def test_definition_runs_must_drop_the_vacation_home_principal(self):
@@ -1588,7 +1732,7 @@ class PaperGuardTests(unittest.TestCase):
         result = self.run_guard()
         self.assertNotEqual(result.returncode, 0)
         self.assertIn(
-            "in-kind prose: written-definition runs drop vacation-home utilities and principal", result.stdout
+            "in-kind prose: Garner–Munoz runs drop vacation-home utilities and principal", result.stdout
         )
         self.assertNotIn("generators were not run", result.stdout)
 
@@ -1611,7 +1755,7 @@ class PaperGuardTests(unittest.TestCase):
         self.reseal_and_repin_components(push_2022_utilities_below_zero)
         result = self.run_guard()
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("in-kind prose: written-definition runs drop vacation-home utilities", result.stdout)
+        self.assertIn("in-kind prose: Garner–Munoz runs drop vacation-home utilities", result.stdout)
         self.assertNotIn("generators were not run", result.stdout)
 
     def test_paper_names_the_internet_row_each_year_uses(self):
@@ -1636,7 +1780,7 @@ class PaperGuardTests(unittest.TestCase):
         self.reseal_and_repin_components(name_a_third_code)
         result = self.run_guard()
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("in-kind prose: written-definition runs keep the vacation-home fuel codes", result.stdout)
+        self.assertIn("in-kind prose: Garner–Munoz runs keep the vacation-home fuel codes", result.stdout)
         self.assertNotIn("generators were not run", result.stdout)
 
     def test_reflected_replicates_fail_only_the_pinned_digest(self):

@@ -1211,10 +1211,24 @@ our_rent = inkind["amounts"]["package"]["rental_assistance_per_renter"]
 rise_ses = {name: entry["standard_error"] for name, entry in package_se["amount_rises"].items()}
 year_table = inkind["year_table"]
 accounting = [inkind["accounting"][t] for t in TENURES]
+# The same split with BLS's Other share kept separate: the benefits' five
+# share rows in place of their terms.
+separate = [inkind["accounting_other_separate"][t] for t in TENURES]
+separate_shares = [part["shares"]["benefits"] for part in separate]
+separate_price_shares = [part["shares"]["prices"] for part in separate]
 rank_shift = [inkind["rank_shift"][t] for t in TENURES]
 price_beyond_cpi = inkind["fcsuti_price_growth"] - inkind["cpi_u_growth"]
 price_shares = [part["shares"]["prices"] for part in accounting]
 internet_share_low, internet_share_high = inkind["bls_internet_share_range"]
+internet_row_low, internet_row_high = inkind["bls_internet_row_share_range"]
+# The section's two coefficients for a component's term: 1.2 s for a
+# component common to every tenure, and 0.2 s on the band mean of a shelter
+# or utility component.
+TERM_COEFFICIENTS = re.findall(
+    r"\$c\$ common to every tenure puts the term \$(\d\.\d)\\,s\\,\\overline\{c\}_E\$ in \$B_\{T,h\}\$, and a shelter or utility component "
+    r"puts \$s\\,\(\\overline\{c\}_\{E,h\}\+(\d\.\d)\\,\\overline\{c\}_E\)\$",
+    section("## BLS's imputed amounts", "## Threshold growth, 2022–2025"),
+)
 common_gaps = inkind["gap_with_bls_internet"]
 owner_rent_low, owner_rent_high = inkind["written_owner_rent_range"]
 # The benefits' lift to each year's threshold and its standard error. The
@@ -1317,6 +1331,10 @@ INKIND_METHOD_CONSTANTS = (
     "midpoint of its three-month reference period",  # 1.5 months in _wic_ebt_complete
     # reference_year = year where quarter >= 2, else year - 1
     "We assign each CE interview to its collection year, and first-quarter interviews to the year before",
+    # load_ce_unit_inputs: rent_paid_monthly sums the unit's RNT QRT3MCMX and
+    # divides by 3; tests/test_ce_inkind.py matches the sum to UCC 210110
+    "We take each unit's monthly rent paid as one third of its three-month rent total in the CE's RNT file, "
+    "which matches its spending on rent of the dwelling (UCC 210110)",
     # _weighted_logit and the amount and Tobit fits: w = weight / weight.mean(),
     # _penalty puts InKindConfig.ridge (1.0) on every slope and none on the intercept
     "We scale the survey weights to average one and add a ridge penalty of one to every slope",
@@ -1340,7 +1358,7 @@ INKIND_THRESHOLD_SOURCE = (
 )
 INKIND_THRESHOLD_CONSTANTS = ("mean imputed benefits per consumer unit in the 47th–53rd percentile band",)
 # Rules the section quotes from spm_calculator/ce_bls_shares.py at this
-# fingerprint (calculator commit 8f632e3, unchanged at 53cb0fa): the written-definition runs and
+# fingerprint (calculator commit 8f632e3, unchanged at 53cb0fa): the Garner–Munoz runs and
 # the reading of BLS's internet rows.
 INKIND_DEFINITION_SOURCE = (
     "spm_calculator/ce_bls_shares.py",
@@ -1353,8 +1371,11 @@ INKIND_DEFINITION_CONSTANTS = (
     "but a rented vacation home",
     # _REMOVED_PAIRS["vacation_home_principal"] zeroes MRTPRNOP and MRTPRNOC,
     # which unit_components adds to shelter
-    "When we follow their written definitions, we remove those amounts and the vacation-home mortgage "
-    "principal we add to shelter",
+    "When we apply only these restrictions from their paper, we remove those amounts and the vacation-home "
+    "mortgage principal we add to shelter",
+    # unit_components puts telephone with food and clothing and takes it out
+    # of utilities, and apply_bls_paper_definition leaves that split alone
+    "We keep telephone out of utilities, as BLS now does [@blsspmhome], where @garner2021 count it as a utility",
 )
 INKIND_SHARES_CONSTANTS = (
     # bls_band_components keeps the internet row whose dollars spread least
@@ -1364,6 +1385,18 @@ INKIND_SHARES_CONSTANTS = (
     "We treat that row as including broadband subsidies and subtract them to recover home internet spending",
 )
 replication_receipt = json.loads((DATA / "inkind" / "ce_inkind_replication_2019_2025.json").read_text())
+# The rental-assistance sensitivities: scripts/rent_sensitivity.py writes this
+# receipt, so replacing it takes an edit here.
+RENT_SENSITIVITY = DATA / "rent_sensitivity" / "rent_model_sensitivity_2022.json"
+RENT_SENSITIVITY_SHA256 = "ac23155ebbd26e8fec70c39e91bcdb3cbbda09e566ca774ed0b40206b6b9c496"
+rent_sensitivity = json.loads(RENT_SENSITIVITY.read_text())
+rent_variants = {
+    name: row["percent_vs_base"] for name, row in rent_sensitivity["variants"].items()
+}
+rent_base = rent_sensitivity["variants"]["base"]["dollars_per_assisted_renter"]
+rent_recorded = replication_receipt["imputation_diagnostics"]["rental_assistance"][
+    str(rent_sensitivity["reference_year"])
+]
 
 
 def previous_quarter(quarter: str) -> str:
@@ -1380,7 +1413,7 @@ half_sample_years = sorted(
     for year, row in current_ce["results"].items()
     if any(before in row["quarters"] and after in row["quarters"] for before, after in half_sample_pairs)
 )
-# The written-definition runs' removal counts, and the vacation-home fuel
+# The Garner–Munoz runs' removal counts, and the vacation-home fuel
 # codes the calculator's stated limitation keeps, behind the paper's
 # account of what those runs drop and keep.
 definition_check = inkind_inputs["components"]["definition_check"]
@@ -1437,7 +1470,7 @@ inkind_pins = (
         has_number(f"{dollars(internet_low)} to {dollars(internet_high)} per unit", text=INKIND_TEXT),
     ),
     (
-        "written-definition out-of-pocket range",
+        "Garner–Munoz out-of-pocket range",
         written_without[1] < 0
         and has_number(
             f"the out-of-pocket replication trails BLS by {-written_without[1]:.2f} to {-written_without[0]:.2f}",
@@ -1445,7 +1478,7 @@ inkind_pins = (
         ),
     ),
     (
-        "written-definition range with benefits",
+        "Garner–Munoz range with benefits",
         written_with[0] < 0 < written_with[1]
         and has_number(
             f"When we also add the imputed benefits, we estimate thresholds between {-written_with[0]:.2f} "
@@ -1454,7 +1487,7 @@ inkind_pins = (
         ),
     ),
     (
-        "written-definition runs drop vacation-home utilities and principal",
+        "Garner–Munoz runs drop vacation-home utilities and principal",
         sorted(definition_check) == list(YEARS)
         and all(
             year_check["units_with_amount_removed"]["vacation_utilities"] > 0
@@ -1466,12 +1499,12 @@ inkind_pins = (
         and "utilities for vacation homes [@cepumd]" in INKIND_TEXT,
     ),
     (
-        "written definitions read from fingerprinted calculator code",
+        "Garner–Munoz restrictions read from fingerprinted calculator code",
         inkind_inputs["components"]["code_sha256"].get(INKIND_DEFINITION_SOURCE[0]) == INKIND_DEFINITION_SOURCE[1]
         and all(has_number(constant, text=INKIND_TEXT) for constant in INKIND_DEFINITION_CONSTANTS),
     ),
     (
-        "written-definition runs keep the vacation-home fuel codes the FMLI summaries omit",
+        "Garner–Munoz runs keep the vacation-home fuel codes the FMLI summaries omit",
         len(vacation_fuel_limitations) == 1
         and "leave out" in vacation_fuel_limitations[0]
         and has_number(
@@ -1481,7 +1514,7 @@ inkind_pins = (
         ),
     ),
     (
-        "written-definition mean absolute deviation",
+        "Garner–Munoz mean absolute deviation",
         written_run["mean_absolute_gap"]["with_in_kind"] < written_run["mean_absolute_gap"]["without_in_kind"]
         and has_number(
             f"mean absolute deviation falls from {written_run['mean_absolute_gap']['without_in_kind']:.2f} to "
@@ -1644,14 +1677,23 @@ inkind_pins = (
     (
         "abstract and discussion: the accounting's shares",
         has_number(
-            f"its imputed benefits supply {min(bls_shares):.0f} to {max(bls_shares):.0f} percent of its "
+            f"its imputed benefits supply {min(bls_shares):.1f} to {max(bls_shares):.1f} percent of its "
             "thresholds' growth beyond CPI-U",
             text=ABSTRACT,
         )
         and has_number(
+            "We give each benefit its part of the 1.2 multiplier in BLS's formula; when we leave that part in "
+            f"the Other share BLS publishes separately, the benefits supply {min(separate_shares):.1f} to "
+            f"{max(separate_shares):.1f} percent",
+            text=ABSTRACT,
+        )
+        and f"{min(price_shares):.0f} {max(price_shares):.0f}"
+        == f"{min(separate_price_shares):.0f} {max(separate_price_shares):.0f}"
+        and has_number(
             f"BLS's FCSUti index supplies {min(price_shares):.0f} to {max(price_shares):.0f} percent of its "
-            f"thresholds' growth beyond CPI-U, its imputed benefits {min(bls_shares):.0f} to "
-            f"{max(bls_shares):.0f} percent, and out-of-pocket spending the rest",
+            f"thresholds' growth beyond CPI-U. Its imputed benefits supply {min(bls_shares):.1f} to "
+            f"{max(bls_shares):.1f} percent when each carries its part of the Other share, and "
+            f"{min(separate_shares):.1f} to {max(separate_shares):.1f} percent when we keep that share separate",
             text=DISCUSSION_TEXT,
         ),
     ),
@@ -1665,9 +1707,9 @@ inkind_pins = (
         and all(d > abs(c) for d, c in zip(deflator, stage_changes)),
     ),
     (
-        "written definitions with the composite CPI: the benefits' change to growth",
+        "Garner–Munoz restrictions with the composite CPI: the benefits' change to growth",
         has_number(
-            "With the written definitions and the replication's composite CPI, we estimate that the benefits "
+            "With the same restrictions and the replication's composite CPI, we estimate that the benefits "
             f"change growth by {signed(written_run['growth'][TENURES[0]]['stage_change'])}, "
             f"{signed(written_run['growth'][TENURES[1]]['stage_change'])}, and "
             f"{signed(written_run['growth'][TENURES[2]]['stage_change'])} points",
@@ -1676,7 +1718,7 @@ inkind_pins = (
         and "change 2022–2025 growth by less than one point per tenure with the CE's spending summaries" in ABSTRACT,
     ),
     (
-        "written definitions with BLS's index come within 0.8 points",
+        "Garner–Munoz restrictions with BLS's index come within 0.8 points",
         max(abs(g) for g in written_index_gaps) < 0.8 and has_number("within 0.8 points", text=INKIND_TEXT),
     ),
     (
@@ -1718,11 +1760,43 @@ inkind_pins = (
             for part in accounting
         )
         and has_number(
-            "If we apply the index's lead to the benefits' terms as well, out-of-pocket spending keeps its part "
-            "and the benefits supply "
+            "If we apply the index's lead to the benefits as well, out-of-pocket spending keeps its part in "
+            "either accounting. The benefits' part falls to "
             + ", ".join(f"{part['index_on_benefits_shares']['benefits']:.1f}" for part in accounting[:-1])
-            + f", and {accounting[-1]['index_on_benefits_shares']['benefits']:.1f} percent",
+            + f", and {accounting[-1]['index_on_benefits_shares']['benefits']:.1f} percent with their terms, and to "
+            + ", ".join(f"{part['index_on_benefits_shares']['benefits']:.1f}" for part in separate[:-1])
+            + f", and {separate[-1]['index_on_benefits_shares']['benefits']:.1f} percent with their rows",
             text=GROWTH_TEXT,
+        ),
+    ),
+    (
+        "accounting with the Other share kept separate",
+        all(
+            math.isclose(part["prices"] + part["benefits"] + part["out_of_pocket"], part["excess"], abs_tol=1e-9)
+            and math.isclose(part["excess"], spread["excess"], abs_tol=1e-9)
+            and 0 < part["shares"]["benefits"] < spread["shares"]["benefits"]
+            and math.isclose(
+                part["index_on_benefits_shares"]["out_of_pocket"], part["shares"]["out_of_pocket"], abs_tol=1e-9
+            )
+            for part, spread in zip(separate, accounting, strict=True)
+        )
+        and has_number(
+            "When we keep the Other share separate, as BLS publishes it, $I$ sums the benefits' five share rows "
+            "times $B$, and we count the Other share with out-of-pocket spending. The benefits then supply "
+            + ", ".join(f"{share:.1f}" for share in separate_shares[:-1])
+            + f", and {separate_shares[-1]:.1f} percent of BLS's growth beyond CPI-U, and out-of-pocket spending "
+            "and the Other share beyond the index supply "
+            + ", ".join(f"{part['shares']['out_of_pocket']:.1f}" for part in separate[:-1])
+            + f", and {separate[-1]['shares']['out_of_pocket']:.1f} percent",
+            text=GROWTH_TEXT,
+        ),
+    ),
+    (
+        "each component's term carries its part of the Other share",
+        TERM_COEFFICIENTS == [("1.2", "0.2")]
+        and has_number(
+            "BLS publishes the share of the last term, $0.2\\,\\overline{FCSUti}_E$, as a separate Other share",
+            text=INKIND_TEXT,
         ),
     ),
     (
@@ -1816,8 +1890,12 @@ inkind_pins = (
     ),
     (
         "home internet's share of BLS's thresholds",
-        has_number(
-            f"supplies {internet_share_low:.2f} to {internet_share_high:.2f} percent of each BLS threshold",
+        math.isclose(internet_share_low, 1.2 * internet_row_low, rel_tol=1e-12)
+        and math.isclose(internet_share_high, 1.2 * internet_row_high, rel_tol=1e-12)
+        and has_number(
+            f"supplies {internet_row_low:.2f} to {internet_row_high:.2f} percent of each BLS threshold by BLS's "
+            f"published shares, and {internet_share_low:.2f} to {internet_share_high:.2f} percent when we give it "
+            "its part of the 1.2 multiplier",
             text=INKIND_TEXT,
         ),
     ),
@@ -1827,13 +1905,13 @@ inkind_pins = (
         and has_number(
             "we estimate thresholds that exceed BLS's in every tenure and year, by "
             f"{common_gaps['package_bls_definition'][0]:.2f} to {common_gaps['package_bls_definition'][1]:.2f} "
-            f"percent under the written definitions and by {common_gaps['package'][0]:.2f} to "
+            f"percent under the Garner–Munoz restrictions and by {common_gaps['package'][0]:.2f} to "
             f"{common_gaps['package'][1]:.2f} percent with the CE summaries",
             text=INKIND_TEXT,
         ),
     ),
     (
-        "written definitions keep owners' rented-dwelling spending",
+        "Garner–Munoz restrictions keep owners' rented-dwelling spending",
         has_number(
             f"which averages {dollars(owner_rent_low)} to {dollars(owner_rent_high)} per owner without a mortgage "
             "in the band",
@@ -1975,6 +2053,54 @@ inkind_pins = (
             f"`{record['calculator_commit']}`" in APPENDIX_B_TEXT
             for record in inkind_provenance["artifacts"].values()
         ),
+    ),
+    (
+        "rent sensitivity receipt matches its pin, its script and the imputation receipt",
+        hashlib.sha256(RENT_SENSITIVITY.read_bytes()).hexdigest() == RENT_SENSITIVITY_SHA256
+        and rent_sensitivity["script_sha256"]
+        == hashlib.sha256((REPO / rent_sensitivity["generated_by"]).read_bytes()).hexdigest()
+        and rent_sensitivity["replication_receipt"]["sha256"]
+        == hashlib.sha256((DATA / "inkind" / REPLICATION).read_bytes()).hexdigest()
+        and math.isclose(rent_base, rent_recorded["ce_mean_amount_per_participant"], rel_tol=1e-9)
+        and all(
+            math.isclose(
+                row["percent_vs_base"], 100 * (row["dollars_per_assisted_renter"] / rent_base - 1), abs_tol=1e-9
+            )
+            for row in rent_sensitivity["variants"].values()
+        ),
+    ),
+    (
+        "rent sensitivities",
+        has_number(
+            f"We test two of these choices on reference year {rent_sensitivity['reference_year']}, for which we "
+            f"estimate rental assistance of {dollars(rent_base)} per assisted renter across the CE",
+            text=UNCERTAINTY_TEXT,
+        )
+        and rent_variants["next_interview_rent"] > 0
+        and has_number(
+            "If each renter whose rent paid is "
+            f"{100 * rent_sensitivity['part_period_bounds'][0]:.0f} to "
+            f"{100 * rent_sensitivity['part_period_bounds'][1]:.0f} percent of its rent at the next interview "
+            f"takes the later rent, the amount rises {rent_variants['next_interview_rent']:.1f} percent; "
+            f"{rent_sensitivity['sample']['renters_with_next_interview_rent']:,} of the "
+            f"{rent_sensitivity['sample']['renters']:,} renters report rent at a next interview",
+            text=UNCERTAINTY_TEXT,
+        )
+        and all(rent_variants[name] < 0 for name in ("predicted_median", "predicted_mean", "levels_predicted"))
+        and has_number(
+            f"the amount falls {-rent_variants['predicted_median']:.0f} percent at the log model's median, "
+            f"{-rent_variants['predicted_mean']:.0f} percent at its mean, and "
+            f"{-rent_variants['levels_predicted']:.0f} percent at the linear prediction of the same model fitted "
+            "to rent in dollars",
+            text=UNCERTAINTY_TEXT,
+        ),
+    ),
+    (
+        "appendix names the rent sensitivity script and receipt",
+        "`scripts/rent_sensitivity.py` reruns" in APPENDIX_B_TEXT
+        and "`data/rent_sensitivity/rent_model_sensitivity_2022.json`" in APPENDIX_B_TEXT
+        and "(scripts/rent_sensitivity.py)" in README_TEXT
+        and "(data/rent_sensitivity/rent_model_sensitivity_2022.json)" in README_TEXT,
     ),
     (
         "appendix counts the receipts",

@@ -25,7 +25,7 @@ REPO = Path(__file__).resolve().parents[1]
 SERIES_LABELS = {
     "package": "Replication",
     "fcsuti": "Replication, FCSUti index",
-    "fcsuti_bls_definition": "Written definitions, FCSUti index",
+    "fcsuti_bls_definition": "Garner–Munoz restrictions, FCSUti index",
 }
 AMOUNT_LABELS = {
     "imputed_total": "All imputed benefits",
@@ -110,17 +110,38 @@ def series_table(figures: dict, errors: dict) -> str:
 
 
 def accounting_table(figures: dict) -> str:
+    """BLS's growth beyond CPI-U in two accountings: each component's term
+    with its part of the Other share, then the Other share kept separate,
+    as BLS's shares workbook reports it."""
     headers = ["Part", "With mortgage", "Without mortgage", "Renter"]
     accounting = figures["accounting"]
     rows = [["Threshold growth beyond CPI-U", *(f"{accounting[t]['excess']:.2f}" for t in TENURES)]]
-    for part, label in (
-        ("prices", "FCSUti index beyond CPI-U, on out-of-pocket terms"),
-        ("benefits", "Imputed benefits"),
-        ("out_of_pocket", "Out-of-pocket spending beyond the index"),
-    ):
-        rows.append(
-            [label, *(f"{accounting[t][part]:.2f} ({accounting[t]['shares'][part]:.1f}%)" for t in TENURES)]
-        )
+    panels = (
+        (
+            "accounting",
+            "*Each term with its part of Other*",
+            (
+                ("prices", "FCSUti index beyond CPI-U, on out-of-pocket terms"),
+                ("benefits", "Imputed benefits"),
+                ("out_of_pocket", "Out-of-pocket spending beyond the index"),
+            ),
+        ),
+        (
+            "accounting_other_separate",
+            "*Other kept separate*",
+            (
+                ("prices", "FCSUti index beyond CPI-U, on out-of-pocket rows and Other"),
+                ("benefits", "Imputed benefits' rows"),
+                ("out_of_pocket", "Out-of-pocket spending and Other beyond the index"),
+            ),
+        ),
+    )
+    for key, heading, parts in panels:
+        rows.append([heading, "", "", ""])
+        for part, label in parts:
+            rows.append(
+                [label, *(f"{figures[key][t][part]:.2f} ({figures[key][t]['shares'][part]:.1f}%)" for t in TENURES)]
+            )
     return markdown_table(headers, rows, widths=(12, 6, 6, 6))
 
 

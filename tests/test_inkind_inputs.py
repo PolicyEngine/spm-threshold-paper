@@ -572,6 +572,181 @@ class GrowthAccountingProperties(unittest.TestCase):
             )
 
 
+class OtherSeparateAccountingProperties(unittest.TestCase):
+    """The split with BLS's Other share kept separate: the benefits' part
+    counts their five share rows, s times school lunch and WIC at equal
+    dollars and s times each tenure's LIHEAP, rental assistance and
+    broadband subsidy, and the Other share joins the rest."""
+
+    CPI, PRICE = 1.10, 1.14
+
+    def synthetic(self, rng):
+        """Bands for 2022 and 2025 with the tenure-specific benefits pooled
+        under the tenure mix, as BLS's workbook gives them, and thresholds
+        from BLS's identity. Out-of-pocket spending grows 25 percent and
+        each benefit 15 to 60 percent, so every part of either split is
+        positive."""
+        weights = [rng.random() + 1e-6 for _ in TENURES]
+        mix = {tenure: weight / sum(weights) for tenure, weight in zip(TENURES, weights)}
+        shared_oop = rng.uniform(5000, 20000)
+        su_oop = {tenure: rng.uniform(5000, 25000) for tenure in TENURES}
+        by_tenure = {
+            tenure: {name: rng.uniform(0, 3000) for name in ("liheap", "rental_assistance")} | {
+                "broadband": rng.uniform(0, 30)
+            }
+            for tenure in TENURES
+        }
+        shared = {name: rng.uniform(0, 1500) for name in ("nslp", "wic")}
+        years, terms = {}, {tenure: {} for tenure in TENURES}
+        for year, oop_growth in (("2022", 1.0), ("2025", 1.25)):
+            growth = {name: 1.0 if year == "2022" else rng.uniform(1.15, 1.6) for name in ALL_IMPUTED}
+            tenure_means = {
+                tenure: {name: value * growth[name] for name, value in means.items()}
+                for tenure, means in by_tenure.items()
+            }
+            pooled = {name: value * growth[name] for name, value in shared.items()}
+            for name in ("liheap", "rental_assistance", "broadband"):
+                pooled[name] = sum(mix[tenure] * tenure_means[tenure][name] for tenure in TENURES)
+            band = {"tenure_mix": mix, "pooled": pooled, "by_tenure": tenure_means}
+            published = thresholds(
+                band, oop_growth * shared_oop, {t: oop_growth * v for t, v in su_oop.items()}, ALL_IMPUTED
+            )
+            for tenure, value in INKIND._imputed_terms(band, ALL_IMPUTED).items():
+                terms[tenure][year] = value
+            years[year] = {
+                "band": band,
+                "published_thresholds": published,
+                "imputed_total": sum(pooled[name] for name in ALL_IMPUTED),
+            }
+        return {
+            "bls": {
+                "years": years,
+                "growth_2022_2025": {
+                    "by_tenure": {tenure: {"imputed_term_dollars": terms[tenure]} for tenure in TENURES}
+                },
+            }
+        }
+
+    def test_parts_sum_to_the_same_growth_beyond_cpi(self):
+        rng = random.Random(20261113)
+        for _ in range(DRAWS // 4):
+            components = self.synthetic(rng)
+            separate = INKIND._growth_accounting_other_separate(components, self.CPI, self.PRICE)
+            for tenure in TENURES:
+                part = separate[tenure]
+                years = components["bls"]["years"]
+                b22 = years["2022"]["published_thresholds"][tenure]
+                b25 = years["2025"]["published_thresholds"][tenure]
+                self.assertTrue(math.isclose(part["excess"], 100 * (b25 / b22 - self.CPI), rel_tol=1e-9))
+                self.assertTrue(
+                    math.isclose(part["prices"] + part["benefits"] + part["out_of_pocket"], part["excess"], rel_tol=1e-9)
+                )
+                self.assertTrue(math.isclose(sum(part["shares"].values()), 100, rel_tol=1e-9))
+
+    def test_rows_equal_the_identity_without_the_other_row(self):
+        """Differential: a tenure's benefit rows are the threshold change from
+        adding the benefits, less their 0.2 share of FCSUti, with that
+        tenure's broadband subsidy in place of the band's."""
+        rng = random.Random(20261114)
+        for _ in range(DRAWS // 4):
+            components = self.synthetic(rng)
+            for year in ("2022", "2025"):
+                band = components["bls"]["years"][year]["band"]
+                rows = INKIND._benefit_rows(band)
+                shared_oop, su_oop = 10_000.0, {tenure: 12_000.0 for tenure in TENURES}
+                change = {
+                    tenure: thresholds(band, shared_oop, su_oop, ALL_IMPUTED)[tenure]
+                    - thresholds(band, shared_oop, su_oop, ())[tenure]
+                    for tenure in TENURES
+                }
+                total = components["bls"]["years"][year]["imputed_total"]
+                for tenure in TENURES:
+                    expected = change[tenure] - 0.82 * (
+                        0.2 * total + band["pooled"]["broadband"] - band["by_tenure"][tenure]["broadband"]
+                    )
+                    self.assertTrue(math.isclose(rows[tenure], expected, rel_tol=1e-9, abs_tol=1e-9), tenure)
+
+    def test_rows_fall_short_of_the_terms(self):
+        """Keeping the Other share separate lowers each tenure's benefits'
+        part, since the rows leave out their 0.2 share of FCSUti."""
+        rng = random.Random(20261115)
+        for _ in range(DRAWS // 4):
+            components = self.synthetic(rng)
+            figures = {
+                "bls": {
+                    tenure: {
+                        "imputed_share_beyond_cpi_u": INKIND._three_parts(
+                            components["bls"]["years"]["2022"]["published_thresholds"][tenure],
+                            components["bls"]["years"]["2025"]["published_thresholds"][tenure],
+                            components["bls"]["growth_2022_2025"]["by_tenure"][tenure]["imputed_term_dollars"]["2022"],
+                            components["bls"]["growth_2022_2025"]["by_tenure"][tenure]["imputed_term_dollars"]["2025"],
+                            self.CPI,
+                            self.PRICE,
+                            tenure,
+                        )["shares"]["benefits"]
+                    }
+                    for tenure in TENURES
+                }
+            }
+            spread = INKIND._growth_accounting(figures, components, self.CPI, self.PRICE)
+            separate = INKIND._growth_accounting_other_separate(components, self.CPI, self.PRICE)
+            for tenure in TENURES:
+                self.assertLess(separate[tenure]["benefits"], spread[tenure]["benefits"])
+                self.assertGreater(separate[tenure]["prices"], spread[tenure]["prices"])
+
+    def test_a_changed_tenure_row_is_rejected(self):
+        components = self.synthetic(random.Random(5))
+        components["bls"]["years"]["2025"]["band"]["by_tenure"]["renter"]["broadband"] += 1
+        with self.assertRaisesRegex(ValueError, "band mean of broadband pools the tenures' means 2025"):
+            INKIND._growth_accounting_other_separate(components, self.CPI, self.PRICE)
+
+    def test_a_changed_shared_row_is_rejected(self):
+        components = self.synthetic(random.Random(6))
+        components["bls"]["years"]["2022"]["band"]["pooled"]["nslp"] += 1
+        with self.assertRaisesRegex(ValueError, "benefit rows fall short of the benefits' terms by their Other share 2022"):
+            INKIND._growth_accounting_other_separate(components, self.CPI, self.PRICE)
+
+    def test_committed_split_matches_the_receipt_directly(self):
+        """A second reading of the component receipt, with no code shared
+        with the module beyond loading it."""
+        inputs = INKIND.load_inkind(REPO / "data/inkind", REPO / "data/current")
+        figures = INKIND.inkind_figures(inputs)
+        components = inputs["components"]
+        cpi = components["inputs"]["cpi"]["cpi_u_ratio_2022_2025"]
+        price = inputs["replication"]["decompositions"]["2022-2025"]["bls_price_factor"]
+        years = components["bls"]["years"]
+        for tenure in TENURES:
+            rows = {}
+            for year in ("2022", "2025"):
+                band = years[year]["band"]
+                rows[year] = 0.82 * (
+                    band["pooled"]["nslp"]
+                    + band["pooled"]["wic"]
+                    + band["by_tenure"][tenure]["broadband"]
+                    + band["by_tenure"][tenure]["liheap"]
+                    + band["by_tenure"][tenure]["rental_assistance"]
+                )
+            b22 = years["2022"]["published_thresholds"][tenure]
+            b25 = years["2025"]["published_thresholds"][tenure]
+            part = figures["accounting_other_separate"][tenure]
+            excess = b25 / b22 - cpi
+            self.assertTrue(math.isclose(part["shares"]["benefits"], 100 * (rows["2025"] / b22 - cpi * rows["2022"] / b22) / excess))
+            self.assertTrue(math.isclose(part["prices"], 100 * (price - cpi) * (1 - rows["2022"] / b22)))
+            self.assertTrue(
+                math.isclose(
+                    part["index_on_benefits_shares"]["benefits"],
+                    100 * (rows["2025"] / b22 - price * rows["2022"] / b22) / excess,
+                )
+            )
+
+    def test_internet_row_is_its_term_without_the_other_share(self):
+        inputs = INKIND.load_inkind(REPO / "data/inkind", REPO / "data/current")
+        levels = INKIND._internet_and_levels(inputs["components"])
+        term, row = levels["bls_internet_share_range"], levels["bls_internet_row_share_range"]
+        for t, r in zip(term, row):
+            self.assertTrue(math.isclose(t, 1.2 * r, rel_tol=1e-12))
+
+
 class ReceiptTieProperties(unittest.TestCase):
     """The new figures tie to other fields of the same receipts, and a
     changed field breaks the tie."""

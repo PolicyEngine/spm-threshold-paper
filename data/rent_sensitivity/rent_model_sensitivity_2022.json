@@ -1,0 +1,93 @@
+{
+  "calculator_commit": "53cb0fa08a0ca2fe1ea4b15a32ec77090ca8b91c",
+  "ce_bundles": {
+    "intrvw22.zip": "c99a2f47c0084b7a88812b34c56a1a288be2798ff010b2b59dcf87e072773e17",
+    "intrvw23.zip": "97e9a17edeee28e77a3fd5a7d874e5f4b9034222be204e25b0d902f4c82235ac"
+  },
+  "code_sha256": {
+    "spm_calculator/ce_decomposition.py": "39be6fc2ceef0764cbf1133a1f4ea39c67a4de6a4e781357f717a7a82d0e00c0",
+    "spm_calculator/ce_inkind.py": "c23e6f26ef32328ef0952d90edca9b382e7fa6e5e029d530a7a0beb9e1d10724",
+    "spm_calculator/ce_inkind_stage.py": "9543b1ce76b6ce1974d1dcfc11e4840202633666da2684201836668f52210986",
+    "spm_calculator/ce_threshold.py": "4efbe2b03f6b1f4eb2911ab0f79f5151bd655cc1e5addf42f5c4540ace1f852f",
+    "spm_calculator/cps_asec.py": "ac4a1ae3b28d34fa3dfbbe5879c88d0274a0e6e46423694bb48808d4f7cf2cc8",
+    "spm_calculator/equivalence_scale.py": "95c797adca4811b0a2c4202e8471f6cd46fcd259bf46b34da74588ab08b41326",
+    "spm_calculator/fcsuti_cpi.py": "cf8fbe9103846d83a280bcd4f13b9ddd91e8baa94e2668b9ef288c7cc980a5fc"
+  },
+  "collection_quarters": [
+    "2022Q2",
+    "2022Q3",
+    "2022Q4",
+    "2023Q1"
+  ],
+  "fit": {
+    "mean_fitted_median_market_rent_assisted_monthly": 1164.0995076838985,
+    "mean_rent_paid_assisted_monthly": 580.7465161598924,
+    "sigma": 0.4682813284091318
+  },
+  "generated_by": "scripts/rent_sensitivity.py",
+  "generated_on": "2026-11-13",
+  "limitations": [
+    "One reference year, 2022, from CE interviews collected from 2022Q2 through 2023Q1",
+    "Amounts are per assisted renter across the CE, not within the 47th-53rd percentile band",
+    "Only renters with a next interview, in the following quarter, can take its rent paid",
+    "The point-prediction variants use the fitted parameters, not parameter draws"
+  ],
+  "next_interview_quarter": "2023Q2",
+  "part_period_bounds": [
+    0.25,
+    0.75
+  ],
+  "reference_year": 2022,
+  "replication_receipt": {
+    "path": "data/inkind/ce_inkind_replication_2019_2025.json",
+    "sha256": "8cbfd872d972f42bd2f7b9a89a2409eb581d81d8446fc96e23b8768632acd168"
+  },
+  "runtime": {
+    "numpy": "2.4.1",
+    "pandas": "3.0.0",
+    "python": "3.14.7",
+    "scipy": "1.18.1"
+  },
+  "sample": {
+    "assisted": 852,
+    "fit_rows": 6033,
+    "part_period_assisted": 29,
+    "part_period_renters": 156,
+    "renters": 6159,
+    "renters_with_next_interview_rent": 3120
+  },
+  "schema_version": 1,
+  "script_sha256": "2ed97a91a259563509b492733a342c8ec779f0a1084598efbc7877e48a12b725",
+  "variants": {
+    "base": {
+      "description": "The replication's model: market rent drawn above rent paid, five implicates",
+      "dollars_per_assisted_renter": 10808.554981616206,
+      "percent_vs_base": 0.0,
+      "share_with_zero_benefit": null
+    },
+    "levels_predicted": {
+      "description": "The same Tobit fitted to rent in dollars, its linear prediction as market rent, negative benefits set to zero",
+      "dollars_per_assisted_renter": 9389.783364723045,
+      "percent_vs_base": -13.126376461111466,
+      "share_with_zero_benefit": 0.05837801477520726
+    },
+    "next_interview_rent": {
+      "description": "The base model, with a renter's rent paid replaced by its next interview's where it is 25 to 75 percent of that one",
+      "dollars_per_assisted_renter": 10897.089512015675,
+      "percent_vs_base": 0.8191153262397499,
+      "share_with_zero_benefit": null
+    },
+    "predicted_mean": {
+      "description": "The base fit's mean market rent, negative benefits set to zero",
+      "dollars_per_assisted_renter": 9053.544059696538,
+      "percent_vs_base": -16.237239158284233,
+      "share_with_zero_benefit": 0.06429425304366417
+    },
+    "predicted_median": {
+      "description": "The base fit's median market rent, negative benefits set to zero",
+      "dollars_per_assisted_renter": 7559.140867971296,
+      "percent_vs_base": -30.06335369687896,
+      "share_with_zero_benefit": 0.10266180876615728
+    }
+  }
+}
