@@ -134,11 +134,20 @@ def check(label: str, ok: bool) -> None:
 
 def bounded(literal: str) -> str:
     """A literal that cannot match inside a longer token: numeric-token
-    boundaries for figures, word boundaries for spelled-out counts."""
+    boundaries for figures, word boundaries for spelled-out counts. A literal
+    that starts or ends with a letter also refuses a letter or hyphen beside
+    that edge, so "six states" fails on "twenty-six states" and "one of the"
+    on "none of the", whether or not the literal holds a figure."""
     pattern = re.escape(literal)
     if any(character.isdigit() for character in literal):
-        return r"(?<![\d.,])" + pattern + r"(?![\d]|[.,]\d)"
-    return r"\b" + pattern + r"\b"
+        left, right = r"(?<![\d.,])", r"(?![\d]|[.,]\d)"
+    else:
+        left, right = r"\b", r"\b"
+    if literal[:1].isalpha():
+        left += r"(?<![A-Za-z-])"
+    if literal[-1:].isalpha():
+        right = r"(?![A-Za-z-])" + right
+    return left + pattern + right
 
 
 def has_number(literal: str, text: str = QMD, min_count: int = 1) -> bool:
@@ -1416,12 +1425,13 @@ INKIND_SHARES_CONSTANTS = (
     # "other_separate" gives broadband the tenure's own mean to match
     "With the Other share kept separate, we read BLS's home internet share for a tenure as that row less the "
     "tenure's own broadband row",
-    # separate_share_errors matches each component row of _ROWS and the Other
-    # share, with internet read from the chosen row less broadband; it reads
-    # neither the other internet row nor the workbook's subtotal and Total
-    # Share rows
-    "When we keep the Other share separate, our terms match BLS's published share for each component and for "
-    "Other, home internet included, within the same bound",
+    # bls_band_components builds the band means from BLS's shares and
+    # thresholds and passes them to separate_share_errors, which matches the
+    # other_separate terms to each component row of _ROWS and the Other share,
+    # with internet read from the chosen row less broadband; it reads neither
+    # the other internet row nor the workbook's subtotal and Total Share rows
+    "When we keep the Other share separate, the terms we compute from BLS's band means match its published "
+    "share for Other and for each component, including home internet, within the same bound",
 )
 # The statewide WIC EBT dates the section quotes, from the calculator's copy
 # of FNS's status report (spm_calculator/data/inkind/usda_wic_ebt_statewide.csv)
@@ -1435,10 +1445,12 @@ INKIND_WIC_DATES_SOURCE = (
     "6a61a4e0f1307f0a15e1c0a7c72a65e8be231a0fd1a6cdfb6c468c617a5d40f3",
 )
 INKIND_WIC_DATES_CONSTANTS = (
-    "six states whose WIC agencies implemented EBT statewide between June and September 2020, from Hawaii to "
-    "Illinois [@fnswicebt2022]",
+    "including in six states whose WIC agencies implemented EBT statewide between June and September 2020, "
+    "from Hawaii to Illinois [@fnswicebt2022]",
     "The WIC agencies of six more states and the District of Columbia did so after the deadline, from Utah in "
-    "November 2020 to Georgia in October 2022",
+    "November 2020 to Georgia in October 2022 [@fnswicebt2022]",
+    "we would add WIC in each of those 12 states and the District until its WIC agency had implemented EBT "
+    "statewide",
 )
 replication_receipt = json.loads((DATA / "inkind" / "ce_inkind_replication_2019_2025.json").read_text())
 
@@ -2053,10 +2065,10 @@ inkind_pins = (
         min(common_gaps["package_bls_definition"][0], common_gaps["package"][0]) > 0
         and has_number(
             "If we add the home internet in BLS's band to our thresholds, with its part of the 1.2 multiplier, we "
-            "estimate thresholds that exceed BLS's in every tenure and year. They exceed BLS's by "
-            f"{common_gaps['package_bls_definition'][0]:.2f} to {common_gaps['package_bls_definition'][1]:.2f} "
-            f"percent under the Garner–Munoz restrictions and by {common_gaps['package'][0]:.2f} to "
-            f"{common_gaps['package'][1]:.2f} percent with the CE summaries",
+            "estimate that ours exceed BLS's for every tenure in every year. Under the Garner–Munoz restrictions "
+            f"they do so by {common_gaps['package_bls_definition'][0]:.2f} to "
+            f"{common_gaps['package_bls_definition'][1]:.2f} percent, and with the CE summaries by "
+            f"{common_gaps['package'][0]:.2f} to {common_gaps['package'][1]:.2f} percent",
             text=INKIND_TEXT,
         ),
     ),
@@ -2238,10 +2250,10 @@ inkind_pins = (
         )
         and rent_variants["next_interview_rent"] > 0
         and has_number(
-            "If we replace a renter's rent paid with its rent at the next interview wherever the first is "
-            f"{100 * rent_sensitivity['part_period_bounds'][0]:.0f} to "
-            f"{100 * rent_sensitivity['part_period_bounds'][1]:.0f} percent of the second, we estimate that the "
-            f"amount rises {rent_variants['next_interview_rent']:.1f} percent. Of the "
+            "If we replace a renter's rent paid with the rent it reports at its next interview, wherever the rent "
+            f"paid is {100 * rent_sensitivity['part_period_bounds'][0]:.0f} to "
+            f"{100 * rent_sensitivity['part_period_bounds'][1]:.0f} percent of that later rent, we estimate that "
+            f"the amount rises {rent_variants['next_interview_rent']:.1f} percent. Of the "
             f"{rent_sensitivity['sample']['renters']:,} renters, "
             f"{rent_sensitivity['sample']['renters_with_next_interview_rent']:,} report rent at a next interview, "
             f"and we replace the rent of {rent_sensitivity['sample']['part_period_renters']:,} of those, including "
@@ -2257,15 +2269,16 @@ inkind_pins = (
         in rent_sensitivity["limitations"]
         and inkind_method["parameter_draws"] is True
         and has_number(
-            f"For these three, we use point estimates of each model's parameters, while for the {dollars(rent_base)} "
-            f"we average {count_word(inkind_method['implicates'])} implicates, each with newly drawn parameters",
+            "For these three, we fix each model's parameters at their point estimates, while for our base estimate "
+            f"of {dollars(rent_base)} we average {count_word(inkind_method['implicates'])} implicates and draw new "
+            "parameters for each",
             text=UNCERTAINTY_TEXT,
         )
         and all(rent_variants[name] < 0 for name in ("predicted_median", "predicted_mean", "levels_predicted"))
         and has_number(
             f"we estimate that the amount falls {-rent_variants['predicted_median']:.0f} percent at the log "
-            f"model's median and {-rent_variants['predicted_mean']:.0f} percent at its mean. With the linear "
-            "prediction of the same model fitted to rent in dollars, it falls "
+            f"model's median and {-rent_variants['predicted_mean']:.0f} percent at its mean. If we fit the same "
+            "model to rent in dollars and use its linear prediction, we estimate that the amount falls "
             f"{-rent_variants['levels_predicted']:.0f} percent",
             text=UNCERTAINTY_TEXT,
         ),

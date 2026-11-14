@@ -382,7 +382,7 @@ alone. If the unit has no child under 5, we count one pregnant woman. We
 give each participant twelve months of USDA's national average monthly
 food cost for the fiscal year that matches the unit's reference year.
 
-We add no WIC from reference year 2020, the year of the statutory deadline. Congress required every WIC state agency to implement EBT throughout the state by October 1, 2020, unless the Secretary of Agriculture exempted it [@usc1786]. We assign interviews from April 2020 to March 2021 to reference year 2020, and their reference periods center on mid-February 2020 to mid-January 2021. So we also drop WIC for reference periods before the deadline, including in six states whose WIC agencies implemented EBT statewide between June and September 2020, from Hawaii to Illinois [@fnswicebt2022]. The WIC agencies of six more states and the District of Columbia did so after the deadline, from Utah in November 2020 to Georgia in October 2022. If we applied BLS's rule state by state, we would add WIC in each of them until its WIC agency had implemented EBT statewide. For earlier reference years, we take each state's statewide date from FNS and add no WIC when the unit's state had fully implemented WIC EBT by the midpoint of its three-month reference period. When the CE suppresses a unit's state, we draw that status with probability equal to the weighted share of known-state units in the same region and quarter whose states had done so. Every interview in our 2025 window references 2020 or later, so our 2025 thresholds include no WIC. If we use each state's own date in every reference year, some units in the 2025 window take WIC. We then estimate that mean WIC per CE unit with children rises by \$1.94 to \$3.21 in the windows behind the 2021–2025 thresholds. Those thresholds move by −\$20 to +\$40 (−0.06 to +0.12 percent) as the added WIC raises spending in the band and changes which units fall in it, and 2022–2025 growth changes by 0.03 points or less.
+We add no WIC from reference year 2020, the year of the statutory deadline. Congress required every WIC state agency to implement EBT throughout the state by October 1, 2020, unless the Secretary of Agriculture exempted it [@usc1786]. We assign interviews from April 2020 to March 2021 to reference year 2020, and their reference periods center on mid-February 2020 to mid-January 2021. So we also drop WIC for reference periods before the deadline, including in six states whose WIC agencies implemented EBT statewide between June and September 2020, from Hawaii to Illinois [@fnswicebt2022]. The WIC agencies of six more states and the District of Columbia did so after the deadline, from Utah in November 2020 to Georgia in October 2022 [@fnswicebt2022]. If we applied BLS's rule state by state, we would add WIC in each of those 12 states and the District until its WIC agency had implemented EBT statewide. For earlier reference years, we take each state's statewide date from FNS and add no WIC when the unit's state had fully implemented WIC EBT by the midpoint of its three-month reference period. When the CE suppresses a unit's state, we draw that status with probability equal to the weighted share of known-state units in the same region and quarter whose states had done so. Every interview in our 2025 window references 2020 or later, so our 2025 thresholds include no WIC. If we use each state's own date in every reference year, some units in the 2025 window take WIC. We then estimate that mean WIC per CE unit with children rises by \$1.94 to \$3.21 in the windows behind the 2021–2025 thresholds. Those thresholds move by −\$20 to +\$40 (−0.06 to +0.12 percent) as the added WIC raises spending in the band and changes which units fall in it, and 2022–2025 growth changes by 0.03 points or less.
 
 For rental assistance, BLS fits a limited dependent variable model that
 treats assisted renters' rents as censored from above, and it values the
@@ -435,7 +435,7 @@ by 1.98 to 4.20 percent. When we also add the imputed benefits, we estimate
 thresholds between 1.73 percent below and 1.47 percent above BLS's, and
 the mean absolute deviation falls from 3.14 to 0.73 percent. That fit
 relies on the internet we omit. If we add the home internet in BLS's band to our thresholds, with its part of the 1.2 multiplier, we
-estimate thresholds that exceed BLS's in every tenure and year. They exceed BLS's by 0.81 to 3.80 percent under the Garner–Munoz restrictions and by 2.32 to 5.86 percent with the CE summaries.
+estimate that ours exceed BLS's for every tenure in every year. Under the Garner–Munoz restrictions they do so by 0.81 to 3.80 percent, and with the CE summaries by 2.32 to 5.86 percent.
 
 ::: {#tbl-inkind-levels}
 {{< include tables/inkind_levels.md >}}
@@ -469,7 +469,7 @@ term $1.2\,s\,\overline{c}_E$ in $B_{T,h}$, and a shelter or utility
 component puts $s\,(\overline{c}_{E,h}+0.2\,\overline{c}_E)$, so the
 terms sum to the threshold. Besides its broadband subsidy row, BLS publishes two internet rows. We use the one that gives
 equal dollars across tenures: "OOP Internet" through 2024 and "Total
-Internet Share" in 2025. We treat that row as including broadband subsidies and subtract them to recover home internet spending. With the Other share kept separate, we read BLS's home internet share for a tenure as that row less the tenure's own broadband row. With these readings, BLS's published shares, thresholds, and tenure shares satisfy both identities within \$0.00001 in every year from 2019 to 2025. When we keep the Other share separate, our terms match BLS's published share for each component and for Other, home internet included, within the same bound.
+Internet Share" in 2025. We treat that row as including broadband subsidies and subtract them to recover home internet spending. With the Other share kept separate, we read BLS's home internet share for a tenure as that row less the tenure's own broadband row. With these readings, BLS's published shares, thresholds, and tenure shares satisfy both identities within \$0.00001 in every year from 2019 to 2025. When we keep the Other share separate, the terms we compute from BLS's band means match its published share for Other and for each component, including home internet, within the same bound.
 
 Between the 2022 and 2025 thresholds, BLS's imputed benefits rose from
 \$855 to \$1,257 per unit in its band, and we estimate that ours rose
@@ -650,14 +650,17 @@ keeps units that receive rent as pay. We test two of these choices on
 reference year 2022, for which we estimate rental assistance of
 \$10,809 per assisted renter across the CE. A unit that paid rent for
 only part of the three months shows a low monthly rent. If we replace a
-renter's rent paid with its rent at the next interview wherever the first
-is 25 to 75 percent of the second, we estimate that the amount rises 0.8
-percent. Of the 6,159 renters, 3,120 report rent at a next interview, and
+renter's rent paid with the rent it reports at its next interview, wherever
+the rent paid is 25 to 75 percent of that later rent, we estimate that the
+amount rises 0.8 percent. Of the 6,159 renters, 3,120 report rent at a next interview, and
 we replace the rent of 156 of those, including 29 assisted renters. If we instead give each assisted unit
 its predicted market rent, as Garner and Gudrais [-@garnergudrais2018]
 do, and set negative benefits to zero, we estimate that the amount falls 30 percent at
-the log model's median and 16 percent at its mean. With the linear
-prediction of the same model fitted to rent in dollars, it falls 13 percent. For these three, we use point estimates of each model's parameters, while for the \$10,809 we average five implicates, each with newly drawn parameters.
+the log model's median and 16 percent at its mean. If we fit the
+same model to rent in dollars and use its linear prediction, we estimate
+that the amount falls 13 percent. For these three, we fix each model's
+parameters at their point estimates, while for our base estimate of
+\$10,809 we average five implicates and draw new parameters for each.
 
 Our school lunch donors report free or reduced-price lunches, while
 Census also values paid lunches and, for respondents who report EBT

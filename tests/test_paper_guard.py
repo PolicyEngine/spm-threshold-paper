@@ -774,8 +774,10 @@ INKIND_PROSE_MUTATIONS = (
     (
         'common-component definitions swapped',
         'section',
-        'under(\\s+)the(\\s+)Garner–Munoz(\\s+)restrictions(\\s+)and(\\s+)by(.*?)with(\\s+)the(\\s+)CE(\\s+)summaries',
-        'with\\1the\\2CE\\3summaries\\4and\\5by\\6under\\7the\\8Garner–Munoz\\9restrictions',
+        'Under(\\s+)the(\\s+)Garner–Munoz(\\s+)restrictions(\\s+)they(\\s+)do(\\s+)so(\\s+)by(.*?)and(\\s+)with'
+        '(\\s+)the(\\s+)CE(\\s+)summaries',
+        'With\\1the\\2CE\\3summaries\\4they\\5do\\6so\\7by\\8and\\9under\\g<10>the\\g<11>Garner–Munoz'
+        '\\g<12>restrictions',
         'thresholds on the components both series hold',
     ),
     (
@@ -1088,8 +1090,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "part-period bounds",
         "section",
-        r"is(\s+)25(\s+)to(\s+)75(\s+)percent(\s+)of(\s+)the(\s+)second",
-        r"is\g<1>20\2to\g<3>80\4percent\5of\6the\7second",
+        r"is(\s+)25(\s+)to(\s+)75(\s+)percent(\s+)of(\s+)that(\s+)later",
+        r"is\g<1>20\2to\g<3>80\4percent\5of\6that\7later",
         "rent sensitivities",
     ),
     (
@@ -1102,8 +1104,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "linear prediction change",
         "section",
-        r"it(\s+)falls(\s+)13(\s+)percent\.",
-        r"it\1falls\g<2>31\3percent.",
+        r"amount(\s+)falls(\s+)13(\s+)percent\.",
+        r"amount\1falls\g<2>31\3percent.",
         "rent sensitivities",
     ),
     # Round 5: broadband's start, the 2020 WIC cutoff, its by-state
@@ -1232,8 +1234,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "separate-Other terms match each component row and Other",
         "section",
-        r"for(\s+)each(\s+)component(\s+)and(\s+)for(\s+)Other",
-        r"for\1each\2component\3but\4not\5Other",
+        r"for(\s+)Other(\s+)and(\s+)for(\s+)each(\s+)component",
+        r"for\1Other\2but\3not\4each\5component",
         "BLS internet reading from fingerprinted calculator code",
     ),
     (
@@ -1260,8 +1262,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "point-fit variants' parameters",
         "section",
-        r"each(\s+)with(\s+)newly(\s+)drawn",
-        r"each\1with\2the\3fitted",
+        r"implicates(\s+)and(\s+)draw(\s+)new(\s+)parameters",
+        r"implicates\1and\2draw\3fitted\4parameters",
         "rent sensitivities",
     ),
     (
@@ -1319,6 +1321,56 @@ INKIND_PROSE_MUTATIONS = (
         r"less(\s+)the(\s+)tenure's(\s+)own(\s+)broadband(\s+)row",
         r"less\1the\2pooled\4broadband\5row",
         "BLS internet reading from fingerprinted calculator code",
+    ),
+    # Round 7: the 4866eb7 delta check.
+    (
+        "separate-Other terms' source",
+        "section",
+        r"terms(\s+)we(\s+)compute(\s+)from(\s+)BLS's(\s+)band(\s+)means",
+        r"terms\1we\2compute\3from\4our\5band\6means",
+        "BLS internet reading from fingerprinted calculator code",
+    ),
+    (
+        "compound count of states statewide before the deadline",
+        "section",
+        r"including(\s+)in(\s+)six(\s+)states(\s+)whose",
+        r"including\1in\2twenty-six\3states\4whose",
+        "WIC EBT dates from the calculator's FNS table",
+    ),
+    (
+        "states BLS's rule would reach",
+        "section",
+        r"those(\s+)12(\s+)states(\s+)and(\s+)the(\s+)District",
+        r"those\g<1>13\2states\3and\4the\5District",
+        "WIC EBT dates from the calculator's FNS table",
+    ),
+    (
+        "compound count of matching neighbors",
+        "section",
+        r"of(\s+)one(\s+)of(\s+)the(\s+)five(\s+)recipients",
+        r"of\1twenty-one\2of\3the\4five\5recipients",
+        "implicate, matching-neighbor and cell-donor counts",
+    ),
+    (
+        "common-component gaps' reach",
+        "section",
+        r"for(\s+)every(\s+)tenure(\s+)in(\s+)every(\s+)year\.(\s+)Under",
+        r"for\1most\2tenures\3in\4every\5year.\6Under",
+        "thresholds on the components both series hold",
+    ),
+    (
+        "interview that supplies the replacement rent",
+        "section",
+        r"reports(\s+)at(\s+)its(\s+)next(\s+)interview,",
+        r"reports\1at\2its\3previous\4interview,",
+        "rent sensitivities",
+    ),
+    (
+        "point-fit variants' parameters fixed",
+        "section",
+        r"we(\s+)fix(\s+)each(\s+)model's(\s+)parameters",
+        r"we\1draw\2each\3model's\4parameters",
+        "rent sensitivities",
     ),
 )
 
