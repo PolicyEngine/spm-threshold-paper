@@ -2161,10 +2161,10 @@ class PaperGuardTests(unittest.TestCase):
         number at a range's first end or in a contrast, the in-kind lift
         range reversed or rounded beside a correct copy or extended, a new
         year, a thousands separator, and a year with an apostrophe, a
-        question mark or quotes. A range whose first end carries the rule's
-        unit fails that rule's tie too. A year in parentheses before a
-        semicolon or a colon passes, since the check strips ( ) , . ; : from
-        each number's ends."""
+        question mark, or straight or curly quotes, double or single. A range
+        whose first end carries the rule's unit fails that rule's tie too. A
+        year in parentheses before a semicolon or a colon passes, since the
+        check strips ( ) , . ; : from each number's ends."""
         self.install_article()
         block = PAPER_TEXT.block_words((self.repo / "paper/index.qmd").read_text(), "abstract")
         # The abstract's lift sentence up to "percent", copied whole, so the
@@ -2230,7 +2230,18 @@ class PaperGuardTests(unittest.TestCase):
                 ((r"for(\s+)2025(\s+)only\.", r"for\g<1>one\g<2>year only: why 2025?"),),
                 [ABSTRACT_INVENTORY],
             ),
-            ("quoted year", ((r"for(\s+)2025(\s+)only", r'for\g<1>"2025"\g<2>only'),), [ABSTRACT_INVENTORY]),
+            ("year in double quotes", ((r"for(\s+)2025(\s+)only", r'for\g<1>"2025"\g<2>only'),), [ABSTRACT_INVENTORY]),
+            ("year in single quotes", ((r"for(\s+)2025(\s+)only", r"for\g<1>'2025'\g<2>only"),), [ABSTRACT_INVENTORY]),
+            (
+                "year in curly double quotes",
+                ((r"for(\s+)2025(\s+)only", "for\\g<1>\u201c2025\u201d\\g<2>only"),),
+                [ABSTRACT_INVENTORY],
+            ),
+            (
+                "year in curly single quotes",
+                ((r"for(\s+)2025(\s+)only", "for\\g<1>\u20182025\u2019\\g<2>only"),),
+                [ABSTRACT_INVENTORY],
+            ),
         )
         # The line the guard prints under its failures, which counts each
         # number as often as the abstract states it.
@@ -2242,7 +2253,14 @@ class PaperGuardTests(unittest.TestCase):
             "year added": "    the abstract states ['2024'] beyond the lists and lacks []",
             "year with an apostrophe": """    the abstract states ["2025's"] beyond the lists and lacks ['2025']""",
             "year with a question mark": "    the abstract states ['2025?'] beyond the lists and lacks ['2025']",
-            "quoted year": """    the abstract states ['"2025"'] beyond the lists and lacks ['2025']""",
+            "year in double quotes": """    the abstract states ['"2025"'] beyond the lists and lacks ['2025']""",
+            "year in single quotes": """    the abstract states ["'2025'"] beyond the lists and lacks ['2025']""",
+            "year in curly double quotes": (
+                "    the abstract states ['\u201c2025\u201d'] beyond the lists and lacks ['2025']"
+            ),
+            "year in curly single quotes": (
+                "    the abstract states ['\u20182025\u2019'] beyond the lists and lacks ['2025']"
+            ),
         }
         for name, edits, labels in cases:
             with self.subTest(case=name):

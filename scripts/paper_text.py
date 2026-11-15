@@ -180,10 +180,10 @@ def block_scalar_span(text: str, key: str) -> tuple[int, int] | None:
       comments, plain keys and ``- `` entries that hold such a key or a value.
       A key opens with an ASCII letter or "_" and holds only ASCII letters and
       digits, "_" and "-". Its value may be empty, a ``|`` or ``>`` block
-      without an indentation digit, a quoted value, which may run over lines,
-      a one-line flow list of plain or quoted items without colons or other
-      indicators, or plain text, which may continue on more deeply indented
-      lines.
+      without an indentation digit, a quoted value, a one-line flow list of
+      plain or quoted items without colons or other indicators, or plain
+      text. A quoted value may run over lines, and plain text may continue
+      on more deeply indented lines.
       YAML reads a more deeply indented line after plain text as more of
       that text, up to any comment, and a comment ends the text. Such a line
       may not hold a key, which YAML rejects there, or open with an
@@ -202,9 +202,9 @@ def block_scalar_span(text: str, key: str) -> tuple[int, int] | None:
       byte order mark or any other character that JavaScript's
       ``trimEnd()`` strips besides a space, a tab or a line end. Quarto
       trims these before it reads the YAML, and the check looks past
-      trailing spaces and tabs, which ``trimEnd()`` strips too. Or a line
-      outside a block opens with ``---``, where Quarto can skip the whole
-      front matter;
+      trailing spaces and tabs, which ``trimEnd()`` strips too;
+    - a front-matter line outside a block opens with ``---``, where Quarto
+      can skip the whole front matter;
     - the front matter names the key other than once, or other than on a
       top-level line that reads exactly ``key: |``. Quarto renders a key
       nested under ``format: html:`` in place of the top-level one. Text
@@ -518,9 +518,9 @@ def stated_values(template: str, text: str, value: str = SIGNED_NUMBER) -> list[
     "2.29". The slot starts only at the start of a whitespace-separated
     token or after "(", so "x2.29" reads as nothing. Anything else between
     a range's ends, such as a comma or a second word, leaves the last
-    number in the slot when a space or "(" comes right before it, as in
-    "2.20, to 2.29", and nothing otherwise, as in "2.20;2.29" or
-    "2.20 ;2.29".
+    number in the slot when whitespace or "(" comes right before it, as in
+    "2.20, to 2.29". Otherwise the slot holds nothing, as in "2.20;2.29"
+    or "2.20 ;2.29".
     The template's words match only whole words, so "index" does not match
     "indexes". A template without exactly one slot matches nothing.
     """

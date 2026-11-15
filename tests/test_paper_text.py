@@ -356,11 +356,12 @@ class BlockScalarSpanTests(unittest.TestCase):
                 self.assertIsNone(block_scalar_span(text, "abstract"))
                 self.assertIn(trims, block_problem(text, "abstract"))
         # JavaScript's trimEnd() strips every space separator (Unicode
-        # category Zs), a tab, \v, \f, a byte order mark and line ends. Each
-        # one besides a space and a tab, after an empty value, fails closed,
-        # even before trailing spaces or tabs, which trimEnd() strips with it,
-        # and with line feeds or carriage return and line feed pairs. The
-        # parser treats no other character as trimmed.
+        # category Zs), a tab, \v, \f, a byte order mark and line ends. After
+        # an empty value, the parser fails closed on each of these besides a
+        # space, a tab and a line end, even when spaces or tabs follow it,
+        # since trimEnd() strips those too. The loop runs each case with line
+        # feeds and with carriage return and line feed pairs. The parser
+        # treats no other character as trimmed.
         spaces = [chr(code) for code in range(0x110000) if unicodedata.category(chr(code)) == "Zs"]
         trimmed = [character for character in [*spaces, "\v", "\f", "\ufeff"] if character != " "]
         self.assertEqual(sorted(PAPER_TEXT.QUARTO_TRIMS), sorted(trimmed))
@@ -898,8 +899,8 @@ class BlockScalarSpanTests(unittest.TestCase):
             with self.subTest(character=repr(character)):
                 text = with_lines(f"  First{character}line 9.99.\n")
                 self.assertIsNotNone(block_words(text, "abstract"))
-        # The guard's message names every kind of character in the set, and
-        # each dash it allows is one a signed number or a range may hold.
+        # Pin the set the guard's message describes, and check that the ties
+        # read each dash in it as a minus sign or a range dash.
         dashes = set("\u2010\u2011\u2012\u2013\u2014\u2015\u2212\ufe58\ufe63\uff0d-")
         self.assertEqual(
             PAPER_TEXT.PROSE_MARKS,
@@ -911,7 +912,8 @@ class BlockScalarSpanTests(unittest.TestCase):
 
     def test_the_key_matches_literally(self):
         """The parser matches a key as written, never as a pattern, and reads
-        only keys named in ASCII letters and digits, "_" and "-"."""
+        only keys that open with an ASCII letter or "_" and hold only ASCII
+        letters and digits, "_" and "-". It fails closed on any other key."""
         text = PAPER.replace("abstract: |\n", "abXtract: |\n")
         self.assertIsNone(block_scalar_span(text, "ab.tract"))
         self.assertEqual(block_problem(text, "ab.tract"), "the front matter has no top-level ab.tract: | line")
@@ -923,6 +925,22 @@ class BlockScalarSpanTests(unittest.TestCase):
             'title: "Thresholds"\n', 'title: "Thresholds"\nab_tract: Other\nabXtract: Other\n'
         ) + "\nabXtract: Body\n"
         self.assertEqual(block_lines(lookalike, "ab-tract"), ABSTRACT_LINES)
+        for line, reads in (
+            ("_note-2: x", True),
+            ("titl\u00e9: x", False),
+            ("\u00e9t: x", False),
+            ("1st: x", False),
+            ("\uff12: x", False),
+            ("-x: y", False),
+        ):
+            with self.subTest(line=line):
+                text = PAPER.replace('title: "Thresholds"\n', f'title: "Thresholds"\n{line}\n')
+                if reads:
+                    self.assertEqual(block_lines(text, "abstract"), ABSTRACT_LINES)
+                else:
+                    self.assertIsNone(block_scalar_span(text, "abstract"))
+                    problem = block_problem(text, "abstract")
+                    self.assertRegex(problem, r"in the front matter, is YAML the guard does not read$")
 
 
 class BlockWordsTests(unittest.TestCase):
@@ -1156,9 +1174,23 @@ class StatedValuesTests(unittest.TestCase):
 
     def test_the_slot_starts_a_token(self):
         """The slot starts only at a whitespace-separated token's start or
-        after "(", so a rate glued to other text reads as no rate."""
+        after "(", so a rate glued to other text, as in "x2.29", "2.20;2.29"
+        or "2.20 ;2.29", reads as no rate. Between a range's ends, a comma
+        before whitespace leaves the last number in the slot."""
         for text, expected in (
             ("of x2.29 percent with the Consumer Price Index", []),
+            ("of 2.20;2.29 percent with the Consumer Price Index", []),
+            ("of 2.20 ;2.29 percent with the Consumer Price Index", []),
+            ("of 2.20,2.29 percent with the Consumer Price Index", []),
+            ("of 2.20:2.29 percent with the Consumer Price Index", []),
+            ("of a/2.29 percent with the Consumer Price Index", []),
+            ("of why?2.29 percent with the Consumer Price Index", []),
+            ("of [2.29 percent with the Consumer Price Index", []),
+            ("of '2.29 percent with the Consumer Price Index", []),
+            ("of \u201c2.29 percent with the Consumer Price Index", []),
+            ("of \u20182.29 percent with the Consumer Price Index", []),
+            ("of 2.20, to 2.29 percent with the Consumer Price Index", ["2.29"]),
+            ("of 2.20,\t2.29 percent with the Consumer Price Index", ["2.29"]),
             ("of US2.29 percent with the Consumer Price Index", []),
             ('of "2.29 percent with the Consumer Price Index', []),
             ("of +2.29 percent with the Consumer Price Index", []),
