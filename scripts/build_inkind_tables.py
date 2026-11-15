@@ -63,10 +63,11 @@ def growth_tables(figures: dict) -> str:
     ]
     for run, label in SERIES_LABELS.items():
         growth = figures["runs"][run]["growth"]
-        rows.append([label, *(f"{growth[t]['growth_without_stage']:.2f}%" for t in TENURES)])
+        rows.append([label, *(f"{growth[t]['growth_without_home_internet']:.2f}%" for t in TENURES)])
+        rows.append(["With home internet", *(f"{growth[t]['growth_without_stage']:.2f}%" for t in TENURES)])
         rows.append(
             [
-                "With imputed benefits",
+                "With internet and benefits",
                 *(
                     f"{growth[t]['growth_with_stage']:.2f}% ({growth[t]['stage_change_sd']:.2f})"
                     for t in TENURES

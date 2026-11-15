@@ -446,7 +446,7 @@ class ComponentReceiptChecks(unittest.TestCase):
     Other-separate terms, run on copies of the committed receipts that
     reseal the edited component receipt with every hash that records it."""
 
-    SCHEMA_LABEL = re.escape("component receipt schema 2 with both accountings of the Other share")
+    SCHEMA_LABEL = re.escape("component receipt schema 3 with both accountings of the Other share")
 
     @staticmethod
     def load_edited(edit):
@@ -493,16 +493,40 @@ class ComponentReceiptChecks(unittest.TestCase):
 
         return edit
 
-    def test_module_reads_schema_2_with_both_accountings(self):
-        self.assertEqual(INKIND.COMPONENTS_SCHEMA, 2)
+    def test_module_reads_schema_3_with_both_accountings(self):
+        self.assertEqual(INKIND.COMPONENTS_SCHEMA, 3)
         self.assertEqual(set(INKIND.ACCOUNTINGS), {"other_spread", "other_separate"})
 
-    def test_schema_1_is_rejected(self):
-        def edit(components):
-            components["schema_version"] = 1
+    def test_earlier_schemas_are_rejected(self):
+        for version in (1, 2):
+            with self.subTest(version=version):
 
-        with self.assertRaisesRegex(ValueError, self.SCHEMA_LABEL):
-            self.load_edited(edit)
+                def edit(components):
+                    components["schema_version"] = version
+
+                with self.assertRaisesRegex(ValueError, self.SCHEMA_LABEL):
+                    self.load_edited(edit)
+
+    def test_a_run_year_missing_a_stage_or_an_internet_accounting_is_rejected(self):
+        """A run year without the stage without home internet, or without one
+        accounting of its home internet record, fails with the schema
+        message, not a KeyError from a later reader."""
+        for run in ("package", "fcsuti_bls_definition"):
+            with self.subTest(run=run, missing="without_home_internet"):
+
+                def edit(components):
+                    del components["runs"][run]["years"]["2024"]["without_home_internet"]
+
+                with self.assertRaisesRegex(ValueError, self.SCHEMA_LABEL):
+                    self.load_edited(edit)
+            for accounting in INKIND.ACCOUNTINGS:
+                with self.subTest(run=run, missing=accounting):
+
+                    def edit(components):
+                        del components["runs"][run]["years"]["2024"]["home_internet"][accounting]
+
+                    with self.assertRaisesRegex(ValueError, self.SCHEMA_LABEL):
+                        self.load_edited(edit)
 
     def test_a_missing_accounting_is_rejected(self):
         for accounting in ("other_spread", "other_separate"):
@@ -564,6 +588,147 @@ class ComponentReceiptChecks(unittest.TestCase):
         errors = inputs["components"]["bls"]["years"]["2024"]["checks"]["other_separate_share_error"]
         self.assertEqual(errors["internet"], error)
         self.assertTrue(all(abs(value) < error for name, value in errors.items() if name != "internet"))
+
+
+def load_resealed(edits):
+    """Load a copy of data/inkind after ``edits``, a map from receipt name to
+    a function that edits that receipt's parsed JSON, with every hash that
+    records a receipt updated: the receipts that name it, the provenance
+    record and the manifest."""
+    with tempfile.TemporaryDirectory(prefix="inkind-resealed-") as temp:
+        data = Path(temp)
+        for name in (*INKIND.INKIND_FILES, "SHA256SUMS"):
+            shutil.copyfile(REPO / "data/inkind" / name, data / name)
+        receipts = {
+            name: json.loads((data / name).read_text())
+            for name in (INKIND.REPLICATION, INKIND.COMPONENTS, INKIND.UNCERTAINTY)
+        }
+        for name, edit in edits.items():
+            edit(receipts[name])
+
+        def write(name):
+            (data / name).write_text(json.dumps(receipts[name]))
+            return hashlib.sha256((data / name).read_bytes()).hexdigest()
+
+        replication = write(INKIND.REPLICATION)
+        receipts[INKIND.COMPONENTS]["inputs"]["replication_receipt"]["sha256"] = replication
+        components = write(INKIND.COMPONENTS)
+        receipts[INKIND.UNCERTAINTY]["inputs"]["replication_receipt"]["sha256"] = replication
+        receipts[INKIND.UNCERTAINTY]["inputs"]["components_receipt"]["sha256"] = components
+        write(INKIND.UNCERTAINTY)
+        provenance = json.loads((data / INKIND.PROVENANCE).read_text())
+        for name in receipts:
+            provenance["artifacts"][f"data/inkind/{name}"]["sha256"] = hashlib.sha256(
+                (data / name).read_bytes()
+            ).hexdigest()
+        (data / INKIND.PROVENANCE).write_text(json.dumps(provenance))
+        (data / "SHA256SUMS").write_text(
+            "".join(
+                f"{hashlib.sha256((data / name).read_bytes()).hexdigest()}  data/inkind/{name}\n"
+                for name in INKIND.INKIND_FILES
+            )
+        )
+        return INKIND.load_inkind(data, REPO / "data/current")
+
+
+class HomeInternetReceiptChecks(unittest.TestCase):
+    """load_inkind's checks on the receipts' schemas, stages and home
+    internet settings, run on resealed copies so that only the check under
+    test can fail."""
+
+    REPLICATION_LABEL = re.escape("replication receipt schema 2 with its three stages")
+    UNCERTAINTY_LABEL = re.escape("replicate receipt schema 2 with home internet")
+    INTERNET_LABEL = re.escape("home internet from UCC 690114, priced with CUUR0000SEEE03, in FCSUti")
+
+    def test_module_reads_the_three_stage_schemas(self):
+        self.assertEqual(
+            (INKIND.REPLICATION_SCHEMA, INKIND.COMPONENTS_SCHEMA, INKIND.UNCERTAINTY_SCHEMA), (2, 3, 2)
+        )
+        self.assertEqual(INKIND.STAGES, ("without_home_internet", "without_in_kind", "with_in_kind"))
+        self.assertEqual((INKIND.INTERNET_UCC, INKIND.INTERNET_CPI_SERIES), (690114, "CUUR0000SEEE03"))
+
+    def test_resealed_copy_loads(self):
+        """The helper alone changes nothing a check reads."""
+        inputs = load_resealed({})
+        self.assertEqual(inputs["replication"]["schema_version"], INKIND.REPLICATION_SCHEMA)
+
+    def test_replication_schema_1_is_rejected(self):
+        def edit(replication):
+            replication["schema_version"] = 1
+
+        with self.assertRaisesRegex(ValueError, self.REPLICATION_LABEL):
+            load_resealed({INKIND.REPLICATION: edit})
+
+    def test_a_replication_year_missing_a_stage_is_rejected(self):
+        for stage in INKIND.STAGES:
+            with self.subTest(stage=stage):
+
+                def edit(replication):
+                    del replication["results"]["2024"][stage]
+
+                with self.assertRaisesRegex(ValueError, self.REPLICATION_LABEL):
+                    load_resealed({INKIND.REPLICATION: edit})
+
+    def test_replicate_schema_1_is_rejected(self):
+        def edit(uncertainty):
+            uncertainty["schema_version"] = 1
+
+        with self.assertRaisesRegex(ValueError, self.UNCERTAINTY_LABEL):
+            load_resealed({INKIND.UNCERTAINTY: edit})
+
+    def test_changed_internet_settings_are_rejected(self):
+        """Another item code, price series, target, or CPI input in any
+        receipt breaks the home internet check."""
+        cases = {
+            "receipt UCC": (INKIND.REPLICATION, lambda r: r["home_internet"].update(ucc=690116)),
+            "year UCC": (INKIND.REPLICATION, lambda r: r["results"]["2023"]["home_internet"].update(ucc=690116)),
+            "year series": (
+                INKIND.REPLICATION,
+                lambda r: r["results"]["2023"]["home_internet"].update(cpi_series="CUUR0000SEEE01"),
+            ),
+            "year target": (INKIND.REPLICATION, lambda r: r["results"]["2023"]["home_internet"].update(enters="su")),
+            "component CPI input": (
+                INKIND.COMPONENTS,
+                lambda c: c["inputs"]["internet_cpi"].update(sha256="0" * 64),
+            ),
+        }
+        for name, (receipt, edit) in cases.items():
+            with self.subTest(case=name):
+                with self.assertRaisesRegex(ValueError, self.INTERNET_LABEL):
+                    load_resealed({receipt: edit})
+
+    def test_replicate_receipt_must_price_internet_with_the_same_input(self):
+        def edit(uncertainty):
+            uncertainty["inputs"]["internet_cpi"]["sha256"] = "0" * 64
+
+        with self.assertRaisesRegex(ValueError, "uncertainty receipt reads the replication receipt's raw inputs"):
+            load_resealed({INKIND.UNCERTAINTY: edit})
+
+    def test_out_of_pocket_stage_must_match_the_retrospective_replication(self):
+        """The stage without home internet or benefits must equal data/current
+        to the bit: a cent's difference fails."""
+
+        def edit(replication):
+            replication["results"]["2022"]["without_home_internet"]["renter"] += 0.01
+
+        with self.assertRaisesRegex(ValueError, "out-of-pocket threshold 2022 renter"):
+            load_resealed({INKIND.REPLICATION: edit})
+
+    def test_stage_effects_must_follow_from_the_thresholds(self):
+        cases = {
+            "home_internet_dollars": "home internet stage 2023 owner_without_mortgage",
+            "home_internet_percent": "home internet lift 2023 owner_without_mortgage",
+            "in_kind_dollars": "in-kind stage 2023 owner_without_mortgage",
+            "in_kind_percent": "in-kind stage lift 2023 owner_without_mortgage",
+        }
+        for field, label in cases.items():
+            with self.subTest(field=field):
+
+                def edit(replication):
+                    replication["results"]["2023"]["stage_effects"][field]["owner_without_mortgage"] += 0.01
+
+                with self.assertRaisesRegex(ValueError, re.escape(label)):
+                    load_resealed({INKIND.REPLICATION: edit})
 
 
 class GrowthAccountingProperties(unittest.TestCase):
@@ -1003,51 +1168,83 @@ class ReceiptTieProperties(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "rank shift renter"):
             INKIND._rank_shift(components)
 
-    def test_internet_share_ties_to_the_level_decomposition(self):
+    def test_internet_records_tie_to_bands_thresholds_and_level_terms(self):
+        """Each home_internet record's dollars follow from its band, its
+        percents from the thresholds, and the level gap's internet term from
+        both sides' dollars; moving any one field breaks its tie."""
         components = self.components_copy()
         levels = INKIND._internet_and_levels(components)
-        low, high = levels["bls_internet_share_range"]
-        self.assertTrue(0 < low < high < 5)
-        for run, (gap_low, gap_high) in levels["gap_with_bls_internet"].items():
-            self.assertTrue(0 < gap_low < gap_high, run)
-        gaps = components["runs"]["package"]["years"]["2023"]["level_gap_percent_of_bls"]
-        gaps["other_spread"]["renter"]["terms"]["internet"] += 0.01
-        with self.assertRaisesRegex(ValueError, "BLS internet term, Other spread package 2023 renter"):
-            INKIND._internet_and_levels(components)
+        for key in (
+            "bls_internet_share_range",
+            "bls_internet_row_share_range",
+            "our_internet_share_range",
+            "our_internet_row_share_range",
+        ):
+            low, high = levels[key]
+            self.assertTrue(0 < low < high < 5, key)
+        low, high = levels["internet_ratio_range"]
+        self.assertTrue(0.9 < low < high < 1.1)
+        fields = {
+            "ours_dollars": "our internet term",
+            "bls_dollars": "BLS internet term",
+            "ours_percent_of_threshold": "our internet share",
+            "bls_percent_of_threshold": "BLS internet share",
+        }
+        for run in ("package", "package_bls_definition"):
+            for accounting in INKIND.ACCOUNTINGS:
+                for field, label in fields.items():
+                    with self.subTest(run=run, accounting=accounting, field=field):
+                        moved = self.components_copy()
+                        moved["runs"][run]["years"]["2023"]["home_internet"][accounting]["renter"][field] += 0.01
+                        with self.assertRaisesRegex(ValueError, re.escape(f"{label}, {accounting} {run} 2023 renter")):
+                            INKIND._internet_and_levels(moved)
+                with self.subTest(run=run, accounting=accounting, field="level term"):
+                    moved = self.components_copy()
+                    gaps = moved["runs"][run]["years"]["2023"]["level_gap_percent_of_bls"]
+                    gaps[accounting]["renter"]["terms"]["internet"] += 0.01
+                    with self.assertRaisesRegex(
+                        ValueError, re.escape(f"internet level term, {accounting} {run} 2023 renter")
+                    ):
+                        INKIND._internet_and_levels(moved)
 
-    def test_internet_row_ties_to_the_separate_level_decomposition(self):
-        """Our band holds no home internet, so the receipt's Other-separate
-        level gap for internet is our broadband part, s (b - b_h) / T, less
-        BLS's row; adding it back recovers the row, and a moved gap term
-        breaks the tie."""
+    def test_internet_terms_rebuild_from_raw_band_means(self):
+        """Rebuilt here from the band means alone: with the Other share
+        spread, each side's term is s * 1.2 * I; kept separate, it is
+        s (I + b - b_h), as BLS's row reads. Our band now holds home
+        internet, and each level gap's internet term is our term less
+        BLS's over BLS's threshold. The reported ranges follow."""
         components = self.components_copy()
         levels = INKIND._internet_and_levels(components)
         years = components["bls"]["years"]
-        rows = []
+
+        def term(band, tenure, accounting):
+            pooled = band["pooled"]
+            if accounting == "other_spread":
+                return 0.82 * 1.2 * pooled["internet"]
+            return 0.82 * (pooled["internet"] + pooled["broadband"] - band["by_tenure"][tenure]["broadband"])
+
+        ours = {accounting: [] for accounting in INKIND.ACCOUNTINGS}
         for year in INKIND.YEARS:
-            for tenure in TENURES:
-                threshold = years[year]["published_thresholds"][tenure]
-                recovered = []
-                for run in ("package", "package_bls_definition"):
-                    entry = components["runs"][run]["years"][year]
-                    ours = entry["with_in_kind"]["band"]
-                    self.assertEqual(ours["pooled"]["internet"], 0, f"{run} {year}")
-                    broadband = ours["pooled"]["broadband"] - ours["by_tenure"][tenure]["broadband"]
-                    ours_part = 100 * 0.82 * broadband / threshold
-                    gap = entry["level_gap_percent_of_bls"]["other_separate"][tenure]["terms"]["internet"]
-                    recovered.append(ours_part - gap)
-                self.assertTrue(math.isclose(recovered[0], recovered[1], rel_tol=1e-9), f"{year} {tenure}")
-                rows.append(recovered[0])
-        low, high = levels["bls_internet_row_share_range"]
-        self.assertTrue(math.isclose(low, min(rows), rel_tol=1e-9))
-        self.assertTrue(math.isclose(high, max(rows), rel_tol=1e-9))
-        for run in ("package", "package_bls_definition"):
-            with self.subTest(run=run):
-                moved = self.components_copy()
-                gaps = moved["runs"][run]["years"]["2023"]["level_gap_percent_of_bls"]
-                gaps["other_separate"]["renter"]["terms"]["internet"] += 0.01
-                with self.assertRaisesRegex(ValueError, f"BLS internet term, Other separate {run} 2023 renter"):
-                    INKIND._internet_and_levels(moved)
+            published = years[year]["published_thresholds"]
+            for run in ("package", "package_bls_definition"):
+                entry = components["runs"][run]["years"][year]
+                band = entry["with_in_kind"]["band"]
+                self.assertGreater(band["pooled"]["internet"], 0, f"{run} {year}")
+                for tenure in TENURES:
+                    for accounting in INKIND.ACCOUNTINGS:
+                        mine = term(band, tenure, accounting)
+                        theirs = term(years[year]["band"], tenure, accounting)
+                        gap = entry["level_gap_percent_of_bls"][accounting][tenure]["terms"]["internet"]
+                        self.assertTrue(
+                            math.isclose(gap, 100 * (mine - theirs) / published[tenure], rel_tol=1e-9, abs_tol=1e-9),
+                            f"{run} {year} {tenure} {accounting}",
+                        )
+                        if run == "package":
+                            ours[accounting].append(100 * mine / entry["with_in_kind"]["thresholds"][tenure])
+        for accounting, key in (("other_spread", "our_internet_share_range"), ("other_separate", "our_internet_row_share_range")):
+            low, high = levels[key]
+            self.assertTrue(math.isclose(low, min(ours[accounting]), rel_tol=1e-9), key)
+            self.assertTrue(math.isclose(high, max(ours[accounting]), rel_tol=1e-9), key)
 
     def test_level_gap_totals_tie_in_both_accountings(self):
         for accounting in INKIND.ACCOUNTINGS:
