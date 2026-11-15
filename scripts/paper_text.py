@@ -46,8 +46,9 @@ QUARTO_COMMENT = re.compile(r"<!--[\W\w]*?-->")
 QUARTO_STRIPS = re.compile(r"<!--|^[\t >]*```").search
 
 # The front matter's grammar. A line holds indentation, any "- " markers of
-# block sequence entries, and then a key named in letters, digits, "_" and
-# "-" followed by a colon, a value alone after a marker, or both.
+# block sequence entries, and then a key followed by a colon, a value alone
+# after a marker, or both. A key opens with a letter or "_" and holds only
+# letters, digits, "_" and "-".
 KEY_NAME = r"[A-Za-z_][A-Za-z0-9_-]*"
 ENTRY = re.compile(
     rf"(?P<indent> *)(?P<marks>(?:- +)*)(?:(?P<key>{KEY_NAME}):(?=[ \t]|$))?[ \t]*(?P<rest>.*)"
@@ -116,7 +117,7 @@ PROSE_MARKS = frozenset(
     " \t\n\r\xa0\u202f.,;:()'\"\u2018\u2019\u201c\u201d?!/+"
     "\u2010\u2011\u2012\u2013\u2014\u2015\u2212\ufe58\ufe63\uff0d-"
 )
-PROSE_LIST = "letters, digits, spaces, dashes and . , ; : ( ) ' \" ? ! / +"
+PROSE_LIST = "letters, digits, spaces, tabs, no-break spaces, dashes, straight and curly quotes and . , ; : ( ) ? ! / +"
 # A list marker: pandoc reads "-", "+", a number, a letter or a roman numeral
 # followed by "." or ")", or one wrapped in parentheses, as a list item when
 # it opens a paragraph and a space or the line's end follows it.
@@ -176,29 +177,32 @@ def block_scalar_span(text: str, key: str) -> tuple[int, int] | None:
       differently;
     - the text lacks such front matter, or the front matter never closes;
     - a front-matter line falls outside the grammar the parser reads. It
-      reads plain keys (letters, digits, "_" and "-"), each with an empty
-      value, a ``|`` or ``>`` block without an indentation digit, a quoted
-      value, which may run over lines, a one-line flow list of plain or
-      quoted items without colons or other indicators, or plain text, which
-      may continue on more deeply indented lines; ``- `` entries that hold
-      such a key or value; and comments. YAML reads a more deeply indented
-      line after plain text as more of that text, so such a line may not
-      open with an indicator such as ``-``. A key with an empty value takes
-      its value from the next deeper line, which must then hold plain text,
-      a key or a ``- `` entry, never a quote, a block indicator, an anchor,
-      a tag or an alias. A value may start with anchors and
-      tags, or be an alias, which name or type it and set no key. Anchors
-      and tags on keys, explicit ``?`` keys, quoted keys, flow mappings,
-      other flow lists, directives, tabs in indentation and a quote still
-      open at the front matter's end all fall outside it;
+      reads plain keys (a letter or "_", then letters, digits, "_" and
+      "-"), each with an empty value, a ``|`` or ``>`` block without an
+      indentation digit, a quoted value, which may run over lines, a
+      one-line flow list of plain or quoted items without colons or other
+      indicators, or plain text, which may continue on more deeply indented
+      lines; ``- `` entries that hold such a key or value; and comments.
+      YAML reads a more deeply indented line after plain text as more of
+      that text, up to any comment, and a comment ends the text. Such a line
+      may not hold a key, which YAML rejects there, or open with an
+      indicator such as ``-``. A key with an empty value takes its value
+      from the next deeper line, which must then hold plain text, a key or a
+      ``- `` entry, never a quote, a block indicator, an anchor, a tag or an
+      alias. A value may start with anchors and tags, or be an alias, which
+      name or type it and set no key. Anchors and tags on keys, explicit
+      ``?`` keys, quoted keys, flow mappings, other flow lists, directives,
+      tabs in indentation and a quote still open at the front matter's end
+      all fall outside it;
     - a front-matter line, even inside another block, holds an HTML comment
       or starts a backtick code fence, which Quarto deletes before it reads
       the YAML;
-    - a front-matter line, even inside a block, ends in a no-break space, a
-      byte order mark or another character besides a space, a tab or a line
-      end that JavaScript's ``trimEnd()`` strips, which Quarto trims before
-      it reads the YAML; or a line outside a block opens with ``---``, where
-      Quarto can skip the whole front matter;
+    - a front-matter line, even inside a block, ends, before any trailing
+      spaces or tabs, in a no-break space, a byte order mark or another
+      character besides a space, a tab or a line end that JavaScript's
+      ``trimEnd()`` strips, which Quarto trims before it reads the YAML; or
+      a line outside a block opens with ``---``, where Quarto can skip the
+      whole front matter;
     - the front matter names the key other than once, or other than on a
       top-level line that reads exactly ``key: |``. Quarto renders a key
       nested under ``format: html:`` in place of the top-level one. Text
@@ -511,7 +515,8 @@ def stated_values(template: str, text: str, value: str = SIGNED_NUMBER) -> list[
     "2.20 to 2.29", "2.20 and 2.29" or "2.20 percent to 2.29" never reads as
     "2.29". Anything else between a range's ends, such as a comma or a
     second word, leaves only the last number in the slot, so "2.20, to 2.29"
-    reads as "2.29". The slot starts only at the start of a
+    reads as "2.29". Punctuation that joins the ends without a space, as in
+    "2.20;2.29", leaves nothing there. The slot starts only at the start of a
     whitespace-separated token or after "(", so "x2.29" reads as nothing.
     The template's words match only whole words, so "index" does not match
     "indexes". A template without exactly one slot matches nothing.

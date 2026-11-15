@@ -37,16 +37,16 @@ push to master and every pull request. It fails when:
     ABSTRACT_YEARS, so a drifted figure, a flipped sign, a range with a
     numeral at either end or an added number fails even beside a correct
     copy, and a swap between rules fails. The guard fails every abstract
-    tie, and says why, when it cannot read the block:
-    the front matter steps outside the plain YAML the parser reads, sets the
-    abstract other than in one top-level block, or holds an HTML comment or
-    code fence; the body holds a line that could set the abstract, a
-    metadata block or a grid table; a line ends in a carriage return without
-    a line feed or holds a Unicode line separator; or the abstract holds
-    anything but plain prose. A project
-    or directory metadata file that names the abstract or more metadata
-    files, a paper that names more, or an include other than a generated
-    table fails too;
+    tie, and says why, when it cannot read the block: the front matter
+    steps outside the plain YAML the parser reads, sets the abstract other
+    than in one top-level block, holds an HTML comment or code fence, holds
+    a line that ends in a character Quarto trims, or holds a line outside a
+    block that opens with ``---``; the body holds a line that could set the
+    abstract, a metadata block or a grid table; a line ends in a carriage
+    return without a line feed or holds a Unicode line separator; or the
+    abstract holds anything but plain prose. A project or directory
+    metadata file that names the abstract or more metadata files, a paper
+    that names more, or an include other than a generated table fails too;
 (e) the README miscounts the in-kind receipts or omits a calculator
     commit that their provenance records.
 
@@ -2161,6 +2161,8 @@ ABSTRACT_FIGURES += [f"{min(bls_shares):.0f}", f"{max(bls_shares):.0f}"]
 # no tie derives from the data belongs here too, as often as the abstract
 # states it.
 ABSTRACT_YEARS = ["2020–2025", "2025", "2025", "2035", "2022–2025"]
+# Each token minus any of ( ) , . ; : at its ends. Other punctuation stays,
+# so "2025's", "2025?" or a quoted "2025" fails the check.
 abstract_numbers = [token.strip("(),.;:") for token in re.findall(r"\S*\d\S*", ABSTRACT)]
 check(
     "abstract states exactly the numbers the guard lists, each as a bare number",

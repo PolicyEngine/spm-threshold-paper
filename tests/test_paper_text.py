@@ -357,15 +357,19 @@ class BlockScalarSpanTests(unittest.TestCase):
         # JavaScript's trimEnd() strips every space separator (Unicode
         # category Zs), a tab, \v, \f, a byte order mark and line ends. Each
         # one besides a space and a tab, after an empty value, fails closed,
+        # even before trailing spaces or tabs, which trimEnd() strips with it,
         # and the parser treats no other character as trimmed.
         spaces = [chr(code) for code in range(0x110000) if unicodedata.category(chr(code)) == "Zs"]
         trimmed = [character for character in [*spaces, "\v", "\f", "\ufeff"] if character != " "]
         self.assertEqual(sorted(PAPER_TEXT.QUARTO_TRIMS), sorted(trimmed))
         for character in trimmed:
-            with self.subTest(character=f"U+{ord(character):04X}"):
-                text = PAPER.replace(ABSTRACT_LINES, ABSTRACT_LINES + f'subtitle: {character}\n  "Public data\n{hidden}')
-                self.assertIsNone(block_scalar_span(text, "abstract"))
-                self.assertIn(trims, block_problem(text, "abstract"))
+            for after in ("", " ", "\t", " \t "):
+                with self.subTest(character=f"U+{ord(character):04X}", after=after):
+                    text = PAPER.replace(
+                        ABSTRACT_LINES, ABSTRACT_LINES + f'subtitle: {character}{after}\n  "Public data\n{hidden}'
+                    )
+                    self.assertIsNone(block_scalar_span(text, "abstract"))
+                    self.assertIn(trims, block_problem(text, "abstract"))
         for lines in ("note: a\xa0b\n", "note: |\n  a\xa0b\n", 'note: "a\n\xa0b"\n', "note: x\n"):
             with self.subTest(lines=lines):
                 text = PAPER.replace(ABSTRACT_LINES, ABSTRACT_LINES + lines)
@@ -857,8 +861,8 @@ class BlockScalarSpanTests(unittest.TestCase):
             ),
             "markup": (
                 with_lines("  First *line*.\n"),
-                "the abstract may hold only letters, digits, spaces, dashes and . , ; : ( ) ' \" ? ! / +, "
-                "and holds '*'",
+                "the abstract may hold only letters, digits, spaces, tabs, no-break spaces, dashes, "
+                "straight and curly quotes and . , ; : ( ) ? ! / +, and holds '*'",
             ),
         }.items():
             with self.subTest(case=name):
@@ -866,9 +870,10 @@ class BlockScalarSpanTests(unittest.TestCase):
         self.assertIsNone(block_problem(PAPER, "abstract"))
 
     def test_only_plain_prose_reads(self):
-        """Every character outside letters, ASCII digits, spaces, dashes, plus
-        signs and sentence punctuation fails the abstract closed, so no
-        markup, symbol or invisible character reaches a tie."""
+        """Every character outside letters, ASCII digits, spaces, tabs,
+        no-break spaces, dashes, quotes, plus signs and sentence punctuation
+        fails the abstract closed, so no markup, symbol or invisible character
+        reaches a tie."""
         for character in "*_`<>[]{}\\&$#|~^@=%\u2248\u00a7\u00a9\u2026\u200b\u00ad\ufeff\u0661":
             with self.subTest(character=repr(character)):
                 text = with_lines(f"  First{character}line 9.99.\n")
@@ -876,8 +881,8 @@ class BlockScalarSpanTests(unittest.TestCase):
                 self.assertIsNone(block_words(text, "abstract"))
                 self.assertEqual(
                     block_problem(text, "abstract"),
-                    "the abstract may hold only letters, digits, spaces, dashes and . , ; : ( ) ' \" ? ! / +, "
-                    f"and holds {character!r}",
+                    "the abstract may hold only letters, digits, spaces, tabs, no-break spaces, dashes, "
+                    f"straight and curly quotes and . , ; : ( ) ? ! / +, and holds {character!r}",
                 )
         for character in "\u00e9\u00df\u4e2d.,;:()'\"?!/+\u2013\u2014\u2212\u2018\u2019\u201c\u201d\u00a0":
             with self.subTest(character=repr(character)):
