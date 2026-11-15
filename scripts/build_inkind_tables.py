@@ -67,7 +67,7 @@ def growth_tables(figures: dict) -> str:
         rows.append(["With home internet", *(f"{growth[t]['growth_without_stage']:.2f}%" for t in TENURES)])
         rows.append(
             [
-                "With internet and benefits",
+                "With home internet and benefits",
                 *(
                     f"{growth[t]['growth_with_stage']:.2f}% ({growth[t]['stage_change_sd']:.2f})"
                     for t in TENURES

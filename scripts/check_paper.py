@@ -68,6 +68,7 @@ from inkind_inputs import (
     INKIND_FILES,
     REPLICATES,
     REPLICATION,
+    STAGES,
     UNCERTAINTY,
     OFFICIAL_2025_CPI_U,
     YEARS,
@@ -539,8 +540,16 @@ check(
 backtest = (TABLES / "backtest.md").read_text()
 for literal in ("2.23%", "1.57%", "0.41%", "**0.76%**"):
     check(f"backtest table literal {literal}", literal in backtest)
+# The in-kind section also quotes 0.76 and 1.57, so these pins read only the
+# benchmark's own section.
+BACKTEST_TEXT = section(
+    "## Five-year benchmark for the 2025 nowcast", "# Pre-committed 2025 validation"
+)
 for literal in ("2.23", "1.57", "0.41", "0.76"):
-    check(f"backtest prose literal {literal}", has_number(literal))
+    check(
+        f"backtest prose literal {literal}",
+        has_number(f"{literal} percent", text=BACKTEST_TEXT),
+    )
 
 # Recompute all four backtest rules (mirrors build_tables.py).
 cpi = json.loads((DATA / "bls_cpi_series.json").read_text())
@@ -747,8 +756,20 @@ check(
 )
 
 # Current retrospective results in the abstract are a separate experiment.
+# Each figure must sit beside its own rule in the abstract: the in-kind
+# section also quotes 0.90.
+CURRENT_PROJECTION_RULES = {
+    "cpi_u": "percent with the Consumer Price Index",
+    "fcsuti_cpi": "percent with a composite price index",
+    "replication_ratio": "percent with replicated consumption growth",
+    "blend": "percent with an equal blend",
+}
+_abstract = " ".join(QMD.split("# Introduction", 1)[0].split())
 for rule, value in current_ce["projection_evaluation"]["summary_2020_2025"].items():
-    check(f"current projection prose {rule}", has_number(f"{value:.2f}"))
+    check(
+        f"current projection prose {rule}",
+        has_number(f"{value:.2f} {CURRENT_PROJECTION_RULES[rule]}", text=_abstract),
+    )
 
 # (e) The September evaluation, re-derived from data/evaluation_2025.json.
 ev = json.loads((DATA / "evaluation_2025.json").read_text())
@@ -1120,7 +1141,7 @@ check(
 # discussion quote re-derives from data/inkind through inkind_figures, and
 # each is pinned inside the section that states it.
 INKIND_TEXT = section(
-    "# Imputing in-kind benefits {#sec-inkind}", "# Projecting thresholds {#sec-projection}"
+    "# Home internet and in-kind benefits {#sec-inkind}", "# Projecting thresholds {#sec-projection}"
 )
 ABSTRACT = " ".join(QMD.split("# Introduction", 1)[0].split())
 EVALUATION_TEXT = section(
@@ -1129,7 +1150,7 @@ EVALUATION_TEXT = section(
 )
 DISCUSSION_TEXT = section("# Discussion {#sec-discussion}", "# Appendix A: replication benchmark")
 REPLICATION_TEXT = section(
-    "# Replication from public consumption data {#sec-replication}", "# Imputing in-kind benefits {#sec-inkind}"
+    "# Replication from public consumption data {#sec-replication}", "# Home internet and in-kind benefits {#sec-inkind}"
 )
 UNCERTAINTY_TEXT = section(
     "## Uncertainty and limitations {#sec-inkind-uncertainty}", "# Projecting thresholds {#sec-projection}"
@@ -1140,6 +1161,9 @@ GROWTH_TEXT = section(
     f"## Threshold growth, {GROWTH_FIRST}–{GROWTH_LAST}", "## Uncertainty and limitations {#sec-inkind-uncertainty}"
 )
 README_TEXT = " ".join((REPO / "README.md").read_text().split())
+INKIND_GROWTH_ROWS = [
+    line.split("|")[1].strip() for line in (TABLES / "inkind_growth.md").read_text().splitlines()[2:]
+]
 PRICE_VALIDATION_TEXT = section(
     "## Validation of the price comparator", "# Conditional forecasts beyond available microdata {#sec-rolling}"
 )
@@ -1466,8 +1490,8 @@ INKIND_INTERNET_CONSTANTS = (
     # read_internet_costs sums the COST of a unit's MTBI rows whose UCC is
     # INTERNET_UCC (690114), read from mtbi_member(member): the MTBI file
     # beside the unit's FMLI file in the same bundle
-    "we sum its MTBI records under UCC 690114, computer information services, from the same quarter's file as "
-    "its FMLI record",
+    "we sum its MTBI records under the CE's Universal Classification Code (UCC) 690114, computer information "
+    "services, from the same quarter's file as its FMLI record",
     # expenditures_with_internet: fcsuti += cost * _ANNUALIZATION[...], which
     # is 4.0 for "quarter4", the annualization the receipt records
     "multiply that three-month total by four, as we do for its other spending",
@@ -1479,8 +1503,8 @@ INKIND_INTERNET_CONSTANTS = (
     # among units with PERSLT18 > 0 over the FCSUti total plus itself, the
     # other weights divided by 1 + ratio
     "We price it with the CPI-U index for internet services and electronic information providers "
-    "(CUUR0000SEEE03), which joins the composite CPI with its weighted share of FCSUti spending among units "
-    "with children; the other components' weights scale down in proportion",
+    "(CUUR0000SEEE03). We add that index to the composite CPI at home internet's weighted share of FCSUti "
+    "spending among units with children and scale the other components' weights down in proportion",
     # add_home_internet calls estimate_thresholds on the frame with internet
     "We add home internet before we estimate the thresholds, so it can change which units fall in the "
     "percentile band",
@@ -1675,11 +1699,29 @@ inkind_pins = (
     (
         "in-kind lift range",
         lift_low > 0
-        and has_number(f"and that the imputed benefits then raise them by {lift_literal} percent", text=INKIND_TEXT),
+        and has_number(
+            f"When we then impute the benefits, we estimate that they raise the thresholds by a further "
+            f"{lift_literal} percent",
+            text=INKIND_TEXT,
+        ),
     ),
     (
         "abstract in-kind lift range",
-        lift_low > 0 and has_number(f"that the benefits then raise replicated thresholds by {lift_literal}", text=ABSTRACT),
+        lift_low > 0
+        and has_number(
+            f"We then impute the five in-kind benefits BLS adds to spending. We estimate that they raise thresholds "
+            f"by a further {lift_literal} percent",
+            text=ABSTRACT,
+        ),
+    ),
+    (
+        "abstract home internet lift range",
+        internet_lift_low > 0
+        and has_number(
+            "We also add home internet spending from the CE's item-level records and estimate that it raises "
+            f"replicated thresholds by {internet_lift_low:.1f} to {internet_lift_high:.1f} percent",
+            text=ABSTRACT,
+        ),
     ),
     (
         "discussion home internet and in-kind lift ranges",
@@ -1689,6 +1731,57 @@ inkind_pins = (
             f"adding home internet raises our levels by {internet_lift_low:.1f} to {internet_lift_high:.1f} percent "
             f"and that imputing in-kind benefits raises them by a further {lift_literal} percent",
             text=DISCUSSION_TEXT,
+        ),
+    ),
+    (
+        # load_inkind requires the receipt's first stage to equal
+        # data/current's exclude_unresolved thresholds exactly.
+        "three runs, the first reproducing the retrospective replication",
+        STAGES == ("without_home_internet", "without_in_kind", "with_in_kind")
+        and has_number(
+            f"We rerun the {YEARS[0]}–{YEARS[-1]} replication {count_word(len(STAGES))} ways: as in "
+            "@sec-replication, with home internet added, and with home internet and the five benefits. The first "
+            "run reproduces the thresholds behind @tbl-current-replication exactly",
+            text=INKIND_TEXT,
+        )
+        and has_number(
+            "we check that the run without home internet or benefits reproduces the retrospective replication "
+            "artifact exactly",
+            text=APPENDIX_B_TEXT,
+        ),
+    ),
+    (
+        "section 3 replication omits home internet",
+        has_number(
+            "We omit home-internet spending, which the public FMLI summaries lack, and add it in @sec-inkind from "
+            "the CE's item-level records",
+            text=REPLICATION_TEXT,
+        ),
+    ),
+    (
+        # build_inkind_tables gives each series one row per stage, in STAGES
+        # order, with the Garner–Munoz series last.
+        "growth table caption names the stages in row order",
+        INKIND_GROWTH_ROWS[-len(STAGES)].startswith("Garner–Munoz restrictions")
+        and INKIND_GROWTH_ROWS[-2:] == ["With home internet", "With home internet and benefits"]
+        and has_number(
+            "For each replication, the first row reports growth without home internet or imputed benefits, the "
+            "second with home internet, and the third with both",
+            text=GROWTH_TEXT,
+        )
+        and has_number(
+            f"In the final {count_word(len(STAGES))} rows, we apply the shelter, utilities, and food restrictions "
+            "of @garner2021",
+            text=GROWTH_TEXT,
+        ),
+    ),
+    (
+        # level_table reads each run's gaps["with_in_kind"].
+        "levels table caption names the stage with both",
+        has_number(
+            "We report the signed deviation of the replication with home internet and imputed in-kind benefits "
+            "from each published national threshold",
+            text=INKIND_TEXT,
         ),
     ),
     (
@@ -1705,14 +1798,15 @@ inkind_pins = (
         "home internet in our band and BLS's",
         internet_ratio_low < 1 < internet_ratio_high
         and has_number(
-            f"we estimate home internet of {dollars(our_internet_low)} to {dollars(our_internet_high)} per unit "
-            f"across the {YEARS[0]}–{YEARS[-1]} thresholds, against {dollars(internet_low)} to "
-            f"{dollars(internet_high)} in BLS's band",
+            "In our band with home internet and the benefits, we estimate home internet spending of "
+            f"{dollars(our_internet_low)} to {dollars(our_internet_high)} per unit across the "
+            f"{YEARS[0]}–{YEARS[-1]} thresholds, against {dollars(internet_low)} to {dollars(internet_high)} in "
+            "BLS's band",
             text=INKIND_TEXT,
         )
         and has_number(
-            f"ours lies between {100 * (1 - internet_ratio_low):.1f} percent below and "
-            f"{100 * (internet_ratio_high - 1):.1f} percent above BLS's",
+            f"Across those years, our estimate differs from BLS's by {signed(100 * (internet_ratio_low - 1), 1)} "
+            f"to {signed(100 * (internet_ratio_high - 1), 1)} percent",
             text=INKIND_TEXT,
         ),
     ),
@@ -1729,8 +1823,8 @@ inkind_pins = (
         "Garner–Munoz range with home internet",
         garner_munoz_internet[0] < 0 < garner_munoz_internet[1]
         and has_number(
-            f"With home internet, we estimate thresholds between {-garner_munoz_internet[0]:.2f} percent below and "
-            f"{garner_munoz_internet[1]:.2f} percent above BLS's",
+            f"With home internet, we estimate thresholds that differ from BLS's by {signed(garner_munoz_internet[0])} "
+            f"to {signed(garner_munoz_internet[1])} percent",
             text=INKIND_TEXT,
         ),
     ),
@@ -1914,7 +2008,9 @@ inkind_pins = (
     (
         "implicate share of the stage change's variance",
         has_number(
-            f"{100 * min(implicate_shares):.0f} to {100 * max(implicate_shares):.0f} percent of each change's variance",
+            f"For each of the benefits' changes to {GROWTH_FIRST}–{GROWTH_LAST} growth, we estimate that the spread "
+            f"across implicates accounts for {100 * min(implicate_shares):.0f} to {100 * max(implicate_shares):.0f} "
+            "percent of the variance",
             text=UNCERTAINTY_TEXT,
         ),
     ),
@@ -1937,7 +2033,7 @@ inkind_pins = (
         has_number(
             f"With the CE's spending summaries, we estimate that adding home internet changes our "
             f"{GROWTH_FIRST}–{GROWTH_LAST} growth by {signed(min(internet_changes))} to "
-            f"{signed(max(internet_changes))} points, and that imputing in-kind benefits then changes it by "
+            f"{signed(max(internet_changes))} points. We estimate that imputing in-kind benefits then changes it by "
             f"{signed(min(stage_changes))} to {signed(max(stage_changes))} points",
             text=DISCUSSION_TEXT,
         ),
@@ -1946,7 +2042,11 @@ inkind_pins = (
         "abstract and discussion: each change within one standard error",
         all(ratio < 1 for ratio in stage_ratios)
         and "each change within one standard error of zero" in ABSTRACT
-        and has_number("points, each within one standard error of zero", text=DISCUSSION_TEXT),
+        and has_number(
+            f"then changes it by {signed(min(stage_changes))} to {signed(max(stage_changes))} points, each change "
+            "within one standard error of zero",
+            text=DISCUSSION_TEXT,
+        ),
     ),
     (
         "abstract and discussion: the accounting's shares",
@@ -2030,12 +2130,13 @@ inkind_pins = (
     ),
     (
         # The component receipt keeps home internet in its own out-of-pocket
-        # component, and BLS's I sums only the benefits' terms or rows, so
-        # internet stays in B - I on both sides.
+        # component, and I sums only the benefits' terms or rows: for BLS's
+        # series and ours, inkind_inputs rebuilds both from the band means
+        # without internet, so internet stays in B - I on both sides.
         "home internet counts with out-of-pocket spending in the accounting",
         "Home internet is out-of-pocket spending in its own component; no in-kind total, share or contribution "
         "includes it" in inkind_inputs["components"]["limitations"]
-        and has_number("In both series, home internet counts with out-of-pocket spending", text=GROWTH_TEXT),
+        and has_number("In both series, we count home internet with out-of-pocket spending", text=GROWTH_TEXT),
     ),
     (
         "accounting with the index's lead on the benefits' terms",
@@ -2148,8 +2249,9 @@ inkind_pins = (
     (
         "renter shortfall with imputed terms removed",
         has_number(
-            f"renter shortfall narrows from {-renter['less_bls']:.2f} to "
-            f"{-renter['less_bls_without_imputed_terms']:.2f} points",
+            "With the composite CPI, we estimate that our renter growth with home internet and the benefits trails "
+            f"BLS's by {-renter['less_bls']:.2f} points, and by {-renter['less_bls_without_imputed_terms']:.2f} points "
+            "when we remove the imputed terms from both series",
             text=INKIND_TEXT,
         )
         and renter["less_bls"] < renter["less_bls_without_imputed_terms"] < 0,
@@ -2186,7 +2288,7 @@ inkind_pins = (
         "evaluation section cites BLS's imputed renter points and our changes",
         has_number(f"that renter growth falls by {recent['imputed_points']:.2f} points", text=EVALUATION_TEXT)
         and has_number(
-            "home internet changes the retrospective replication's renter growth by "
+            "home internet changes the retrospective replication's 2024–2025 renter growth by "
             f"{signed(recent['replication_without_stage'] - recent['replication_without_home_internet'])} points "
             "and that our imputed benefits then change it by "
             f"{signed(recent['replication_with_stage'] - recent['replication_without_stage'])} points",
@@ -2207,15 +2309,18 @@ inkind_pins = (
         # level-gap terms.
         "home internet's share of our thresholds and BLS's, in both accountings",
         has_number(
-            "By BLS's published shares, which keep the Other share separate, home internet supplies "
-            f"{internet_row_low:.2f} to {internet_row_high:.2f} percent of each BLS threshold, and by the same "
-            f"reading {our_internet_row_low:.2f} to {our_internet_row_high:.2f} percent of ours with the benefits",
+            "In its formula, BLS adds 0.2 times the band's mean FCSUti for other basic goods and services, and it "
+            "publishes that term's share of each threshold as a separate Other share. With that share kept separate, "
+            "home internet supplies "
+            f"{internet_row_low:.2f} to {internet_row_high:.2f} percent of each BLS threshold, and we estimate that "
+            f"it supplies {our_internet_row_low:.2f} to {our_internet_row_high:.2f} percent of ours with home "
+            "internet and the benefits",
             text=INKIND_TEXT,
         )
         and has_number(
-            f"When we give it its part of the 1.2 multiplier, it supplies {internet_share_low:.2f} to "
-            f"{internet_share_high:.2f} percent of BLS's thresholds and {our_internet_share_low:.2f} to "
-            f"{our_internet_share_high:.2f} percent of ours",
+            f"When we give it its part of the Other share, it supplies {internet_share_low:.2f} to "
+            f"{internet_share_high:.2f} percent of BLS's thresholds and, we estimate, {our_internet_share_low:.2f} "
+            f"to {our_internet_share_high:.2f} percent of ours",
             text=INKIND_TEXT,
         ),
     ),

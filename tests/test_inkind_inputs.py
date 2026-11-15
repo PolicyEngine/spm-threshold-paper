@@ -659,6 +659,33 @@ class HomeInternetReceiptChecks(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, self.REPLICATION_LABEL):
             load_resealed({INKIND.REPLICATION: edit})
 
+    def test_our_imputed_terms_must_leave_home_internet_out(self):
+        """Count the FCSUti run's home internet, with its part of the Other
+        share, among its renter terms, and restate every figure the receipt
+        derives from those terms, so only their rebuild from the band means
+        can fail."""
+        ratio = 1 + INKIND.inkind_figures(load_resealed({}))["cpi_u_growth"] / 100
+
+        def edit(components):
+            run = components["runs"]["fcsuti"]
+            spread = run["growth_2022_2025"]["by_tenure"]["renter"]["other_spread"]
+            terms = spread["imputed_term_dollars"]
+            for year in terms:
+                internet = run["years"][year]["with_in_kind"]["band"]["pooled"]["internet"]
+                terms[year] += INKIND.ANCHOR_SHARE * 1.2 * internet
+            with22, with25 = (run["years"][year]["with_in_kind"]["thresholds"]["renter"] for year in ("2022", "2025"))
+            spread["imputed_share_of_growth_beyond_cpi_u_percent"] = (
+                100 * (terms["2025"] - ratio * terms["2022"]) / (with25 - ratio * with22)
+            )
+            without = 100 * ((with25 - terms["2025"]) / (with22 - terms["2022"]) - 1)
+            spread["growth_without_imputed_terms_less_bls_points"] += without - spread["growth_without_imputed_terms"]
+            spread["growth_without_imputed_terms"] = without
+
+        with self.assertRaisesRegex(
+            ValueError, re.escape("our imputed terms rebuild from the band means 2022 fcsuti renter")
+        ):
+            INKIND.inkind_figures(load_resealed({INKIND.COMPONENTS: edit}))
+
     def test_a_replication_year_missing_a_stage_is_rejected(self):
         for stage in INKIND.STAGES:
             with self.subTest(stage=stage):

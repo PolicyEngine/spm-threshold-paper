@@ -185,7 +185,7 @@ ROLLING_PROSE_MUTATIONS = (
 )
 
 
-INKIND_HEADING = "# Imputing in-kind benefits {#sec-inkind}\n"
+INKIND_HEADING = "# Home internet and in-kind benefits {#sec-inkind}\n"
 PROJECTION_HEADING = "# Projecting thresholds {#sec-projection}\n"
 INKIND_NAMES = (
     "ce_inkind_bls_components_2019_2025.json",
@@ -251,8 +251,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         'Garner–Munoz lower bound with home internet',
         'section',
-        r"2\.13(\s+)percent(\s+)below",
-        r"2.14\1percent\2below",
+        r"by(\s+)−2\.13(\s+)to(\s+)\+0\.90",
+        r"by\1−2.14\2to\g<3>+0.90",
         'Garner–Munoz range with home internet',
     ),
     (
@@ -447,8 +447,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "renter shortfall direction",
         "section",
-        r"shortfall(\s+)narrows",
-        r"shortfall\1widens",
+        r"benefits(\s+)trails(\s+)BLS's(\s+)by(\s+)2\.59",
+        r"benefits\1exceeds\2BLS's\3by\g<4>2.59",
         "renter shortfall with imputed terms removed",
     ),
     (
@@ -505,15 +505,15 @@ INKIND_PROSE_MUTATIONS = (
     (
         'lift direction',
         'section',
-        r"imputed(\s+)benefits(\s+)then(\s+)raise(\s+)them",
-        r"imputed\1benefits\2then\3lower\4them",
+        r"they(\s+)raise(\s+)the(\s+)thresholds(\s+)by(\s+)a(\s+)further",
+        r"they\1lower\2the\3thresholds\4by\5a\6further",
         'in-kind lift range',
     ),
     (
         'abstract lift direction',
         'abstract',
-        r"benefits(\s+)then(\s+)raise(\s+)replicated",
-        r"benefits\1then\2lower\3replicated",
+        r"they(\s+)raise(\s+)thresholds(\s+)by(\s+)a(\s+)further",
+        r"they\1lower\2thresholds\3by\4a\5further",
         'abstract in-kind lift range',
     ),
     (
@@ -885,8 +885,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         'discussion uncertainty',
         'discussion',
-        'points,(\\s+)each(\\s+)within(\\s+)one',
-        'points,\\1each\\2within\\3half a',
+        'points,(\\s+)each(\\s+)change(\\s+)within(\\s+)one',
+        'points,\\1each\\2change\\3within\\4half a',
         'abstract and discussion: each change within one standard error',
     ),
     (
@@ -1437,8 +1437,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         'home internet item code',
         'section',
-        r"under(\s+)UCC(\s+)690114",
-        r"under\1UCC\g<2>690116",
+        r"\(UCC\)(\s+)690114",
+        r"(UCC)\g<1>690116",
         'home internet rules read from fingerprinted calculator code',
     ),
     (
@@ -1472,8 +1472,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "home internet moved into the benefits' terms",
         'section',
-        r"counts(\s+)with(\s+)out-of-pocket(\s+)spending",
-        r"counts\1with\2the\3benefits",
+        r"count(\s+)home(\s+)internet(\s+)with(\s+)out-of-pocket(\s+)spending",
+        r"count\1home\2internet\3with\4the\5benefits",
         'home internet counts with out-of-pocket spending in the accounting',
     ),
     (
@@ -1521,22 +1521,22 @@ INKIND_PROSE_MUTATIONS = (
     (
         "our band's home internet",
         'section',
-        r"internet(\s+)of(\s+)\\\$543(\s+)to(\s+)\\\$869",
-        r"internet\1of\2\\$543\3to\4\\$896",
+        r"spending(\s+)of(\s+)\\\$543(\s+)to(\s+)\\\$869",
+        r"spending\1of\2\\$543\3to\4\\$896",
         "home internet in our band and BLS's",
     ),
     (
         "our band's home internet against BLS's",
         'section',
-        r"between(\s+)1\.1(\s+)percent(\s+)below(\s+)and(\s+)3\.1",
-        r"between\g<1>1.1\2percent\3below\4and\g<5>3.2",
+        r"by(\s+)−1\.1(\s+)to(\s+)\+3\.1",
+        r"by\1−1.1\2to\g<3>+3.2",
         "home internet in our band and BLS's",
     ),
     (
         "home internet's share of ours, Other separate",
         'section',
-        r"reading(\s+)1\.49(\s+)to(\s+)2\.04",
-        r"reading\g<1>1.49\2to\g<3>2.40",
+        r"supplies(\s+)1\.49(\s+)to(\s+)2\.04",
+        r"supplies\g<1>1.49\2to\g<3>2.40",
         "home internet's share of our thresholds and BLS's",
     ),
     (
@@ -1594,6 +1594,111 @@ INKIND_PROSE_MUTATIONS = (
         r"for(\s+)the(\s+)replication(\s+)with(\s+)home(\s+)internet(\s+)added",
         r"for\1the\2replication\3without\4home\5internet",
         "replication standard errors relative to BLS's",
+    ),
+    (
+        "abstract home internet lift",
+        'abstract',
+        r"by(\s+)0\.3(\s+)to(\s+)4\.0(\s+)percent",
+        r"by\g<1>0.3\2to\g<3>4.1\4percent",
+        'abstract home internet lift range',
+    ),
+    (
+        "abstract home internet lift direction",
+        'abstract',
+        r"it(\s+)raises(\s+)replicated",
+        r"it\1lowers\2replicated",
+        'abstract home internet lift range',
+    ),
+    (
+        "run count",
+        'section',
+        r"replication(\s+)three(\s+)ways",
+        r"replication\1four\2ways",
+        "three runs, the first reproducing the retrospective replication",
+    ),
+    (
+        "the second run claims the exact reproduction",
+        'section',
+        r"The(\s+)first(\s+)run(\s+)reproduces",
+        r"The\1second\2run\3reproduces",
+        "three runs, the first reproducing the retrospective replication",
+    ),
+    (
+        "appendix names the run with home internet as the reproduction",
+        'appendix',
+        r"run(\s+)without(\s+)home(\s+)internet(\s+)or(\s+)benefits(\s+)reproduces",
+        r"run\1with\2home\3internet\6reproduces",
+        "three runs, the first reproducing the retrospective replication",
+    ),
+    (
+        "section 3 includes home internet",
+        'replication',
+        r"We(\s+)omit(\s+)home-internet(\s+)spending",
+        r"We\1include\2home-internet\3spending",
+        "section 3 replication omits home internet",
+    ),
+    (
+        "growth caption swaps the second and third rows",
+        'section',
+        r"the(\s+)second(\s+)with(\s+)home(\s+)internet,(\s+)and(\s+)the(\s+)third(\s+)with(\s+)both",
+        r"the\1second\2with\3both,\5and\6the\7third\8with\9home internet",
+        "growth table caption names the stages in row order",
+    ),
+    (
+        "growth caption's Garner–Munoz row count",
+        'section',
+        r"In(\s+)the(\s+)final(\s+)three(\s+)rows",
+        r"In\1the\2final\3two\4rows",
+        "growth table caption names the stages in row order",
+    ),
+    (
+        "levels caption drops home internet",
+        'section',
+        r"replication(\s+)with(\s+)home(\s+)internet(\s+)and(\s+)imputed(\s+)in-kind(\s+)benefits(\s+)from",
+        r"replication\1with\5imputed\6in-kind\7benefits\8from",
+        "levels table caption names the stage with both",
+    ),
+    (
+        "discussion's standard-error clause moves to home internet",
+        'discussion',
+        r"\+4\.33(\s+)points\.(\s+)We(\s+)estimate",
+        r"+4.33\1points, each change within one standard error of zero.\2We\3estimate",
+        'discussion growth changes from home internet and the benefits',
+    ),
+    (
+        "discussion drops the benefits' standard-error clause",
+        'discussion',
+        r"points,(\s+)each(\s+)change(\s+)within(\s+)one(\s+)standard(\s+)error(\s+)of(\s+)zero\.",
+        r"points.",
+        'abstract and discussion: each change within one standard error',
+    ),
+    (
+        "implicate share without the benefits' scope",
+        'section',
+        r"For(\s+)each(\s+)of(\s+)the(\s+)benefits'(\s+)changes(\s+)to(\s+)2022–2025(\s+)growth,",
+        r"For\1each\2change,",
+        "implicate share of the stage change's variance",
+    ),
+    (
+        "band scope drops home internet",
+        'section',
+        r"In(\s+)our(\s+)band(\s+)with(\s+)home(\s+)internet(\s+)and(\s+)the(\s+)benefits,",
+        r"In\1our\2band\3with\7the\8benefits,",
+        "home internet in our band and BLS's",
+    ),
+    (
+        "evaluation's home internet change without its period",
+        'evaluation',
+        r"replication's(\s+)2024–2025(\s+)renter",
+        r"replication's\1renter",
+        "evaluation section cites BLS's imputed renter points and our changes",
+    ),
+    (
+        "our home internet share stage drops home internet",
+        'section',
+        r"of(\s+)ours(\s+)with(\s+)home(\s+)internet(\s+)and(\s+)the(\s+)benefits",
+        r"of\1ours\2with\6the\7benefits",
+        "home internet's share of our thresholds and BLS's",
     ),
 )
 
@@ -2051,6 +2156,34 @@ class PaperGuardTests(unittest.TestCase):
         result = self.run_guard()
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("current projection prose replication_ratio", result.stdout)
+
+    def test_projection_and_backtest_figures_quoted_elsewhere_still_pin(self):
+        """The in-kind section also quotes 0.90 and 0.76, so a drifted
+        abstract blend or benchmark blend must still fail its own pin."""
+        path = self.repo / "paper/index.qmd"
+        text = path.read_text()
+        for number, old, new, label in (
+            (
+                "0.90",
+                "0.90 percent with an equal blend",
+                "0.91 percent with an equal blend",
+                "current projection prose blend",
+            ),
+            (
+                "0.76",
+                "The equal blend scores 0.76 percent",
+                "The equal blend scores 0.77 percent",
+                "backtest prose literal 0.76",
+            ),
+        ):
+            with self.subTest(label=label):
+                self.assertEqual(text.count(old), 1)
+                self.assertGreater(len(re.findall(rf"(?<![\d.]){re.escape(number)}(?!\d)", text)), 1)
+                path.write_text(text.replace(old, new))
+                result = self.run_guard()
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(label, result.stdout)
+        path.write_text(text)
 
     def test_signed_cpi_u_bias_pins_its_sign(self):
         path = self.repo / "paper/index.qmd"

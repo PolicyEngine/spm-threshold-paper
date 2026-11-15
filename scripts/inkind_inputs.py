@@ -93,6 +93,10 @@ SHARED_IMPUTED = ("nslp", "wic", "broadband")
 SHELTER_UTILITY_IMPUTED = ("liheap", "rental_assistance")
 # The paper states this bound for BLS's share identities, in dollars.
 BLS_IDENTITY_TOLERANCE_DOLLARS = 1e-5
+# Our runs' imputed terms against a rebuild from their band means: the
+# receipt averages each implicate's terms, so the two differ by cents, while
+# home internet counted among the terms would add more than $100.
+OUR_TERMS_TOLERANCE_DOLLARS = 1.0
 # The CE's balanced repeated replication: 44 replicate weights, standard BRR
 # (Fay's coefficient 0) through 2024 CE data, and the 43 strata as the
 # complete-data degrees of freedom. The windows for 2019-2025 end in 2025Q1,
@@ -579,6 +583,14 @@ def inkind_figures(inputs: dict) -> dict:
             _close(stdev(draws), row["stage_change_between_implicate_sd"], f"stage change SD {label}")
             spread, separate = row["other_spread"], row["other_separate"]
             c22, c25 = spread["imputed_term_dollars"]["2022"], spread["imputed_term_dollars"]["2025"]
+            # Our terms, like BLS's, sum only the benefits, so home internet
+            # stays with out-of-pocket spending.
+            for year, recorded in (("2022", c22), ("2025", c25)):
+                rebuilt = _imputed_terms(years[year]["with_in_kind"]["band"], SHARED_IMPUTED + SHELTER_UTILITY_IMPUTED)
+                _require(
+                    abs(rebuilt[tenure] - recorded) < OUR_TERMS_TOLERANCE_DOLLARS,
+                    f"our imputed terms rebuild from the band means {year} {label}",
+                )
             share = share_beyond_cpi(c22, c25, with22, with25)
             _close(share, spread["imputed_share_of_growth_beyond_cpi_u_percent"], f"imputed share {label}")
             for year in ("2022", "2025"):
