@@ -2214,6 +2214,15 @@ class PaperGuardTests(unittest.TestCase):
             ("year added", ((renters, "renters in 2024."),), [ABSTRACT_INVENTORY]),
             ("thousands separator", ((renters, "renters, across 10,000 records."),), [ABSTRACT_INVENTORY]),
         )
+        # The line the guard prints under its failures, which counts each
+        # number as often as the abstract states it.
+        notes = {
+            "tied figure in other wording": "    the abstract states ['0.75'] beyond the lists and lacks []",
+            "lift range extended by a whole number": (
+                f"    the abstract states ['{high}\u20134'] beyond the lists and lacks ['{high}']"
+            ),
+            "year added": "    the abstract states ['2024'] beyond the lists and lacks []",
+        }
         for name, edits, labels in cases:
             with self.subTest(case=name):
                 self.install_article()
@@ -2222,12 +2231,8 @@ class PaperGuardTests(unittest.TestCase):
                 result = self.run_guard()
                 self.assertNotEqual(result.returncode, 0)
                 self.assertEqual(sorted(failure_lines(result.stdout)), sorted(labels))
-                if name == "year added":
-                    # The guard names the number the abstract states beyond the lists.
-                    self.assertIn(
-                        "    the abstract states ['2024'] beyond the lists and lacks []",
-                        result.stdout.splitlines(),
-                    )
+                if name in notes:
+                    self.assertIn(notes[name], result.stdout.splitlines())
         self.install_article()
 
     def test_abstract_tie_fails_on_a_word_in_its_slot(self):

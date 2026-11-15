@@ -22,11 +22,12 @@ FRONT_MATTER_ENDS = ("---", "...")
 DASHES = "\u2010-\u2015\u2212\ufe58\ufe63\uff0d-"
 NUMBER = r"\d[\d,]*(?:\.\d+)?"
 # What joins two numbers into a range or a pair: dashes, a slash, or a word
-# such as "to", "and" or "through", in any case.
+# such as "to", "and" or "through", in upper or lower case.
 RANGE_JOIN = rf"\s*[{DASHES}]+\s*|\s*/\s*|\s+(?i:to|and|or|through|thru|till|until|versus|vs\.?)\s+"
 # A number read whole, with any run of dashes before it, spaced or not, as
 # its sign, and with any number joined to it as above, as a range, even when
-# a word such as "percent" follows the first number.
+# a word such as "percent" follows the first number. Anything else between
+# the two numbers, such as a comma or a second word, leaves the first one out.
 SIGNED_NUMBER = rf"(?:[{DASHES}]+\s*)?{NUMBER}(?:(?:\s+[^\W\d_]+)?(?:{RANGE_JOIN}){NUMBER})?"
 LINE = re.compile(r"[^\n]*\n|[^\n]+\Z")
 # Line ends that Quarto and pandoc read differently. Quarto ends a line at a
@@ -194,10 +195,10 @@ def block_scalar_span(text: str, key: str) -> tuple[int, int] | None:
       or starts a backtick code fence, which Quarto deletes before it reads
       the YAML;
     - a front-matter line, even inside a block, ends in a no-break space, a
-      byte order mark or another character besides a space or a tab that
-      JavaScript's ``trimEnd()`` strips, which Quarto trims before it reads
-      the YAML; or a line outside a block opens with ``---``, where Quarto
-      can skip the whole front matter;
+      byte order mark or another character besides a space, a tab or a line
+      end that JavaScript's ``trimEnd()`` strips, which Quarto trims before
+      it reads the YAML; or a line outside a block opens with ``---``, where
+      Quarto can skip the whole front matter;
     - the front matter names the key other than once, or other than on a
       top-level line that reads exactly ``key: |``. Quarto renders a key
       nested under ``format: html:`` in place of the top-level one. Text
@@ -349,7 +350,7 @@ def _front_matter_block(header, key: str) -> tuple[int, int] | str:
         # such characters is blank for Quarto, which can move where a block's
         # text starts or ends, but text for pandoc and YAML.
         if text != text.rstrip(QUARTO_TRIMS):
-            return f"line {number}, in the front matter, ends in a space that Quarto trims and YAML reads as text"
+            return f"line {number}, in the front matter, ends in a character that Quarto trims before it reads the YAML"
         spaces = len(text) - len(text.lstrip(" "))
         if block is not None:
             parent, indent, opener = block
@@ -508,11 +509,12 @@ def stated_values(template: str, text: str, value: str = SIGNED_NUMBER) -> list[
     "through", as a range, with or without a word such as "percent" after
     the first number. So the text's "12.29", "−2.29", "– 2.29", "2.20–2.29",
     "2.20 to 2.29", "2.20 and 2.29" or "2.20 percent to 2.29" never reads as
-    "2.29". The
-    slot starts only at the start of a whitespace-separated token or after
-    "(", so "x2.29" reads as nothing. The template's words match only whole
-    words, so "index" does not match "indexes". A template without exactly
-    one slot matches nothing.
+    "2.29". Anything else between a range's ends, such as a comma or a
+    second word, leaves only the last number in the slot, so "2.20, to 2.29"
+    reads as "2.29". The slot starts only at the start of a
+    whitespace-separated token or after "(", so "x2.29" reads as nothing.
+    The template's words match only whole words, so "index" does not match
+    "indexes". A template without exactly one slot matches nothing.
     """
     parts = template.split("{}")
     if len(parts) != 2:

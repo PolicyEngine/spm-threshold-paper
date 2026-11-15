@@ -327,7 +327,7 @@ class BlockScalarSpanTests(unittest.TestCase):
         where the block's text starts. Every such line fails closed, and the
         reason names it; a no-break space inside a line reads."""
         hidden = 'description: "\nabstract: Hidden 9.99.\nnote: end"\n'
-        trims = "ends in a space that Quarto trims"
+        trims = "ends in a character that Quarto trims"
         for name, (lines, reason) in {
             "no-break space after an empty value": (f'subtitle: \xa0\n  "Public data\n{hidden}', trims),
             "byte order mark after an empty value": (f'subtitle: \ufeff\n  "Public data\n{hidden}', trims),
@@ -356,16 +356,17 @@ class BlockScalarSpanTests(unittest.TestCase):
                 self.assertIn(trims, block_problem(text, "abstract"))
         # JavaScript's trimEnd() strips every space separator (Unicode
         # category Zs), a tab, \v, \f, a byte order mark and line ends. Each
-        # one besides a space and a tab, after an empty value, fails closed.
-        stripped = [chr(code) for code in range(0x110000) if unicodedata.category(chr(code)) == "Zs"]
-        for character in [*stripped, "\v", "\f", "\ufeff"]:
-            if character == " ":
-                continue
+        # one besides a space and a tab, after an empty value, fails closed,
+        # and the parser treats no other character as trimmed.
+        spaces = [chr(code) for code in range(0x110000) if unicodedata.category(chr(code)) == "Zs"]
+        trimmed = [character for character in [*spaces, "\v", "\f", "\ufeff"] if character != " "]
+        self.assertEqual(sorted(PAPER_TEXT.QUARTO_TRIMS), sorted(trimmed))
+        for character in trimmed:
             with self.subTest(character=f"U+{ord(character):04X}"):
                 text = PAPER.replace(ABSTRACT_LINES, ABSTRACT_LINES + f'subtitle: {character}\n  "Public data\n{hidden}')
                 self.assertIsNone(block_scalar_span(text, "abstract"))
                 self.assertIn(trims, block_problem(text, "abstract"))
-        for lines in ("note: a\xa0b\n", "note: |\n  a\xa0b\n", "note: x\n"):
+        for lines in ("note: a\xa0b\n", "note: |\n  a\xa0b\n", 'note: "a\n\xa0b"\n', "note: x\n"):
             with self.subTest(lines=lines):
                 text = PAPER.replace(ABSTRACT_LINES, ABSTRACT_LINES + lines)
                 self.assertEqual(block_lines(text), ABSTRACT_LINES)
@@ -390,6 +391,12 @@ class BlockScalarSpanTests(unittest.TestCase):
                 "        \\usepackage{needspace}\n", "        ```\n        \\usepackage{needspace}\n        ```\n"
             ),
             "fence line before the key": PAPER.replace("abstract: |\n", "```\nabstract: |\n"),
+            "fence after a tab in a quoted value": PAPER.replace(
+                ABSTRACT_LINES, ABSTRACT_LINES + 'note: "a\n\t```\n\tb\n\t```\n\tc"\n'
+            ),
+            "fence after a block quote marker in a quoted value": PAPER.replace(
+                ABSTRACT_LINES, ABSTRACT_LINES + 'note: "a\n  > ```\n  > b\n  > ```\n  c"\n'
+            ),
             "comment that opens before the key and closes after the block": PAPER.replace(
                 'title: "Thresholds"\n', "title: Thresholds <!--\n"
             ).replace(ABSTRACT_LINES, ABSTRACT_LINES + "note: end -->\n"),
@@ -620,7 +627,7 @@ class BlockScalarSpanTests(unittest.TestCase):
         third line, so the line fails closed."""
         lines = "   \u00a0\n    Four 2.29,\n   three 9.99.\n"
         self.assertIsNone(block_scalar_span(with_lines(lines), "abstract"))
-        self.assertIn("ends in a space that Quarto trims", block_problem(with_lines(lines), "abstract"))
+        self.assertIn("ends in a character that Quarto trims", block_problem(with_lines(lines), "abstract"))
 
     def test_a_trailing_comment_ends_the_block(self):
         """YAML ends the block at a line indented less than its first line,

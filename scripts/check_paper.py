@@ -799,8 +799,8 @@ def abstract_states(template: str, literal: str) -> bool:
     once and nothing else there. Every statement of the template's wording
     must hold a whole number the slot reads, so a rate glued to other text
     fails rather than leaving the tie to a correct copy elsewhere in the
-    abstract. So does a swap between rules, a flipped sign or a range whose
-    ends are at most one word apart."""
+    abstract. So does a swap between rules, a flipped sign or a range that
+    ``stated_values`` reads whole."""
     values = stated_values(template, ABSTRACT)
     tokens = [token.removeprefix("(") for token in stated_values(template, ABSTRACT, r"\S+")]
     return set(values) == {literal} and values == tokens
