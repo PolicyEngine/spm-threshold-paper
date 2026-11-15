@@ -1199,8 +1199,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "2025 window's reference years",
         "section",
-        r"references(\s+)2020(\s+)or(\s+)later,(\s+)so(\s+)our",
-        r"references\g<1>2019\2or\3later,\4so\5our",
+        r"reference(\s+)year(\s+)2020(\s+)or(\s+)later,(\s+)so(\s+)our",
+        r"reference\1year\g<2>2019\3or\4later,\5so\6our",
         "percentile band and windows read from fingerprinted calculator code",
     ),
     (
@@ -1341,8 +1341,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "states BLS's rule would reach",
         "section",
-        r"those(\s+)12(\s+)states(\s+)and(\s+)the(\s+)District",
-        r"those\g<1>13\2states\3and\4the\5District",
+        r"the(\s+)12(\s+)states(\s+)and(\s+)the(\s+)District",
+        r"the\g<1>13\2states\3and\4the\5District",
         "WIC EBT dates from the calculator's FNS table",
     ),
     (
@@ -1420,9 +1420,16 @@ INKIND_PROSE_MUTATIONS = (
     (
         "2025 window's reference years in the WIC universe's sentence",
         "section",
-        r"references(\s+)2020(\s+)or(\s+)later,(\s+)and(\s+)we(\s+)add",
-        r"references\g<1>2019\2or\3later,\4and\5we\6add",
+        r"reference(\s+)year(\s+)2020(\s+)or(\s+)later,(\s+)and(\s+)we(\s+)add",
+        r"reference\1year\g<2>2019\3or\4later,\5and\6we\7add",
         "broadband start and WIC cutoff from the imputation receipt",
+    ),
+    (
+        "statewide dates the by-state run reaches",
+        "section",
+        r"fall(\s+)in(\s+)June(\s+)2020(\s+)or(\s+)later",
+        r"fall\1in\2July\g<3>2020\4or\5later",
+        "WIC EBT dates from the calculator's FNS table",
     ),
     (
         "re-ranking stated as an estimate",

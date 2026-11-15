@@ -1397,7 +1397,8 @@ INKIND_THRESHOLD_CONSTANTS = (
     # The 2025 WIC universe's sentence states the window too, under the cutoff
     # pin, so this literal runs to the end of its own sentence: each copy then
     # has a pin that only it satisfies.
-    "Every interview in our 2025 window references 2020 or later, so our 2025 thresholds include no WIC",
+    "We assign every interview in our 2025 window to reference year 2020 or later, so our 2025 thresholds "
+    "include no WIC",
 )
 # Rules the section quotes from spm_calculator/ce_bls_shares.py at this
 # fingerprint (calculator commit 28740b5; every rule but the reading with the
@@ -1448,6 +1449,8 @@ INKIND_SHARES_CONSTANTS = (
 # CA 2020-07-22, MO 2020-09-15, PA 2020-09-23, RI 2020-09-29, IL 2020-09-30)
 # and six states and DC after it (UT 2020-11-02, ND 2020-12-31,
 # MS 2021-06-11, ME 2021-06-22, DC 2022-04-27, NJ 2022-07-22, GA 2022-10-26).
+# Those 12 states and DC are the only rows dated June 2020 or later; every
+# other state's date is 2019-12-31 or earlier.
 INKIND_WIC_DATES_SOURCE = (
     "usda_wic_ebt_statewide.csv",
     "6a61a4e0f1307f0a15e1c0a7c72a65e8be231a0fd1a6cdfb6c468c617a5d40f3",
@@ -1457,7 +1460,8 @@ INKIND_WIC_DATES_CONSTANTS = (
     "from Hawaii to Illinois [@fnswicebt2022]",
     "The WIC agencies of six more states and the District of Columbia did so after the deadline, from Utah in "
     "November 2020 to Georgia in October 2022 [@fnswicebt2022]",
-    "we add WIC in each of those 12 states and the District until its WIC agency implemented EBT statewide",
+    "we add WIC in the 12 states and the District whose statewide dates fall in June 2020 or later, each until "
+    "its date",
 )
 replication_receipt = json.loads((DATA / "inkind" / "ce_inkind_replication_2019_2025.json").read_text())
 
@@ -1531,7 +1535,7 @@ def wic_by_state_pin() -> bool:
         and growth_follows
         and risen[-1] == max(targets)
         and has_number(
-            "If we instead apply BLS's rule state by state in every reference year, we add WIC in each of those",
+            "If we instead apply BLS's rule state by state in every reference year, we add WIC in the 12 states",
             text=INKIND_TEXT,
         )
         and has_number(f"Some units in the {risen[-1]} window then take WIC", text=INKIND_TEXT)
@@ -2352,9 +2356,9 @@ inkind_pins = (
         )
         and replication_receipt["results"]["2025"]["sample_mean_in_kind_threshold_year_dollars"]["wic"] == 0
         and has_number(
-            f"Every interview in our 2025 window references "
-            f"{inkind_method['wic_ebt_all_states_from_reference_year']} or later, and we add no WIC from reference "
-            f"year {inkind_method['wic_ebt_all_states_from_reference_year']} on, so these units take none",
+            "We assign every interview in our 2025 window to reference year 2020 or later, and we add no WIC "
+            f"from reference year {inkind_method['wic_ebt_all_states_from_reference_year']} on, so these units "
+            "take none",
             text=INKIND_TEXT,
         ),
     ),
