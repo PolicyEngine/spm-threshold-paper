@@ -1610,6 +1610,27 @@ INKIND_PROSE_MUTATIONS = (
         'abstract and discussion: each change within one standard error',
     ),
     (
+        "abstract benefits' growth change given to home internet",
+        'abstract',
+        r"percent(\s+)and(\s+)change(\s+)2022–2025",
+        r"percent\1and\2home internet costs change\g<3>2022–2025",
+        'abstract stage-change range',
+    ),
+    (
+        "discussion levels claim given to BLS",
+        'discussion',
+        r"We(\s+)estimate(\s+)that(\s+)adding(\s+)home(\s+)internet(\s+)raises",
+        r"BLS\1estimates\2that\3adding\4home\5internet\6raises",
+        'discussion home internet and in-kind lift ranges',
+    ),
+    (
+        "discussion credits home internet with the shelter definitions' move",
+        'discussion',
+        r"shelter(\s+)definitions(\s+)also(\s+)move(\s+)them",
+        r"shelter\1definitions\2and\3home internet\3also move\4them",
+        'discussion home internet and in-kind lift ranges',
+    ),
+    (
         "WIC threshold moves without our estimate",
         'section',
         r"it,(\s+)we(\s+)estimate(\s+)that(\s+)those(\s+)thresholds(\s+)move",

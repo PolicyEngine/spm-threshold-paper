@@ -1730,8 +1730,9 @@ inkind_pins = (
         lift_low > 0
         and internet_lift_low > 0
         and has_number(
-            f"adding home internet raises our levels by {internet_lift_low:.1f} to {internet_lift_high:.1f} percent "
-            f"and that imputing in-kind benefits raises them by a further {lift_literal} percent",
+            f"We estimate that adding home internet raises our levels by {internet_lift_low:.1f} to "
+            f"{internet_lift_high:.1f} percent and that imputing in-kind benefits raises them by a further "
+            f"{lift_literal} percent; shelter definitions also move them",
             text=DISCUSSION_TEXT,
         ),
     ),
@@ -2304,10 +2305,13 @@ inkind_pins = (
         ),
     ),
     (
+        # One literal from the benefits' subject through their growth range
+        # and its standard-error clause, so no other subject can take them.
         "abstract stage-change range",
         has_number(
-            f"change 2022–2025 growth by {signed(min(stage_changes))} to {signed(max(stage_changes))} points per "
-            "tenure with the CE's spending summaries",
+            f"We estimate that they raise thresholds by a further {lift_literal} percent and change 2022–2025 "
+            f"growth by {signed(min(stage_changes))} to {signed(max(stage_changes))} points per tenure with the "
+            "CE's spending summaries, each change within one standard error of zero",
             text=ABSTRACT,
         ),
     ),
