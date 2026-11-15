@@ -40,11 +40,12 @@ push to master and every pull request. It fails when:
     tie, and says why, when it cannot read the block: the front matter
     steps outside the plain YAML the parser reads, sets the abstract other
     than in one top-level block, holds an HTML comment or code fence, holds
-    a line that ends in a character Quarto trims, or holds a line outside a
-    block that opens with ``---``; the body holds a line that could set the
-    abstract, a metadata block or a grid table; a line ends in a carriage
-    return without a line feed or holds a Unicode line separator; or the
-    abstract holds anything but plain prose. A project or directory
+    a line whose last character besides spaces and tabs is one Quarto
+    trims, such as a no-break space, or holds a line outside a block that
+    opens with ``---``; the body holds a line that could set the abstract,
+    a metadata block or a grid table; a line ends in a carriage return
+    without a line feed or holds a Unicode line separator; or the abstract
+    holds anything but plain prose. A project or directory
     metadata file that names the abstract or more metadata files, a paper
     that names more, or an include other than a generated table fails too;
 (e) the README miscounts the in-kind receipts or omits a calculator

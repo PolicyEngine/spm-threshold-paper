@@ -2160,8 +2160,11 @@ class PaperGuardTests(unittest.TestCase):
         split by a space, a tied figure restated in other wording, a whole
         number at a range's first end or in a contrast, the in-kind lift
         range reversed or rounded beside a correct copy or extended, a new
-        year and a thousands separator. A range whose first end carries the
-        rule's unit fails that rule's tie too."""
+        year, a thousands separator, and a year with an apostrophe, a
+        question mark or quotes. A range whose first end carries the rule's
+        unit fails that rule's tie too. A year in parentheses before a
+        semicolon or a colon passes, since the check strips ( ) , . ; : from
+        each number's ends."""
         self.install_article()
         block = PAPER_TEXT.block_words((self.repo / "paper/index.qmd").read_text(), "abstract")
         low, high = re.search(r"thresholds by (\d+\.\d+) to (\d+\.\d+) percent", block).groups()
@@ -2213,6 +2216,17 @@ class PaperGuardTests(unittest.TestCase):
             ),
             ("year added", ((renters, "renters in 2024."),), [ABSTRACT_INVENTORY]),
             ("thousands separator", ((renters, "renters, across 10,000 records."),), [ABSTRACT_INVENTORY]),
+            (
+                "year with an apostrophe",
+                ((r"for(\s+)2025(\s+)only", r"for\g<1>2025's\g<2>thresholds only"),),
+                [ABSTRACT_INVENTORY],
+            ),
+            (
+                "year with a question mark",
+                ((r"for(\s+)2025(\s+)only\.", r"for\g<1>one\g<2>year only: why 2025?"),),
+                [ABSTRACT_INVENTORY],
+            ),
+            ("quoted year", ((r"for(\s+)2025(\s+)only", r'for\g<1>"2025"\g<2>only'),), [ABSTRACT_INVENTORY]),
         )
         # The line the guard prints under its failures, which counts each
         # number as often as the abstract states it.
@@ -2222,6 +2236,9 @@ class PaperGuardTests(unittest.TestCase):
                 f"    the abstract states ['{high}\u20134'] beyond the lists and lacks ['{high}']"
             ),
             "year added": "    the abstract states ['2024'] beyond the lists and lacks []",
+            "year with an apostrophe": """    the abstract states ["2025's"] beyond the lists and lacks ['2025']""",
+            "year with a question mark": "    the abstract states ['2025?'] beyond the lists and lacks ['2025']",
+            "quoted year": """    the abstract states ['"2025"'] beyond the lists and lacks ['2025']""",
         }
         for name, edits, labels in cases:
             with self.subTest(case=name):
@@ -2233,6 +2250,15 @@ class PaperGuardTests(unittest.TestCase):
                 self.assertEqual(sorted(failure_lines(result.stdout)), sorted(labels))
                 if name in notes:
                     self.assertIn(notes[name], result.stdout.splitlines())
+        for name, replacement in (
+            ("year in parentheses before a semicolon", r"for\g<1>one\g<2>year (2025); later years wait."),
+            ("year in parentheses before a colon", r"for\g<1>one\g<2>year (2025): the nowcast's."),
+        ):
+            with self.subTest(case=name):
+                self.install_article()
+                self.mutate_article("abstract", r"for(\s+)2025(\s+)only\.", replacement)
+                result = self.run_guard()
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.install_article()
 
     def test_abstract_tie_fails_on_a_word_in_its_slot(self):

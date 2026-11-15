@@ -337,6 +337,7 @@ class BlockScalarSpanTests(unittest.TestCase):
             "no-break space alone under an empty value": ("note:\n  \xa0\n", trims),
             "no-break space after text in another block": ("note: |\n  text\xa0\n", trims),
             "no-break space alone in another block": ("note: |\n  text\n  \xa0\n      more\n", trims),
+            "no-break space inside a quoted value": ('note: "a\n  b\xa0\n  c"\n', trims),
             "dashes after blank lines in a quote": ('note: "a\n\n\n---b"\n', "starts with ---"),
             "dashes after one blank line in a quote": ('note: "a\n\n---b"\n', "starts with ---"),
         }.items():
@@ -358,19 +359,28 @@ class BlockScalarSpanTests(unittest.TestCase):
         # category Zs), a tab, \v, \f, a byte order mark and line ends. Each
         # one besides a space and a tab, after an empty value, fails closed,
         # even before trailing spaces or tabs, which trimEnd() strips with it,
-        # and the parser treats no other character as trimmed.
+        # and with line feeds or carriage return and line feed pairs. The
+        # parser treats no other character as trimmed.
         spaces = [chr(code) for code in range(0x110000) if unicodedata.category(chr(code)) == "Zs"]
         trimmed = [character for character in [*spaces, "\v", "\f", "\ufeff"] if character != " "]
         self.assertEqual(sorted(PAPER_TEXT.QUARTO_TRIMS), sorted(trimmed))
         for character in trimmed:
             for after in ("", " ", "\t", " \t "):
-                with self.subTest(character=f"U+{ord(character):04X}", after=after):
-                    text = PAPER.replace(
-                        ABSTRACT_LINES, ABSTRACT_LINES + f'subtitle: {character}{after}\n  "Public data\n{hidden}'
-                    )
-                    self.assertIsNone(block_scalar_span(text, "abstract"))
-                    self.assertIn(trims, block_problem(text, "abstract"))
-        for lines in ("note: a\xa0b\n", "note: |\n  a\xa0b\n", 'note: "a\n\xa0b"\n', "note: x\n"):
+                for ending in ("\n", "\r\n"):
+                    with self.subTest(character=f"U+{ord(character):04X}", after=after, ending=ending):
+                        text = PAPER.replace(
+                            ABSTRACT_LINES, ABSTRACT_LINES + f'subtitle: {character}{after}\n  "Public data\n{hidden}'
+                        ).replace("\n", ending)
+                        self.assertIsNone(block_scalar_span(text, "abstract"))
+                        self.assertIn(trims, block_problem(text, "abstract"))
+        for lines in (
+            "note: a\xa0b\n",
+            "note: |\n  a\xa0b\n",
+            'note: "a\n\xa0b"\n',
+            "note: x\n",
+            "note: x\u200b\n",
+            "note: x\u180e\n",
+        ):
             with self.subTest(lines=lines):
                 text = PAPER.replace(ABSTRACT_LINES, ABSTRACT_LINES + lines)
                 self.assertEqual(block_lines(text), ABSTRACT_LINES)
@@ -861,8 +871,8 @@ class BlockScalarSpanTests(unittest.TestCase):
             ),
             "markup": (
                 with_lines("  First *line*.\n"),
-                "the abstract may hold only letters, digits, spaces, tabs, no-break spaces, dashes, "
-                "straight and curly quotes and . , ; : ( ) ? ! / +, and holds '*'",
+                "the abstract may hold only letters, the digits 0 to 9, spaces, tabs, no-break spaces, "
+                "dashes, straight and curly quotes and . , ; : ( ) ? ! / +, and holds '*'",
             ),
         }.items():
             with self.subTest(case=name):
@@ -881,17 +891,27 @@ class BlockScalarSpanTests(unittest.TestCase):
                 self.assertIsNone(block_words(text, "abstract"))
                 self.assertEqual(
                     block_problem(text, "abstract"),
-                    "the abstract may hold only letters, digits, spaces, tabs, no-break spaces, dashes, "
-                    f"straight and curly quotes and . , ; : ( ) ? ! / +, and holds {character!r}",
+                    "the abstract may hold only letters, the digits 0 to 9, spaces, tabs, no-break spaces, "
+                    f"dashes, straight and curly quotes and . , ; : ( ) ? ! / +, and holds {character!r}",
                 )
         for character in "\u00e9\u00df\u4e2d.,;:()'\"?!/+\u2013\u2014\u2212\u2018\u2019\u201c\u201d\u00a0":
             with self.subTest(character=repr(character)):
                 text = with_lines(f"  First{character}line 9.99.\n")
                 self.assertIsNotNone(block_words(text, "abstract"))
+        # The guard's message names every kind of character in the set, and
+        # each dash it allows is one a signed number or a range may hold.
+        dashes = set("\u2010\u2011\u2012\u2013\u2014\u2015\u2212\ufe58\ufe63\uff0d-")
+        self.assertEqual(
+            PAPER_TEXT.PROSE_MARKS,
+            frozenset(" \t\n\r\xa0\u202f.,;:()?!/+'\"\u2018\u2019\u201c\u201d") | dashes,
+        )
+        for dash in dashes:
+            with self.subTest(dash=repr(dash)):
+                self.assertRegex(dash, f"^[{PAPER_TEXT.DASHES}]$")
 
     def test_the_key_matches_literally(self):
         """The parser matches a key as written, never as a pattern, and reads
-        only keys named in letters, digits, "_" and "-"."""
+        only keys named in ASCII letters and digits, "_" and "-"."""
         text = PAPER.replace("abstract: |\n", "abXtract: |\n")
         self.assertIsNone(block_scalar_span(text, "ab.tract"))
         self.assertEqual(block_problem(text, "ab.tract"), "the front matter has no top-level ab.tract: | line")
