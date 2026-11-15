@@ -271,6 +271,8 @@ class BlockScalarSpanTests(unittest.TestCase):
             "alias": ("note:\n  *n\n", ""),
             "block indicator": ("", 'note:\n  |\n  sub: "x\nabstract: Hidden 9.99.\nend: y "\n'),
             "anchored block indicator": ("", 'note: &n\n  |\n  sub: "x\nabstract: Hidden 9.99.\nend: y "\n'),
+            "plain text at the key's own depth": ("note:\nplain words\n", ""),
+            "plain text at a sequence key's depth": ("author:\n  - name:\n    plain words\n", ""),
         }.items():
             with self.subTest(case=name):
                 text = PAPER.replace("abstract: |\n", f"{before}abstract: |\n").replace(
@@ -309,6 +311,49 @@ class BlockScalarSpanTests(unittest.TestCase):
             'note:\n  plain words\n  "more" words\n',
             'note:\n  sub: a\n    "b" c\n',
         ):
+            with self.subTest(lines=lines):
+                text = PAPER.replace(ABSTRACT_LINES, ABSTRACT_LINES + lines)
+                self.assertEqual(block_lines(text), ABSTRACT_LINES)
+
+    def test_what_quarto_trims_or_skips_fails_closed(self):
+        """Quarto trims each front-matter line with JavaScript's trimEnd()
+        before it reads the YAML, so a no-break space, a byte order mark or
+        another such space at a line's end can leave an empty value whose
+        next line opens a quote, or a key, for Quarto alone. Quarto also
+        drops the whole front matter when a line opens with "---" after an
+        empty line and a blank one. A line inside a block that holds only
+        such spaces is blank for Quarto and text for pandoc, so it can move
+        where the block's text starts. Every such line fails closed, and the
+        reason names it; a no-break space inside a line reads."""
+        hidden = 'description: "\nabstract: Hidden 9.99.\nnote: end"\n'
+        trims = "ends in a space that Quarto trims"
+        for name, (lines, reason) in {
+            "no-break space after an empty value": (f'subtitle: \xa0\n  "Public data\n{hidden}', trims),
+            "byte order mark after an empty value": (f'subtitle: \ufeff\n  "Public data\n{hidden}', trims),
+            "ideographic space after an empty value": (f'subtitle: \u3000\n  "Public data\n{hidden}', trims),
+            "narrow no-break space after an empty value": (f'subtitle: \u202f\n  "Public data\n{hidden}', trims),
+            "no-break space after a key": ("format:\n  html-smart:\xa0\n    abstract:\xa0\n      Hidden 9.99.\n", trims),
+            "no-break space alone under an empty value": ("note:\n  \xa0\n", trims),
+            "no-break space after text in another block": ("note: |\n  text\xa0\n", trims),
+            "no-break space alone in another block": ("note: |\n  text\n  \xa0\n      more\n", trims),
+            "dashes after blank lines in a quote": ('note: "a\n\n\n---b"\n', "starts with ---"),
+            "dashes after one blank line in a quote": ('note: "a\n\n---b"\n', "starts with ---"),
+        }.items():
+            with self.subTest(case=name):
+                text = PAPER.replace(ABSTRACT_LINES, ABSTRACT_LINES + lines)
+                self.assertIsNone(block_scalar_span(text, "abstract"))
+                self.assertIn(reason, block_problem(text, "abstract"))
+        for name, lines in {
+            "no-break space alone on the abstract's first line": (
+                "  \xa0\n\n      The blend yields 1.17 percent in\n   2025. The next sentence.\n"
+            ),
+            "no-break space after the abstract's text": "  The blend yields 1.17 percent.\xa0\n",
+        }.items():
+            with self.subTest(case=name):
+                text = with_lines(lines)
+                self.assertIsNone(block_scalar_span(text, "abstract"))
+                self.assertIn(trims, block_problem(text, "abstract"))
+        for lines in ("note: a\xa0b\n", "note: |\n  a\xa0b\n", "note: x\n"):
             with self.subTest(lines=lines):
                 text = PAPER.replace(ABSTRACT_LINES, ABSTRACT_LINES + lines)
                 self.assertEqual(block_lines(text), ABSTRACT_LINES)
@@ -490,6 +535,10 @@ class BlockScalarSpanTests(unittest.TestCase):
             "opener with trailing spaces": '---  \n"\\x61bstract": Body copy 9.99.\n---  \n',
             "opener before a YAML comment": '---\n#. >\n"\\x61bstract": Body copy 9.99.\n---\n',
             "opener before a bare block quote marker": '---\n  >\n"\\x61bstract": Body copy 9.99.\n---\n',
+            "opener after a TeX command ending in a hyphen": '\\let\\x----\n"\\x61bstract": Body copy 9.99.\n---\n',
+            "opener after a TeX caption": "\\caption----\n!!str abstract: Body copy 9.99.\n---\n",
+            "rule line after a dangling TeX command": "\\let\\x\n\n----\n&a abstract: Body copy 9.99.\n---\n",
+            "rule line before text": "----\nText under a rule.\n\n---\n",
         }.items():
             with self.subTest(case=name):
                 self.assertIsNone(block_scalar_span(with_body(insert), "abstract"))
@@ -506,7 +555,7 @@ class BlockScalarSpanTests(unittest.TestCase):
             "Text.\n\n---\nMore.",
             "---\n\nText between two breaks.\n\n---\n",
             "---\n---\n",
-            "----\nText under a rule.\n\n---\n",
+            "----\n\nText after a rule.\n\n---\n",
             "<hr>---\n\nText after a rule.\n\n---\n",
             "Text with +----+ inside.\n",
         ):
@@ -547,11 +596,15 @@ class BlockScalarSpanTests(unittest.TestCase):
         leading_blank = "\n" + ABSTRACT_LINES
         self.assertEqual(block_lines(with_lines(leading_blank)), leading_blank)
 
-    def test_only_spaces_and_tabs_make_a_line_blank(self):
-        """YAML reads a no-break space as text, so a first line of spaces and
-        a no-break space sets the block's indentation, as pandoc reads it."""
+    def test_a_line_only_quarto_reads_as_blank_fails_closed(self):
+        """YAML reads a no-break space as text, so for pandoc a first line of
+        spaces and a no-break space sets the block's indentation, and the
+        block holds all three lines. Quarto trims the line to blank first,
+        takes the next line's indentation, and ends the block before the
+        third line, so the line fails closed."""
         lines = "   \u00a0\n    Four 2.29,\n   three 9.99.\n"
-        self.assertEqual(block_lines(with_lines(lines)), lines)
+        self.assertIsNone(block_scalar_span(with_lines(lines), "abstract"))
+        self.assertIn("ends in a space that Quarto trims", block_problem(with_lines(lines), "abstract"))
 
     def test_a_trailing_comment_ends_the_block(self):
         """YAML ends the block at a line indented less than its first line,
@@ -938,10 +991,6 @@ class BlockWordsTests(unittest.TestCase):
                 "  1234567890. 9.99 percent\n",
                 "line 9, in the abstract, opens a paragraph with '1234567890.', which pandoc reads as a list marker",
             ),
-            "number after a code block under a no-break space": (
-                "  \xa0\n\n      The blend yields 1.17 percent in\n   2025. The next sentence.\n",
-                "line 12, in the abstract, opens a paragraph with '2025.', which pandoc reads as a list marker",
-            ),
         }.items():
             with self.subTest(case=name):
                 text = with_lines(lines)
@@ -1013,6 +1062,7 @@ class StatedValuesTests(unittest.TestCase):
             "2.20 AND 2.29",
             "2.20 percent to 2.29",
             "2.20 percent and 2.29",
+            "2.20 points to 2.29",
         ):
             with self.subTest(value=value):
                 text = f"of {value} percent with the Consumer Price Index"
@@ -1030,6 +1080,25 @@ class StatedValuesTests(unittest.TestCase):
         ):
             with self.subTest(text=text):
                 self.assertEqual(stated_values(CPI_U, text), [])
+
+    def test_a_range_the_slot_cannot_join_reads_as_its_last_number(self):
+        """The slot joins a range only across a dash, a slash or a join word,
+        with at most one word before it, and it reads only numerals. A
+        spelled number, two words or other joins leave the rate to read
+        bare. check_paper.py's number check then catches a numeral first end,
+        since the abstract states no other numbers; a spelled one passes."""
+        for first in (
+            "2 percentage points to",
+            "2 percent, not",
+            "2 percent up to",
+            "2 rather than",
+            "two to",
+            "minus",
+            "+",
+        ):
+            with self.subTest(first=first):
+                text = f"of {first} 2.29 percent with the Consumer Price Index"
+                self.assertEqual(stated_values(CPI_U, text), ["2.29"])
 
     def test_to_after_a_word_opens_no_range(self):
         for joiner in ("to", "and", "through", "/"):
@@ -1626,6 +1695,17 @@ EDGE_CASES = {
     "no-break space line before a code block": with_lines(
         "  \xa0\n\n      The blend yields 1.17 percent in\n   2025. The next sentence.\n"
     ),
+    "no-break space after an empty value, over the key line": PAPER.replace(
+        ABSTRACT_LINES, ABSTRACT_LINES + 'subtitle: \xa0\n  "Public data\ndescription: "\nabstract: Hidden 9.99.\nnote: end"\n'
+    ),
+    "no-break space after a format key": PAPER.replace(
+        ABSTRACT_LINES, ABSTRACT_LINES + "format:\n  html-smart:\xa0\n    abstract:\xa0\n      Hidden 9.99.\n"
+    ),
+    "dashes after blank lines in a quote": PAPER.replace(ABSTRACT_LINES, ABSTRACT_LINES + 'note: "a\n\n\n---b"\n'),
+    "body opener after a TeX command ending in a hyphen": with_body(
+        '\\let\\x----\n"\\x61bstract": Body copy 9.99.\n---\n'
+    ),
+    "rule line before text in the body": with_body("----\nText under a rule.\n\n---\n"),
 }
 
 # The edge cases from which the parser reads an abstract; it fails closed on
@@ -1646,7 +1726,6 @@ EDGE_CASES_READ = frozenset(
         "fixture",
         "leading blank line deeper than the text",
         "line indented more than the first",
-        "no-break space on the first line",
         "quoted title wrapped over two lines",
         "tab after a deeper line's indentation",
         "tab after the block's indentation",

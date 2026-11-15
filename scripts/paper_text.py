@@ -86,15 +86,20 @@ PROPERTIES = re.compile(r"(?:[&!][^\s,\[\]{}]*(?:[ \t]+|$))*").match
 ALIAS = re.compile(r"\*[^\s,\[\]{}]+(?:[ \t]+#.*)?").fullmatch
 CONTINUATION_FIRST = frozenset("-?:,[]{}#")
 COMMENT = re.compile(r"[ \t]#").search
+# What JavaScript's trimEnd() strips from a line's end besides spaces and
+# tabs. Quarto trims each front-matter line this way before it reads the
+# YAML, while pandoc and Python keep these characters as text.
+QUARTO_TRIMS = "\v\f\xa0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\ufeff"
 
 # A container prefix that pandoc reads before a body block, so a metadata
 # block can open after it: indentation, block quote markers, and bullet,
 # numbered, example or definition list markers.
 CONTAINER = re.compile(r"[ \t>]+|(?:[-*+:~]|\(?(?:[0-9A-Za-z#]{1,9}|@[\w-]*)[.)])[ \t]+").match
-# A line that ends in exactly three hyphens. pandoc opens a metadata block
-# at such a line after any prefix it reads as a container or a raw block: an
-# HTML tag, a comment, a footnote label or a list marker of any length.
-OPENER = re.compile(r"(?<!-)---$").search
+# A line that ends in three or more hyphens. pandoc opens a metadata block
+# at the last three after any prefix it reads as a container or a raw block:
+# an HTML tag, a comment, a footnote label, a list marker of any length, or
+# a TeX command such as ``\let\x-`` that ends in a hyphen of its own.
+OPENER = re.compile(r"---$").search
 # A grid table's border at a line's end. pandoc reads grid cells as blocks,
 # so a cell can hold a metadata block.
 GRID_BORDER = re.compile(r"\+[-=:]+\+(?:[-=:]*\+)*$").search
@@ -187,6 +192,11 @@ def block_scalar_span(text: str, key: str) -> tuple[int, int] | None:
     - a front-matter line, even inside another block, holds an HTML comment
       or starts a backtick code fence, which Quarto deletes before it reads
       the YAML;
+    - a front-matter line, even inside a block, ends in a no-break space, a
+      byte order mark or another character that JavaScript's ``trimEnd()``
+      strips, which Quarto trims before it reads the YAML; or a line outside
+      a block opens with ``---``, where Quarto can skip the whole front
+      matter;
     - the front matter names the key other than once, or other than on a
       top-level line that reads exactly ``key: |``. Quarto renders a key
       nested under ``format: html:`` in place of the top-level one. Text
@@ -194,8 +204,8 @@ def block_scalar_span(text: str, key: str) -> tuple[int, int] | None:
     - the key's block holds no text;
     - a body line, after list and block quote markers, names the key at its
       start or in flow style; ends in a grid table's border; or opens what
-      pandoc could read as a metadata block: a line that ends in exactly
-      ``---``, whatever comes before it, followed by a line with any text
+      pandoc could read as a metadata block: a line that ends in ``---``,
+      whatever comes before it, followed by a line with any text
       and later by a ``---`` or ``...`` line. Quarto deletes
       HTML comments before it looks for metadata blocks, so the body is
       checked as pandoc reads it and with comments deleted, as Quarto reads
@@ -245,10 +255,12 @@ def _marker_problem(block: str, key: str, first: int) -> str | None:
     A list marker counts only where a paragraph opens: at the block's first
     line with text, after a line of whitespace, or after a line indented four
     or more columns past the block's own indentation, which ends an indented
-    code block. Mid-paragraph, pandoc renders a list marker as typed. Python's
-    whitespace includes characters, such as a no-break space, that pandoc
-    reads as text, so these checks open more paragraphs and strip more
-    indentation than pandoc does, never fewer."""
+    code block. Mid-paragraph, pandoc renders a list marker as typed.
+    ``str.strip`` also strips a no-break space, which pandoc reads as text,
+    so a marker after one counts here though pandoc renders it as typed. A
+    line of such spaces alone never gets here: the front-matter scan fails
+    closed on it, since Quarto trims it to blank and pandoc reads it as
+    text."""
     lines = block.split("\n")
     # YAML takes the block's indentation from its first line with anything
     # but spaces and tabs, a no-break space included, so the least such
@@ -331,6 +343,12 @@ def _front_matter_block(header, key: str) -> tuple[int, int] | str:
             if QUARTO_STRIPS(text)
             else None
         )
+        # A no-break space or a byte order mark at a line's end can leave a
+        # key or an empty value for Quarto alone, and a line that holds only
+        # such characters is blank for Quarto, which can move where a block's
+        # text starts or ends, but text for pandoc and YAML.
+        if text != text.rstrip(QUARTO_TRIMS):
+            return f"line {number}, in the front matter, ends in a space that Quarto trims and YAML reads as text"
         spaces = len(text) - len(text.lstrip(" "))
         if block is not None:
             parent, indent, opener = block
@@ -350,6 +368,10 @@ def _front_matter_block(header, key: str) -> tuple[int, int] | str:
             block = None
         if stripped:
             return stripped
+        # A line that opens with "---" after two blank lines makes Quarto
+        # drop the whole front matter.
+        if text.startswith("---"):
+            return f"line {number}, in the front matter, starts with ---, where Quarto can drop the front matter"
         if quote is not None:
             closes = QUOTE_CLOSES[quote[0]](text)
             if closes is None:
@@ -380,8 +402,9 @@ def _front_matter_block(header, key: str) -> tuple[int, int] | str:
         if name is None and not marks:
             comment = COMMENT(rest)
             value = rest if comment is None else rest[: comment.start()]
-            first = PLAIN_FIRST if pending else CONTINUATION_FIRST
-            if plain is None or spaces <= plain or not _plain(value, first):
+            # Only a pending key's first value line gets here: the branch
+            # above takes every other deeper line.
+            if not pending or plain is None or spaces <= plain or not _plain(value):
                 return unread
             pending = False
             if comment is not None:

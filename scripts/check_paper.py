@@ -786,7 +786,7 @@ check(
 ABSTRACT = front_matter_block("abstract")
 # Every figure an abstract tie checks, as the abstract writes it. The check
 # at the end of this file requires the abstract to state each one exactly
-# once and no other decimal.
+# once, and no other number but the years in ABSTRACT_YEARS.
 ABSTRACT_FIGURES = []
 
 
@@ -2141,18 +2141,23 @@ inkind_pins = (
 for label, ok in inkind_pins:
     check(f"in-kind prose: {label}", ok)
 
-# The abstract states each figure its ties check exactly once, written as a
-# bare number, and no other decimal. A token counts as a decimal when it
-# holds a point or a comma before a digit, so ".85" and "2,31" count. So a
-# changed, signed or added figure, a range or a unit glued to a figure fails
-# even beside a correct copy, a statement whose wording changed cannot hide
-# a drifted figure from its tie, and a tied figure restated in other wording,
-# or a correct copy beside a changed statement, fails as a second copy.
+# The abstract states each figure its ties check exactly once and each year
+# in ABSTRACT_YEARS as often as that list names it, all written as bare
+# numbers, and no other number. Any token that holds a digit counts, so
+# ".85", "2,31", "10,000" and the "31" of "2. 31" count. So a changed,
+# signed or added figure, a unit glued to a figure, a range with a numeral
+# at either end, or a rounded copy, fails even beside a correct copy; a
+# statement whose wording changed cannot hide a drifted figure from its tie;
+# and a tied figure restated in other wording, or a correct copy beside a
+# changed statement, fails as a second copy.
 ABSTRACT_FIGURES += lift_literal.split(" to ")
-abstract_decimals = [token.strip("(),.;:") for token in re.findall(r"\S*[.,]\d\S*", ABSTRACT)]
+ABSTRACT_FIGURES += [f"{min(bls_shares):.0f}", f"{max(bls_shares):.0f}"]
+# The years the abstract names, which no tie derives from the data.
+ABSTRACT_YEARS = ["2020–2025", "2025", "2025", "2035", "2022–2025"]
+abstract_numbers = [token.strip("(),.;:") for token in re.findall(r"\S*\d\S*", ABSTRACT)]
 check(
-    "abstract states only its tied figures, each once and as a bare number",
-    bool(ABSTRACT) and sorted(abstract_decimals) == sorted(ABSTRACT_FIGURES),
+    "abstract states exactly the numbers the guard lists, each as a bare number",
+    bool(ABSTRACT) and sorted(abstract_numbers) == sorted(ABSTRACT_FIGURES + ABSTRACT_YEARS),
 )
 
 if failures:

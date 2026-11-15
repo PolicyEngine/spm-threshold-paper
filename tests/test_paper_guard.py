@@ -962,10 +962,10 @@ INKIND_PROSE_MUTATIONS = (
 )
 
 # The guard's label when it cannot read the abstract, before its reason, and
-# the label of its check that the abstract states each tied figure once and
-# no other decimal.
+# the label of its check that the abstract states each tied figure once, its
+# years as listed, and no other number.
 ABSTRACT_UNREAD = "paper's abstract cannot be read:"
-ABSTRACT_INVENTORY = "abstract states only its tied figures, each once and as a bare number"
+ABSTRACT_INVENTORY = "abstract states exactly the numbers the guard lists, each as a bare number"
 
 # Each case drifts figures in the abstract alone: (name, pattern, replacement,
 # failing ties, decoy). The body or a generated table states every one of these
@@ -2137,16 +2137,16 @@ class PaperGuardTests(unittest.TestCase):
         """With the original wording restated in the discussion, in another
         metadata field, in body text before the introduction or inside the
         abstract itself, only the abstract's own checks fail. A copy inside
-        the abstract restates figures the abstract already states, so the
-        figure check fails beside it too. A renamed rule's tie passes beside
-        such a copy, which states the rule's rate, and the figure check
+        the abstract restates numbers the abstract already states, so the
+        number check fails beside it too. A renamed rule's tie passes beside
+        such a copy, which states the rule's rate, and the number check
         fails alone."""
         for host in ABSTRACT_DECOY_HOSTS:
             for name, pattern, replacement, labels, decoy in ABSTRACT_PROSE_MUTATIONS:
                 with self.subTest(host=host, name=name):
                     result = self.run_abstract_mutation(pattern, replacement, decoy, host)
                     expected = set(labels)
-                    if host.startswith("abstract") and re.search(r"\d\.\d", decoy):
+                    if host.startswith("abstract") and re.search(r"\d", decoy):
                         expected.add(ABSTRACT_INVENTORY)
                         if name in ABSTRACT_RULE_RENAMES:
                             expected = {ABSTRACT_INVENTORY}
@@ -2154,12 +2154,14 @@ class PaperGuardTests(unittest.TestCase):
                     self.assertEqual(sorted(failure_lines(result.stdout)), sorted(expected))
         self.install_article()
 
-    def test_abstract_figure_check_counts_each_figure(self):
-        """The figure check alone catches a decimal that no tie reads: one
-        written without its leading zero or with a decimal comma, a tied
-        figure restated in other wording, and the in-kind lift range reversed
-        beside a correct copy. A range whose first end carries the rule's
-        unit fails that rule's tie too."""
+    def test_abstract_number_check_counts_each_number(self):
+        """The number check alone catches a number that no tie reads: a
+        decimal written without its leading zero, with a decimal comma or
+        split by a space, a tied figure restated in other wording, a whole
+        number at a range's first end or in a contrast, the in-kind lift
+        range reversed or rounded beside a correct copy or extended, a new
+        year and a thousands separator. A range whose first end carries the
+        rule's unit fails that rule's tie too."""
         self.install_article()
         block = PAPER_TEXT.block_words((self.repo / "paper/index.qmd").read_text(), "abstract")
         low, high = re.search(r"thresholds by (\d+\.\d+) to (\d+\.\d+) percent", block).groups()
@@ -2185,6 +2187,32 @@ class PaperGuardTests(unittest.TestCase):
                 ((r"2\.29(\s+)percent(\s+)with", r"0.90 percent to 2.29\1percent\2with"),),
                 ["abstract current projection cpi_u 2.29", ABSTRACT_INVENTORY],
             ),
+            ("decimal split by a space", ((renters, "renters, at 2. 31 percent."),), [ABSTRACT_INVENTORY]),
+            (
+                "whole number at a range's first end",
+                ((r"2\.29(\s+)percent(\s+)with", r"2 percent up to 2.29\1percent\2with"),),
+                [ABSTRACT_INVENTORY],
+            ),
+            (
+                "whole number in a contrast",
+                ((r"2\.29(\s+)percent(\s+)with", r"2 percent, not 2.29\1percent\2with"),),
+                [ABSTRACT_INVENTORY],
+            ),
+            (
+                "lift range rounded beside a correct copy",
+                (
+                    (r"by(\s+)\d+\.\d+(\s+)to(\s+)\d+\.\d+(\s+)percent", r"by\g<1>1\g<2>to\g<3>4\g<4>percent"),
+                    (renters, f"renters. We estimate that they raise replicated thresholds by {low} to {high} percent."),
+                ),
+                [ABSTRACT_INVENTORY],
+            ),
+            (
+                "lift range extended by a whole number",
+                ((rf"to(\s+){re.escape(high)}(\s+)percent", f"to\\g<1>{high}\u20134\\g<2>percent"),),
+                [ABSTRACT_INVENTORY],
+            ),
+            ("year added", ((renters, "renters in 2024."),), [ABSTRACT_INVENTORY]),
+            ("thousands separator", ((renters, "renters, across 10,000 records."),), [ABSTRACT_INVENTORY]),
         )
         for name, edits, labels in cases:
             with self.subTest(case=name):
@@ -2194,6 +2222,22 @@ class PaperGuardTests(unittest.TestCase):
                 result = self.run_guard()
                 self.assertNotEqual(result.returncode, 0)
                 self.assertEqual(sorted(failure_lines(result.stdout)), sorted(labels))
+        self.install_article()
+
+    def test_abstract_tie_fails_on_a_word_in_its_slot(self):
+        """A tie requires every statement of its wording to hold a number its
+        slot reads, so a figure spelled out in that wording fails the tie
+        beside a correct copy, while the number check, which reads numerals
+        alone, passes."""
+        self.install_article()
+        self.mutate_article(
+            "abstract",
+            r"renters\.",
+            "renters. Rents rose two percent with the Consumer Price Index for All Urban Consumers (CPI-U).",
+        )
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(failure_lines(result.stdout), ["abstract current projection cpi_u 2.29"])
         self.install_article()
 
     def test_abstract_ties_ignore_the_introduction_heading(self):
