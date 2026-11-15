@@ -1617,12 +1617,14 @@ def wic_by_state_pin() -> bool:
             text=INKIND_TEXT,
         )
         and has_number(
-            f"Those thresholds move by {signed_dollars(min(moved_dollars))} to {signed_dollars(max(moved_dollars))} "
+            "As the added WIC raises spending in the band and changes which units fall in it, we estimate that "
+            f"those thresholds move by {signed_dollars(min(moved_dollars))} to "
+            f"{signed_dollars(max(moved_dollars))} "
             f"({signed(min(moved_percent))} to {signed(max(moved_percent))} percent)",
             text=INKIND_TEXT,
         )
         and 0.02 < growth <= 0.03
-        and has_number("2022–2025 growth changes by 0.03 points or less", text=INKIND_TEXT)
+        and has_number("We estimate a change of 0.03 points or less in 2022–2025 growth", text=INKIND_TEXT)
     )
 # The rental-assistance sensitivities: scripts/rent_sensitivity.py writes this
 # receipt, so replacing it takes an edit here.
@@ -1765,8 +1767,10 @@ inkind_pins = (
         INKIND_GROWTH_ROWS[-len(STAGES)].startswith("Garner–Munoz restrictions")
         and INKIND_GROWTH_ROWS[-2:] == ["With home internet", "With home internet and benefits"]
         and has_number(
-            "For each replication, the first row reports growth without home internet or imputed benefits, the "
-            "second with home internet, and the third with both",
+            f"We report national threshold growth from {GROWTH_FIRST} to {GROWTH_LAST} in {count_word(len(STAGES))} "
+            "rows for each replication: without home internet or imputed benefits, with home internet, and with "
+            "both. In the third row, we give in parentheses the "
+            "between-implicate standard deviation of the benefits' change in points",
             text=GROWTH_TEXT,
         )
         and has_number(
@@ -2041,7 +2045,11 @@ inkind_pins = (
     (
         "abstract and discussion: each change within one standard error",
         all(ratio < 1 for ratio in stage_ratios)
-        and "each change within one standard error of zero" in ABSTRACT
+        and has_number(
+            f"{signed(max(stage_changes))} points per tenure with the CE's spending summaries, each change within "
+            "one standard error of zero",
+            text=ABSTRACT,
+        )
         and has_number(
             f"then changes it by {signed(min(stage_changes))} to {signed(max(stage_changes))} points, each change "
             "within one standard error of zero",

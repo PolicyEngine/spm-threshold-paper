@@ -1301,8 +1301,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "by-state WIC growth bound",
         "section",
-        r"growth(\s+)changes(\s+)by(\s+)0\.03(\s+)points(\s+)or(\s+)less",
-        r"growth\1changes\2by\g<3>0.02\4points\5or\6less",
+        r"change(\s+)of(\s+)0\.03(\s+)points(\s+)or(\s+)less",
+        r"change\1of\g<2>0.02\3points\4or\5less",
         "WIC by-state sensitivity from the imputation receipt",
     ),
     (
@@ -1603,6 +1603,20 @@ INKIND_PROSE_MUTATIONS = (
         'abstract home internet lift range',
     ),
     (
+        "abstract standard-error clause moves to home internet",
+        'abstract',
+        r"4\.0(\s+)percent\.([\s\S]*?)summaries,(\s+)each(\s+)change(\s+)within(\s+)one(\s+)standard(\s+)error(\s+)of(\s+)zero\.",
+        r"4.0\1percent, each change within one standard error of zero.\2summaries.",
+        'abstract and discussion: each change within one standard error',
+    ),
+    (
+        "WIC threshold moves without our estimate",
+        'section',
+        r"it,(\s+)we(\s+)estimate(\s+)that(\s+)those(\s+)thresholds(\s+)move",
+        r"it,\1those\5thresholds\6move",
+        'WIC by-state sensitivity from the imputation receipt',
+    ),
+    (
         "abstract home internet lift direction",
         'abstract',
         r"it(\s+)raises(\s+)replicated",
@@ -1640,8 +1654,15 @@ INKIND_PROSE_MUTATIONS = (
     (
         "growth caption swaps the second and third rows",
         'section',
-        r"the(\s+)second(\s+)with(\s+)home(\s+)internet,(\s+)and(\s+)the(\s+)third(\s+)with(\s+)both",
-        r"the\1second\2with\3both,\5and\6the\7third\8with\9home internet",
+        r"benefits,(\s+)with(\s+)home(\s+)internet,(\s+)and(\s+)with(\s+)both\.",
+        r"benefits,\1with\2both,\4and\5with\6home internet.",
+        "growth table caption names the stages in row order",
+    ),
+    (
+        "growth caption puts the standard deviation in the second row",
+        'section',
+        r"In(\s+)the(\s+)third(\s+)row,",
+        r"In\1the\2second\3row,",
         "growth table caption names the stages in row order",
     ),
     (

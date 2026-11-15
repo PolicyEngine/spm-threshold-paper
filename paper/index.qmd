@@ -417,7 +417,7 @@ food cost for the fiscal year that matches the unit's reference year.
 
 We add no WIC from reference year 2020, the year of the statutory deadline. Congress required every WIC state agency to implement EBT throughout the state by October 1, 2020, unless the Secretary of Agriculture exempted it [@usc1786]. We assign interviews from April 2020 to March 2021 to reference year 2020, and their reference periods center on mid-February 2020 to mid-January 2021. So we also drop WIC for reference periods before the deadline, including in six states whose WIC agencies implemented EBT statewide between June and September 2020, from Hawaii to Illinois [@fnswicebt2022]. The WIC agencies of six more states and the District of Columbia did so after the deadline, from Utah in November 2020 to Georgia in October 2022 [@fnswicebt2022]. For earlier reference years, we take each state's statewide date from FNS and add no WIC when the unit's state had fully implemented WIC EBT by the midpoint of its three-month reference period. When the CE suppresses a unit's state, we draw that status with probability equal to the weighted share of known-state units in the same region and quarter whose states had done so.
 
-We assign every interview in our 2025 window to reference year 2020 or later, so our 2025 thresholds include no WIC. If we instead apply BLS's rule state by state in every reference year, we add WIC in the 12 states and the District whose statewide dates fall in June 2020 or later, each until its date. Some units in the 2025 window then take WIC. We estimate that mean WIC per CE unit with children rises by \$1.94 to \$3.20 in the windows behind the 2021–2025 thresholds. Those thresholds move by −\$5 to +\$18 (−0.01 to +0.05 percent) as the added WIC raises spending in the band and changes which units fall in it, and 2022–2025 growth changes by 0.03 points or less.
+We assign every interview in our 2025 window to reference year 2020 or later, so our 2025 thresholds include no WIC. If we instead apply BLS's rule state by state in every reference year, we add WIC in the 12 states and the District whose statewide dates fall in June 2020 or later, each until its date. Some units in the 2025 window then take WIC. We estimate that mean WIC per CE unit with children rises by \$1.94 to \$3.20 in the windows behind the 2021–2025 thresholds. As the added WIC raises spending in the band and changes which units fall in it, we estimate that those thresholds move by −\$5 to +\$18 (−0.01 to +0.05 percent). We estimate a change of 0.03 points or less in 2022–2025 growth.
 
 For rental assistance, BLS fits a limited dependent variable model that
 treats assisted renters' rents as censored from above, and it values the
@@ -577,10 +577,10 @@ composite CPI, we estimate that the benefits change growth by +0.42,
 ::: {#tbl-inkind-growth tbl-colwidths="[40,20,20,20]"}
 {{< include tables/inkind_growth.md >}}
 
-We report national threshold growth from 2022 to 2025. For each
-replication, the first row reports growth without home internet or
-imputed benefits, the second with home internet, and the third with
-both, followed by the between-implicate standard deviation of the
+We report national threshold growth from 2022 to 2025 in three rows for
+each replication: without home internet or imputed benefits, with home
+internet, and with both. In the third row,
+we give in parentheses the between-implicate standard deviation of the
 benefits' change in points. In the final three rows, we apply the
 shelter, utilities, and food restrictions of @garner2021.
 :::
