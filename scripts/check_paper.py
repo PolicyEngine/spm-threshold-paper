@@ -37,17 +37,18 @@ push to master and every pull request. It fails when:
     ABSTRACT_YEARS, so a drifted figure, a flipped sign, a range with a
     numeral at either end or an added number fails even beside a correct
     copy, and a swap between rules fails. The guard fails every abstract
-    tie, and says why, when it cannot read the block: the front matter
-    steps outside the plain YAML the parser reads, sets the abstract other
-    than in one top-level block, holds an HTML comment or code fence, holds
-    a line that ends, past any trailing spaces or tabs, in a character
-    Quarto trims, such as a no-break space, or holds a line outside a block
-    that opens with ``---``; the body holds a line that could set the
-    abstract, a metadata block or a grid table; a line ends in a carriage
-    return without a line feed or holds a Unicode line separator; or the
-    abstract holds anything but plain prose. A project or directory
-    metadata file that names the abstract or more metadata files, a paper
-    that names more, or an include other than a generated table fails too;
+    tie, and says why, when it cannot read the block. It cannot when the
+    front matter steps outside the plain YAML the parser reads, sets the
+    abstract other than in one top-level block, holds an HTML comment or
+    code fence, holds a line that ends, past any trailing spaces or tabs,
+    in a character Quarto trims, such as a no-break space, or holds a line
+    that opens with ``---`` outside a block. Nor can it when the body holds
+    a line that could set the abstract, a metadata block or a grid table,
+    when a line ends in a carriage return without a line feed or holds a
+    Unicode line separator, or when the abstract holds anything but plain
+    prose. A project or directory metadata file that names the abstract or
+    more metadata files, a paper that names more, or an include other than
+    a generated table fails too;
 (e) the README miscounts the in-kind receipts or omits a calculator
     commit that their provenance records.
 

@@ -201,10 +201,10 @@ def block_scalar_span(text: str, key: str) -> tuple[int, int] | None:
     - a front-matter line, even inside a block, ends in a no-break space, a
       byte order mark or any other character that JavaScript's
       ``trimEnd()`` strips besides a space, a tab or a line end. Quarto
-      trims these before it reads the YAML, and the check looks past
+      trims these before it reads the YAML, and the parser looks past
       trailing spaces and tabs, which ``trimEnd()`` strips too;
-    - a front-matter line outside a block opens with ``---``, where Quarto
-      can skip the whole front matter;
+    - a front-matter line outside a block opens with ``---``, since Quarto
+      can then skip the whole front matter;
     - the front matter names the key other than once, or other than on a
       top-level line that reads exactly ``key: |``. Quarto renders a key
       nested under ``format: html:`` in place of the top-level one. Text

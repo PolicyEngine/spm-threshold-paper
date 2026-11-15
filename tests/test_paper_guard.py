@@ -2158,21 +2158,30 @@ class PaperGuardTests(unittest.TestCase):
         """The number check alone catches a number that no tie reads: a
         decimal written without its leading zero, with a decimal comma or
         split by a space, a tied figure restated in other wording, a whole
-        number at a range's first end or in a contrast, the in-kind lift
-        range reversed or rounded beside a correct copy or extended, a new
-        year, a thousands separator, and a year with an apostrophe, a
-        question mark, or straight or curly quotes, double or single. A range
-        whose first end carries the rule's unit fails that rule's tie too. A
-        year in parentheses before a semicolon or a colon passes, since the
-        check strips ( ) , . ; : from each number's ends."""
+        number at a range's first end or in a contrast, the abstract's first
+        lift range reversed or rounded beside a correct copy, or extended, a
+        new year, a thousands separator, and a year with an apostrophe, a
+        question mark, or straight or curly quotes, double or single, or
+        followed by any other mark the abstract's prose allows. A range whose
+        first end carries the rule's unit fails that rule's tie too. A year in
+        parentheses before a semicolon or a colon passes, since the check
+        strips ( ) , . ; : from each number's ends."""
         self.install_article()
         block = PAPER_TEXT.block_words((self.repo / "paper/index.qmd").read_text(), "abstract")
-        # The abstract's lift sentence up to "percent", copied whole, so the
-        # copy passes the lift tie whatever words lead into the range.
+        # Copy the abstract's lift sentence from the first word after the
+        # last period before the range through "percent", so the copy keeps
+        # the lead the paper gives the range and passes the lift tie. A
+        # period inside that lead starts the copy after it.
         lift = re.search(r"[^.\s][^.]*?thresholds by (\d+\.\d+) to (\d+\.\d+) percent", block)
         high = lift[2]
         renters = r"renters\."
         lift_copy = f"renters. {lift[0]}."
+        # Write the last 2025 once with each mark the abstract's prose allows
+        # glued to its end, leaving out whitespace and the ( ) , . ; : the
+        # check strips. A strip set that takes one more mark then changes
+        # the note.
+        kept_marks = sorted(PAPER_TEXT.PROSE_MARKS - set("(),.;:") - {m for m in PAPER_TEXT.PROSE_MARKS if m.isspace()})
+        marked_years = [f"2025{mark}" for mark in kept_marks]
         cases = (
             ("decimal without a leading zero", ((renters, "renters, at .85 percent."),), [ABSTRACT_INVENTORY]),
             ("decimal comma", ((renters, "renters, at 2,31 percent."),), [ABSTRACT_INVENTORY]),
@@ -2242,6 +2251,11 @@ class PaperGuardTests(unittest.TestCase):
                 ((r"for(\s+)2025(\s+)only", "for\\g<1>\u20182025\u2019\\g<2>only"),),
                 [ABSTRACT_INVENTORY],
             ),
+            (
+                "year followed by each mark the check keeps",
+                ((r"for(\s+)2025(\s+)only\.", rf"for\g<1>one\g<2>year only: {' '.join(marked_years)}."),),
+                [ABSTRACT_INVENTORY],
+            ),
         )
         # The line the guard prints under its failures, which counts each
         # number as often as the abstract states it.
@@ -2260,6 +2274,9 @@ class PaperGuardTests(unittest.TestCase):
             ),
             "year in curly single quotes": (
                 "    the abstract states ['\u20182025\u2019'] beyond the lists and lacks ['2025']"
+            ),
+            "year followed by each mark the check keeps": (
+                f"    the abstract states {sorted(marked_years)} beyond the lists and lacks ['2025']"
             ),
         }
         for name, edits, labels in cases:
