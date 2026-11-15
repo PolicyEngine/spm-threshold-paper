@@ -2167,8 +2167,12 @@ class PaperGuardTests(unittest.TestCase):
         each number's ends."""
         self.install_article()
         block = PAPER_TEXT.block_words((self.repo / "paper/index.qmd").read_text(), "abstract")
-        low, high = re.search(r"thresholds by (\d+\.\d+) to (\d+\.\d+) percent", block).groups()
+        # The abstract's lift sentence up to "percent", copied whole, so the
+        # copy passes the lift tie whatever words lead into the range.
+        lift = re.search(r"[^.\s][^.]*?thresholds by (\d+\.\d+) to (\d+\.\d+) percent", block)
+        high = lift[2]
         renters = r"renters\."
+        lift_copy = f"renters. {lift[0]}."
         cases = (
             ("decimal without a leading zero", ((renters, "renters, at .85 percent."),), [ABSTRACT_INVENTORY]),
             ("decimal comma", ((renters, "renters, at 2,31 percent."),), [ABSTRACT_INVENTORY]),
@@ -2181,7 +2185,7 @@ class PaperGuardTests(unittest.TestCase):
                 "lift range reversed beside a correct copy",
                 (
                     (r"by(\s+)(\d+\.\d+)(\s+)to(\s+)(\d+\.\d+)(\s+)percent", r"by\1\5\3to\4\2\6percent"),
-                    (renters, f"renters. We estimate that they raise replicated thresholds by {low} to {high} percent."),
+                    (renters, lift_copy),
                 ),
                 [ABSTRACT_INVENTORY],
             ),
@@ -2205,7 +2209,7 @@ class PaperGuardTests(unittest.TestCase):
                 "lift range rounded beside a correct copy",
                 (
                     (r"by(\s+)\d+\.\d+(\s+)to(\s+)\d+\.\d+(\s+)percent", r"by\g<1>1\g<2>to\g<3>4\g<4>percent"),
-                    (renters, f"renters. We estimate that they raise replicated thresholds by {low} to {high} percent."),
+                    (renters, lift_copy),
                 ),
                 [ABSTRACT_INVENTORY],
             ),
