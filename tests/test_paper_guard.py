@@ -2696,16 +2696,17 @@ class PaperGuardTests(unittest.TestCase):
 
     def edit_article(self, edits, host=None, decoy=None):
         """Apply exact single-occurrence prose edits, optionally restating the
-        original figure under another heading."""
+        original figure under another heading. A call may add only the decoy,
+        so the check that the fixture changed the article runs after both."""
         path = self.repo / "paper/index.qmd"
         prose = original = path.read_text()
         for old, new in edits:
             self.assertEqual(prose.count(old), 1, f"ambiguous fixture edit: {old!r}")
             prose = prose.replace(old, new)
-        self.assertNotEqual(prose, original, f"fixture edits change nothing: {edits!r}")
         if host is not None:
             self.assertEqual(prose.count(host), 1, f"ambiguous fixture host: {host!r}")
             prose = prose.replace(host, f"{host}\n{decoy}\n")
+        self.assertNotEqual(prose, original, f"fixture edits change nothing: {edits!r}")
         path.write_text(prose)
 
     def assert_article_mutation_fails(
