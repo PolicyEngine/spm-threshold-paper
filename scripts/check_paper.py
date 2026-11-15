@@ -32,10 +32,12 @@ push to master and every pull request. It fails when:
     block alone, as Quarto and pandoc read it, beside the rule it scores.
     Every statement of that rule's wording must hold a rate the guard
     reads, and every such rate must equal the registered value. Every
-    decimal the abstract states must be one of its tied figures, written
-    as a bare number, so a drifted figure, a flipped sign or a range fails
-    even beside a correct copy, and a swap between rules fails. The guard
-    fails every abstract tie, and says why, when it cannot read the block:
+    token in the abstract that holds a digit must be one of its tied
+    figures, stated once and as a bare number, or a year in
+    ABSTRACT_YEARS, so a drifted figure, a flipped sign, a range with a
+    numeral at either end or an added number fails even beside a correct
+    copy, and a swap between rules fails. The guard fails every abstract
+    tie, and says why, when it cannot read the block:
     the front matter steps outside the plain YAML the parser reads, sets the
     abstract other than in one top-level block, or holds an HTML comment or
     code fence; the body holds a line that could set the abstract, a
@@ -152,6 +154,8 @@ GENERATORS = (
 )
 
 failures: list[str] = []
+# Lines the guard prints under its failures to say what a check found.
+failure_notes: list[str] = []
 
 
 def check(label: str, ok: bool) -> None:
@@ -795,7 +799,8 @@ def abstract_states(template: str, literal: str) -> bool:
     once and nothing else there. Every statement of the template's wording
     must hold a whole number the slot reads, so a rate glued to other text
     fails rather than leaving the tie to a correct copy elsewhere in the
-    abstract. So does a swap between rules, a flipped sign or a range."""
+    abstract. So does a swap between rules, a flipped sign or a range whose
+    ends are at most one word apart."""
     values = stated_values(template, ABSTRACT)
     tokens = [token.removeprefix("(") for token in stated_values(template, ABSTRACT, r"\S+")]
     return set(values) == {literal} and values == tokens
@@ -2152,18 +2157,29 @@ for label, ok in inkind_pins:
 # changed statement, fails as a second copy.
 ABSTRACT_FIGURES += lift_literal.split(" to ")
 ABSTRACT_FIGURES += [f"{min(bls_shares):.0f}", f"{max(bls_shares):.0f}"]
-# The years the abstract names, which no tie derives from the data.
+# The years the abstract names. Any other number the abstract states that
+# no tie derives from the data belongs here too, as often as the abstract
+# states it.
 ABSTRACT_YEARS = ["2020–2025", "2025", "2025", "2035", "2022–2025"]
 abstract_numbers = [token.strip("(),.;:") for token in re.findall(r"\S*\d\S*", ABSTRACT)]
 check(
     "abstract states exactly the numbers the guard lists, each as a bare number",
     bool(ABSTRACT) and sorted(abstract_numbers) == sorted(ABSTRACT_FIGURES + ABSTRACT_YEARS),
 )
+if ABSTRACT and sorted(abstract_numbers) != sorted(ABSTRACT_FIGURES + ABSTRACT_YEARS):
+    numbers_stated = Counter(abstract_numbers)
+    numbers_listed = Counter(ABSTRACT_FIGURES + ABSTRACT_YEARS)
+    failure_notes.append(
+        f"the abstract states {sorted((numbers_stated - numbers_listed).elements())} beyond the lists "
+        f"and lacks {sorted((numbers_listed - numbers_stated).elements())}"
+    )
 
 if failures:
     print("PAPER DRIFT CHECK FAILED:")
     for f in failures:
         print(f"  - {f}")
+    for note in failure_notes:
+        print(f"    {note}")
     sys.exit(1)
 print(
     f"paper drift check passed ({len(EXPECTED_TABLES)} tables, {len(listed)} frozen + {len(current_listed)} retrospective + {len(ROLLING_FILES)} rolling + {len(INKIND_FILES)} in-kind artifacts, prose pins OK)"

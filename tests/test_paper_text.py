@@ -21,6 +21,7 @@ import shutil
 import subprocess
 import tempfile
 import textwrap
+import unicodedata
 import unittest
 from pathlib import Path
 
@@ -353,6 +354,17 @@ class BlockScalarSpanTests(unittest.TestCase):
                 text = with_lines(lines)
                 self.assertIsNone(block_scalar_span(text, "abstract"))
                 self.assertIn(trims, block_problem(text, "abstract"))
+        # JavaScript's trimEnd() strips every space separator (Unicode
+        # category Zs), a tab, \v, \f, a byte order mark and line ends. Each
+        # one besides a space and a tab, after an empty value, fails closed.
+        stripped = [chr(code) for code in range(0x110000) if unicodedata.category(chr(code)) == "Zs"]
+        for character in [*stripped, "\v", "\f", "\ufeff"]:
+            if character == " ":
+                continue
+            with self.subTest(character=f"U+{ord(character):04X}"):
+                text = PAPER.replace(ABSTRACT_LINES, ABSTRACT_LINES + f'subtitle: {character}\n  "Public data\n{hidden}')
+                self.assertIsNone(block_scalar_span(text, "abstract"))
+                self.assertIn(trims, block_problem(text, "abstract"))
         for lines in ("note: a\xa0b\n", "note: |\n  a\xa0b\n", "note: x\n"):
             with self.subTest(lines=lines):
                 text = PAPER.replace(ABSTRACT_LINES, ABSTRACT_LINES + lines)
@@ -378,9 +390,13 @@ class BlockScalarSpanTests(unittest.TestCase):
                 "        \\usepackage{needspace}\n", "        ```\n        \\usepackage{needspace}\n        ```\n"
             ),
             "fence line before the key": PAPER.replace("abstract: |\n", "```\nabstract: |\n"),
+            "comment that opens before the key and closes after the block": PAPER.replace(
+                'title: "Thresholds"\n', "title: Thresholds <!--\n"
+            ).replace(ABSTRACT_LINES, ABSTRACT_LINES + "note: end -->\n"),
         }.items():
             with self.subTest(case=name):
                 self.assertIsNone(block_scalar_span(text, "abstract"))
+                self.assertIn("holds an HTML comment or a code fence", block_problem(text, "abstract"))
 
     def test_a_quoted_value_wrapped_over_lines_still_reads(self):
         """A quoted value that closes on a later line leaves the abstract

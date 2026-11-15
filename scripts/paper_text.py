@@ -86,9 +86,10 @@ PROPERTIES = re.compile(r"(?:[&!][^\s,\[\]{}]*(?:[ \t]+|$))*").match
 ALIAS = re.compile(r"\*[^\s,\[\]{}]+(?:[ \t]+#.*)?").fullmatch
 CONTINUATION_FIRST = frozenset("-?:,[]{}#")
 COMMENT = re.compile(r"[ \t]#").search
-# What JavaScript's trimEnd() strips from a line's end besides spaces and
-# tabs. Quarto trims each front-matter line this way before it reads the
-# YAML, while pandoc and Python keep these characters as text.
+# What JavaScript's trimEnd() strips from a line's end besides spaces, tabs
+# and line ends. Quarto trims each front-matter line this way before it
+# reads the YAML. pandoc reads the space characters and the byte order mark
+# among them as text, and it rejects \v and \f.
 QUARTO_TRIMS = "\v\f\xa0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\ufeff"
 
 # A container prefix that pandoc reads before a body block, so a metadata
@@ -193,10 +194,10 @@ def block_scalar_span(text: str, key: str) -> tuple[int, int] | None:
       or starts a backtick code fence, which Quarto deletes before it reads
       the YAML;
     - a front-matter line, even inside a block, ends in a no-break space, a
-      byte order mark or another character that JavaScript's ``trimEnd()``
-      strips, which Quarto trims before it reads the YAML; or a line outside
-      a block opens with ``---``, where Quarto can skip the whole front
-      matter;
+      byte order mark or another character besides a space or a tab that
+      JavaScript's ``trimEnd()`` strips, which Quarto trims before it reads
+      the YAML; or a line outside a block opens with ``---``, where Quarto
+      can skip the whole front matter;
     - the front matter names the key other than once, or other than on a
       top-level line that reads exactly ``key: |``. Quarto renders a key
       nested under ``format: html:`` in place of the top-level one. Text

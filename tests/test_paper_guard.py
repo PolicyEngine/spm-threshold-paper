@@ -2222,6 +2222,12 @@ class PaperGuardTests(unittest.TestCase):
                 result = self.run_guard()
                 self.assertNotEqual(result.returncode, 0)
                 self.assertEqual(sorted(failure_lines(result.stdout)), sorted(labels))
+                if name == "year added":
+                    # The guard names the number the abstract states beyond the lists.
+                    self.assertIn(
+                        "    the abstract states ['2024'] beyond the lists and lacks []",
+                        result.stdout.splitlines(),
+                    )
         self.install_article()
 
     def test_abstract_tie_fails_on_a_word_in_its_slot(self):
