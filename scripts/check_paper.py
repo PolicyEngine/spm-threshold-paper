@@ -1393,8 +1393,11 @@ INKIND_THRESHOLD_CONSTANTS = (
     "mean imputed benefits per consumer unit in the 47th–53rd percentile band",
     # bls_quarter_window(2025) runs from 2020 Q2 to 2025 Q1, and ce_inkind
     # assigns those interviews to reference years 2020 to 2024 (reference_year
-    # = year where quarter >= 2, else year - 1), so its pin checks both files
-    "Every interview in our 2025 window references 2020 or later",
+    # = year where quarter >= 2, else year - 1), so its pin checks both files.
+    # The 2025 WIC universe's sentence states the window too, under the cutoff
+    # pin, so this literal runs to the end of its own sentence: each copy then
+    # has a pin that only it satisfies.
+    "Every interview in our 2025 window references 2020 or later, so our 2025 thresholds include no WIC",
 )
 # Rules the section quotes from spm_calculator/ce_bls_shares.py at this
 # fingerprint (calculator commit 28740b5; every rule but the reading with the
@@ -1454,8 +1457,7 @@ INKIND_WIC_DATES_CONSTANTS = (
     "from Hawaii to Illinois [@fnswicebt2022]",
     "The WIC agencies of six more states and the District of Columbia did so after the deadline, from Utah in "
     "November 2020 to Georgia in October 2022 [@fnswicebt2022]",
-    "we would add WIC in each of those 12 states and the District until its WIC agency had implemented EBT "
-    "statewide",
+    "we add WIC in each of those 12 states and the District until its WIC agency implemented EBT statewide",
 )
 replication_receipt = json.loads((DATA / "inkind" / "ce_inkind_replication_2019_2025.json").read_text())
 
@@ -1527,6 +1529,12 @@ def wic_by_state_pin() -> bool:
     return (
         levels_follow
         and growth_follows
+        and risen[-1] == max(targets)
+        and has_number(
+            "If we instead apply BLS's rule state by state in every reference year, we add WIC in each of those",
+            text=INKIND_TEXT,
+        )
+        and has_number(f"Some units in the {risen[-1]} window then take WIC", text=INKIND_TEXT)
         and all(
             abs(rise[year]) < 1e-9
             and all(targets[year]["change_dollars"][tenure] == 0 for tenure in TENURES)
@@ -1967,8 +1975,26 @@ inkind_pins = (
     (
         "re-ranking left out of the accounting",
         has_number(
-            f"that re-ranking moves {GROWTH_FIRST}–{GROWTH_LAST} growth by {signed(rank_shift[0])}, "
+            f"we estimate that this re-ranking moves {GROWTH_FIRST}–{GROWTH_LAST} growth by {signed(rank_shift[0])}, "
             f"{signed(rank_shift[1])}, and {signed(rank_shift[2])} points",
+            text=GROWTH_TEXT,
+        ),
+    ),
+    (
+        # load_inkind already requires BLS's shares to reproduce each year's
+        # thresholds within $0.00001 through the share identities. This pin
+        # adds that the 2022 thresholds the component receipt starts from are
+        # the ones BLS reissued on July 17, 2026, not the earlier release.
+        "growth split from BLS's July 2026 reissue",
+        all(
+            inkind_inputs["components"]["bls"]["years"][str(GROWTH_FIRST)]["published_thresholds"][tenure]
+            == corrected[int(GROWTH_FIRST)][tenure]
+            != published[int(GROWTH_FIRST)][tenure]
+            for tenure in TENURES
+        )
+        and has_number(
+            f"We start our split from the {GROWTH_FIRST} thresholds BLS reissued in July 2026 and the shares from "
+            "which we reproduce them",
             text=GROWTH_TEXT,
         ),
     ),
@@ -2326,8 +2352,9 @@ inkind_pins = (
         )
         and replication_receipt["results"]["2025"]["sample_mean_in_kind_threshold_year_dollars"]["wic"] == 0
         and has_number(
-            f"Because we add no WIC from reference year {inkind_method['wic_ebt_all_states_from_reference_year']}, "
-            "these units take none",
+            f"Every interview in our 2025 window references "
+            f"{inkind_method['wic_ebt_all_states_from_reference_year']} or later, and we add no WIC from reference "
+            f"year {inkind_method['wic_ebt_all_states_from_reference_year']} on, so these units take none",
             text=INKIND_TEXT,
         ),
     ),

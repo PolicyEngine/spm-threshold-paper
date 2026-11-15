@@ -220,13 +220,14 @@ def load_inkind(data_dir: Path, current_dir: Path) -> dict:
     ]
     _require(
         all(set(ACCOUNTINGS) <= set(rows.get(tenure, ())) for rows in growth_rows for tenure in TENURES)
-        and all(set(ACCOUNTINGS) <= set(gaps) for gaps in level_rows),
+        and all(set(ACCOUNTINGS) <= set(gaps) for gaps in level_rows)
+        and all(set(TENURES) <= set(gaps[accounting]) for gaps in level_rows for accounting in ACCOUNTINGS),
         f"component receipt schema {COMPONENTS_SCHEMA} with both accountings of the Other share",
     )
-    for run, (deflator, written) in RUNS.items():
+    for run, (deflator, garner_munoz) in RUNS.items():
         entry = components["runs"][run]
         _require(
-            entry["deflator"] == deflator and entry["bls_written_definitions"] is written,
+            entry["deflator"] == deflator and entry["bls_written_definitions"] is garner_munoz,
             f"run settings {run}",
         )
 

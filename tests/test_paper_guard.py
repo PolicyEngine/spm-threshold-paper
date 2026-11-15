@@ -1199,8 +1199,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "2025 window's reference years",
         "section",
-        r"references(\s+)2020(\s+)or(\s+)later",
-        r"references\g<1>2019\2or\3later",
+        r"references(\s+)2020(\s+)or(\s+)later,(\s+)so(\s+)our",
+        r"references\g<1>2019\2or\3later,\4so\5our",
         "percentile band and windows read from fingerprinted calculator code",
     ),
     (
@@ -1380,6 +1380,56 @@ INKIND_PROSE_MUTATIONS = (
         r"of(\s+)one(\s+)of(\s+)the(\s+)five(\s+)recipients",
         "of\\1twenty\u2011one\\2of\\3the\\4five\\5recipients",
         "implicate, matching-neighbor and cell-donor counts",
+    ),
+    # Round 9: the bf4b9ab review's P3s.
+    (
+        "shares the growth split starts from",
+        "section",
+        r"and(\s+)the(\s+)shares(\s+)from(\s+)which(\s+)we(\s+)reproduce(\s+)them",
+        r"and\1shares\2BLS\3reissued",
+        "growth split from BLS's July 2026 reissue",
+    ),
+    (
+        "thresholds the growth split starts from",
+        "section",
+        r"2022(\s+)thresholds(\s+)BLS(\s+)reissued(\s+)in(\s+)July(\s+)2026",
+        r"2022\1thresholds\2BLS\3published\4in\5September\g<6>2023",
+        "growth split from BLS's July 2026 reissue",
+    ),
+    (
+        "by-state run's reference years",
+        "section",
+        r"apply(\s+)BLS's(\s+)rule(\s+)state(\s+)by(\s+)state(\s+)in(\s+)every(\s+)reference(\s+)year",
+        r"apply\1BLS's\2rule\3state\4by\5state\6in\7earlier\8reference\9years",
+        "WIC by-state sensitivity from the imputation receipt",
+    ),
+    (
+        "by-state run's units in the 2025 window",
+        "section",
+        r"Some(\s+)units(\s+)in(\s+)the(\s+)2025(\s+)window(\s+)then",
+        r"No\1units\2in\3the\g<4>2025\5window\6then",
+        "WIC by-state sensitivity from the imputation receipt",
+    ),
+    (
+        "the 2025 WIC universe's cutoff year",
+        "section",
+        r"we(\s+)add(\s+)no(\s+)WIC(\s+)from(\s+)reference(\s+)year(\s+)2020(\s+)on,",
+        r"we\1add\2no\3WIC\4from\5reference\6year\g<7>2021\8on,",
+        "broadband start and WIC cutoff from the imputation receipt",
+    ),
+    (
+        "2025 window's reference years in the WIC universe's sentence",
+        "section",
+        r"references(\s+)2020(\s+)or(\s+)later,(\s+)and(\s+)we(\s+)add",
+        r"references\g<1>2019\2or\3later,\4and\5we\6add",
+        "broadband start and WIC cutoff from the imputation receipt",
+    ),
+    (
+        "re-ranking stated as an estimate",
+        "section",
+        r"replication,(\s+)we(\s+)estimate(\s+)that(\s+)this(\s+)re-ranking",
+        r"replication,\1that\2re-ranking",
+        "re-ranking left out of the accounting",
     ),
 )
 

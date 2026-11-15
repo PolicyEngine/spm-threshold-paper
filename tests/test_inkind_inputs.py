@@ -532,6 +532,20 @@ class ComponentReceiptChecks(unittest.TestCase):
                     with self.assertRaisesRegex(ValueError, self.SCHEMA_LABEL):
                         self.load_edited(edit)
 
+    def test_a_level_gap_missing_a_tenure_is_rejected(self):
+        """A level gap that lacks a tenure under one accounting fails with the
+        schema message, not a KeyError from the reader that prints the gaps."""
+        for run in ("package", "package_bls_definition"):
+            for accounting in ("other_spread", "other_separate"):
+                for tenure in INKIND.TENURES:
+                    with self.subTest(run=run, accounting=accounting, tenure=tenure):
+
+                        def edit(components):
+                            del components["runs"][run]["years"]["2024"]["level_gap_percent_of_bls"][accounting][tenure]
+
+                        with self.assertRaisesRegex(ValueError, self.SCHEMA_LABEL):
+                            self.load_edited(edit)
+
     def test_an_other_separate_share_error_over_tolerance_is_rejected(self):
         for sign in (1, -1):
             with self.subTest(sign=sign):
