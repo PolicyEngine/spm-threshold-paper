@@ -22,11 +22,12 @@ FRONT_MATTER_ENDS = ("---", "...")
 DASHES = "\u2010-\u2015\u2212\ufe58\ufe63\uff0d-"
 NUMBER = r"\d[\d,]*(?:\.\d+)?"
 # What joins two numbers into a range or a pair: dashes, a slash, or a word
-# such as "to", "and" or "through".
-RANGE_JOIN = rf"\s*[{DASHES}]+\s*|\s*/\s*|\s+(?:to|and|or|through|thru|till|until|versus|vs\.?)\s+"
+# such as "to", "and" or "through", in any case.
+RANGE_JOIN = rf"\s*[{DASHES}]+\s*|\s*/\s*|\s+(?i:to|and|or|through|thru|till|until|versus|vs\.?)\s+"
 # A number read whole, with any run of dashes before it, spaced or not, as
-# its sign, and with any number joined to it as above, as a range.
-SIGNED_NUMBER = rf"(?:[{DASHES}]+\s*)?{NUMBER}(?:(?:{RANGE_JOIN}){NUMBER})?"
+# its sign, and with any number joined to it as above, as a range, even when
+# a word such as "percent" follows the first number.
+SIGNED_NUMBER = rf"(?:[{DASHES}]+\s*)?{NUMBER}(?:(?:\s+[^\W\d_]+)?(?:{RANGE_JOIN}){NUMBER})?"
 LINE = re.compile(r"[^\n]*\n|[^\n]+\Z")
 # Line ends that Quarto and pandoc read differently. Quarto ends a line at a
 # carriage return without a line feed, which pandoc drops, and the
@@ -90,6 +91,10 @@ COMMENT = re.compile(r"[ \t]#").search
 # block can open after it: indentation, block quote markers, and bullet,
 # numbered, example or definition list markers.
 CONTAINER = re.compile(r"[ \t>]+|(?:[-*+:~]|\(?(?:[0-9A-Za-z#]{1,9}|@[\w-]*)[.)])[ \t]+").match
+# A line that ends in exactly three hyphens. pandoc opens a metadata block
+# at such a line after any prefix it reads as a container or a raw block: an
+# HTML tag, a comment, a footnote label or a list marker of any length.
+OPENER = re.compile(r"(?<!-)---$").search
 # A grid table's border at a line's end. pandoc reads grid cells as blocks,
 # so a cell can hold a metadata block.
 GRID_BORDER = re.compile(r"\+[-=:]+\+(?:[-=:]*\+)*$").search
@@ -169,7 +174,12 @@ def block_scalar_span(text: str, key: str) -> tuple[int, int] | None:
       value, which may run over lines, a one-line flow list of plain or
       quoted items without colons or other indicators, or plain text, which
       may continue on more deeply indented lines; ``- `` entries that hold
-      such a key or value; and comments. A value may start with anchors and
+      such a key or value; and comments. YAML reads a more deeply indented
+      line after plain text as more of that text, so such a line may not
+      open with an indicator such as ``-``. A key with an empty value takes
+      its value from the next deeper line, which must then hold plain text,
+      a key or a ``- `` entry, never a quote, a block indicator, an anchor,
+      a tag or an alias. A value may start with anchors and
       tags, or be an alias, which name or type it and set no key. Anchors
       and tags on keys, explicit ``?`` keys, quoted keys, flow mappings,
       other flow lists, directives, tabs in indentation and a quote still
@@ -184,8 +194,9 @@ def block_scalar_span(text: str, key: str) -> tuple[int, int] | None:
     - the key's block holds no text;
     - a body line, after list and block quote markers, names the key at its
       start or in flow style; ends in a grid table's border; or opens what
-      pandoc could read as a metadata block: a ``---`` line followed by a
-      line with text and later by a ``---`` or ``...`` line. Quarto deletes
+      pandoc could read as a metadata block: a line that ends in exactly
+      ``---``, whatever comes before it, followed by a line with any text
+      and later by a ``---`` or ``...`` line. Quarto deletes
       HTML comments before it looks for metadata blocks, so the body is
       checked as pandoc reads it and with comments deleted, as Quarto reads
       it.
@@ -238,16 +249,18 @@ def _marker_problem(block: str, key: str, first: int) -> str | None:
     whitespace includes characters, such as a no-break space, that pandoc
     reads as text, so these checks open more paragraphs and strip more
     indentation than pandoc does, never fewer."""
-    indent = None
+    lines = block.split("\n")
+    # YAML takes the block's indentation from its first line with anything
+    # but spaces and tabs, a no-break space included, so the least such
+    # indentation is never more than YAML's.
+    indent = min((len(line) - len(line.lstrip(" ")) for line in lines if line.strip(" \t\r")), default=0)
     opens = True
-    for number, line in enumerate(block.split("\n"), first):
+    for number, line in enumerate(lines, first):
         text = line.strip()
         if not text:
             opens = True
             continue
         lead = re.match(r"[ \t]*", line).group()
-        if indent is None:
-            indent = len(lead) - len(lead.lstrip(" "))
         if RULE_LINE(text):
             return (
                 f"line {number}, in the {key}, holds only hyphens or plus signs, which pandoc "
@@ -302,6 +315,10 @@ def _front_matter_block(header, key: str) -> tuple[int, int] | str:
     block = None  # [indentation its text must exceed, its text's indentation, opener's row]
     quote = None  # (quote character, line number) of a quoted value still open
     plain = None  # indentation a plain value's next lines must exceed to continue it
+    # Whether that value has yet to start: a key with no value on its line
+    # takes its value from the next deeper line, where YAML reads quotes,
+    # block indicators, anchors, tags and aliases as syntax.
+    pending = False
     rows = []
     span = None
     for row, (_, line) in enumerate(header):
@@ -348,13 +365,25 @@ def _front_matter_block(header, key: str) -> tuple[int, int] | str:
         if text[spaces] == "#":
             plain = None
             continue
+        if plain is not None and not pending and spaces > plain:
+            # YAML reads a deeper line after plain text as more of that text,
+            # even when it opens with "- " or holds a quote.
+            comment = COMMENT(text)
+            value = text[spaces:] if comment is None else text[spaces : comment.start()]
+            if not _plain(value, CONTINUATION_FIRST):
+                return unread
+            if comment is not None:
+                plain = None
+            continue
         entry = ENTRY(text)
         name, marks, rest = entry["key"], entry["marks"], entry["rest"]
         if name is None and not marks:
             comment = COMMENT(rest)
             value = rest if comment is None else rest[: comment.start()]
-            if plain is None or spaces <= plain or not _plain(value, CONTINUATION_FIRST):
+            first = PLAIN_FIRST if pending else CONTINUATION_FIRST
+            if plain is None or spaces <= plain or not _plain(value, first):
                 return unread
+            pending = False
             if comment is not None:
                 plain = None
             continue
@@ -370,6 +399,7 @@ def _front_matter_block(header, key: str) -> tuple[int, int] | str:
         rest = rest[PROPERTIES(rest).end() :]
         if not rest or rest.startswith("#"):
             plain = parent
+            pending = True
         elif BLOCK_INDICATOR(rest):
             block = [parent, None, row]
         elif FLOW_LIST(rest) or ALIAS(rest):
@@ -389,6 +419,7 @@ def _front_matter_block(header, key: str) -> tuple[int, int] | str:
             if not _plain(value):
                 return unread
             plain = parent if comment is None else None
+            pending = False
     if quote is not None:
         return f"a quote opened on line {quote[1]} is still open at the front matter's end"
     if block is not None and block[2] in rows:
@@ -426,8 +457,8 @@ def _view_problem(body: list[str], key: str, where: str, first_number: int) -> s
         if key_anywhere(uncontained[row]):
             return f"{place} could set {key}"
     fences = [line in FRONT_MATTER_ENDS for line in uncontained]
-    for row, line in enumerate(uncontained):
-        if line == "---" and row + 1 < len(body) and uncontained[row + 1] and any(fences[row + 2 :]):
+    for row, line in enumerate(body):
+        if OPENER(line) and row + 1 < len(body) and body[row + 1] and any(fences[row + 2 :]):
             return f"{where.format(first_number + row)} could open a metadata block, which sets the paper's metadata"
     return None
 
@@ -450,8 +481,10 @@ def stated_values(template: str, text: str, value: str = SIGNED_NUMBER) -> list[
     By default the slot takes a number at numeric-token boundaries, with any
     run of dashes before it, spaced or not, as its sign and with any number
     joined to it by dashes, a slash or a word such as "to", "and" or
-    "through", as a range. So the text's "12.29", "−2.29", "– 2.29",
-    "2.20–2.29", "2.20 to 2.29" or "2.20 and 2.29" never reads as "2.29". The
+    "through", as a range, with or without a word such as "percent" after
+    the first number. So the text's "12.29", "−2.29", "– 2.29", "2.20–2.29",
+    "2.20 to 2.29", "2.20 and 2.29" or "2.20 percent to 2.29" never reads as
+    "2.29". The
     slot starts only at the start of a whitespace-separated token or after
     "(", so "x2.29" reads as nothing. The template's words match only whole
     words, so "index" does not match "indexes". A template without exactly

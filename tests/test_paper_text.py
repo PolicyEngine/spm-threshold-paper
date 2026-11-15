@@ -16,6 +16,7 @@ import concurrent.futures
 import html.parser
 import importlib.util
 import random
+import re
 import shutil
 import subprocess
 import tempfile
@@ -131,6 +132,7 @@ class BlockScalarSpanTests(unittest.TestCase):
             "'abstract': A quoted copy.\n",
             "? abstract\n: |\n  An explicit copy.\n",
             "? abstract # a comment\n: |\n  An explicit copy.\n",
+            '"\\x61bstract": An escaped copy.\n',
         ):
             before = PAPER.replace('title: "Thresholds"\n', f'title: "Thresholds"\n{repeat}')
             after = PAPER.replace(CLOSE, f"{repeat}{CLOSE}")
@@ -168,6 +170,9 @@ class BlockScalarSpanTests(unittest.TestCase):
             "explicit nested key": PAPER.replace(
                 "  pdf:\n", "  html:\n    ? abstract\n    : Copy 9.99.\n  pdf:\n"
             ),
+            "key beside an empty block in a sequence entry": PAPER.replace(
+                'title: "Thresholds"\n', 'title: "Thresholds"\nnotes:\n  - text: |\n    abstract: Copy 9.99.\n'
+            ),
         }.items():
             with self.subTest(case=name):
                 self.assertIsNone(block_scalar_span(text, "abstract"))
@@ -196,6 +201,7 @@ class BlockScalarSpanTests(unittest.TestCase):
             "aliased key after a question mark in a flow mapping": '  html: {note: Why? "x, *k : Copy 9.99., c: y"}\n',
             "escaped key with an adjacent value": '  html: {"\\x61bstract":Copy 9.99.}\n',
             "flow sequence key with an adjacent value": "  html: {[abstract]:Copy 9.99.}\n",
+            "comment glued to a closing quote": '  html:\n    pagetitle: "x"#c\n',
         }.items():
             with self.subTest(case=name):
                 text = PAPER.replace("format:\n", f"format:\n{insert}")
@@ -246,6 +252,67 @@ class BlockScalarSpanTests(unittest.TestCase):
             with self.subTest(case=name):
                 self.assertIsNone(block_scalar_span(text, "abstract"))
 
+    def test_a_value_on_the_next_line_reads_only_as_plain_text(self):
+        """A key with nothing after it on its line takes its value from the
+        next deeper line, where YAML reads a quote, a block indicator, a tag,
+        an anchor or an alias as syntax. A quote there runs on over the
+        abstract's key line, and YAML then reads a later key that the
+        parser's own quote hides, so anything but plain text there fails
+        closed, a closed quote included. Plain text and nested keys there
+        still read."""
+        hidden = 'other: "\nabstract: Hidden 9.99.\nend: x "\n'
+        for name, (before, after) in {
+            "double quote": ('note:\n  "x\n', hidden),
+            "single quote": ("note:\n  'x\n", hidden.replace('"', "'")),
+            "quote after a comment on the key line": ('note: # see\n  "x\n', hidden),
+            "tagged quote": ('note:\n  !!str "x\n', hidden),
+            "quote under a key in a sequence entry": ('author:\n  - name:\n      "x\n', hidden),
+            "closed quote": ('note:\n  "x"\n', ""),
+            "alias": ("note:\n  *n\n", ""),
+            "block indicator": ("", 'note:\n  |\n  sub: "x\nabstract: Hidden 9.99.\nend: y "\n'),
+            "anchored block indicator": ("", 'note: &n\n  |\n  sub: "x\nabstract: Hidden 9.99.\nend: y "\n'),
+        }.items():
+            with self.subTest(case=name):
+                text = PAPER.replace("abstract: |\n", f"{before}abstract: |\n").replace(
+                    ABSTRACT_LINES, ABSTRACT_LINES + after
+                )
+                self.assertIsNone(block_scalar_span(text, "abstract"))
+        for lines in (
+            "note:\n  plain words\n",
+            "note:\n  plain words\n  over two lines\n",
+            "note: # see\n  plain words\n",
+            "author:\n  - name: Max\n    affiliation: PolicyEngine\n",
+        ):
+            with self.subTest(lines=lines):
+                text = PAPER.replace("abstract: |\n", f"{lines}abstract: |\n")
+                self.assertEqual(block_lines(text), ABSTRACT_LINES)
+
+    def test_a_deeper_line_after_plain_text_continues_it(self):
+        """YAML reads a deeper line after plain text as more of that text,
+        even when it opens with "- " or holds a quote, so it opens no
+        sequence entry and no quote. The parser reads such a line only as
+        plain text: one that opens with an indicator such as "-" fails
+        closed, and one that holds a quote reads."""
+        for name, lines in {
+            "dash and quote after a plain value": 'note: foo\n  - "q\nabstract: Hidden 9.99.\nend: y "\n',
+            "dash and quote after a sequence entry": 'keywords:\n  - poverty\n    - "q\nabstract: Hidden 9.99.\nend: y "\n',
+            "key after a plain value": "note: foo\n  sub: bar\n",
+            "line after a commented plain value": "note: foo # see\n  bar\n",
+        }.items():
+            with self.subTest(case=name):
+                text = PAPER.replace(ABSTRACT_LINES, ABSTRACT_LINES + lines)
+                self.assertIsNone(block_scalar_span(text, "abstract"))
+        for lines in (
+            'note: a\n  "b" c\n',
+            "note: a\n  b's c\n",
+            "keywords:\n  - poverty\n    lines\n",
+            'note:\n  plain words\n  "more" words\n',
+            'note:\n  sub: a\n    "b" c\n',
+        ):
+            with self.subTest(lines=lines):
+                text = PAPER.replace(ABSTRACT_LINES, ABSTRACT_LINES + lines)
+                self.assertEqual(block_lines(text), ABSTRACT_LINES)
+
     def test_markup_quarto_deletes_from_the_front_matter_fails_closed(self):
         """Quarto 1.9.36 deletes HTML comments and backtick code fences from
         the whole file before it reads the YAML, so a comment glued to a key
@@ -276,6 +343,8 @@ class BlockScalarSpanTests(unittest.TestCase):
         for value in (
             '"Thresholds for\n  the SPM"',
             "'The CE''s\n  thresholds'",
+            "'The\n  CE''s thresholds'",
+            "'The\n  CE''s\n  thresholds'",
             '"A \\"quoted\\"\n  word"',
             '"Data, *rolling*\n  forecasts"\nheader: |\n  abstract: not a key',
         ):
@@ -399,6 +468,28 @@ class BlockScalarSpanTests(unittest.TestCase):
                 "| ---                            |\n"
                 "+--------------------------------+\n"
             ),
+            "grid table in a list item": (
+                "- +--------------------------------+\n"
+                "  | ---                            |\n"
+                '  | "\\x61bstract": Body copy 9.99. |\n'
+                "  | ---                            |\n"
+                "  +--------------------------------+\n"
+            ),
+            "opener after an HTML tag": '<div>---\n"\\x61bstract": Body copy 9.99.\n---\n</div>\n',
+            "opener after a closing tag": '<div>\n\n</div>---\n"\\x61bstract": Body copy 9.99.\n---\n',
+            "opener after an empty tag": '<hr>---\n"\\x61bstract": Body copy 9.99.\n---\n',
+            "opener after a processing instruction": '<?x y?>---\n"\\x61bstract": Body copy 9.99.\n---\n',
+            "opener after a footnote label": "Text.[^n]\n\n[^n]:---\n    !!str abstract: Body copy 9.99.\n    ---\n",
+            "opener after a ten-digit list marker": (
+                "1234567890. ---\n            &a abstract: Body copy 9.99.\n            ---\n"
+            ),
+            "opener after a definition marker": "Term\n\n: ---\n    !!str abstract: Body copy 9.99.\n    ---\n",
+            "opener in a block quote in a list item": (
+                "- > ---\n  > !!str abstract: Body copy 9.99.\n  > ---\n"
+            ),
+            "opener with trailing spaces": '---  \n"\\x61bstract": Body copy 9.99.\n---  \n',
+            "opener before a YAML comment": '---\n#. >\n"\\x61bstract": Body copy 9.99.\n---\n',
+            "opener before a bare block quote marker": '---\n  >\n"\\x61bstract": Body copy 9.99.\n---\n',
         }.items():
             with self.subTest(case=name):
                 self.assertIsNone(block_scalar_span(with_body(insert), "abstract"))
@@ -414,6 +505,10 @@ class BlockScalarSpanTests(unittest.TestCase):
             "---\n\nText after a break.\n",
             "Text.\n\n---\nMore.",
             "---\n\nText between two breaks.\n\n---\n",
+            "---\n---\n",
+            "----\nText under a rule.\n\n---\n",
+            "<hr>---\n\nText after a rule.\n\n---\n",
+            "Text with +----+ inside.\n",
         ):
             with self.subTest(insert=insert):
                 self.assertEqual(block_lines(with_body(insert)), ABSTRACT_LINES)
@@ -428,6 +523,7 @@ class BlockScalarSpanTests(unittest.TestCase):
             "? abstracts",
             "The title, abstract and keywords.",
             "{abstracts: 9.99}",
+            "- > abstracts: 9.99 percent",
         ):
             with self.subTest(line=line):
                 self.assertEqual(block_lines(with_body(line)), ABSTRACT_LINES)
@@ -627,6 +723,10 @@ class BlockScalarSpanTests(unittest.TestCase):
                 "line 3, in the front matter, holds an HTML comment or a code fence, "
                 "which Quarto deletes before it reads the YAML",
             ),
+            "quoted key": (
+                PAPER.replace("abstract: |\n", '"abstract": |\n'),
+                f"line {key_row}, in the front matter, is YAML the guard does not read",
+            ),
             "key line with a comment": (
                 PAPER.replace("abstract: |\n", "abstract: | # note\n"),
                 f"line {key_row}, in the front matter, sets abstract other than on a top-level abstract: | line",
@@ -652,6 +752,27 @@ class BlockScalarSpanTests(unittest.TestCase):
             "body key": (
                 with_body("- abstract: Body copy 9.99.\n"),
                 f"line {PAPER.count(chr(10)) + 2}, in the body, could set abstract",
+            ),
+            "body key behind two containers": (
+                with_body("- > abstract: Body copy 9.99.\n"),
+                f"line {PAPER.count(chr(10)) + 2}, in the body, could set abstract",
+            ),
+            "body key after an example marker": (
+                with_body("(@) abstract: Body copy 9.99.\n"),
+                f"line {PAPER.count(chr(10)) + 2}, in the body, could set abstract",
+            ),
+            "body key after a parenthesized number": (
+                with_body("1) abstract: Body copy 9.99.\n"),
+                f"line {PAPER.count(chr(10)) + 2}, in the body, could set abstract",
+            ),
+            "body key in a definition": (
+                with_body("Term\n\n: abstract: Body copy 9.99.\n"),
+                f"line {PAPER.count(chr(10)) + 4}, in the body, could set abstract",
+            ),
+            "hidden body opener": (
+                with_body('<div>---\n"\\x61bstract": Body copy 9.99.\n---\n</div>\n'),
+                f"line {PAPER.count(chr(10)) + 2}, in the body, could open a metadata block, "
+                "which sets the paper's metadata",
             ),
             "comment-glued body fences": (
                 with_body('<!-- -->---\n"\\x61bstract": Body copy 9.99.\n<!-- -->---\n'),
@@ -793,6 +914,34 @@ class BlockWordsTests(unittest.TestCase):
                 "  First line\n  : 9.99 percent\n",
                 "line 10, in the abstract, opens with ':', which pandoc reads as a definition list marker",
             ),
+            "definition after a tab": (
+                "  First line\n  :\t9.99 percent\n",
+                "line 10, in the abstract, opens with ':', which pandoc reads as a definition list marker",
+            ),
+            "lone colon": (
+                "  First line\n  :\n",
+                "line 10, in the abstract, opens with ':', which pandoc reads as a definition list marker",
+            ),
+            "uppercase roman numeral": (
+                "  First line.\n\n  IV. 9.99 percent\n",
+                "line 11, in the abstract, opens a paragraph with 'IV.', which pandoc reads as a list marker",
+            ),
+            "uppercase letter": (
+                "  First line.\n\n  B) 9.99 percent\n",
+                "line 11, in the abstract, opens a paragraph with 'B)', which pandoc reads as a list marker",
+            ),
+            "tab after a marker": (
+                "  First line.\n\n  1.\t9.99 percent\n",
+                "line 11, in the abstract, opens a paragraph with '1.', which pandoc reads as a list marker",
+            ),
+            "ten-digit number": (
+                "  1234567890. 9.99 percent\n",
+                "line 9, in the abstract, opens a paragraph with '1234567890.', which pandoc reads as a list marker",
+            ),
+            "number after a code block under a no-break space": (
+                "  \xa0\n\n      The blend yields 1.17 percent in\n   2025. The next sentence.\n",
+                "line 12, in the abstract, opens a paragraph with '2025.', which pandoc reads as a list marker",
+            ),
         }.items():
             with self.subTest(case=name):
                 text = with_lines(lines)
@@ -858,6 +1007,12 @@ class StatedValuesTests(unittest.TestCase):
             "2.20 - 2.29",
             "2.20 to 2.29",
             "2.20 to\n  2.29",
+            "2.20 vs 2.29",
+            "2.20 till 2.29",
+            "2.20 To 2.29",
+            "2.20 AND 2.29",
+            "2.20 percent to 2.29",
+            "2.20 percent and 2.29",
         ):
             with self.subTest(value=value):
                 text = f"of {value} percent with the Consumer Price Index"
@@ -888,6 +1043,8 @@ class StatedValuesTests(unittest.TestCase):
         for text, expected in (
             ("of x2.29 percent with the Consumer Price Index", []),
             ("of US2.29 percent with the Consumer Price Index", []),
+            ('of "2.29 percent with the Consumer Price Index', []),
+            ("of +2.29 percent with the Consumer Price Index", []),
             ("of (2.29 percent with the Consumer Price Index", ["2.29"]),
             ("of\n2.29 percent with the Consumer Price Index", ["2.29"]),
         ):
@@ -1452,6 +1609,23 @@ EDGE_CASES = {
     ),
     "signed figures opening paragraphs": with_lines("  +1.04 points.\n\n  -0.63 points and \u22120.63.\n"),
     "en dash line and inner colon": with_lines("  Rates: 9.99\n  \u2013\u2013\n  :not a marker.\n"),
+    "plain value on the line after its key": PAPER.replace("abstract: |\n", "note:\n  plain words\nabstract: |\n"),
+    "quote continuing a plain value": PAPER.replace(ABSTRACT_LINES, ABSTRACT_LINES + 'note: a\n  "b" c\n'),
+    "quote on the line after its key, over the key line": PAPER.replace(
+        "abstract: |\n", 'note:\n  "x\nabstract: |\n'
+    ).replace(ABSTRACT_LINES, ABSTRACT_LINES + 'other: "\nabstract: Hidden 9.99.\nend: x "\n'),
+    "block indicator on the line after its key": PAPER.replace(
+        ABSTRACT_LINES, ABSTRACT_LINES + 'note:\n  |\n  sub: "x\nabstract: Hidden 9.99.\nend: y "\n'
+    ),
+    "dash and quote continuing a plain value": PAPER.replace(
+        ABSTRACT_LINES, ABSTRACT_LINES + 'note: foo\n  - "q\nabstract: Hidden 9.99.\nend: y "\n'
+    ),
+    "body opener after an HTML tag": with_body('<div>---\n"\\x61bstract": Body copy 9.99.\n---\n</div>\n'),
+    "body opener before a YAML comment": with_body('---\n#. >\n"\\x61bstract": Body copy 9.99.\n---\n'),
+    "rule tag before a blank line": with_body("<hr>---\n\nText after a rule.\n\n---\n"),
+    "no-break space line before a code block": with_lines(
+        "  \xa0\n\n      The blend yields 1.17 percent in\n   2025. The next sentence.\n"
+    ),
 }
 
 # The edge cases from which the parser reads an abstract; it fails closed on
@@ -1491,6 +1665,9 @@ EDGE_CASES_READ = frozenset(
         "bullet and number mid-paragraph",
         "signed figures opening paragraphs",
         "en dash line and inner colon",
+        "plain value on the line after its key",
+        "quote continuing a plain value",
+        "rule tag before a blank line",
     )
 )
 
@@ -1514,14 +1691,21 @@ class PandocAgreementTests(unittest.TestCase):
 
     def rendered(self, text):
         """The words pandoc renders as the abstract, or None when pandoc
-        rejects the document."""
+        rejects the document. pandoc writes HTML here, since its plain writer
+        would write a list's markers back as text, and the abstract may render
+        only as paragraphs, line breaks or code, which keep its words."""
         result = subprocess.run(
-            [PANDOC, "--from=markdown", "--to=plain", f"--template={self.template}"],
+            [PANDOC, "--from=markdown", "--to=html", f"--template={self.template}"],
             input=text.encode(),
             capture_output=True,
             check=False,
         )
-        return None if result.returncode else words(result.stdout.decode())
+        if result.returncode:
+            return None
+        rendered = result.stdout.decode()
+        tags = set(re.findall(r"</?([A-Za-z][A-Za-z0-9]*)", rendered))
+        self.assertLessEqual(tags, {"p", "br", "pre", "code"}, rendered)
+        return words(html.unescape(re.sub(r"<[^>]*>", " ", rendered)))
 
     def agrees(self, text):
         """Whether the parser read an abstract that pandoc renders, after

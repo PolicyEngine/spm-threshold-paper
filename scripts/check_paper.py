@@ -784,6 +784,10 @@ check(
 # parser cannot read the block (paper_text.block_scalar_span lists when),
 # every tie fails and the guard says why.
 ABSTRACT = front_matter_block("abstract")
+# Every figure an abstract tie checks, as the abstract writes it. The check
+# at the end of this file requires the abstract to state each one exactly
+# once and no other decimal.
+ABSTRACT_FIGURES = []
 
 
 def abstract_states(template: str, literal: str) -> bool:
@@ -842,6 +846,7 @@ check(
 for rule, value in retrospective.items():
     check(f"current projection prose {rule}", has_number(f"{value:.2f}"))
     rule_phrase = ABSTRACT_RETROSPECTIVE_RULES.get(rule, "<unnamed rule>")
+    ABSTRACT_FIGURES.append(f"{value:.2f}")
     check(
         f"abstract current projection {rule} {value:.2f}",
         abstract_states(f"{{}} percent {rule_phrase}", f"{value:.2f}"),
@@ -880,6 +885,7 @@ for label, value, literal, abstract_phrase in [
     rounds_to_literal = f"{value:.2%}".rstrip("%") == literal
     check(label, has_number(literal) and rounds_to_literal)
     if abstract_phrase is not None:
+        ABSTRACT_FIGURES.append(literal)
         check(
             f"abstract {label}",
             rounds_to_literal
@@ -2135,19 +2141,18 @@ inkind_pins = (
 for label, ok in inkind_pins:
     check(f"in-kind prose: {label}", ok)
 
-# Every decimal the abstract states is one of the figures its ties check,
-# written as a bare number, so a changed figure, a sign, a range or an added
-# figure fails even beside a correct copy, and a statement whose wording
-# changed cannot hide a drifted figure from its tie.
-ABSTRACT_FIGURES = (
-    {f"{value:.2f}" for value in retrospective.values()}
-    | {"1.17", "0.75", "2.58"}
-    | set(lift_literal.split(" to "))
-)
-abstract_decimals = {token.strip("(),.;:") for token in re.findall(r"\S*\d\.\d\S*", ABSTRACT)}
+# The abstract states each figure its ties check exactly once, written as a
+# bare number, and no other decimal. A token counts as a decimal when it
+# holds a point or a comma before a digit, so ".85" and "2,31" count. So a
+# changed, signed or added figure, a range or a unit glued to a figure fails
+# even beside a correct copy, a statement whose wording changed cannot hide
+# a drifted figure from its tie, and a tied figure restated in other wording,
+# or a correct copy beside a changed statement, fails as a second copy.
+ABSTRACT_FIGURES += lift_literal.split(" to ")
+abstract_decimals = [token.strip("(),.;:") for token in re.findall(r"\S*[.,]\d\S*", ABSTRACT)]
 check(
-    "abstract states only its tied figures, each as a bare number",
-    bool(ABSTRACT) and abstract_decimals == ABSTRACT_FIGURES,
+    "abstract states only its tied figures, each once and as a bare number",
+    bool(ABSTRACT) and sorted(abstract_decimals) == sorted(ABSTRACT_FIGURES),
 )
 
 if failures:

@@ -962,9 +962,10 @@ INKIND_PROSE_MUTATIONS = (
 )
 
 # The guard's label when it cannot read the abstract, before its reason, and
-# the label of its check that every decimal in the abstract is a tied figure.
+# the label of its check that the abstract states each tied figure once and
+# no other decimal.
 ABSTRACT_UNREAD = "paper's abstract cannot be read:"
-ABSTRACT_INVENTORY = "abstract states only its tied figures, each as a bare number"
+ABSTRACT_INVENTORY = "abstract states only its tied figures, each once and as a bare number"
 
 # Each case drifts figures in the abstract alone: (name, pattern, replacement,
 # failing ties, decoy). The body or a generated table states every one of these
@@ -973,9 +974,10 @@ ABSTRACT_INVENTORY = "abstract states only its tied figures, each as a bare numb
 # or for the first or last rate it found, would pass the edited paper. The
 # slot reads a sign typed as any dash and a range joined by a dash, a slash,
 # "to" or "and" whole, so each fails beside a copy too, as does the
-# inventory of the abstract's figures. Only ABSTRACT_RULE_RENAMES, which
-# leave no statement of the rule's wording, pass beside a copy inside the
-# abstract. The wording-removal cases in
+# inventory of the abstract's figures. A copy inside the abstract restates
+# figures the abstract already states, so the inventory fails beside it
+# too, and it fails alone for ABSTRACT_RULE_RENAMES, which leave no
+# statement of the rule's wording. The wording-removal cases in
 # test_abstract_ties_skip_wording_outside_the_block catch a tie that reads
 # past the block, and test_abstract_markup_fails_every_abstract_tie covers
 # emphasis and other markup.
@@ -1130,7 +1132,8 @@ ABSTRACT_PROSE_MUTATIONS = (
 ABSTRACT_DECOY_HOSTS = ("discussion", "metadata", "preamble", "abstract", "abstract start")
 # Cases that rename a rule, so that the edited sentence states no rate in the
 # rule's wording. A copy of the original sentence inside the abstract then
-# states the rule's rate correctly.
+# states the rule's rate correctly, and only the inventory fails, since the
+# abstract now states that rate twice.
 ABSTRACT_RULE_RENAMES = ("CPI-U rule renamed CPI-W", "blend rule renamed")
 
 # Every tie this file's abstract mutations target.
@@ -2133,18 +2136,64 @@ class PaperGuardTests(unittest.TestCase):
     def test_abstract_pins_reject_a_copy_restated_elsewhere(self):
         """With the original wording restated in the discussion, in another
         metadata field, in body text before the introduction or inside the
-        abstract itself, only the abstract's own ties fail. A renamed rule is
-        the one exception: a correct copy inside the abstract still states
-        that rule's rate, so the guard passes the paper."""
+        abstract itself, only the abstract's own checks fail. A copy inside
+        the abstract restates figures the abstract already states, so the
+        figure check fails beside it too. A renamed rule's tie passes beside
+        such a copy, which states the rule's rate, and the figure check
+        fails alone."""
         for host in ABSTRACT_DECOY_HOSTS:
             for name, pattern, replacement, labels, decoy in ABSTRACT_PROSE_MUTATIONS:
                 with self.subTest(host=host, name=name):
                     result = self.run_abstract_mutation(pattern, replacement, decoy, host)
-                    if name in ABSTRACT_RULE_RENAMES and host.startswith("abstract"):
-                        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-                        continue
+                    expected = set(labels)
+                    if host.startswith("abstract") and re.search(r"\d\.\d", decoy):
+                        expected.add(ABSTRACT_INVENTORY)
+                        if name in ABSTRACT_RULE_RENAMES:
+                            expected = {ABSTRACT_INVENTORY}
                     self.assertNotEqual(result.returncode, 0)
-                    self.assertEqual(sorted(failure_lines(result.stdout)), sorted(labels))
+                    self.assertEqual(sorted(failure_lines(result.stdout)), sorted(expected))
+        self.install_article()
+
+    def test_abstract_figure_check_counts_each_figure(self):
+        """The figure check alone catches a decimal that no tie reads: one
+        written without its leading zero or with a decimal comma, a tied
+        figure restated in other wording, and the in-kind lift range reversed
+        beside a correct copy. A range whose first end carries the rule's
+        unit fails that rule's tie too."""
+        self.install_article()
+        block = PAPER_TEXT.block_words((self.repo / "paper/index.qmd").read_text(), "abstract")
+        low, high = re.search(r"thresholds by (\d+\.\d+) to (\d+\.\d+) percent", block).groups()
+        renters = r"renters\."
+        cases = (
+            ("decimal without a leading zero", ((renters, "renters, at .85 percent."),), [ABSTRACT_INVENTORY]),
+            ("decimal comma", ((renters, "renters, at 2,31 percent."),), [ABSTRACT_INVENTORY]),
+            (
+                "tied figure in other wording",
+                ((renters, "renters. The blend's error of 0.75 percent leads."),),
+                [ABSTRACT_INVENTORY],
+            ),
+            (
+                "lift range reversed beside a correct copy",
+                (
+                    (r"by(\s+)(\d+\.\d+)(\s+)to(\s+)(\d+\.\d+)(\s+)percent", r"by\1\5\3to\4\2\6percent"),
+                    (renters, f"renters. We estimate that they raise replicated thresholds by {low} to {high} percent."),
+                ),
+                [ABSTRACT_INVENTORY],
+            ),
+            (
+                "range with the unit after its first end",
+                ((r"2\.29(\s+)percent(\s+)with", r"0.90 percent to 2.29\1percent\2with"),),
+                ["abstract current projection cpi_u 2.29", ABSTRACT_INVENTORY],
+            ),
+        )
+        for name, edits, labels in cases:
+            with self.subTest(case=name):
+                self.install_article()
+                for pattern, replacement in edits:
+                    self.mutate_article("abstract", pattern, replacement)
+                result = self.run_guard()
+                self.assertNotEqual(result.returncode, 0)
+                self.assertEqual(sorted(failure_lines(result.stdout)), sorted(labels))
         self.install_article()
 
     def test_abstract_ties_ignore_the_introduction_heading(self):
