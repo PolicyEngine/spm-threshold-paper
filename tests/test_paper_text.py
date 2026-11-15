@@ -18,6 +18,7 @@ import importlib.util
 import random
 import re
 import shutil
+import string
 import subprocess
 import tempfile
 import textwrap
@@ -925,6 +926,10 @@ class BlockScalarSpanTests(unittest.TestCase):
             'title: "Thresholds"\n', 'title: "Thresholds"\nab_tract: Other\nabXtract: Other\n'
         ) + "\nabXtract: Body\n"
         self.assertEqual(block_lines(lookalike, "ab-tract"), ABSTRACT_LINES)
+        # Each ASCII letter and "_" may open a key, and each ASCII letter and
+        # digit, "_" and "-" may follow.
+        every_character = [(f"{first}: x", True) for first in string.ascii_letters + "_"]
+        every_character.append((f"x{string.ascii_letters}{string.digits}_-: x", True))
         for line, reads in (
             ("_note-2: x", True),
             ("titl\u00e9: x", False),
@@ -943,6 +948,7 @@ class BlockScalarSpanTests(unittest.TestCase):
             ("it's: x", False),
             ("a\u2013b: x", False),
             ("a\u0663: x", False),
+            *every_character,
         ):
             with self.subTest(line=line):
                 text = PAPER.replace('title: "Thresholds"\n', f'title: "Thresholds"\n{line}\n')
