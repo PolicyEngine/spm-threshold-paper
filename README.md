@@ -55,14 +55,14 @@ version 0.5.0 at commit
 The in-kind benefit experiment uses three receipts from spm-calculator, which
 we keep in [`data/inkind`](data/inkind) with their provenance and checksums:
 the imputation, the comparison with BLS's components and the
-replicate-weight standard errors, all at commit `e602bc77bcd0c9f7cb9ed6ec43e295b70d4951e3`. Tags
-`paper-inkind-components-e602bc7` and `paper-inkind-se-e602bc7` in
+replicate-weight standard errors, all at commit `2321f2f462fde3fcf99554413d1910060b180be7`. Tags
+`paper-inkind-components-2321f2f` and `paper-inkind-se-2321f2f` in
 spm-calculator point at that commit, so a default clone holds it. To regenerate the receipts, run these scripts in
 spm-calculator at that commit: `scripts/replicate_ce_inkind.py`
 writes the imputation receipt, `scripts/compare_ce_inkind_bls_shares.py` the
 comparison with BLS's components, and `scripts/estimate_ce_replicate_uncertainty.py`
 the standard errors. The calculator's
-[in-kind page](https://github.com/PolicyEngine/spm-calculator/blob/e602bc77bcd0c9f7cb9ed6ec43e295b70d4951e3/docs/ce-inkind-imputation.md)
+[in-kind page](https://github.com/PolicyEngine/spm-calculator/blob/2321f2f462fde3fcf99554413d1910060b180be7/docs/ce-inkind-imputation.md)
 lists the inputs each script needs. The guard
 recomputes every in-kind estimate and standard error in the tables and text
 and checks that the run without home internet or benefits reproduces the

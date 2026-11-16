@@ -72,9 +72,11 @@ AMOUNTS = ("imputed_total", "rental_assistance_per_renter", "school_lunch")
 # out-of-pocket run, and ``without_in_kind`` and ``with_in_kind`` both carry
 # home internet. Earlier schemas used ``without_in_kind`` for the run without
 # it, so an earlier receipt must fail here rather than pass with that meaning.
+# Replicate schema 3 renames a full-sample check and records the threshold
+# series' hash; this module reads neither.
 REPLICATION_SCHEMA = 2
 COMPONENTS_SCHEMA = 3
-UNCERTAINTY_SCHEMA = 2
+UNCERTAINTY_SCHEMA = 3
 STAGES = ("without_home_internet", "without_in_kind", "with_in_kind")
 # The component receipt's two accountings of the Other share.
 ACCOUNTINGS = ("other_spread", "other_separate")
@@ -115,16 +117,16 @@ BLS_REVISED_SEGMENT = "revised_2019_2024"
 # path>`` in PolicyEngine/spm-calculator when we copied the receipt here.
 RECEIPT_PINS = {
     REPLICATION: (
-        "d17a7af4f75e0db61ab5d8ec466453896f7c3d9db1d26c6f1737ce6ab2d8d847",
-        "e602bc77bcd0c9f7cb9ed6ec43e295b70d4951e3",
+        "d1e83652e9857a881dcb6cf61505cc5af0e6b2549c9f6c7ac9220f202d34f29b",
+        "2321f2f462fde3fcf99554413d1910060b180be7",
     ),
     COMPONENTS: (
-        "a39d9e4cd012bcef04f9dbb3d3f1a938a69c6c2c6998d738acbf931507240243",
-        "e602bc77bcd0c9f7cb9ed6ec43e295b70d4951e3",
+        "4e2e274b45e9b4ae979400b1063199ff8533046ce53ea5eb360135c71b3bdd41",
+        "2321f2f462fde3fcf99554413d1910060b180be7",
     ),
     UNCERTAINTY: (
-        "81f6b704b266bcc0e7d75d9c061e46e1feef96a6cb69a9b6cb1a775cd6f78387",
-        "e602bc77bcd0c9f7cb9ed6ec43e295b70d4951e3",
+        "1e0e705b7653100861a0d996feb5574e0d74f6c40c63eae5ba2d11fe69f6758d",
+        "2321f2f462fde3fcf99554413d1910060b180be7",
     ),
 }
 # The growth window whose standard errors the section reports.

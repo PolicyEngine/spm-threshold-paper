@@ -1,18 +1,19 @@
 {
-  "calculator_commit": "e602bc77bcd0c9f7cb9ed6ec43e295b70d4951e3",
+  "calculator_commit": "2321f2f462fde3fcf99554413d1910060b180be7",
   "ce_bundles": {
     "intrvw22.zip": "c99a2f47c0084b7a88812b34c56a1a288be2798ff010b2b59dcf87e072773e17",
     "intrvw23.zip": "97e9a17edeee28e77a3fd5a7d874e5f4b9034222be204e25b0d902f4c82235ac"
   },
   "code_sha256": {
     "spm_calculator/ce_decomposition.py": "39be6fc2ceef0764cbf1133a1f4ea39c67a4de6a4e781357f717a7a82d0e00c0",
-    "spm_calculator/ce_inkind.py": "25f93fb8b996b5e623ab564d70e2eedfbc4daa11ff96850f06e76ef229aef0b8",
+    "spm_calculator/ce_inkind.py": "97d0b6b76982bab9d9c7e9d15d5c1723f667adbbfe54432533eaf1ebf198bdd8",
     "spm_calculator/ce_inkind_stage.py": "68e881d04cfc8c35f5ca11fd7b6b60d88abfb0bc26921ad93f7ba8a390a8fd8c",
-    "spm_calculator/ce_internet.py": "b265a73ae47738d49f65f7c0c9dda9e244c344bb193d634e388b28fc9b20a23e",
+    "spm_calculator/ce_internet.py": "c0a1a928b708a418cacef585f07c53a5da84b551d6540733251d9c5ca0fc0f73",
     "spm_calculator/ce_threshold.py": "4efbe2b03f6b1f4eb2911ab0f79f5151bd655cc1e5addf42f5c4540ace1f852f",
     "spm_calculator/cps_asec.py": "ac4a1ae3b28d34fa3dfbbe5879c88d0274a0e6e46423694bb48808d4f7cf2cc8",
     "spm_calculator/equivalence_scale.py": "95c797adca4811b0a2c4202e8471f6cd46fcd259bf46b34da74588ab08b41326",
-    "spm_calculator/fcsuti_cpi.py": "cf8fbe9103846d83a280bcd4f13b9ddd91e8baa94e2668b9ef288c7cc980a5fc"
+    "spm_calculator/fcsuti_cpi.py": "cf8fbe9103846d83a280bcd4f13b9ddd91e8baa94e2668b9ef288c7cc980a5fc",
+    "spm_calculator/published_thresholds.py": "bbed3fb2c1658e86172917148f986383c86ba673be1055d9688e8a53600ae2ba"
   },
   "collection_quarters": [
     "2022Q2",
@@ -26,7 +27,7 @@
     "sigma": 0.4682813284091317
   },
   "generated_by": "scripts/rent_sensitivity.py",
-  "generated_on": "2026-11-15",
+  "generated_on": "2026-11-16",
   "limitations": [
     "One reference year, 2022, from CE interviews collected from 2022Q2 through 2023Q1",
     "Amounts are per assisted renter across the CE, not within the 47th-53rd percentile band",
@@ -41,7 +42,7 @@
   "reference_year": 2022,
   "replication_receipt": {
     "path": "data/inkind/ce_inkind_replication_2019_2025.json",
-    "sha256": "d17a7af4f75e0db61ab5d8ec466453896f7c3d9db1d26c6f1737ce6ab2d8d847"
+    "sha256": "d1e83652e9857a881dcb6cf61505cc5af0e6b2549c9f6c7ac9220f202d34f29b"
   },
   "runtime": {
     "numpy": "2.4.1",

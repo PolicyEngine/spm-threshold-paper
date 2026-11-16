@@ -1353,14 +1353,15 @@ def displayed_shares() -> list[float] | None:
 
 # Method constants the section quotes from the calculator's code rather
 # than from a receipt. We read each from spm_calculator/ce_inkind.py at
-# this fingerprint (calculator commit e602bc7). Since 4778dfa, the file has
+# this fingerprint (calculator commit 2321f2f). Since 4778dfa, the file has
 # changed two rules: the 2020 WIC cutoff, quoted below, and the broadband
 # start (reference year 2022), which the receipt records and a pin below
-# reads. A receipt rebuilt from changed code fails the pin until someone
-# rereads them.
+# reads. Since e602bc7 it has changed only a docstring and the status its
+# diagnostics give a program before its first reference year. A receipt
+# rebuilt from changed code fails the pin until someone rereads them.
 INKIND_METHOD_SOURCE = (
     "spm_calculator/ce_inkind.py",
-    "25f93fb8b996b5e623ab564d70e2eedfbc4daa11ff96850f06e76ef229aef0b8",
+    "97d0b6b76982bab9d9c7e9d15d5c1723f667adbbfe54432533eaf1ebf198bdd8",
 )
 INKIND_METHOD_CONSTANTS = (
     "over 179 school days",  # NSLP_SCHOOL_DAYS
@@ -1436,14 +1437,15 @@ INKIND_THRESHOLD_CONSTANTS = (
     "include no WIC",
 )
 # Rules the section quotes from spm_calculator/ce_bls_shares.py at this
-# fingerprint (calculator commit e602bc7; every rule but the reading with the
+# fingerprint (calculator commit 2321f2f; every rule but the reading with the
 # Other share kept separate is unchanged since 8f632e3, and since 28740b5 the
-# file has changed only its docstring, an import, and unit_components, which
-# now reads home internet from the frame): the Garner–Munoz runs and the
-# reading of BLS's internet rows.
+# file has changed only its docstrings, an import, and unit_components, which
+# now reads home internet from the frame and, since e602bc7, raises when a
+# frame carries home internet that its FCSUti leaves out): the Garner–Munoz
+# runs and the reading of BLS's internet rows.
 INKIND_DEFINITION_SOURCE = (
     "spm_calculator/ce_bls_shares.py",
-    "832a658cb3c7e8706d60ad96355fc17192ad82722d29958101524ffcc608e64b",
+    "288864009d0156277a8bf7f163e7792c9499f4340953461dac20aabb0cd6cf5d",
 )
 INKIND_DEFINITION_CONSTANTS = (
     # _vacation_utilities takes both vacation-home utility summaries from
@@ -1480,11 +1482,13 @@ INKIND_SHARES_CONSTANTS = (
     "share for Other and for each component, including home internet, within the same bound",
 )
 # The home internet rules the section quotes from spm_calculator/ce_internet.py
-# at this fingerprint (calculator commit e602bc7). Both receipts record it, and
-# a receipt rebuilt from changed code fails the pin until someone rereads them.
+# at this fingerprint (calculator commit 2321f2f; since e602bc7 the file has
+# added a check that the CPI series include CUUR0000SEEE03 and reworded its
+# note on UCC 690116). Both receipts record it, and a receipt rebuilt from
+# changed code fails the pin until someone rereads them.
 INKIND_INTERNET_SOURCE = (
     "spm_calculator/ce_internet.py",
-    "b265a73ae47738d49f65f7c0c9dda9e244c344bb193d634e388b28fc9b20a23e",
+    "c0a1a928b708a418cacef585f07c53a5da84b551d6540733251d9c5ca0fc0f73",
 )
 INKIND_INTERNET_CONSTANTS = (
     # read_internet_costs sums the COST of a unit's MTBI rows whose UCC is
@@ -1629,7 +1633,7 @@ def wic_by_state_pin() -> bool:
 # The rental-assistance sensitivities: scripts/rent_sensitivity.py writes this
 # receipt, so replacing it takes an edit here.
 RENT_SENSITIVITY = DATA / "rent_sensitivity" / "rent_model_sensitivity_2022.json"
-RENT_SENSITIVITY_SHA256 = "02ac935fcc9bbe2724573b8e89931d0b3d51ad99018ed405d649c129130ab426"
+RENT_SENSITIVITY_SHA256 = "5df35aa1e90f6575d0469344bdcb4dd914e85d895d94e734c3e15a249c2ff91f"
 rent_sensitivity = json.loads(RENT_SENSITIVITY.read_text())
 rent_variants = {
     name: row["percent_vs_base"] for name, row in rent_sensitivity["variants"].items()
@@ -2143,8 +2147,8 @@ inkind_pins = (
         # series and ours, inkind_inputs rebuilds both from the band means
         # without internet, so internet stays in B - I on both sides.
         "home internet counts with out-of-pocket spending in the accounting",
-        "Home internet is out-of-pocket spending in its own component; no in-kind total, share or contribution "
-        "includes it" in inkind_inputs["components"]["limitations"]
+        "We count home internet as out-of-pocket spending in its own component, and no in-kind total, share or "
+        "contribution includes it" in inkind_inputs["components"]["limitations"]
         and has_number("In both series, we count home internet with out-of-pocket spending", text=GROWTH_TEXT),
     ),
     (

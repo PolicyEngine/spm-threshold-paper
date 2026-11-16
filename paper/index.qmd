@@ -1225,9 +1225,9 @@ digest is:
 
 For the in-kind experiment in @sec-inkind, we keep three receipts from
 spm-calculator, with their provenance and checksums, in the paper
-repository's [`data/inkind`](https://github.com/PolicyEngine/spm-threshold-paper/tree/inkind-receipts-e602bc7/data/inkind) folder: the imputation, the comparison with BLS's components, and the
+repository's [`data/inkind`](https://github.com/PolicyEngine/spm-threshold-paper/tree/inkind-receipts-2321f2f/data/inkind) folder: the imputation, the comparison with BLS's components, and the
 replicate-weight standard errors, all at commit
-`e602bc77bcd0c9f7cb9ed6ec43e295b70d4951e3`. Before each render, we
+`2321f2f462fde3fcf99554413d1910060b180be7`. Before each render, we
 check that the run without home internet or benefits reproduces the
 retrospective replication artifact exactly. We then recompute every in-kind estimate
 in the tables and text from the receipts' thresholds, band means, and
@@ -1244,7 +1244,7 @@ provenance](https://github.com/PolicyEngine/spm-threshold-paper/blob/20bfbe1abcb
 and [forecast
 record](https://github.com/PolicyEngine/spm-threshold-paper/blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0/docs/forecast-record.md)
 identify the inputs and evidence of the earlier experiments, and
-[`data/inkind/provenance.json`](https://github.com/PolicyEngine/spm-threshold-paper/blob/inkind-receipts-e602bc7/data/inkind/provenance.json)
+[`data/inkind/provenance.json`](https://github.com/PolicyEngine/spm-threshold-paper/blob/inkind-receipts-2321f2f/data/inkind/provenance.json)
 those of the in-kind experiment.
 
 To verify the reported tables, clone the paper repository with its full

@@ -1,6 +1,6 @@
 {
   "accountings": {
-    "other_separate": "0.2 FCSUti forms its own 'other' term, as in the 'Other Share' row of BLS's shares workbook, and broadband takes each tenure's own mean, so each term over the threshold gives the component's share as BLS publishes it",
+    "other_separate": "0.2 FCSUti forms its own 'other' term, as in the 'Other Share' row of BLS's shares workbook, and broadband takes each tenure's own mean, so each term over the threshold gives the component's share as BLS publishes it, except home internet, which matches the tenure-invariant internet row less broadband",
     "other_spread": "Each term carries its component's part of the 1.2 multiplier, spreading 0.2 FCSUti in proportion to size, so a term gives what the threshold would lose without the component, with the band held fixed"
   },
   "bls": {
@@ -743,13 +743,13 @@
   },
   "classification": "current_retrospective_research",
   "code_sha256": {
-    "scripts/compare_ce_inkind_bls_shares.py": "f8133e73ab81f9c8c22e6d8df35f4eab28fa93418ffff702417f8f250b7d2edb",
-    "scripts/replicate_ce_inkind.py": "28502e7c1d457be48e4d70013f7d5d3c36dfe601265ed3019c57ed422288215e",
-    "spm_calculator/ce_bls_shares.py": "832a658cb3c7e8706d60ad96355fc17192ad82722d29958101524ffcc608e64b",
+    "scripts/compare_ce_inkind_bls_shares.py": "eddedcb2f3614888a4d77bce7ef948c6a7a688cf6fb841877830a7199d8406a0",
+    "scripts/replicate_ce_inkind.py": "0c026f67c7d2ccabad9dd1c4f95210d2a031ef431b3e693c7dbcae905533a143",
+    "spm_calculator/ce_bls_shares.py": "288864009d0156277a8bf7f163e7792c9499f4340953461dac20aabb0cd6cf5d",
     "spm_calculator/ce_decomposition.py": "39be6fc2ceef0764cbf1133a1f4ea39c67a4de6a4e781357f717a7a82d0e00c0",
-    "spm_calculator/ce_inkind.py": "25f93fb8b996b5e623ab564d70e2eedfbc4daa11ff96850f06e76ef229aef0b8",
+    "spm_calculator/ce_inkind.py": "97d0b6b76982bab9d9c7e9d15d5c1723f667adbbfe54432533eaf1ebf198bdd8",
     "spm_calculator/ce_inkind_stage.py": "68e881d04cfc8c35f5ca11fd7b6b60d88abfb0bc26921ad93f7ba8a390a8fd8c",
-    "spm_calculator/ce_internet.py": "b265a73ae47738d49f65f7c0c9dda9e244c344bb193d634e388b28fc9b20a23e",
+    "spm_calculator/ce_internet.py": "c0a1a928b708a418cacef585f07c53a5da84b551d6540733251d9c5ca0fc0f73",
     "spm_calculator/ce_threshold.py": "4efbe2b03f6b1f4eb2911ab0f79f5151bd655cc1e5addf42f5c4540ace1f852f",
     "spm_calculator/cps_asec.py": "ac4a1ae3b28d34fa3dfbbe5879c88d0274a0e6e46423694bb48808d4f7cf2cc8",
     "spm_calculator/equivalence_scale.py": "95c797adca4811b0a2c4202e8471f6cd46fcd259bf46b34da74588ab08b41326",
@@ -948,8 +948,8 @@
     }
   },
   "generated_by": "scripts/compare_ce_inkind_bls_shares.py",
-  "generated_on": "2026-11-14",
-  "git_head": "8b0ddaca9208d231e48ca208fd8e4457abcdefcd",
+  "generated_on": "2026-11-16",
+  "git_head": "876007bed02d9e29cc54511fa8af022f7f1c47bc",
   "inputs": {
     "bls_shares_workbook": {
       "path": "spm_calculator/data/current/bls_spm_shares.xlsx",
@@ -968,7 +968,7 @@
     },
     "replication_receipt": {
       "path": "spm_calculator/data/current/ce_inkind_replication_2019_2025.json",
-      "sha256": "d17a7af4f75e0db61ab5d8ec466453896f7c3d9db1d26c6f1737ce6ab2d8d847"
+      "sha256": "d1e83652e9857a881dcb6cf61505cc5af0e6b2549c9f6c7ac9220f202d34f29b"
     },
     "threshold_series": {
       "path": "spm_calculator/data/bls/threshold_series.json",
@@ -980,20 +980,20 @@
     "BLS's written definitions come from Garner and Munoz (2021); BLS's current code may differ, and its thresholds also carry later refinements and corrections",
     "FMLI's vacation-home utility summaries leave out coal, wood and other fuels for vacation homes (UCCs 250913 and 250914), so the definition runs keep those fuels",
     "Removing imputed terms holds each band as it stands; the replication's own with-and-without runs show how far rank shifts move that",
-    "Home internet is CE UCC 690114 alone, priced with CPI-U CUUR0000SEEE03; BLS has not published the UCCs behind its home internet term",
-    "Home internet is out-of-pocket spending in its own component; no in-kind total, share or contribution includes it",
+    "We take home internet from CE UCC 690114 alone and price it with CPI-U CUUR0000SEEE03; BLS has not published the UCCs or the price series behind its home internet term",
+    "We count home internet as out-of-pocket spending in its own component, and no in-kind total, share or contribution includes it",
     "The archived replication excludes home internet, and the canonical forecast, nowcast and projections exclude it until the forecast is next rebuilt, which is a separate change",
-    "The runs estimate imputation uncertainty (implicate spread) but not sampling uncertainty"
+    "We estimate imputation uncertainty from the implicate spread and sampling uncertainty in ce_replicate_uncertainty_2019_2025.json"
   ],
   "replication_receipt_check": {
     "fcsuti": {
       "out_of_pocket_thresholds_identical": true,
-      "with_in_kind_largest_relative_difference": 0.0,
+      "with_in_kind_largest_relative_difference": 4.440892098500626e-16,
       "with_in_kind_tolerance": 1e-12
     },
     "package": {
       "out_of_pocket_thresholds_identical": true,
-      "with_in_kind_largest_relative_difference": 0.0,
+      "with_in_kind_largest_relative_difference": 4.440892098500626e-16,
       "with_in_kind_tolerance": 1e-12
     }
   },
@@ -1571,7 +1571,7 @@
               }
             }
           },
-          "largest_relative_difference_from_receipt": 0.0,
+          "largest_relative_difference_from_receipt": 2.220446049250313e-16,
           "level_gap_percent_of_bls": {
             "other_separate": {
               "owner_with_mortgage": {
@@ -1951,7 +1951,7 @@
               }
             }
           },
-          "largest_relative_difference_from_receipt": 0.0,
+          "largest_relative_difference_from_receipt": 4.440892098500626e-16,
           "level_gap_percent_of_bls": {
             "other_separate": {
               "owner_with_mortgage": {
@@ -2331,7 +2331,7 @@
               }
             }
           },
-          "largest_relative_difference_from_receipt": 0.0,
+          "largest_relative_difference_from_receipt": 2.220446049250313e-16,
           "level_gap_percent_of_bls": {
             "other_separate": {
               "owner_with_mortgage": {
@@ -2711,7 +2711,7 @@
               }
             }
           },
-          "largest_relative_difference_from_receipt": 0.0,
+          "largest_relative_difference_from_receipt": 2.220446049250313e-16,
           "level_gap_percent_of_bls": {
             "other_separate": {
               "owner_with_mortgage": {
@@ -3471,7 +3471,7 @@
               }
             }
           },
-          "largest_relative_difference_from_receipt": 0.0,
+          "largest_relative_difference_from_receipt": 4.440892098500626e-16,
           "level_gap_percent_of_bls": {
             "other_separate": {
               "owner_with_mortgage": {
@@ -6815,7 +6815,7 @@
               }
             }
           },
-          "largest_relative_difference_from_receipt": 0.0,
+          "largest_relative_difference_from_receipt": 4.440892098500626e-16,
           "level_gap_percent_of_bls": {
             "other_separate": {
               "owner_with_mortgage": {
@@ -7195,7 +7195,7 @@
               }
             }
           },
-          "largest_relative_difference_from_receipt": 0.0,
+          "largest_relative_difference_from_receipt": 2.220446049250313e-16,
           "level_gap_percent_of_bls": {
             "other_separate": {
               "owner_with_mortgage": {
@@ -7575,7 +7575,7 @@
               }
             }
           },
-          "largest_relative_difference_from_receipt": 0.0,
+          "largest_relative_difference_from_receipt": 2.220446049250313e-16,
           "level_gap_percent_of_bls": {
             "other_separate": {
               "owner_with_mortgage": {
@@ -7955,7 +7955,7 @@
               }
             }
           },
-          "largest_relative_difference_from_receipt": 0.0,
+          "largest_relative_difference_from_receipt": 2.220446049250313e-16,
           "level_gap_percent_of_bls": {
             "other_separate": {
               "owner_with_mortgage": {
@@ -8335,7 +8335,7 @@
               }
             }
           },
-          "largest_relative_difference_from_receipt": 0.0,
+          "largest_relative_difference_from_receipt": 2.220446049250313e-16,
           "level_gap_percent_of_bls": {
             "other_separate": {
               "owner_with_mortgage": {
@@ -8715,7 +8715,7 @@
               }
             }
           },
-          "largest_relative_difference_from_receipt": 0.0,
+          "largest_relative_difference_from_receipt": 2.220446049250313e-16,
           "level_gap_percent_of_bls": {
             "other_separate": {
               "owner_with_mortgage": {
@@ -9095,7 +9095,7 @@
               }
             }
           },
-          "largest_relative_difference_from_receipt": 0.0,
+          "largest_relative_difference_from_receipt": 2.220446049250313e-16,
           "level_gap_percent_of_bls": {
             "other_separate": {
               "owner_with_mortgage": {
@@ -12252,6 +12252,6 @@
     "pandas": "3.0.0",
     "python": "3.13.13"
   },
-  "runtime_seconds": 133,
+  "runtime_seconds": 82,
   "schema_version": 3
 }

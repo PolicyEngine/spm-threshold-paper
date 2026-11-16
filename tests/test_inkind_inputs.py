@@ -637,12 +637,12 @@ class HomeInternetReceiptChecks(unittest.TestCase):
     test can fail."""
 
     REPLICATION_LABEL = re.escape("replication receipt schema 2 with its three stages")
-    UNCERTAINTY_LABEL = re.escape("replicate receipt schema 2 with home internet")
+    UNCERTAINTY_LABEL = re.escape("replicate receipt schema 3 with home internet")
     INTERNET_LABEL = re.escape("home internet from UCC 690114, priced with CUUR0000SEEE03, in FCSUti")
 
     def test_module_reads_the_three_stage_schemas(self):
         self.assertEqual(
-            (INKIND.REPLICATION_SCHEMA, INKIND.COMPONENTS_SCHEMA, INKIND.UNCERTAINTY_SCHEMA), (2, 3, 2)
+            (INKIND.REPLICATION_SCHEMA, INKIND.COMPONENTS_SCHEMA, INKIND.UNCERTAINTY_SCHEMA), (2, 3, 3)
         )
         self.assertEqual(INKIND.STAGES, ("without_home_internet", "without_in_kind", "with_in_kind"))
         self.assertEqual((INKIND.INTERNET_UCC, INKIND.INTERNET_CPI_SERIES), (690114, "CUUR0000SEEE03"))
@@ -696,12 +696,15 @@ class HomeInternetReceiptChecks(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, self.REPLICATION_LABEL):
                     load_resealed({INKIND.REPLICATION: edit})
 
-    def test_replicate_schema_1_is_rejected(self):
-        def edit(uncertainty):
-            uncertainty["schema_version"] = 1
+    def test_earlier_replicate_schemas_are_rejected(self):
+        for version in (1, 2):
+            with self.subTest(version=version):
 
-        with self.assertRaisesRegex(ValueError, self.UNCERTAINTY_LABEL):
-            load_resealed({INKIND.UNCERTAINTY: edit})
+                def edit(uncertainty, version=version):
+                    uncertainty["schema_version"] = version
+
+                with self.assertRaisesRegex(ValueError, self.UNCERTAINTY_LABEL):
+                    load_resealed({INKIND.UNCERTAINTY: edit})
 
     def test_changed_internet_settings_are_rejected(self):
         """Another item code, price series, target, or CPI input in any
