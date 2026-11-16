@@ -711,7 +711,7 @@ parameters at their point estimates, while for our base estimate of
 
 Our school lunch donors report free or reduced-price lunches, while
 Census also values paid lunches and, for respondents who report EBT
-benefits but no SNAP, summer EBT [@spmtechnical]. BLS says it values school lunches by the
+benefits but no SNAP, summer Pandemic EBT [@spmtechnical; @shrider2023]. BLS says it values school lunches by the
 traditional method before and after the COVID-19 period [@blsspmhome],
 and we use Census's SPM-unit values for every reference year from 2018;
 from reference year 2023, Census estimates those values with its fall
