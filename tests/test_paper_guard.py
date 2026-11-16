@@ -480,6 +480,20 @@ INKIND_PROSE_MUTATIONS = (
         "displayed share formula reproduces BLS's shares",
     ),
     (
+        "summer Pandemic EBT year",
+        "section",
+        r"summer(\s+)Pandemic(\s+)EBT(\s+)in(\s+)its(\s+)2022",
+        r"summer\1Pandemic\2EBT\3in\4its\g<5>2023",
+        "school lunch EBT caveat reaches 2022's summer Pandemic EBT",
+    ),
+    (
+        "EBT-card caveat confined to 2020 and 2021",
+        "section",
+        r"2021(\s+)values(\s+)and(\s+)for(\s+)summer(\s+)Pandemic(\s+)EBT(\s+)in(\s+)its(\s+)2022(\s+)values(\s+)",
+        r"2021\1values\2",
+        "school lunch EBT caveat reaches 2022's summer Pandemic EBT",
+    ),
+    (
         "school days",
         "section",
         r"179(\s+)school",

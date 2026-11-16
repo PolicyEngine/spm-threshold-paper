@@ -1356,9 +1356,10 @@ def displayed_shares() -> list[float] | None:
 # this fingerprint (calculator commit 2321f2f). Since 4778dfa, the file has
 # changed two rules: the 2020 WIC cutoff, quoted below, and the broadband
 # start (reference year 2022), which the receipt records and a pin below
-# reads. Since e602bc7 it has changed only a docstring and the status its
-# diagnostics give a program before its first reference year. A receipt
-# rebuilt from changed code fails the pin until someone rereads them.
+# reads. Since e602bc7 it has changed only a docstring and the diagnostics
+# entry it gives a program before its first reference year, which now has
+# a new status and names that year. A receipt rebuilt from changed code
+# fails the pin until someone rereads them.
 INKIND_METHOD_SOURCE = (
     "spm_calculator/ce_inkind.py",
     "97d0b6b76982bab9d9c7e9d15d5c1723f667adbbfe54432533eaf1ebf198bdd8",
@@ -1633,7 +1634,7 @@ def wic_by_state_pin() -> bool:
 # The rental-assistance sensitivities: scripts/rent_sensitivity.py writes this
 # receipt, so replacing it takes an edit here.
 RENT_SENSITIVITY = DATA / "rent_sensitivity" / "rent_model_sensitivity_2022.json"
-RENT_SENSITIVITY_SHA256 = "5df35aa1e90f6575d0469344bdcb4dd914e85d895d94e734c3e15a249c2ff91f"
+RENT_SENSITIVITY_SHA256 = "f503130b124943991969c7a8b97460f884bad38dde0eae58e3c6d48f04ea052b"
 rent_sensitivity = json.loads(RENT_SENSITIVITY.read_text())
 rent_variants = {
     name: row["percent_vs_base"] for name, row in rent_sensitivity["variants"].items()
@@ -2455,6 +2456,22 @@ inkind_pins = (
             f"For reference years {lunch_years[0]}–{int(census_lunch_years[0]) - 1}, Census publishes SPM-unit "
             f"values in research files, and for {int(census_lunch_years[0]) - 1} also in the "
             f"{census_lunch_years[0]} CPS ASEC Bridge File",
+            text=INKIND_TEXT,
+        ),
+    ),
+    (
+        # Shrider (2023), SEHSD WP 2023-20: the 2022 school lunch value adds
+        # summer P-EBT, not school-year P-EBT, for respondents who report
+        # P-EBT and not SNAP; P-EBT went on SNAP cards or separate P-EBT
+        # cards. The technical documentation counts summer EBT in 2022 for
+        # respondents who report EBT and not SNAP. The receipt's limitation
+        # must say the same, so a rewording there sends someone back here.
+        "school lunch EBT caveat reaches 2022's summer Pandemic EBT",
+        any("for 2022 it counts summer P-EBT" in limitation for limitation in replication_receipt["limitations"])
+        and has_number(
+            "Census accounts for Pandemic EBT in its 2020 and 2021 values and for summer Pandemic EBT in its 2022 "
+            "values [@spmtechnical; @shrider2023]. States paid those benefits on EBT cards, so under BLS's "
+            "reasoning for SNAP, reported food spending may already include them",
             text=INKIND_TEXT,
         ),
     ),

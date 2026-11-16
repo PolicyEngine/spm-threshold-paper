@@ -82,7 +82,7 @@
   },
   "classification": "current_retrospective_research",
   "code_sha256": {
-    "scripts/replicate_ce_inkind.py": "0c026f67c7d2ccabad9dd1c4f95210d2a031ef431b3e693c7dbcae905533a143",
+    "scripts/replicate_ce_inkind.py": "53cfdad1c2875e07b89ef06fab49c73f63490e3bb438948aefe540d8373d91f1",
     "spm_calculator/ce_decomposition.py": "39be6fc2ceef0764cbf1133a1f4ea39c67a4de6a4e781357f717a7a82d0e00c0",
     "spm_calculator/ce_inkind.py": "97d0b6b76982bab9d9c7e9d15d5c1723f667adbbfe54432533eaf1ebf198bdd8",
     "spm_calculator/ce_inkind_stage.py": "68e881d04cfc8c35f5ca11fd7b6b60d88abfb0bc26921ad93f7ba8a390a8fd8c",
@@ -2148,7 +2148,7 @@
   },
   "generated_by": "scripts/replicate_ce_inkind.py",
   "generated_on": "2026-11-16",
-  "git_head": "876007bed02d9e29cc54511fa8af022f7f1c47bc",
+  "git_head": "d97169d79f4bb7afabb06dc0bdaeba07332628db",
   "home_internet": {
     "annualization": "three-month cost times four, with FMLI spending",
     "cpi_input": {
@@ -3625,7 +3625,7 @@
     "School lunch donor values for reference years 2014-2017 come from the USDA formula; later years use Census SPM_SCHLUNCH values",
     "BLS says it assigns school lunch by the traditional method before and after the COVID-19 period; the stage uses Census SPM_SCHLUNCH values for every reference year from 2018, and from reference year 2023 Census estimates those values with its fall 2022 method",
     "The imputation assigns school lunch only to households it imputes as receiving free, reduced-price or universal-free lunch; Census also values paid lunches and, in some years, P-EBT or Summer EBT for other households",
-    "Census accounts for P-EBT in its school lunch values for reference years 2020 and 2021, and for 2022 it adds summer EBT benefits, which states paid that summer as P-EBT; states paid both on EBT cards. BLS says it follows Census's COVID-era methods, so the stage does too, but by BLS's reasoning for leaving out SNAP, reported food spending may already include those benefits",
+    "Census accounts for P-EBT in its school lunch values for reference years 2020 and 2021, and for 2022 it counts summer P-EBT, which its technical documentation calls summer EBT, but not school-year P-EBT; states paid both on EBT cards (Census SPM technical documentation; Shrider 2023). BLS says it follows Census's COVID-era methods, so the stage does too, but by BLS's reasoning for leaving out SNAP, reported food spending may already include those benefits",
     "WIC uses USDA's national fiscal-year average food cost; Census has used state averages since its revised 2019 estimates",
     "Participation models share one covariate set across programs and years; CE and CPS income concepts differ",
     "We take home internet from CE UCC 690114 alone and price it with CPI-U CUUR0000SEEE03; BLS has not published the UCCs or the price series behind its home internet term",

@@ -1,5 +1,5 @@
 {
-  "calculator_commit": "2321f2f462fde3fcf99554413d1910060b180be7",
+  "calculator_commit": "948c6e1c502c39edcf3f3ea2645392a932b8b06a",
   "ce_bundles": {
     "intrvw22.zip": "c99a2f47c0084b7a88812b34c56a1a288be2798ff010b2b59dcf87e072773e17",
     "intrvw23.zip": "97e9a17edeee28e77a3fd5a7d874e5f4b9034222be204e25b0d902f4c82235ac"
@@ -42,7 +42,7 @@
   "reference_year": 2022,
   "replication_receipt": {
     "path": "data/inkind/ce_inkind_replication_2019_2025.json",
-    "sha256": "d1e83652e9857a881dcb6cf61505cc5af0e6b2549c9f6c7ac9220f202d34f29b"
+    "sha256": "d2e5748d9c42ea79c313144773663787e3f22320e2f6903cbd6e9e368ef34ccb"
   },
   "runtime": {
     "numpy": "2.4.1",

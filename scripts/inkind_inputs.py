@@ -117,16 +117,16 @@ BLS_REVISED_SEGMENT = "revised_2019_2024"
 # path>`` in PolicyEngine/spm-calculator when we copied the receipt here.
 RECEIPT_PINS = {
     REPLICATION: (
-        "d1e83652e9857a881dcb6cf61505cc5af0e6b2549c9f6c7ac9220f202d34f29b",
-        "2321f2f462fde3fcf99554413d1910060b180be7",
+        "d2e5748d9c42ea79c313144773663787e3f22320e2f6903cbd6e9e368ef34ccb",
+        "948c6e1c502c39edcf3f3ea2645392a932b8b06a",
     ),
     COMPONENTS: (
-        "4e2e274b45e9b4ae979400b1063199ff8533046ce53ea5eb360135c71b3bdd41",
-        "2321f2f462fde3fcf99554413d1910060b180be7",
+        "b2ed9f5d026be6a6b5cd6508fc7e8ad6be2ec32ed0711107b9f80e1830b535c3",
+        "948c6e1c502c39edcf3f3ea2645392a932b8b06a",
     ),
     UNCERTAINTY: (
-        "1e0e705b7653100861a0d996feb5574e0d74f6c40c63eae5ba2d11fe69f6758d",
-        "2321f2f462fde3fcf99554413d1910060b180be7",
+        "7fa62b22f91d4773aca5ec77308e83a5576b863364d2cc88fcfc30bf8b997483",
+        "948c6e1c502c39edcf3f3ea2645392a932b8b06a",
     ),
 }
 # The growth window whose standard errors the section reports.

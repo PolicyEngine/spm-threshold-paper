@@ -34,7 +34,7 @@
   "classification": "current_retrospective_research",
   "code_sha256": {
     "scripts/estimate_ce_replicate_uncertainty.py": "1f2acc430d58408acfff588d414a0d6a4190b551b74addee1c0a921ae244126f",
-    "scripts/replicate_ce_inkind.py": "0c026f67c7d2ccabad9dd1c4f95210d2a031ef431b3e693c7dbcae905533a143",
+    "scripts/replicate_ce_inkind.py": "53cfdad1c2875e07b89ef06fab49c73f63490e3bb438948aefe540d8373d91f1",
     "spm_calculator/ce_bls_shares.py": "288864009d0156277a8bf7f163e7792c9499f4340953461dac20aabb0cd6cf5d",
     "spm_calculator/ce_decomposition.py": "39be6fc2ceef0764cbf1133a1f4ea39c67a4de6a4e781357f717a7a82d0e00c0",
     "spm_calculator/ce_inkind.py": "97d0b6b76982bab9d9c7e9d15d5c1723f667adbbfe54432533eaf1ebf198bdd8",
@@ -50,7 +50,7 @@
   "complete": true,
   "generated_by": "scripts/estimate_ce_replicate_uncertainty.py",
   "generated_on": "2026-11-16",
-  "git_head": "876007bed02d9e29cc54511fa8af022f7f1c47bc",
+  "git_head": "d97169d79f4bb7afabb06dc0bdaeba07332628db",
   "inputs": {
     "ce_bundles": {
       "intrvw14.zip": {
@@ -100,7 +100,7 @@
     },
     "components_receipt": {
       "path": "spm_calculator/data/current/ce_inkind_bls_components_2019_2025.json",
-      "sha256": "4e2e274b45e9b4ae979400b1063199ff8533046ce53ea5eb360135c71b3bdd41"
+      "sha256": "b2ed9f5d026be6a6b5cd6508fc7e8ad6be2ec32ed0711107b9f80e1830b535c3"
     },
     "cpi": {
       "path": "spm_calculator/data/bls/cpi_annual.json",
@@ -258,7 +258,7 @@
     },
     "replication_receipt": {
       "path": "spm_calculator/data/current/ce_inkind_replication_2019_2025.json",
-      "sha256": "d1e83652e9857a881dcb6cf61505cc5af0e6b2549c9f6c7ac9220f202d34f29b"
+      "sha256": "d2e5748d9c42ea79c313144773663787e3f22320e2f6903cbd6e9e368ef34ccb"
     },
     "threshold_series": {
       "path": "spm_calculator/data/bls/threshold_series.json",
@@ -5910,7 +5910,7 @@
     "python": "3.13.13",
     "scipy": "1.18.1"
   },
-  "runtime_seconds": 223,
+  "runtime_seconds": 221,
   "schema_version": 3,
   "targets": [2019, 2020, 2021, 2022, 2023, 2024, 2025]
 }

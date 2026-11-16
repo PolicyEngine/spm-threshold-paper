@@ -716,9 +716,10 @@ traditional method before and after the COVID-19 period [@blsspmhome],
 and we use Census's SPM-unit values for every reference year from 2018;
 from reference year 2023, Census estimates those values with its fall
 2022 method [@spmtechnical]. Census accounts for Pandemic EBT in its
-2020 and 2021 values, and states paid those benefits on EBT cards; under
-BLS's reasoning for SNAP, reported food spending may already include
-them. For the reference years before 2020, we value WIC at USDA's national average food cost, while Census uses state averages [@spmtechnical] and BLS assigns the WIC values Census staff supply [@blsspmhome]. From BLS's 2025 shares, we compute WIC of \$1.80 per unit in its band, where we add none. With the Garner–Munoz restrictions, we depart from @garner2021 in three
+2020 and 2021 values and for summer Pandemic EBT in its 2022 values
+[@spmtechnical; @shrider2023]. States paid those benefits on EBT cards,
+so under BLS's reasoning for SNAP, reported food spending may already
+include them. For the reference years before 2020, we value WIC at USDA's national average food cost, while Census uses state averages [@spmtechnical] and BLS assigns the WIC values Census staff supply [@blsspmhome]. From BLS's 2025 shares, we compute WIC of \$1.80 per unit in its band, where we add none. With the Garner–Munoz restrictions, we depart from @garner2021 in three
 ways. We keep telephone out of utilities, as BLS now does
 [@blsspmshares], where @garner2021 count it as a utility. We keep spending under two codes for other fuels in vacation
 homes, which the FMLI summaries of vacation-home utilities leave out
@@ -1225,9 +1226,9 @@ digest is:
 
 For the in-kind experiment in @sec-inkind, we keep three receipts from
 spm-calculator, with their provenance and checksums, in the paper
-repository's [`data/inkind`](https://github.com/PolicyEngine/spm-threshold-paper/tree/inkind-receipts-2321f2f/data/inkind) folder: the imputation, the comparison with BLS's components, and the
+repository's [`data/inkind`](https://github.com/PolicyEngine/spm-threshold-paper/tree/inkind-receipts-948c6e1/data/inkind) folder: the imputation, the comparison with BLS's components, and the
 replicate-weight standard errors, all at commit
-`2321f2f462fde3fcf99554413d1910060b180be7`. Before each render, we
+`948c6e1c502c39edcf3f3ea2645392a932b8b06a`. Before each render, we
 check that the run without home internet or benefits reproduces the
 retrospective replication artifact exactly. We then recompute every in-kind estimate
 in the tables and text from the receipts' thresholds, band means, and
@@ -1244,7 +1245,7 @@ provenance](https://github.com/PolicyEngine/spm-threshold-paper/blob/20bfbe1abcb
 and [forecast
 record](https://github.com/PolicyEngine/spm-threshold-paper/blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0/docs/forecast-record.md)
 identify the inputs and evidence of the earlier experiments, and
-[`data/inkind/provenance.json`](https://github.com/PolicyEngine/spm-threshold-paper/blob/inkind-receipts-2321f2f/data/inkind/provenance.json)
+[`data/inkind/provenance.json`](https://github.com/PolicyEngine/spm-threshold-paper/blob/inkind-receipts-948c6e1/data/inkind/provenance.json)
 those of the in-kind experiment.
 
 To verify the reported tables, clone the paper repository with its full
