@@ -4,19 +4,25 @@
 provenance record and a checksum manifest:
 
 - ``ce_inkind_replication_2019_2025.json`` replicates 2019-2025 thresholds
-  with and without the calculator's in-kind benefit stage, under the
-  replication's composite CPI and under BLS's FCSUti index.
+  in three stages, under the replication's composite CPI and under BLS's
+  FCSUti index: ``without_home_internet``, the out-of-pocket replication in
+  ``data/current``; ``without_in_kind``, which adds home internet from the
+  CE's MTBI file; and ``with_in_kind``, which adds the calculator's in-kind
+  benefit stage to that run. Its schema 2 introduced the first key; before
+  it, ``without_in_kind`` named the run without home internet.
 - ``ce_inkind_bls_components_2019_2025.json`` recovers BLS's in-band
   component means from its published threshold shares and compares them with
   the replication's, under the CE summary definitions and under the shelter,
-  utilities and food restrictions in Garner and Munoz (2021). Its schema 2
-  records each threshold's imputed terms in two accountings of the 0.2 F
-  term BLS publishes as its Other share: ``other_spread`` gives each
-  component its part of that term, and ``other_separate`` keeps it apart, as
-  BLS's shares workbook does.
-- ``ce_replicate_uncertainty_2019_2025.json`` reruns both price-index runs
-  under each of the CE's 44 replicate weights and stores every replicate's
-  thresholds, for each implicate.
+  utilities and food restrictions in Garner and Munoz (2021). It records
+  each threshold's imputed terms in two accountings of the 0.2 F term BLS
+  publishes as its Other share: ``other_spread`` gives each component its
+  part of that term, and ``other_separate`` keeps it apart, as BLS's shares
+  workbook does. Its schema 3 adds the three stages and, under each
+  accounting, our home internet term beside BLS's.
+- ``ce_replicate_uncertainty_2019_2025.json`` reruns both price-index runs,
+  with home internet, with and without the stage, under each of the CE's 44
+  replicate weights and stores every replicate's thresholds, for each
+  implicate. It holds no run without home internet.
 
 ``load_inkind`` checks the bytes, the provenance, and the receipts' agreement
 with each other and with the out-of-pocket replication in ``data/current``.
@@ -61,9 +67,24 @@ RUNS = {
     "fcsuti_bls_definition": ("fcsuti", True),
 }
 AMOUNTS = ("imputed_total", "rental_assistance_per_renter", "school_lunch")
-# The component receipt's schema and its two accountings of the Other share.
-COMPONENTS_SCHEMA = 2
+# Each receipt's schema. Replication schema 2, component schema 3 and
+# replicate schema 2 add home internet: ``without_home_internet`` names the
+# out-of-pocket run, and ``without_in_kind`` and ``with_in_kind`` both carry
+# home internet. Earlier schemas used ``without_in_kind`` for the run without
+# it, so an earlier receipt must fail here rather than pass with that meaning.
+# Replicate schema 3 renames a full-sample check and records the threshold
+# series' hash; this module reads neither.
+REPLICATION_SCHEMA = 2
+COMPONENTS_SCHEMA = 3
+UNCERTAINTY_SCHEMA = 3
+STAGES = ("without_home_internet", "without_in_kind", "with_in_kind")
+# The component receipt's two accountings of the Other share.
 ACCOUNTINGS = ("other_spread", "other_separate")
+# Home internet as the receipts record it: each unit's spending on CE UCC
+# 690114 from the MTBI file, added to FCSUti alone and priced with CPI-U
+# series CUUR0000SEEE03.
+INTERNET_UCC = 690114
+INTERNET_CPI_SERIES = "CUUR0000SEEE03"
 # BLS's threshold for tenure h is s * (C + SU_h + 0.2 F), with F = C + sum_h
 # P_h SU_h. School lunch, WIC and broadband enter the shared term C; LIHEAP
 # and rental assistance enter SU_h. ``_imputed_terms`` gives each benefit its
@@ -74,6 +95,10 @@ SHARED_IMPUTED = ("nslp", "wic", "broadband")
 SHELTER_UTILITY_IMPUTED = ("liheap", "rental_assistance")
 # The paper states this bound for BLS's share identities, in dollars.
 BLS_IDENTITY_TOLERANCE_DOLLARS = 1e-5
+# Our runs' imputed terms against a rebuild from their band means: the
+# receipt averages each implicate's terms, so the two differ by cents, while
+# home internet counted among the terms would add more than $100.
+OUR_TERMS_TOLERANCE_DOLLARS = 1.0
 # The CE's balanced repeated replication: 44 replicate weights, standard BRR
 # (Fay's coefficient 0) through 2024 CE data, and the 43 strata as the
 # complete-data degrees of freedom. The windows for 2019-2025 end in 2025Q1,
@@ -92,16 +117,16 @@ BLS_REVISED_SEGMENT = "revised_2019_2024"
 # path>`` in PolicyEngine/spm-calculator when we copied the receipt here.
 RECEIPT_PINS = {
     REPLICATION: (
-        "221e79fa439509a574a020ccc155a0971f74d230c686046a0de6f69b7d492173",
-        "28740b5c7c6ba54af99c8631c955294b094ba239",
+        "d2e5748d9c42ea79c313144773663787e3f22320e2f6903cbd6e9e368ef34ccb",
+        "948c6e1c502c39edcf3f3ea2645392a932b8b06a",
     ),
     COMPONENTS: (
-        "fa203592f1d79f723e357122088474047096a1b29d4cc47d3f8b8037dd713ae2",
-        "28740b5c7c6ba54af99c8631c955294b094ba239",
+        "b2ed9f5d026be6a6b5cd6508fc7e8ad6be2ec32ed0711107b9f80e1830b535c3",
+        "948c6e1c502c39edcf3f3ea2645392a932b8b06a",
     ),
     UNCERTAINTY: (
-        "1f348cb6a52bc4cace5fcf1a91647c188ef1169838504c3123639528bd0af767",
-        "28740b5c7c6ba54af99c8631c955294b094ba239",
+        "7fa62b22f91d4773aca5ec77308e83a5576b863364d2cc88fcfc30bf8b997483",
+        "948c6e1c502c39edcf3f3ea2645392a932b8b06a",
     ),
 }
 # The growth window whose standard errors the section reports.
@@ -206,6 +231,31 @@ def load_inkind(data_dir: Path, current_dir: Path) -> dict:
         "out-of-pocket run reproduces data/current's replication artifact",
     )
     _require(
+        replication.get("schema_version") == REPLICATION_SCHEMA
+        and all(set(STAGES) <= set(replication["results"][year]) for year in YEARS),
+        f"replication receipt schema {REPLICATION_SCHEMA} with its three stages",
+    )
+    # Every receipt prices home internet with the same pinned CPI input,
+    # and every replication year reads it from UCC 690114 into FCSUti.
+    internet = replication["home_internet"]
+    internet_cpi = {
+        "path": internet["cpi_input"]["path"],
+        "series_id": internet["cpi_series"],
+        "sha256": internet["cpi_input"]["sha256"],
+    }
+    _require(
+        internet["ucc"] == INTERNET_UCC
+        and internet["cpi_series"] == INTERNET_CPI_SERIES
+        and components["inputs"]["internet_cpi"] == internet_cpi
+        and all(
+            replication["results"][year]["home_internet"]["ucc"] == INTERNET_UCC
+            and replication["results"][year]["home_internet"]["cpi_series"] == INTERNET_CPI_SERIES
+            and replication["results"][year]["home_internet"]["enters"] == "fcsuti"
+            for year in YEARS
+        ),
+        f"home internet from UCC {INTERNET_UCC}, priced with {INTERNET_CPI_SERIES}, in FCSUti",
+    )
+    _require(
         components.get("schema_version") == COMPONENTS_SCHEMA
         and tuple(sorted(components.get("accountings", ()))) == tuple(sorted(ACCOUNTINGS)),
         f"component receipt schema {COMPONENTS_SCHEMA} with both accountings of the Other share",
@@ -221,7 +271,13 @@ def load_inkind(data_dir: Path, current_dir: Path) -> dict:
     _require(
         all(set(ACCOUNTINGS) <= set(rows.get(tenure, ())) for rows in growth_rows for tenure in TENURES)
         and all(set(ACCOUNTINGS) <= set(gaps) for gaps in level_rows)
-        and all(set(TENURES) <= set(gaps[accounting]) for gaps in level_rows for accounting in ACCOUNTINGS),
+        and all(set(TENURES) <= set(gaps[accounting]) for gaps in level_rows for accounting in ACCOUNTINGS)
+        and all(
+            set(STAGES) <= set(components["runs"][run]["years"][year])
+            and set(ACCOUNTINGS) <= set(components["runs"][run]["years"][year].get("home_internet", ()))
+            for run in RUNS
+            for year in YEARS
+        ),
         f"component receipt schema {COMPONENTS_SCHEMA} with both accountings of the Other share",
     )
     for run, (deflator, garner_munoz) in RUNS.items():
@@ -262,8 +318,10 @@ def load_inkind(data_dir: Path, current_dir: Path) -> dict:
         _require(len(record["with_in_kind_by_implicate"]) == implicates, f"implicates {year}")
         for tenure in TENURES:
             label = f"{year} {tenure}"
+            # The run without home internet or benefits is the out-of-pocket
+            # replication, to the bit.
             _require(
-                record["without_in_kind"][tenure] == baseline["thresholds"][tenure],
+                record["without_home_internet"][tenure] == baseline["thresholds"][tenure],
                 f"out-of-pocket threshold {label}",
             )
             _close(record["published"][tenure], current["results"][year]["published"][tenure], f"published {label}")
@@ -273,20 +331,60 @@ def load_inkind(data_dir: Path, current_dir: Path) -> dict:
                 record["with_in_kind"][tenure],
                 f"implicate mean {label}",
             )
+            # Each stage's effect, as the receipt records it, follows from
+            # the thresholds on either side of it.
+            effects = record["stage_effects"]
+            _close(
+                record["without_in_kind"][tenure] - record["without_home_internet"][tenure],
+                effects["home_internet_dollars"][tenure],
+                f"home internet stage {label}",
+            )
+            _close(
+                _growth(record["without_home_internet"][tenure], record["without_in_kind"][tenure]),
+                effects["home_internet_percent"][tenure],
+                f"home internet lift {label}",
+            )
+            _close(
+                record["with_in_kind"][tenure] - record["without_in_kind"][tenure],
+                effects["in_kind_dollars"][tenure],
+                f"in-kind stage {label}",
+            )
             _close(
                 _growth(record["without_in_kind"][tenure], record["with_in_kind"][tenure]),
                 record["in_kind_lift_percent"][tenure],
                 f"in-kind lift {label}",
             )
+            _close(effects["in_kind_percent"][tenure], record["in_kind_lift_percent"][tenure], f"in-kind stage lift {label}")
+            _close(
+                _growth(published[tenure], record["without_home_internet"][tenure]),
+                record["gap_percent_without_home_internet"][tenure],
+                f"out-of-pocket gap {label}",
+            )
             package = components["runs"]["package"]["years"][year]
             _close(package["with_in_kind"]["thresholds"][tenure], record["with_in_kind"][tenure], f"package run with {label}")
             _close(package["without_in_kind"]["thresholds"][tenure], record["without_in_kind"][tenure], f"package run without {label}")
+            _close(
+                package["without_home_internet"]["thresholds"][tenure],
+                record["without_home_internet"][tenure],
+                f"package run without home internet {label}",
+            )
             fcsuti = components["runs"]["fcsuti"]["years"][year]
-            _close(fcsuti["with_in_kind"]["gap_percent"][tenure], record["fcsuti_deflated"]["gap_percent_with"][tenure], f"FCSUti run with {label}")
-            _close(fcsuti["without_in_kind"]["gap_percent"][tenure], record["fcsuti_deflated"]["gap_percent_without"][tenure], f"FCSUti run without {label}")
+            deflated = record["fcsuti_deflated"]
+            _close(fcsuti["with_in_kind"]["gap_percent"][tenure], deflated["gap_percent_with"][tenure], f"FCSUti run with {label}")
+            _close(fcsuti["without_in_kind"]["gap_percent"][tenure], deflated["gap_percent_without"][tenure], f"FCSUti run without {label}")
+            _close(
+                fcsuti["without_home_internet"]["thresholds"][tenure],
+                deflated["without_home_internet"][tenure],
+                f"FCSUti run without home internet {label}",
+            )
+            _close(
+                _growth(deflated["without_home_internet"][tenure], deflated["without_in_kind"][tenure]),
+                deflated["home_internet_percent"][tenure],
+                f"FCSUti home internet lift {label}",
+            )
             for run in RUNS:
                 entry = components["runs"][run]["years"][year]
-                for stage in ("with_in_kind", "without_in_kind"):
+                for stage in STAGES:
                     _close(
                         _growth(published[tenure], entry[stage]["thresholds"][tenure]),
                         entry[stage]["gap_percent"][tenure],
@@ -308,7 +406,13 @@ def _check_uncertainty_receipt(uncertainty: dict, replication: dict, components:
     consistency, not authenticity: ``check_receipt_pins`` covers a receipt
     resealed with altered replicates. Runs after every other check, so an
     edit to the replication or component receipt fails where those checks
-    catch it."""
+    catch it. Every replicate run carries home internet: its
+    ``without_in_kind`` is the replication's run with home internet and no
+    benefits."""
+    _require(
+        uncertainty.get("schema_version") == UNCERTAINTY_SCHEMA,
+        f"replicate receipt schema {UNCERTAINTY_SCHEMA} with home internet",
+    )
     for name, key in ((REPLICATION, "replication_receipt"), (COMPONENTS, "components_receipt")):
         _require(
             uncertainty["inputs"][key]["sha256"] == manifest[f"data/inkind/{name}"],
@@ -320,6 +424,7 @@ def _check_uncertainty_receipt(uncertainty: dict, replication: dict, components:
         and inputs["cps_asec_files"] == replication["cps_asec_files"]
         and inputs["cpi"] == replication["cpi_input"]
         and {key: components["inputs"]["cpi"][key] for key in ("path", "sha256")} == replication["cpi_input"]
+        and inputs["internet_cpi"] == components["inputs"]["internet_cpi"]
         and inputs["imputation_seed"] == replication["in_kind_methodology"]["seed"],
         "uncertainty receipt reads the replication receipt's raw inputs and seed",
     )
@@ -437,6 +542,13 @@ def inkind_figures(inputs: dict) -> dict:
             "imputed_share_beyond_cpi_u": share,
         }
 
+    # The replication receipt's own 2022-2025 growth without home internet or
+    # benefits, for the two runs it deflates: the component receipt records
+    # no growth for that stage, so we recompute it from each run's thresholds.
+    no_internet_growth = {
+        "package": span["growth_percent_without_home_internet"],
+        "fcsuti": span["fcsuti_deflated"]["growth_percent_without_home_internet"],
+    }
     for run in RUNS:
         entry = components["runs"][run]
         years = entry["years"]
@@ -450,6 +562,12 @@ def inkind_figures(inputs: dict) -> dict:
                 years["2022"]["without_in_kind"]["thresholds"][tenure],
                 years["2025"]["without_in_kind"]["thresholds"][tenure],
             )
+            no_internet = _growth(
+                years["2022"]["without_home_internet"]["thresholds"][tenure],
+                years["2025"]["without_home_internet"]["thresholds"][tenure],
+            )
+            if run in no_internet_growth:
+                _close(no_internet, no_internet_growth[run][tenure], f"growth without home internet {label}")
             with_stage = _growth(with22, with25)
             _close(with_stage, row["growth_with_stage"], f"growth with stage {label}")
             _close(without, row["growth_without_stage"], f"growth without stage {label}")
@@ -467,6 +585,14 @@ def inkind_figures(inputs: dict) -> dict:
             _close(stdev(draws), row["stage_change_between_implicate_sd"], f"stage change SD {label}")
             spread, separate = row["other_spread"], row["other_separate"]
             c22, c25 = spread["imputed_term_dollars"]["2022"], spread["imputed_term_dollars"]["2025"]
+            # Our terms, like BLS's, sum only the benefits, so home internet
+            # stays with out-of-pocket spending.
+            for year, recorded in (("2022", c22), ("2025", c25)):
+                rebuilt = _imputed_terms(years[year]["with_in_kind"]["band"], SHARED_IMPUTED + SHELTER_UTILITY_IMPUTED)
+                _require(
+                    abs(rebuilt[tenure] - recorded) < OUR_TERMS_TOLERANCE_DOLLARS,
+                    f"our imputed terms rebuild from the band means {year} {label}",
+                )
             share = share_beyond_cpi(c22, c25, with22, with25)
             _close(share, spread["imputed_share_of_growth_beyond_cpi_u_percent"], f"imputed share {label}")
             for year in ("2022", "2025"):
@@ -493,8 +619,10 @@ def inkind_figures(inputs: dict) -> dict:
                 f"growth without imputed terms less BLS {label}",
             )
             out[tenure] = {
+                "growth_without_home_internet": no_internet,
                 "growth_without_stage": without,
                 "growth_with_stage": with_stage,
+                "internet_change": without - no_internet,
                 "stage_change": with_stage - without,
                 "stage_change_sd": stdev(draws),
                 "imputed_share_beyond_cpi_u": share,
@@ -502,10 +630,7 @@ def inkind_figures(inputs: dict) -> dict:
                 "less_bls": with_stage - bls_row["growth"],
                 "less_bls_without_imputed_terms": without_terms - bls_row["growth_without_imputed_terms"],
             }
-        gaps = {
-            stage: {year: dict(years[year][stage]["gap_percent"]) for year in YEARS}
-            for stage in ("with_in_kind", "without_in_kind")
-        }
+        gaps = {stage: {year: dict(years[year][stage]["gap_percent"]) for year in YEARS} for stage in STAGES}
         cells = {stage: [gaps[stage][y][t] for y in YEARS for t in TENURES] for stage in gaps}
         figures["runs"][run] = {
             "growth": out,
@@ -546,6 +671,13 @@ def inkind_figures(inputs: dict) -> dict:
     }
     lifts = [replication["results"][y]["in_kind_lift_percent"][t] for y in YEARS for t in TENURES]
     figures["in_kind_lift_range"] = (min(lifts), max(lifts))
+    # Home internet's lift to each threshold over the out-of-pocket run, by
+    # tenure across the seven years, as the replication receipt records it.
+    internet_lifts = {
+        tenure: [replication["results"][y]["stage_effects"]["home_internet_percent"][tenure] for y in YEARS]
+        for tenure in TENURES
+    }
+    figures["home_internet_lift_range"] = {tenure: (min(v), max(v)) for tenure, v in internet_lifts.items()}
     internet = [bls_years[y]["band"]["pooled"]["internet"] for y in YEARS]
     figures["bls_internet_range"] = (min(internet), max(internet))
     rises = [
@@ -587,7 +719,11 @@ def inkind_figures(inputs: dict) -> dict:
             growth,
             f"published growth 2024-2025 {tenure}",
         )
-        for stage, key in (("without_in_kind", "growth_percent_without"), ("with_in_kind", "growth_percent_with")):
+        for stage, key in (
+            ("without_home_internet", "growth_percent_without_home_internet"),
+            ("without_in_kind", "growth_percent_without"),
+            ("with_in_kind", "growth_percent_with"),
+        ):
             _close(
                 _growth(results["2024"][stage][tenure], results["2025"][stage][tenure]),
                 recent[key][tenure],
@@ -609,6 +745,7 @@ def inkind_figures(inputs: dict) -> dict:
             "growth_without_imputed_terms": without,
             "imputed_points": growth - without,
             "rental_assistance_points": growth - _growth(t24 - rent24, t25 - rent25),
+            "replication_without_home_internet": recent["growth_percent_without_home_internet"][tenure],
             "replication_without_stage": recent["growth_percent_without"][tenure],
             "replication_with_stage": recent["growth_percent_with"][tenure],
         }
@@ -815,56 +952,68 @@ def _rank_shift(components: dict) -> dict[str, float]:
 
 
 def _internet_and_levels(components: dict) -> dict:
-    """BLS's home internet term as a percent of each of its thresholds,
-    in the component receipt's two accountings: with the Other share
-    spread, s * 1.2 times the band mean of internet; with it kept separate,
-    as BLS's workbook publishes it, s times that mean plus the band's mean
-    broadband subsidy less the tenure's own, which leaves internet's part
-    of 0.2 F in the Other share. Our band holds no home internet, so the
-    receipt's level gap for internet is our broadband part less BLS's
-    term, and each figure here must match it. Also our level gaps once the
-    spread term joins our thresholds."""
+    """Home internet's term in each threshold, ours beside BLS's, as the
+    component receipt's ``home_internet`` record gives it under both
+    accountings, each checked against the band means. With the Other share
+    spread, each side's term is s * 1.2 times its band's mean home internet;
+    with it kept separate, as BLS's workbook publishes it, s times that mean
+    plus the band's mean broadband subsidy less the tenure's own, which
+    leaves internet's part of 0.2 F in the Other share. Our term is a percent
+    of our threshold with home internet and benefits, BLS's of its published
+    threshold, and each run's level gap for internet is our term less BLS's
+    over BLS's threshold. The figures come from the package run, whose band
+    the section reports. Also the Garner–Munoz runs' owner rent."""
     bls_years = components["bls"]["years"]
 
-    def separate_row(band: dict, tenure: str, threshold: float) -> float:
+    def terms(band: dict, tenure: str) -> dict[str, float]:
         pooled = band["pooled"]
-        return 100 * ANCHOR_SHARE * (pooled["internet"] + pooled["broadband"] - band["by_tenure"][tenure]["broadband"]) / threshold
+        return {
+            "other_spread": ANCHOR_SHARE * 1.2 * pooled["internet"],
+            "other_separate": ANCHOR_SHARE
+            * (pooled["internet"] + pooled["broadband"] - band["by_tenure"][tenure]["broadband"]),
+        }
 
-    shares, rows = {}, {}
+    shares = {(side, accounting): [] for side in ("ours", "bls") for accounting in ACCOUNTINGS}
     for year in YEARS:
-        internet = bls_years[year]["band"]["pooled"]["internet"]
-        for tenure in TENURES:
-            threshold = bls_years[year]["published_thresholds"][tenure]
-            share = 100 * ANCHOR_SHARE * 1.2 * internet / threshold
-            row = separate_row(bls_years[year]["band"], tenure, threshold)
-            for run in ("package", "package_bls_definition"):
-                entry = components["runs"][run]["years"][year]
-                gaps = entry["level_gap_percent_of_bls"]
-                ours = entry["with_in_kind"]["band"]
-                _require(ours["pooled"]["internet"] == 0, f"our band holds no home internet {run} {year}")
-                _close(-gaps["other_spread"][tenure]["terms"]["internet"], share, f"BLS internet term, Other spread {run} {year} {tenure}")
-                _close(
-                    separate_row(ours, tenure, threshold) - gaps["other_separate"][tenure]["terms"]["internet"],
-                    row,
-                    f"BLS internet term, Other separate {run} {year} {tenure}",
-                )
+        bls_band = bls_years[year]["band"]
+        for run in ("package", "package_bls_definition"):
+            entry = components["runs"][run]["years"][year]
+            ours_band = entry["with_in_kind"]["band"]
+            for tenure in TENURES:
+                label = f"{run} {year} {tenure}"
+                published = bls_years[year]["published_thresholds"][tenure]
+                ours_terms, bls_terms = terms(ours_band, tenure), terms(bls_band, tenure)
                 for accounting in ACCOUNTINGS:
+                    record = entry["home_internet"][accounting][tenure]
+                    _close(record["ours_dollars"], ours_terms[accounting], f"our internet term, {accounting} {label}")
+                    _close(record["bls_dollars"], bls_terms[accounting], f"BLS internet term, {accounting} {label}")
                     _close(
-                        gaps[accounting][tenure]["total"],
-                        entry["with_in_kind"]["gap_percent"][tenure],
-                        f"level terms total, {accounting} {run} {year} {tenure}",
+                        record["ours_percent_of_threshold"],
+                        100 * record["ours_dollars"] / entry["with_in_kind"]["thresholds"][tenure],
+                        f"our internet share, {accounting} {label}",
                     )
-            shares[(year, tenure)] = share
-            rows[(year, tenure)] = row
-    gaps = {}
-    for run in ("package", "package_bls_definition"):
-        years = components["runs"][run]["years"]
-        values = [
-            years[year]["with_in_kind"]["gap_percent"][tenure] + shares[(year, tenure)]
-            for year in YEARS
-            for tenure in TENURES
-        ]
-        gaps[run] = (min(values), max(values))
+                    _close(
+                        record["bls_percent_of_threshold"],
+                        100 * record["bls_dollars"] / published,
+                        f"BLS internet share, {accounting} {label}",
+                    )
+                    gaps = entry["level_gap_percent_of_bls"][accounting][tenure]
+                    _close(
+                        gaps["terms"]["internet"],
+                        100 * (record["ours_dollars"] - record["bls_dollars"]) / published,
+                        f"internet level term, {accounting} {label}",
+                    )
+                    _close(
+                        gaps["total"],
+                        entry["with_in_kind"]["gap_percent"][tenure],
+                        f"level terms total, {accounting} {label}",
+                    )
+                    if run == "package":
+                        shares[("ours", accounting)].append(record["ours_percent_of_threshold"])
+                        shares[("bls", accounting)].append(record["bls_percent_of_threshold"])
+    ours = [components["runs"]["package"]["years"][year]["with_in_kind"]["band"]["pooled"]["internet"] for year in YEARS]
+    bls = [bls_years[year]["band"]["pooled"]["internet"] for year in YEARS]
+    ratios = [a / b for a, b in zip(ours, bls, strict=True)]
     # Owners' spending under the CE's rented-dwelling summary, which the
     # Garner–Munoz runs keep: per owner without a mortgage in the band.
     kept = [
@@ -873,11 +1022,18 @@ def _internet_and_levels(components: dict) -> dict:
         ]["rent_and_rental_costs"]
         for year in YEARS
     ]
+
+    def span(values: list[float]) -> tuple[float, float]:
+        return (min(values), max(values))
+
     return {
-        "bls_internet_share_range": (min(shares.values()), max(shares.values())),
-        "bls_internet_row_share_range": (min(rows.values()), max(rows.values())),
-        "gap_with_bls_internet": gaps,
-        "garner_munoz_owner_rent_range": (min(kept), max(kept)),
+        "bls_internet_share_range": span(shares[("bls", "other_spread")]),
+        "bls_internet_row_share_range": span(shares[("bls", "other_separate")]),
+        "our_internet_share_range": span(shares[("ours", "other_spread")]),
+        "our_internet_row_share_range": span(shares[("ours", "other_separate")]),
+        "our_internet_range": span(ours),
+        "internet_ratio_range": span(ratios),
+        "garner_munoz_owner_rent_range": span(kept),
     }
 
 
