@@ -2554,7 +2554,8 @@ for label, ok in inkind_pins:
 # and a tied figure restated in other wording, or a correct copy beside a
 # changed statement, fails as a second copy.
 ABSTRACT_FIGURES += lift_literal.split(" to ")
-ABSTRACT_FIGURES += [f"{min(bls_shares):.0f}", f"{max(bls_shares):.0f}"]
+ABSTRACT_FIGURES += [f"{share:.1f}" for share in (min(bls_shares), max(bls_shares), min(separate_shares), max(separate_shares))]
+ABSTRACT_FIGURES += ["1.2", signed(min(stage_changes)), signed(max(stage_changes))]
 # The years the abstract names. Any other number the abstract states that
 # no tie derives from the data belongs here too, as often as the abstract
 # states it.

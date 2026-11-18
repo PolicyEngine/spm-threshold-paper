@@ -1645,8 +1645,7 @@ INKIND_ABSTRACT_TIE_LABELS = (
     "in-kind prose: abstract in-kind lift range",
     "in-kind prose: abstract and discussion: each change within one standard error",
     "in-kind prose: abstract and discussion: the accounting's shares",
-    "in-kind prose: written definitions with the composite CPI: the benefits' change to growth",
-    "in-kind prose: abstract stage changes under one point per tenure",
+    "in-kind prose: abstract stage-change range",
 )
 
 
@@ -3219,14 +3218,11 @@ class PaperGuardTests(unittest.TestCase):
                 ["abstract current projection cpi_u 2.29"],
             ),
             (
-                "stage-change bound changed",
-                r"less(\s+)than(\s+)one(\s+)point",
-                r"less\1than\2half\3a point",
-                "change 2022–2025 growth by less than one point per tenure with the CE's spending summaries",
-                [
-                    "in-kind prose: abstract stage changes under one point per tenure",
-                    "in-kind prose: written definitions with the composite CPI: the benefits' change to growth",
-                ],
+                "stage-change range reworded",
+                r"points(\s+)per(\s+)tenure",
+                r"points\1per\2household",
+                "change 2022–2025 growth by −0.63 to +1.04 points per tenure with the CE's spending summaries",
+                ["in-kind prose: abstract stage-change range"],
             ),
         )
         places = {
