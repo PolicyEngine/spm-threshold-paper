@@ -1,0 +1,46 @@
+{
+ "cpi_factor": 1.02631,
+ "anchor_factors": {
+  "1": 0.9744,
+  "2": 0.983,
+  "3": 0.9653
+ },
+ "spm_published_replication": {
+  "all": 13.11,
+  "children": 13.39,
+  "18-64": 12.28,
+  "65+": 15.38
+ },
+ "official_replication": {
+  "all": 10.2,
+  "children": 13.41,
+  "18-64": 9.2,
+  "65+": 9.77
+ },
+ "spm_anchored_2024_thresholds": {
+  "all": 12.31,
+  "children": 12.31,
+  "18-64": 11.55,
+  "65+": 14.66
+ },
+ "by_tenure": {
+  "owner_with_mortgage": {
+   "published": 6.0,
+   "anchored": 5.67
+  },
+  "owner_without_mortgage": {
+   "published": 11.89,
+   "anchored": 11.49
+  },
+  "renter": {
+   "published": 23.96,
+   "anchored": 22.13
+  }
+ },
+ "threshold_effect_pp": {
+  "all": 0.8,
+  "children": 1.08,
+  "18-64": 0.73,
+  "65+": 0.72
+ }
+}

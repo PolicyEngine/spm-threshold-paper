@@ -1,0 +1,52 @@
+state,name,official_plus_pct,official_plus_moe,spm_pct,spm_moe
+AL,Alabama,15.2,1.6,14.4,1.3
+AK,Alaska,10,1.1,10.4,1.3
+AZ,Arizona,10.7,1.1,13.7,1.2
+AR,Arkansas,12.7,1.5,12.8,1.4
+CA,California,10.7,0.5,17.8,0.6
+CO,Colorado,8.6,1.5,10.8,1.5
+CT,Connecticut,8.6,1.4,10.4,1.4
+DE,Delaware,7.3,1.2,8.9,1.3
+DC,District of Columbia,12.1,1.4,15.7,1.5
+FL,Florida,11.3,0.7,16.4,0.9
+GA,Georgia,12.3,1.1,14,1.2
+HI,Hawaii,8.5,1.3,11.7,1.3
+ID,Idaho,8.4,0.9,9.4,1
+IL,Illinois,10.4,0.8,11.6,0.9
+IN,Indiana,9.3,1.1,10.3,1.2
+IA,Iowa,8.1,0.9,8.3,1.1
+KS,Kansas,8.1,1.2,8.1,1
+KY,Kentucky,13.7,1.6,13.2,1.6
+LA,Louisiana,19.6,1.5,19,1.4
+ME,Maine,7.5,1.1,6.4,1.1
+MD,Maryland,7.2,1.1,10.9,1.4
+MA,Massachusetts,9.1,1,12.5,1
+MI,Michigan,11.5,0.9,10.6,1.2
+MN,Minnesota,7.4,1,7.9,1
+MS,Mississippi,17.6,1.2,16.8,1.4
+MO,Missouri,9.3,1.4,9.4,1.3
+MT,Montana,8.6,1.3,9.5,1.6
+NE,Nebraska,7.3,1.2,7.5,1
+NV,Nevada,11.8,1.2,15.3,1.5
+NH,New Hampshire,5.4,0.9,8,1.3
+NJ,New Jersey,8.9,1,12.1,1
+NM,New Mexico,16,2.6,13.2,1.5
+NY,New York,10.9,0.8,15.1,0.9
+NC,North Carolina,13.1,1.3,13.5,1.2
+ND,North Dakota,8.6,1.1,8.9,1.1
+OH,Ohio,10.8,1,9.9,1
+OK,Oklahoma,12.6,1.3,11.1,1.3
+OR,Oregon,9.2,0.9,11,1
+PA,Pennsylvania,9.3,0.9,10.7,1
+RI,Rhode Island,9.4,1.3,10.6,1.4
+SC,South Carolina,11,1.1,11.1,1.2
+SD,South Dakota,8.6,1.3,8,1.1
+TN,Tennessee,10.7,1.2,11.1,1.1
+TX,Texas,11.7,0.6,14.4,0.6
+UT,Utah,6.9,1,9.9,1.1
+VT,Vermont,7.3,1,8.9,1.2
+VA,Virginia,8.7,1.2,10.6,1.2
+WA,Washington,8.8,1.2,10.5,1.3
+WV,West Virginia,13.5,1.5,12.1,1.6
+WI,Wisconsin,8.8,1.5,7.9,1.2
+WY,Wyoming,8.6,1.1,8.7,1.1
