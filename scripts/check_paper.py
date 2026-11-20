@@ -2556,9 +2556,8 @@ for label, ok in inkind_pins:
 ABSTRACT_FIGURES += lift_literal.split(" to ")
 ABSTRACT_FIGURES += [f"{share:.1f}" for share in (min(bls_shares), max(bls_shares), min(separate_shares), max(separate_shares))]
 ABSTRACT_FIGURES += ["1.2", signed(min(stage_changes)), signed(max(stage_changes))]
-# The years the abstract names. Any other number the abstract states that
-# no tie derives from the data belongs here too, as often as the abstract
-# states it.
+# The years the abstract names, and any other number it states that no tie
+# checks in the abstract, each as often as the abstract states it.
 ABSTRACT_YEARS = ["2020–2025", "2025", "2025", "2035", "2022–2025"]
 # Each token minus any of ( ) , . ; : at its ends. Other punctuation stays,
 # so "2025's", "2025?" or a quoted "2025" fails the check.
