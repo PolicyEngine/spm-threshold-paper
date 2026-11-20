@@ -411,16 +411,21 @@ Following Census [@spmtechnical], we count every child under 5 in each
 participating unit, plus one mother if the unit has a child aged 0 or 1.
 We count that mother only when the unit has a woman aged 15 or older, so
 in the units we add to the WIC universe for 2025, we count the children
-alone. If the unit has no child under 5, we count one pregnant woman. We
-give each participant twelve months of the average monthly WIC food cost
-per person in the unit's state, for the fiscal year that matches the
-unit's reference year. The Census Bureau's SPM team compiled these state
-averages from the WIC program data of USDA's Food and Nutrition Service
-(FNS) [@spmcalculator2026inkind]. Census values WIC with state averages
+alone. If the unit has no child under 5, we count one pregnant woman.
+Where the CE reports the unit's state, we value each participant's WIC at
+twelve times the average monthly WIC food cost per person in that state,
+for the fiscal year that matches the unit's reference year. The Census
+Bureau's SPM team compiled these state averages from the WIC program data
+of USDA's Food and Nutrition Service (FNS) and provided them to us. We
+publish their table as received in the calculator's repository
+[@spmcalculator2026wictable]. Census values WIC with state averages
 [@spmtechnical], and BLS assigns the WIC values Census staff supply
-[@blsspmhome].
+[@blsspmhome]. Census valued WIC at USDA's national average until its
+September 2021 report, when it adopted state averages and recomputed its
+2019 estimates with them [@burnsfox2021]. We apply the state averages in
+every reference year in which we add WIC, 2014 to 2019.
 
-We add no WIC from reference year 2020, the year of the statutory deadline. Congress required every WIC state agency to implement EBT throughout the state by October 1, 2020, unless the Secretary of Agriculture exempted it [@usc1786]. We assign interviews from April 2020 to March 2021 to reference year 2020, and their reference periods center on mid-February 2020 to mid-January 2021. So we also drop WIC for reference periods before the deadline, including in six states whose WIC agencies implemented EBT statewide between June and September 2020, from Hawaii to Illinois [@fnswicebt2022]. The WIC agencies of six more states and the District of Columbia did so after the deadline, from Utah in November 2020 to Georgia in October 2022 [@fnswicebt2022]. For earlier reference years, we take each state's statewide date from FNS and add no WIC when the unit's state had fully implemented WIC EBT by the midpoint of its three-month reference period. When the CE suppresses a unit's state, we draw that status with probability equal to the weighted share of known-state units in the same region and quarter whose states had done so. If such a unit takes WIC, we give it the weighted mean food cost of the known-state units in its region and quarter whose states had not done so.
+We add no WIC from reference year 2020, the year of the statutory deadline. Congress required every WIC state agency to implement EBT throughout the state by October 1, 2020, unless the Secretary of Agriculture exempted it [@usc1786]. We assign interviews from April 2020 to March 2021 to reference year 2020, and their reference periods center on mid-February 2020 to mid-January 2021. So we also drop WIC for reference periods before the deadline, including in six states whose WIC agencies implemented EBT statewide between June and September 2020, from Hawaii to Illinois [@fnswicebt2022]. The WIC agencies of six more states and the District of Columbia did so after the deadline, from Utah in November 2020 to Georgia in October 2022 [@fnswicebt2022]. For earlier reference years, we take each state's statewide date from FNS and add no WIC when the unit's state had fully implemented WIC EBT by the midpoint of its three-month reference period. When the CE suppresses a unit's state, we draw that status with probability equal to the weighted share of known-state units in the same region and collection quarter whose states had done so. Where that cell has no known-state unit, as when the CE also withholds the region, we count the state as having done so and add no WIC. If a unit with a suppressed state takes WIC, we value its participants at the weighted mean food cost of the cell's known-state units whose states had not fully implemented WIC EBT, in the unit's reference year.
 
 We assign every interview in our 2025 window to reference year 2020 or later, so our 2025 thresholds include no WIC. If we instead apply BLS's rule state by state in every reference year, we add WIC in the 12 states and the District whose statewide dates fall in June 2020 or later, each until its date. Some units in the 2025 window then take WIC. We estimate that mean WIC per CE unit with children rises by \$2.07 to \$3.45 in the windows behind the 2021–2025 thresholds. As the added WIC raises spending in the band and changes which units fall in it, we estimate that those thresholds move by −\$9 to +\$19 (−0.03 to +0.06 percent). We estimate a change of 0.03 points or less in 2022–2025 growth.
 

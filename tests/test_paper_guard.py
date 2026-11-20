@@ -659,22 +659,64 @@ INKIND_PROSE_MUTATIONS = (
     (
         "WIC state food cost",
         "section",
-        r"per(\s+)person(\s+)in(\s+)the(\s+)unit's(\s+)state,",
+        r"per(\s+)person(\s+)in(\s+)that(\s+)state,",
         r"per\1person\2in\3the\4nation,",
         "method constants read from fingerprinted calculator code",
     ),
     (
-        "WIC suppressed-state food cost cell",
+        "WIC suppressed-state food cost donors",
         "section",
-        r"known-state(\s+)units(\s+)in(\s+)its(\s+)region(\s+)and(\s+)quarter(\s+)whose(\s+)states(\s+)had(\s+)not",
-        r"known-state\1units\2in\3its\4region\5and\6year\7whose\8states\9had\10not",
+        r"of(\s+)the(\s+)cell's(\s+)known-state(\s+)units(\s+)whose(\s+)states(\s+)had(\s+)not(\s+)fully",
+        r"of\1the\2cell's\3known-state\4units\5whose\6states\7had\8fully",
         "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "WIC suppressed-state cell",
+        "section",
+        r"same(\s+)region(\s+)and(\s+)collection(\s+)quarter",
+        r"same\1region\2and\3collection\4year",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "WIC cell without known-state units",
+        "section",
+        r"as(\s+)having(\s+)done(\s+)so(\s+)and(\s+)add(\s+)no(\s+)WIC\.",
+        r"as\1having\2done\3so\4and\5add\6their\7WIC.",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "WIC donor cost year",
+        "section",
+        r"EBT,(\s+)in(\s+)the(\s+)unit's(\s+)reference(\s+)year",
+        r"EBT,\1in\2each\3donor's\4reference\5year",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "WIC years valued with state averages",
+        "section",
+        r"add(\s+)WIC,(\s+)2014(\s+)to(\s+)2019\.",
+        r"add\1WIC,\g<2>2015\3to\g<4>2019.",
+        "WIC years valued with state averages",
+    ),
+    (
+        "Census national average until its 2021 report",
+        "section",
+        r"September(\s+)2021(\s+)report,",
+        r"September\g<1>2020\2report,",
+        "WIC years valued with state averages",
     ),
     (
         "WIC state averages source",
         "section",
         r"The(\s+)Census(\s+)Bureau's(\s+)SPM(\s+)team(\s+)compiled",
         r"The\1Food\2and\3Nutrition\4Service\5compiled",
+        "WIC food cost from the Census SPM team's state averages",
+    ),
+    (
+        "WIC state averages provided as received",
+        "section",
+        r"We(\s+)publish(\s+)their(\s+)table(\s+)as(\s+)received",
+        r"We\1publish\2their\3table\4as\5revised",
         "WIC food cost from the Census SPM team's state averages",
     ),
     (
@@ -2235,10 +2277,10 @@ class PaperGuardTests(unittest.TestCase):
         self.assertIn("current projection prose replication_ratio", result.stdout)
 
     def test_projection_and_backtest_figures_quoted_elsewhere_still_pin(self):
-        """The in-kind section also quotes 0.90 and 0.76, so a drifted
-        abstract blend or benchmark blend must still fail its own pin."""
-        path = self.repo / "paper/index.qmd"
-        text = path.read_text()
+        """A drifted abstract blend or benchmark blend must fail its own pin
+        even where another section quotes the same number. Each case restates
+        the number under the discussion heading, so the case holds whether or
+        not the in-kind figures happen to share it."""
         for number, old, new, label in (
             (
                 "0.90",
@@ -2254,13 +2296,10 @@ class PaperGuardTests(unittest.TestCase):
             ),
         ):
             with self.subTest(label=label):
-                self.assertEqual(text.count(old), 1)
-                self.assertGreater(len(re.findall(rf"(?<![\d.]){re.escape(number)}(?!\d)", text)), 1)
-                path.write_text(text.replace(old, new))
-                result = self.run_guard()
-                self.assertNotEqual(result.returncode, 0)
-                self.assertIn(label, result.stdout)
-        path.write_text(text)
+                self.assert_article_mutation_fails(
+                    label, ((old, new),), label, DISCUSSION_HEADING, f"Another estimate reaches {number} percent."
+                )
+        self.install_article()
 
     def test_signed_cpi_u_bias_pins_its_sign(self):
         path = self.repo / "paper/index.qmd"
@@ -2970,6 +3009,8 @@ class PaperGuardTests(unittest.TestCase):
         inkind = (inkind, original.index("\n}\n", inkind) + 3)
         se = original.index("@misc{spmcalculator2026se")
         se = (se, original.index("\n}\n", se) + 3)
+        wic = original.index("@misc{spmcalculator2026wictable")
+        wic = (wic, original.index("\n}\n", wic) + 3)
 
         def in_entry(entry, old, new):
             start, end = entry
@@ -2980,6 +3021,9 @@ class PaperGuardTests(unittest.TestCase):
             ("stale standard-error commit", in_entry(se, uncertainty, stale_uncertainty)),
             ("stale components link", in_entry(inkind, f"blob/{components}/", f"blob/{stale_components}/")),
             ("stale standard-error link", in_entry(se, f"blob/{uncertainty}/", f"blob/{stale_uncertainty}/")),
+            ("stale WIC table commit", in_entry(wic, f"commit {replication},", f"commit {stale_replication},")),
+            ("stale WIC table link", in_entry(wic, f"blob/{replication}/", f"blob/{stale_replication}/")),
+            ("WIC table link to the main branch", in_entry(wic, f"blob/{replication}/", "blob/main/")),
             (
                 "note names the imputation's old commit",
                 original.replace(
@@ -2999,6 +3043,7 @@ class PaperGuardTests(unittest.TestCase):
         self.assertEqual(original.count(note), 1)
         self.assertEqual(original[inkind[0] : inkind[1]].count(components), 2)
         self.assertEqual(original[se[0] : se[1]].count(uncertainty), 2)
+        self.assertEqual(original[wic[0] : wic[1]].count(replication), 2)
         for name, edited in cases:
             with self.subTest(name=name):
                 self.assertNotEqual(edited, original)
