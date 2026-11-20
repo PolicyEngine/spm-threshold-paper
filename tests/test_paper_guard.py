@@ -666,15 +666,36 @@ INKIND_PROSE_MUTATIONS = (
     (
         "WIC suppressed-state food cost donors",
         "section",
-        r"of(\s+)the(\s+)cell's(\s+)known-state(\s+)units(\s+)whose(\s+)states(\s+)had(\s+)not(\s+)fully",
-        r"of\1the\2cell's\3known-state\4units\5whose\6states\7had\8fully",
+        r"units(\s+)whose(\s+)states(\s+)had(\s+)not(\s+)done(\s+)so,",
+        r"units\1whose\2states\3had\4done\6so,",
         "method constants read from fingerprinted calculator code",
     ),
     (
         "WIC suppressed-state cell",
         "section",
-        r"same(\s+)region(\s+)and(\s+)collection(\s+)quarter",
-        r"same\1region\2and\3collection\4year",
+        r"same(\s+)region,(\s+)collection(\s+)year,(\s+)and(\s+)collection(\s+)quarter",
+        r"same\1region\2and\5collection\6quarter",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "WIC suppressed-state draw weights",
+        "section",
+        r"the(\s+)weighted(\s+)share(\s+)of(\s+)known-state(\s+)units",
+        r"the\1unweighted\2share\3of\4known-state\5units",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "WIC suppressed-state annual value",
+        "section",
+        r"at(\s+)twelve(\s+)times(\s+)a(\s+)weighted(\s+)mean(\s+)monthly",
+        r"at\1a\4weighted\5mean\6monthly",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "WIC donor survey weights",
+        "section",
+        r"weighting(\s+)each(\s+)unit(\s+)by(\s+)its(\s+)survey(\s+)weight",
+        r"weighting\1each\2state\3by\4its\5WIC\6caseload",
         "method constants read from fingerprinted calculator code",
     ),
     (
@@ -687,8 +708,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "WIC donor cost year",
         "section",
-        r"EBT,(\s+)in(\s+)the(\s+)unit's(\s+)reference(\s+)year",
-        r"EBT,\1in\2each\3donor's\4reference\5year",
+        r"matches(\s+)the(\s+)cell's(\s+)reference(\s+)year",
+        r"matches\1the\2donor's\3interview\4year",
         "method constants read from fingerprinted calculator code",
     ),
     (
@@ -2281,15 +2302,15 @@ class PaperGuardTests(unittest.TestCase):
         even where another section quotes the same number. Each case restates
         the number under the discussion heading, so the case holds whether or
         not the in-kind figures happen to share it."""
-        for number, old, new, label in (
+        for quoted, old, new, label in (
             (
-                "0.90",
+                "0.90 percent with an equal blend",
                 "0.90 percent with an equal blend",
                 "0.91 percent with an equal blend",
                 "current projection prose blend",
             ),
             (
-                "0.76",
+                "0.76 percent",
                 "The equal blend scores 0.76 percent",
                 "The equal blend scores 0.77 percent",
                 "backtest prose literal 0.76",
@@ -2297,7 +2318,7 @@ class PaperGuardTests(unittest.TestCase):
         ):
             with self.subTest(label=label):
                 self.assert_article_mutation_fails(
-                    label, ((old, new),), label, DISCUSSION_HEADING, f"Another estimate reaches {number} percent."
+                    label, ((old, new),), label, DISCUSSION_HEADING, f"Another estimate reaches {quoted}."
                 )
         self.install_article()
 
@@ -2759,6 +2780,32 @@ class PaperGuardTests(unittest.TestCase):
 
         self.assert_resealed_receipts_fail(
             (("FNS table", change_the_fns_table, ("WIC EBT dates from the calculator's FNS table",)),)
+        )
+
+    def test_wic_citation_follows_the_census_table_the_receipt_hashes(self):
+        def change_the_census_table(receipts):
+            receipts[INKIND_NAMES[1]]["in_kind_methodology"]["parameter_files_sha256"][
+                "census_wic_state_monthly_cost.csv"
+            ] = "0" * 64
+
+        def drop_the_census_table(receipts):
+            del receipts[INKIND_NAMES[1]]["in_kind_methodology"]["parameter_files_sha256"][
+                "census_wic_state_monthly_cost.csv"
+            ]
+
+        self.assert_resealed_receipts_fail(
+            (
+                ("changed Census table", change_the_census_table, ("WIC food cost from the Census SPM team's state averages",)),
+                ("missing Census table", drop_the_census_table, ("WIC food cost from the Census SPM team's state averages",)),
+            )
+        )
+
+    def test_unset_wic_cutoff_fails_by_name(self):
+        def unset_the_cutoff(receipts):
+            receipts[INKIND_NAMES[1]]["in_kind_methodology"]["wic_ebt_all_states_from_reference_year"] = None
+
+        self.assert_resealed_receipts_fail(
+            (("unset WIC cutoff", unset_the_cutoff, ("WIC years valued with state averages",)),)
         )
 
     def test_paper_adds_no_2025_wic_only_while_the_receipt_adds_none(self):
