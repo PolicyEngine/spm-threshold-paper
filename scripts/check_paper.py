@@ -1353,22 +1353,30 @@ def displayed_shares() -> list[float] | None:
 
 # Method constants the section quotes from the calculator's code rather
 # than from a receipt. We read each from spm_calculator/ce_inkind.py at
-# this fingerprint (calculator commit 2321f2f). Since 4778dfa, the file has
-# changed two rules: the 2020 WIC cutoff, quoted below, and the broadband
+# this fingerprint (calculator commit 83afa0c). Since 4778dfa, the file has
+# changed three rules: the 2020 WIC cutoff, quoted below, the broadband
 # start (reference year 2022), which the receipt records and a pin below
-# reads. Since e602bc7 it has changed only a docstring and the diagnostics
-# entry it gives a program before its first reference year, which now has
-# a new status and names that year. A receipt rebuilt from changed code
-# fails the pin until someone rereads them.
+# reads, and, since 948c6e1, the WIC food cost, which now comes from the
+# Census SPM team's state table, with a cell mean where the CE withholds
+# the state, both quoted below. A receipt rebuilt from changed code fails
+# the pin until someone rereads them.
 INKIND_METHOD_SOURCE = (
     "spm_calculator/ce_inkind.py",
-    "97d0b6b76982bab9d9c7e9d15d5c1723f667adbbfe54432533eaf1ebf198bdd8",
+    "1240e2707e666a42b2b46932cd23b259f1be43c03588c4c57dbd16e87553a729",
 )
 INKIND_METHOD_CONSTANTS = (
     "over 179 school days",  # NSLP_SCHOOL_DAYS
     "free rate below 150 percent of the poverty line",  # FREE_LUNCH_POVERTY_RATIO
     "split the income groups at 150 percent of the official poverty line",  # the same ratio, for cells
-    "twelve months of USDA's national average monthly food cost",  # 12.0 * cost in the WIC stage
+    # 12.0 * monthly in the WIC stage; _wic_monthly_cost looks up
+    # wic_state_monthly_food_cost() by the unit's state and reference year
+    "twelve months of the average monthly WIC food cost per person in the unit's state, for the fiscal year "
+    "that matches the unit's reference year",
+    # _wic_monthly_cost: a suppressed-state unit takes the weight-weighted
+    # mean of the state values of known-state units in its (region, CE year,
+    # collection quarter) cell whose state had not finished WIC EBT
+    "If such a unit takes WIC, we give it the weighted mean food cost of the known-state units in its region "
+    "and quarter whose states had not done so",
     # _wic_participants: n_lt5 children, plus a mother when n_infants > 0
     # and n_women_15_plus >= 1; otherwise one participant. Census's rule
     # has no woman test. Every narrow-universe unit has a woman aged 15 or
@@ -1634,7 +1642,7 @@ def wic_by_state_pin() -> bool:
 # The rental-assistance sensitivities: scripts/rent_sensitivity.py writes this
 # receipt, so replacing it takes an edit here.
 RENT_SENSITIVITY = DATA / "rent_sensitivity" / "rent_model_sensitivity_2022.json"
-RENT_SENSITIVITY_SHA256 = "f503130b124943991969c7a8b97460f884bad38dde0eae58e3c6d48f04ea052b"
+RENT_SENSITIVITY_SHA256 = "f36ab621dc597643084cab0957b8791f69744358b31a2ebe8566b25c7b9e609a"
 rent_sensitivity = json.loads(RENT_SENSITIVITY.read_text())
 rent_variants = {
     name: row["percent_vs_base"] for name, row in rent_sensitivity["variants"].items()
@@ -2467,11 +2475,29 @@ inkind_pins = (
         # respondents who report EBT and not SNAP. The receipt's limitation
         # must say the same, so a rewording there sends someone back here.
         "school lunch EBT caveat reaches 2022's summer Pandemic EBT",
-        any("for 2022 it counts summer P-EBT" in limitation for limitation in replication_receipt["limitations"])
+        any(
+            "For 2022, it counts summer P-EBT (summer EBT in its technical documentation) and excludes "
+            "school-year P-EBT" in limitation
+            for limitation in replication_receipt["limitations"]
+        )
         and has_number(
             "Census accounts for Pandemic EBT in its 2020 and 2021 values and for summer Pandemic EBT in its 2022 "
             "values [@spmtechnical; @shrider2023]. States paid those benefits on EBT cards, so under BLS's "
             "reasoning for SNAP, reported food spending may already include them",
+            text=INKIND_TEXT,
+        ),
+    ),
+    (
+        # The receipt's WIC limitation names the Census SPM team's state
+        # averages; the paper's method sentence must name the same source.
+        "WIC food cost from the Census SPM team's state averages",
+        any(
+            limitation.startswith("WIC applies the Census SPM team's state averages of the monthly food cost per person")
+            for limitation in replication_receipt["limitations"]
+        )
+        and has_number(
+            "The Census Bureau's SPM team compiled these state averages from the WIC program data of USDA's Food "
+            "and Nutrition Service (FNS)",
             text=INKIND_TEXT,
         ),
     ),

@@ -49,7 +49,7 @@ abstract: |
   estimate that it raises replicated thresholds by 0.3 to 4.0 percent.
   We then impute the five in-kind benefits BLS adds to spending. We
   estimate that they raise thresholds by a further 0.5 to 3.5 percent and
-  change 2022–2025 growth by −1.63 to −0.17 points per tenure with
+  change 2022–2025 growth by −1.62 to −0.19 points per tenure with
   the CE's spending summaries, each change within one standard error of
   zero. From BLS's published
   shares, we compute that its imputed benefits supply 4.9 to 12.9
@@ -337,7 +337,7 @@ counts as home internet.
 In our band with home internet and the benefits, we estimate home
 internet spending of \$543 to \$869 per unit across the 2019–2025
 thresholds, against \$547 to \$878 in BLS's band (@sec-inkind-bls).
-Across those years, our estimate differs from BLS's by −1.1 to +3.1
+Across those years, our estimate differs from BLS's by −1.1 to +3.2
 percent. In its formula, BLS adds 0.2 times the band's mean FCSUti for
 other basic goods and services, and it publishes that term's share of
 each threshold as a separate Other share. With that share kept separate, home internet supplies 1.54 to
@@ -412,12 +412,17 @@ participating unit, plus one mother if the unit has a child aged 0 or 1.
 We count that mother only when the unit has a woman aged 15 or older, so
 in the units we add to the WIC universe for 2025, we count the children
 alone. If the unit has no child under 5, we count one pregnant woman. We
-give each participant twelve months of USDA's national average monthly
-food cost for the fiscal year that matches the unit's reference year.
+give each participant twelve months of the average monthly WIC food cost
+per person in the unit's state, for the fiscal year that matches the
+unit's reference year. The Census Bureau's SPM team compiled these state
+averages from the WIC program data of USDA's Food and Nutrition Service
+(FNS) [@spmcalculator2026inkind]. Census values WIC with state averages
+[@spmtechnical], and BLS assigns the WIC values Census staff supply
+[@blsspmhome].
 
-We add no WIC from reference year 2020, the year of the statutory deadline. Congress required every WIC state agency to implement EBT throughout the state by October 1, 2020, unless the Secretary of Agriculture exempted it [@usc1786]. We assign interviews from April 2020 to March 2021 to reference year 2020, and their reference periods center on mid-February 2020 to mid-January 2021. So we also drop WIC for reference periods before the deadline, including in six states whose WIC agencies implemented EBT statewide between June and September 2020, from Hawaii to Illinois [@fnswicebt2022]. The WIC agencies of six more states and the District of Columbia did so after the deadline, from Utah in November 2020 to Georgia in October 2022 [@fnswicebt2022]. For earlier reference years, we take each state's statewide date from FNS and add no WIC when the unit's state had fully implemented WIC EBT by the midpoint of its three-month reference period. When the CE suppresses a unit's state, we draw that status with probability equal to the weighted share of known-state units in the same region and quarter whose states had done so.
+We add no WIC from reference year 2020, the year of the statutory deadline. Congress required every WIC state agency to implement EBT throughout the state by October 1, 2020, unless the Secretary of Agriculture exempted it [@usc1786]. We assign interviews from April 2020 to March 2021 to reference year 2020, and their reference periods center on mid-February 2020 to mid-January 2021. So we also drop WIC for reference periods before the deadline, including in six states whose WIC agencies implemented EBT statewide between June and September 2020, from Hawaii to Illinois [@fnswicebt2022]. The WIC agencies of six more states and the District of Columbia did so after the deadline, from Utah in November 2020 to Georgia in October 2022 [@fnswicebt2022]. For earlier reference years, we take each state's statewide date from FNS and add no WIC when the unit's state had fully implemented WIC EBT by the midpoint of its three-month reference period. When the CE suppresses a unit's state, we draw that status with probability equal to the weighted share of known-state units in the same region and quarter whose states had done so. If such a unit takes WIC, we give it the weighted mean food cost of the known-state units in its region and quarter whose states had not done so.
 
-We assign every interview in our 2025 window to reference year 2020 or later, so our 2025 thresholds include no WIC. If we instead apply BLS's rule state by state in every reference year, we add WIC in the 12 states and the District whose statewide dates fall in June 2020 or later, each until its date. Some units in the 2025 window then take WIC. We estimate that mean WIC per CE unit with children rises by \$1.94 to \$3.20 in the windows behind the 2021–2025 thresholds. As the added WIC raises spending in the band and changes which units fall in it, we estimate that those thresholds move by −\$5 to +\$18 (−0.01 to +0.05 percent). We estimate a change of 0.03 points or less in 2022–2025 growth.
+We assign every interview in our 2025 window to reference year 2020 or later, so our 2025 thresholds include no WIC. If we instead apply BLS's rule state by state in every reference year, we add WIC in the 12 states and the District whose statewide dates fall in June 2020 or later, each until its date. Some units in the 2025 window then take WIC. We estimate that mean WIC per CE unit with children rises by \$2.07 to \$3.45 in the windows behind the 2021–2025 thresholds. As the added WIC raises spending in the band and changes which units fall in it, we estimate that those thresholds move by −\$9 to +\$19 (−0.03 to +0.06 percent). We estimate a change of 0.03 points or less in 2022–2025 growth.
 
 For rental assistance, BLS fits a limited dependent variable model that
 treats assisted renters' rents as censored from above, and it values the
@@ -456,7 +461,7 @@ owners without mortgages, and 1.53 to 2.38 percent for renters. When we
 then impute the benefits, we estimate that they raise the thresholds by
 a further 0.5 to 3.5 percent. With both,
 we estimate thresholds that exceed BLS's for every tenure in every year,
-by 2.18 to 7.06 percent (@tbl-inkind-levels). We read the CE's shelter,
+by 2.18 to 7.07 percent (@tbl-inkind-levels). We read the CE's shelter,
 utilities, and food summaries, which include rent and meals received as
 pay, other lodging such as vacation homes and lodging on out-of-town
 trips [@ceglossary], and utilities for vacation homes [@cepumd]. Garner and
@@ -470,7 +475,7 @@ benefits trails BLS by 1.98 to 4.20 percent. With home internet, we
 estimate thresholds that differ from BLS's by −2.13 to +0.90 percent,
 and the mean absolute deviation falls from 3.14 to 1.11 percent.
 When we also add the imputed benefits, we estimate thresholds that
-exceed BLS's for every tenure in every year, by 0.76 to 3.63 percent,
+exceed BLS's for every tenure in every year, by 0.75 to 3.63 percent,
 and the mean absolute deviation rises to 1.76 percent.
 
 ::: {#tbl-inkind-levels}
@@ -509,15 +514,15 @@ Internet Share" in 2025. We treat that row as including broadband subsidies and 
 
 Between the 2022 and 2025 thresholds, BLS's imputed benefits rose from
 \$855 to \$1,257 per unit in its band, and we estimate that ours rose
-from \$1,028 to \$1,170, a rise of \$143 with a standard error of \$190
-(@tbl-inkind-amounts). Of the \$259 difference between the two rises,
-rental assistance supplies \$175 and school lunch \$92, and the other
-three benefits narrow it by \$9. From the 2019 to the 2022 thresholds, BLS's rental
+from \$1,029 to \$1,170, a rise of \$141 with a standard error of \$189
+(@tbl-inkind-amounts). Of the \$260 difference between the two rises,
+rental assistance supplies \$174 and school lunch \$92, and the other
+three benefits narrow it by \$6. From the 2019 to the 2022 thresholds, BLS's rental
 assistance per renter rose 17 percent, and we estimate that ours rose 14
 percent (@tbl-inkind-series). For the 2019–2023
-thresholds, we estimate rental assistance per renter 60 to 89 percent above BLS's, \$1,351 against \$738 in 2022. BLS's amount then rose to
+thresholds, we estimate rental assistance per renter 58 to 87 percent above BLS's, \$1,347 against \$738 in 2022. BLS's amount then rose to
 \$940 in 2024 and \$1,243 in 2025, where we estimate \$1,448. From 2022
-to 2025, BLS's amount rose by \$505, and we estimate that ours rose by \$97, with a standard error of \$453. BLS draws on many of the same CE
+to 2025, BLS's amount rose by \$505, and we estimate that ours rose by \$101, with a standard error of \$452. BLS draws on many of the same CE
 interviews, so that standard error does not measure the sampling error
 in the gap between the two rises. We have not established what produces
 the level gap or what raised BLS's amount in 2024 and 2025
@@ -559,16 +564,16 @@ with October interpolated, 138.289 against the official 138.198 (2013 =
 percent. We estimate that home internet changes the replication's
 growth by +0.01 points for owners with mortgages, +4.33 for owners
 without mortgages, and −0.54 for renters. With home internet added, we
-estimate that the imputed benefits change growth by −0.17, −1.63, and
-−0.27 points, each within one standard error of zero
+estimate that the imputed benefits change growth by −0.19, −1.62, and
+−0.26 points, each within one standard error of zero
 (@sec-inkind-uncertainty). When we deflate with BLS's FCSUti index
 instead of the replication's composite CPI, we estimate that growth with
 home internet changes by +0.97, −0.12, and +1.29 points. Under the
 Garner–Munoz restrictions and BLS's index, we estimate growth with home
-internet and the benefits that differs from BLS's by +0.56, −0.52, and
+internet and the benefits that differs from BLS's by +0.54, −0.52, and
 −1.13 points. With the same restrictions and the replication's
-composite CPI, we estimate that the benefits change growth by +0.42,
-−4.45, and −0.01 points.
+composite CPI, we estimate that the benefits change growth by +0.41,
+−4.49, and −0.02 points.
 
 ```{=latex}
 \Needspace{25\baselineskip}
@@ -595,7 +600,7 @@ out-of-pocket spending beyond BLS's index supplies the remaining 6.92.
 The three parts supply 4.10, 0.81, and 5.72 of 10.63 points for owners
 without mortgages, and 4.04, 1.57, and 6.54 of 12.14 points for renters.
 Imputed benefits therefore supply 4.9, 7.6, and 12.9 percent of BLS's
-growth beyond CPI-U, and we estimate 2.3, 2.6, and 1.5 percent for ours.
+growth beyond CPI-U, and we estimate 2.3, 2.5, and 1.5 percent for ours.
 In both series, we count home internet with out-of-pocket spending.
 We compute each share as $(I_{2025}-\pi I_{2022})/(B_{2025}-\pi
 B_{2022})$, where $I$ sums the imputed benefits' terms in threshold $B$
@@ -610,11 +615,11 @@ accounting. The benefits' part falls to 4.3, 6.8, and 11.7 percent with
 their terms, and to 3.0, 5.2, and 10.7 percent with their rows. We take each year's
 band means as BLS's shares give them, so we leave out how the benefits
 change which units fall in the band. In our replication, we estimate that this re-ranking
-moves 2022–2025 growth by −0.27, −1.72, and +0.04 points. The
+moves 2022–2025 growth by −0.28, −1.70, and +0.05 points. The
 out-of-pocket part combines real spending growth with changes in the
 sample as newer CE quarters replace older ones.
 With the composite CPI, we estimate that our renter growth with home
-internet and the benefits trails BLS's by 2.59 points, and by 1.10
+internet and the benefits trails BLS's by 2.58 points, and by 1.09
 points when we remove the imputed terms from both series.
 
 ```{=latex}
@@ -641,7 +646,7 @@ points. BLS's rental assistance per renter rose from \$940 to \$1,243
 between those thresholds, and we estimate that ours rose from \$1,277 to
 \$1,448. We estimate the retrospective replication's renter growth at
 4.85 percent without home internet or benefits, 4.58 percent with home
-internet, and 4.83 percent with both.
+internet, and 4.82 percent with both.
 
 ## Uncertainty and limitations {#sec-inkind-uncertainty}
 
@@ -657,14 +662,14 @@ composite CPI, we apply its published values in every replicate, so the
 price factors do not vary. We
 combine the replicate variance with the variance across implicates by
 Rubin's rules [@rubin1987]. For the benefits' change to 2022–2025
-growth, we estimate standard errors of 0.68 points for owners with mortgages, 3.19 for owners without mortgages, and 0.83 for renters.
+growth, we estimate standard errors of 0.67 points for owners with mortgages, 3.18 for owners without mortgages, and 0.82 for renters.
 Under either price index, every change lies within three-quarters of a
 standard error of zero. For the 2022–2025 rises in our band amounts, we
-estimate standard errors of \$190 for all imputed benefits, \$453 for rental assistance per renter, and \$47 for school lunch. For the
+estimate standard errors of \$189 for all imputed benefits, \$452 for rental assistance per renter, and \$46 for school lunch. For the
 benefits' lift to each year's threshold with the composite CPI, we
-estimate standard errors of 0.26 to 0.57 points for owners with mortgages and renters, whose lifts
+estimate standard errors of 0.27 to 0.57 points for owners with mortgages and renters, whose lifts
 exceed five standard errors in every year. For owners without mortgages,
-we estimate standard errors of 0.99 to 2.21 points, and the 2024–2025
+we estimate standard errors of 1.01 to 2.21 points, and the 2024–2025
 lifts each fall within 1.5 standard errors of zero.
 
 For each of the benefits' changes to 2022–2025 growth, we estimate that
@@ -719,7 +724,7 @@ from reference year 2023, Census estimates those values with its fall
 2020 and 2021 values and for summer Pandemic EBT in its 2022 values
 [@spmtechnical; @shrider2023]. States paid those benefits on EBT cards,
 so under BLS's reasoning for SNAP, reported food spending may already
-include them. For the reference years before 2020, we value WIC at USDA's national average food cost, while Census uses state averages [@spmtechnical] and BLS assigns the WIC values Census staff supply [@blsspmhome]. From BLS's 2025 shares, we compute WIC of \$1.80 per unit in its band, where we add none. With the Garner–Munoz restrictions, we depart from @garner2021 in three
+include them. From BLS's 2025 shares, we compute WIC of \$1.80 per unit in its band, where we add none. With the Garner–Munoz restrictions, we depart from @garner2021 in three
 ways. We keep telephone out of utilities, as BLS now does
 [@blsspmshares], where @garner2021 count it as a utility. We keep spending under two codes for other fuels in vacation
 homes, which the FMLI summaries of vacation-home utilities leave out
@@ -928,7 +933,7 @@ imputed benefits' terms from both years, that renter growth falls by 0.62 points
 because of rental assistance.
 We estimate that home internet changes the retrospective replication's
 2024–2025 renter growth by −0.27 points and that our imputed benefits then change
-it by +0.25 points (@sec-inkind). Price treatment, sample
+it by +0.24 points (@sec-inkind). Price treatment, sample
 classification, and percentile conventions can also affect growth, and
 the comparison does not isolate their contributions to the renter miss.
 
@@ -1152,7 +1157,7 @@ second case; we do not split real spending from sample composition
 within that part (@sec-inkind). With the
 CE's spending summaries, we estimate that adding home internet changes
 our 2022–2025 growth by −0.54 to +4.33 points. We estimate that imputing
-in-kind benefits then changes it by −1.63 to −0.17 points, each change
+in-kind benefits then changes it by −1.62 to −0.19 points, each change
 within one standard error of zero. Price-indexed
 anchored measures serve a different purpose: they hold the real standard
 fixed [@wimer2016; @sehsd2026].
@@ -1226,9 +1231,9 @@ digest is:
 
 For the in-kind experiment in @sec-inkind, we keep three receipts from
 spm-calculator, with their provenance and checksums, in the paper
-repository's [`data/inkind`](https://github.com/PolicyEngine/spm-threshold-paper/tree/inkind-receipts-948c6e1/data/inkind) folder: the imputation, the comparison with BLS's components, and the
+repository's [`data/inkind`](https://github.com/PolicyEngine/spm-threshold-paper/tree/inkind-receipts-83afa0c/data/inkind) folder: the imputation, the comparison with BLS's components, and the
 replicate-weight standard errors, all at commit
-`948c6e1c502c39edcf3f3ea2645392a932b8b06a`. Before each render, we
+`83afa0c97c170026fe42b00ec703298a4447eaa8`. Before each render, we
 check that the run without home internet or benefits reproduces the
 retrospective replication artifact exactly. We then recompute every in-kind estimate
 in the tables and text from the receipts' thresholds, band means, and
@@ -1245,7 +1250,7 @@ provenance](https://github.com/PolicyEngine/spm-threshold-paper/blob/20bfbe1abcb
 and [forecast
 record](https://github.com/PolicyEngine/spm-threshold-paper/blob/20bfbe1abcb83b4f9f60fbe54789144321ff62b0/docs/forecast-record.md)
 identify the inputs and evidence of the earlier experiments, and
-[`data/inkind/provenance.json`](https://github.com/PolicyEngine/spm-threshold-paper/blob/inkind-receipts-948c6e1/data/inkind/provenance.json)
+[`data/inkind/provenance.json`](https://github.com/PolicyEngine/spm-threshold-paper/blob/inkind-receipts-83afa0c/data/inkind/provenance.json)
 those of the in-kind experiment.
 
 To verify the reported tables, clone the paper repository with its full

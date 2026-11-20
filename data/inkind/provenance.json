@@ -1,14 +1,14 @@
 {
   "artifacts": {
     "data/inkind/ce_inkind_bls_components_2019_2025.json": {
-      "calculator_commit": "948c6e1c502c39edcf3f3ea2645392a932b8b06a",
+      "calculator_commit": "83afa0c97c170026fe42b00ec703298a4447eaa8",
       "calculator_path": "spm_calculator/data/current/ce_inkind_bls_components_2019_2025.json",
       "code_sha256": {
         "scripts/compare_ce_inkind_bls_shares.py": "eddedcb2f3614888a4d77bce7ef948c6a7a688cf6fb841877830a7199d8406a0",
-        "scripts/replicate_ce_inkind.py": "53cfdad1c2875e07b89ef06fab49c73f63490e3bb438948aefe540d8373d91f1",
+        "scripts/replicate_ce_inkind.py": "a8b3e16d767f1d688d361979dda206b43be0bdda721925ae0738792bef93d8ed",
         "spm_calculator/ce_bls_shares.py": "288864009d0156277a8bf7f163e7792c9499f4340953461dac20aabb0cd6cf5d",
         "spm_calculator/ce_decomposition.py": "39be6fc2ceef0764cbf1133a1f4ea39c67a4de6a4e781357f717a7a82d0e00c0",
-        "spm_calculator/ce_inkind.py": "97d0b6b76982bab9d9c7e9d15d5c1723f667adbbfe54432533eaf1ebf198bdd8",
+        "spm_calculator/ce_inkind.py": "1240e2707e666a42b2b46932cd23b259f1be43c03588c4c57dbd16e87553a729",
         "spm_calculator/ce_inkind_stage.py": "68e881d04cfc8c35f5ca11fd7b6b60d88abfb0bc26921ad93f7ba8a390a8fd8c",
         "spm_calculator/ce_internet.py": "c0a1a928b708a418cacef585f07c53a5da84b551d6540733251d9c5ca0fc0f73",
         "spm_calculator/ce_threshold.py": "4efbe2b03f6b1f4eb2911ab0f79f5151bd655cc1e5addf42f5c4540ace1f852f",
@@ -17,17 +17,17 @@
         "spm_calculator/fcsuti_cpi.py": "cf8fbe9103846d83a280bcd4f13b9ddd91e8baa94e2668b9ef288c7cc980a5fc",
         "spm_calculator/published_thresholds.py": "bbed3fb2c1658e86172917148f986383c86ba673be1055d9688e8a53600ae2ba"
       },
-      "generated_at_git_head": "d97169d79f4bb7afabb06dc0bdaeba07332628db",
-      "pull_request": "https://github.com/PolicyEngine/spm-calculator/pull/62",
-      "sha256": "b2ed9f5d026be6a6b5cd6508fc7e8ad6be2ec32ed0711107b9f80e1830b535c3"
+      "generated_at_git_head": "46ec2692e2ec3d3c5fec125d29c17101ec9706d2",
+      "pull_request": "https://github.com/PolicyEngine/spm-calculator/pull/63",
+      "sha256": "e70acb195f8e45458f73d01deeea5f800b0192b12542b8a0d218e5d7c4c68c8a"
     },
     "data/inkind/ce_inkind_replication_2019_2025.json": {
-      "calculator_commit": "948c6e1c502c39edcf3f3ea2645392a932b8b06a",
+      "calculator_commit": "83afa0c97c170026fe42b00ec703298a4447eaa8",
       "calculator_path": "spm_calculator/data/current/ce_inkind_replication_2019_2025.json",
       "code_sha256": {
-        "scripts/replicate_ce_inkind.py": "53cfdad1c2875e07b89ef06fab49c73f63490e3bb438948aefe540d8373d91f1",
+        "scripts/replicate_ce_inkind.py": "a8b3e16d767f1d688d361979dda206b43be0bdda721925ae0738792bef93d8ed",
         "spm_calculator/ce_decomposition.py": "39be6fc2ceef0764cbf1133a1f4ea39c67a4de6a4e781357f717a7a82d0e00c0",
-        "spm_calculator/ce_inkind.py": "97d0b6b76982bab9d9c7e9d15d5c1723f667adbbfe54432533eaf1ebf198bdd8",
+        "spm_calculator/ce_inkind.py": "1240e2707e666a42b2b46932cd23b259f1be43c03588c4c57dbd16e87553a729",
         "spm_calculator/ce_inkind_stage.py": "68e881d04cfc8c35f5ca11fd7b6b60d88abfb0bc26921ad93f7ba8a390a8fd8c",
         "spm_calculator/ce_internet.py": "c0a1a928b708a418cacef585f07c53a5da84b551d6540733251d9c5ca0fc0f73",
         "spm_calculator/ce_threshold.py": "4efbe2b03f6b1f4eb2911ab0f79f5151bd655cc1e5addf42f5c4540ace1f852f",
@@ -36,19 +36,19 @@
         "spm_calculator/fcsuti_cpi.py": "cf8fbe9103846d83a280bcd4f13b9ddd91e8baa94e2668b9ef288c7cc980a5fc",
         "spm_calculator/published_thresholds.py": "bbed3fb2c1658e86172917148f986383c86ba673be1055d9688e8a53600ae2ba"
       },
-      "generated_at_git_head": "d97169d79f4bb7afabb06dc0bdaeba07332628db",
-      "pull_request": "https://github.com/PolicyEngine/spm-calculator/pull/62",
-      "sha256": "d2e5748d9c42ea79c313144773663787e3f22320e2f6903cbd6e9e368ef34ccb"
+      "generated_at_git_head": "46ec2692e2ec3d3c5fec125d29c17101ec9706d2",
+      "pull_request": "https://github.com/PolicyEngine/spm-calculator/pull/63",
+      "sha256": "ea463f56f96ae5425d31ef5e58ed58d20be8759a5a07f91e811b6fa233c1c7d3"
     },
     "data/inkind/ce_replicate_uncertainty_2019_2025.json": {
-      "calculator_commit": "948c6e1c502c39edcf3f3ea2645392a932b8b06a",
+      "calculator_commit": "83afa0c97c170026fe42b00ec703298a4447eaa8",
       "calculator_path": "spm_calculator/data/current/ce_replicate_uncertainty_2019_2025.json",
       "code_sha256": {
         "scripts/estimate_ce_replicate_uncertainty.py": "1f2acc430d58408acfff588d414a0d6a4190b551b74addee1c0a921ae244126f",
-        "scripts/replicate_ce_inkind.py": "53cfdad1c2875e07b89ef06fab49c73f63490e3bb438948aefe540d8373d91f1",
+        "scripts/replicate_ce_inkind.py": "a8b3e16d767f1d688d361979dda206b43be0bdda721925ae0738792bef93d8ed",
         "spm_calculator/ce_bls_shares.py": "288864009d0156277a8bf7f163e7792c9499f4340953461dac20aabb0cd6cf5d",
         "spm_calculator/ce_decomposition.py": "39be6fc2ceef0764cbf1133a1f4ea39c67a4de6a4e781357f717a7a82d0e00c0",
-        "spm_calculator/ce_inkind.py": "97d0b6b76982bab9d9c7e9d15d5c1723f667adbbfe54432533eaf1ebf198bdd8",
+        "spm_calculator/ce_inkind.py": "1240e2707e666a42b2b46932cd23b259f1be43c03588c4c57dbd16e87553a729",
         "spm_calculator/ce_inkind_stage.py": "68e881d04cfc8c35f5ca11fd7b6b60d88abfb0bc26921ad93f7ba8a390a8fd8c",
         "spm_calculator/ce_internet.py": "c0a1a928b708a418cacef585f07c53a5da84b551d6540733251d9c5ca0fc0f73",
         "spm_calculator/ce_replicates.py": "4467a7c963faa62b889187c3680e4113ebb6b5c218a482c5ddbb018a6200fdf1",
@@ -58,14 +58,14 @@
         "spm_calculator/fcsuti_cpi.py": "cf8fbe9103846d83a280bcd4f13b9ddd91e8baa94e2668b9ef288c7cc980a5fc",
         "spm_calculator/published_thresholds.py": "bbed3fb2c1658e86172917148f986383c86ba673be1055d9688e8a53600ae2ba"
       },
-      "generated_at_git_head": "d97169d79f4bb7afabb06dc0bdaeba07332628db",
-      "pull_request": "https://github.com/PolicyEngine/spm-calculator/pull/62",
-      "sha256": "7fa62b22f91d4773aca5ec77308e83a5576b863364d2cc88fcfc30bf8b997483"
+      "generated_at_git_head": "46ec2692e2ec3d3c5fec125d29c17101ec9706d2",
+      "pull_request": "https://github.com/PolicyEngine/spm-calculator/pull/63",
+      "sha256": "97836f87c78a3d21dff3a387e2634b4a171dfab7d65b6755546a60cc260cc166"
     }
   },
   "calculator_repository": "https://github.com/PolicyEngine/spm-calculator",
   "classification": "current_retrospective_research",
   "covered_by_original_timestamp": false,
   "frozen_commitments_modified": false,
-  "recorded_on": "2026-11-16"
+  "recorded_on": "2026-11-20"
 }

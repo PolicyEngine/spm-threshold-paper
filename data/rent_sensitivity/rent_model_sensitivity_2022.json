@@ -1,12 +1,12 @@
 {
-  "calculator_commit": "948c6e1c502c39edcf3f3ea2645392a932b8b06a",
+  "calculator_commit": "83afa0c97c170026fe42b00ec703298a4447eaa8",
   "ce_bundles": {
     "intrvw22.zip": "c99a2f47c0084b7a88812b34c56a1a288be2798ff010b2b59dcf87e072773e17",
     "intrvw23.zip": "97e9a17edeee28e77a3fd5a7d874e5f4b9034222be204e25b0d902f4c82235ac"
   },
   "code_sha256": {
     "spm_calculator/ce_decomposition.py": "39be6fc2ceef0764cbf1133a1f4ea39c67a4de6a4e781357f717a7a82d0e00c0",
-    "spm_calculator/ce_inkind.py": "97d0b6b76982bab9d9c7e9d15d5c1723f667adbbfe54432533eaf1ebf198bdd8",
+    "spm_calculator/ce_inkind.py": "1240e2707e666a42b2b46932cd23b259f1be43c03588c4c57dbd16e87553a729",
     "spm_calculator/ce_inkind_stage.py": "68e881d04cfc8c35f5ca11fd7b6b60d88abfb0bc26921ad93f7ba8a390a8fd8c",
     "spm_calculator/ce_internet.py": "c0a1a928b708a418cacef585f07c53a5da84b551d6540733251d9c5ca0fc0f73",
     "spm_calculator/ce_threshold.py": "4efbe2b03f6b1f4eb2911ab0f79f5151bd655cc1e5addf42f5c4540ace1f852f",
@@ -27,7 +27,7 @@
     "sigma": 0.4682813284091317
   },
   "generated_by": "scripts/rent_sensitivity.py",
-  "generated_on": "2026-11-16",
+  "generated_on": "2026-11-20",
   "limitations": [
     "One reference year, 2022, from CE interviews collected from 2022Q2 through 2023Q1",
     "Amounts are per assisted renter across the CE, not within the 47th-53rd percentile band",
@@ -42,7 +42,7 @@
   "reference_year": 2022,
   "replication_receipt": {
     "path": "data/inkind/ce_inkind_replication_2019_2025.json",
-    "sha256": "d2e5748d9c42ea79c313144773663787e3f22320e2f6903cbd6e9e368ef34ccb"
+    "sha256": "ea463f56f96ae5425d31ef5e58ed58d20be8759a5a07f91e811b6fa233c1c7d3"
   },
   "runtime": {
     "numpy": "2.4.1",
