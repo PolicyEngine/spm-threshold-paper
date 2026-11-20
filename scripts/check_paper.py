@@ -27,7 +27,28 @@ push to master and every pull request. It fails when:
     and the thin-donor support count — are pinned inside a
     whitespace-normalized slice of that section, so the same numeral
     occurring elsewhere in the paper cannot satisfy them and line
-    rewrapping cannot split a multi-word literal;
+    rewrapping cannot split a multi-word literal. The guard reads each
+    error rate the abstract quotes from the front matter's ``abstract: |``
+    block alone, as Quarto and pandoc read it, beside the rule it scores.
+    Every statement of that rule's wording must hold a rate the guard
+    reads, and every such rate must equal the registered value. Every
+    token in the abstract that holds a digit must be one of its tied
+    figures, stated once and as a bare number, or a year in
+    ABSTRACT_YEARS, so a drifted figure, a flipped sign, a range with a
+    numeral at either end or an added number fails even beside a correct
+    copy, and a swap between rules fails. The guard fails every abstract
+    tie, and says why, when it cannot read the block. It cannot when the
+    front matter steps outside the plain YAML the parser reads, sets the
+    abstract other than in one top-level block, holds an HTML comment or
+    code fence, holds a line that ends, past any trailing spaces or tabs,
+    in a character Quarto trims, such as a no-break space, or holds a line
+    that opens with ``---`` outside a block. Nor can it when the body holds
+    a line that could set the abstract, a metadata block or a grid table,
+    when a line ends in a carriage return without a line feed or holds a
+    Unicode line separator, or when the abstract holds anything but plain
+    prose. A project or directory metadata file that names the abstract or
+    more metadata files, a paper that names more, or an include other than
+    a generated table fails too;
 (e) the README miscounts the in-kind receipts or omits a calculator
     commit that their provenance records.
 
@@ -78,12 +99,22 @@ from inkind_inputs import (
     published_standard_errors,
     uncertainty_figures,
 )
+from paper_text import block_problem, block_words, stated_values
 
 REPO = Path(__file__).resolve().parent.parent
 DATA = REPO / "data"
 TABLES = REPO / "paper" / "tables"
 FORECAST_RECORD = REPO / "docs" / "forecast-record.md"
 QMD = (REPO / "paper" / "index.qmd").read_text()
+# The paper as stored, line endings included: read_text() turns a lone
+# carriage return into a line feed, and the abstract's parser fails closed on
+# one, since Quarto and pandoc read it differently. Quarto and pandoc skip a
+# byte-order mark, so the guard does too.
+QMD_RAW = (REPO / "paper" / "index.qmd").read_bytes().decode("utf-8-sig")
+# The files the paper includes, quotes removed, as Quarto reads the paths.
+INCLUDES = [name.strip("\"'") for name in re.findall(r"\{\{<\s*include\s+(.*?)\s*>\}\}", QMD_RAW)]
+# How the paper names a generated table it includes.
+TABLE_INCLUDE = re.compile(r"tables/[A-Za-z0-9_-]+\.md").fullmatch
 
 TENURES = ("owner_with_mortgage", "owner_without_mortgage", "renter")
 
@@ -125,11 +156,18 @@ GENERATORS = (
 )
 
 failures: list[str] = []
+# Lines the guard prints under its failures to say what a check found.
+failure_notes: list[str] = []
 
 
 def check(label: str, ok: bool) -> None:
     if not ok:
         failures.append(label)
+
+
+# The start of the failure the guard reports when it cannot read the
+# abstract; the parser's reason follows it.
+ABSTRACT_UNREAD = "paper's abstract cannot be read:"
 
 
 def bounded(literal: str) -> str:
@@ -183,6 +221,19 @@ def section(start: str, end: str | None = None, text: str = QMD) -> str:
         failures.append(f"paper sections out of order: {start!r} before {end!r}")
         return ""
     return " ".join(text[first:last].split())
+
+
+def front_matter_block(key: str, text: str = QMD_RAW) -> str:
+    """Whitespace-normalized words of the front matter's one ``key: |``
+    literal block, read as Quarto and pandoc read it. Pins that read it see
+    no other metadata field, comment or body text. When the parser cannot
+    read the block, the guard records why and the slice is empty, so every
+    pin inside it fails instead of reading other text."""
+    problem = block_problem(text, key)
+    if problem is not None:
+        failures.append(f"{ABSTRACT_UNREAD} {problem}")
+        return ""
+    return block_words(text, key)
 
 
 COUNT_WORDS = (
@@ -410,7 +461,7 @@ with tempfile.TemporaryDirectory(prefix="spm-paper-check-") as tmp:
         )
 
 # (b) Every QMD include names an expected table.
-includes = set(re.findall(r"\{\{<\s*include\s+tables/([^\s>]+)\s*>\}\}", QMD))
+includes = {name.removeprefix("tables/") for name in INCLUDES if TABLE_INCLUDE(name)}
 check(
     f"qmd includes outside allowlist: {includes - ARTICLE_TABLES}",
     includes <= ARTICLE_TABLES,
@@ -746,9 +797,81 @@ check(
     has_number("2.63") and abs(realized_2025 - 0.0263) < 0.0005,
 )
 
+# Figures in the abstract also appear in the body or its tables, so their
+# abstract ties read only the front matter's `abstract: |` block, as Quarto
+# and pandoc read it. Other metadata fields, comments and body text fall
+# outside it, so a copy there cannot rescue a drifted figure. When the
+# parser cannot read the block (paper_text.block_scalar_span lists when),
+# every tie fails and the guard says why.
+ABSTRACT = front_matter_block("abstract")
+# Every figure an abstract tie checks, as the abstract writes it. The check
+# at the end of this file requires the abstract to state each one exactly
+# once, and no other number but the years in ABSTRACT_YEARS.
+ABSTRACT_FIGURES = []
+
+
+def abstract_states(template: str, literal: str) -> bool:
+    """Whether the abstract states ``literal`` in ``template``'s slot at least
+    once and nothing else there. Every statement of the template's wording
+    must hold a whole number the slot reads, so a rate glued to other text
+    fails rather than leaving the tie to a correct copy elsewhere in the
+    abstract. So does a swap between rules, a flipped sign or a range that
+    ``stated_values`` reads whole."""
+    values = stated_values(template, ABSTRACT)
+    tokens = [token.removeprefix("(") for token in stated_values(template, ABSTRACT, r"\S+")]
+    return set(values) == {literal} and values == tokens
+
+
+# Quarto merges the project's _quarto file, with its profile and .local
+# variants, paper/_metadata, and any metadata-files they or the paper name
+# into the paper's metadata, so an abstract set there could replace the block
+# the ties read. None of them, nor a _metadata file at the root, may name the
+# abstract or more metadata files.
+# Names match in any case, since macOS finds `_Metadata.yml` as Quarto looks
+# for `_metadata.yml`. The check reads the files' text, not their keys, so it
+# also fails on a comment or a key such as `abstract-title` that mentions the
+# abstract; set those in the paper's own front matter instead.
+METADATA_SOURCES = sorted(
+    path
+    for folder in (REPO, REPO / "paper")
+    for path in folder.iterdir()
+    if path.is_file() and re.fullmatch(r"_quarto.*\.ya?ml(?:\.local)?|_metadata\.ya?ml", path.name, re.I)
+)
+# Quarto also renders an included file's own front matter and metadata
+# blocks into the paper's metadata, so the paper may include only the
+# generated tables that (a) and (b) check, each named as `tables/<name>.md`.
+check(
+    "paper/index.qmd may include only the generated tables, as tables/<name>.md",
+    all(TABLE_INCLUDE(name) for name in INCLUDES),
+)
+check(
+    "only paper/index.qmd may set the abstract or name metadata files",
+    not re.search(r"metadata-files?", QMD_RAW)
+    and not any(re.search(r"abstract|metadata-files?", path.read_text()) for path in METADATA_SOURCES),
+)
+
 # Current retrospective results in the abstract are a separate experiment.
-for rule, value in current_ce["projection_evaluation"]["summary_2020_2025"].items():
+ABSTRACT_RETROSPECTIVE_RULES = {
+    "cpi_u": "with the Consumer Price Index for All Urban Consumers (CPI-U)",
+    "fcsuti_cpi": "with a composite price index",
+    "replication_ratio": "with replicated consumption growth",
+    "blend": "with an equal blend of the latter two",
+}
+retrospective = current_ce["projection_evaluation"]["summary_2020_2025"]
+check(
+    "abstract names the retrospective rules and their count",
+    set(retrospective) == set(ABSTRACT_RETROSPECTIVE_RULES)
+    and set(stated_values("compare {} projection rules", ABSTRACT, r"\S+"))
+    == {count_word(len(retrospective))},
+)
+for rule, value in retrospective.items():
     check(f"current projection prose {rule}", has_number(f"{value:.2f}"))
+    rule_phrase = ABSTRACT_RETROSPECTIVE_RULES.get(rule, "<unnamed rule>")
+    ABSTRACT_FIGURES.append(f"{value:.2f}")
+    check(
+        f"abstract current projection {rule} {value:.2f}",
+        abstract_states(f"{{}} percent {rule_phrase}", f"{value:.2f}"),
+    )
 
 # (e) The September evaluation, re-derived from data/evaluation_2025.json.
 ev = json.loads((DATA / "evaluation_2025.json").read_text())
@@ -758,13 +881,37 @@ original = R["Original nowcast (pre-repair blend)"]
 repl = R["CE replication growth ratio alone"]
 comp = R["FCSUti-composite CPI aging alone"]
 cpiu = R["All-Items CPI-U aging (status quo)"]
-for label, value, literal in [
-    ("evaluation amended MAE 1.17", amended["mae"], "1.17"),
-    ("evaluation replication MAE 0.75", repl["mae"], "0.75"),
-    ("evaluation composite MAE 2.02", comp["mae"], "2.02"),
-    ("evaluation CPI-U MAE 2.58", cpiu["mae"], "2.58"),
+# The abstract quotes three of these errors, and the body restates each.
+for label, value, literal, abstract_phrase in [
+    (
+        "evaluation amended MAE 1.17",
+        amended["mae"],
+        "1.17",
+        "blend yields a mean absolute error of {} percent",
+    ),
+    (
+        "evaluation replication MAE 0.75",
+        repl["mae"],
+        "0.75",
+        "{} percent for consumption growth alone",
+    ),
+    ("evaluation composite MAE 2.02", comp["mae"], "2.02", None),
+    (
+        "evaluation CPI-U MAE 2.58",
+        cpiu["mae"],
+        "2.58",
+        "{} percent for CPI-U adjustment",
+    ),
 ]:
-    check(label, has_number(literal) and f"{value:.2%}".rstrip("%") == literal)
+    rounds_to_literal = f"{value:.2%}".rstrip("%") == literal
+    check(label, has_number(literal) and rounds_to_literal)
+    if abstract_phrase is not None:
+        ABSTRACT_FIGURES.append(literal)
+        check(
+            f"abstract {label}",
+            rounds_to_literal
+            and abstract_states(abstract_phrase, literal),
+        )
 check(
     "forecast record evaluation original MAE 0.98",
     has_number("0.98", text=record_text)
@@ -1122,7 +1269,6 @@ check(
 INKIND_TEXT = section(
     "# Imputing in-kind benefits {#sec-inkind}", "# Projecting thresholds {#sec-projection}"
 )
-ABSTRACT = " ".join(QMD.split("# Introduction", 1)[0].split())
 EVALUATION_TEXT = section(
     "## Evaluation against published thresholds {#sec-evaluation}",
     "## Validation of the price comparator",
@@ -2398,10 +2544,42 @@ inkind_pins = (
 for label, ok in inkind_pins:
     check(f"in-kind prose: {label}", ok)
 
+# The abstract states each figure its ties check exactly once and each year
+# in ABSTRACT_YEARS as often as that list names it, all written as bare
+# numbers, and no other number. Any token that holds a digit counts, so
+# ".85", "2,31", "10,000" and the "31" of "2. 31" count. So a changed,
+# signed or added figure, a unit glued to a figure, a range with a numeral
+# at either end, or a rounded copy, fails even beside a correct copy; a
+# statement whose wording changed cannot hide a drifted figure from its tie;
+# and a tied figure restated in other wording, or a correct copy beside a
+# changed statement, fails as a second copy.
+ABSTRACT_FIGURES += lift_literal.split(" to ")
+ABSTRACT_FIGURES += [f"{share:.1f}" for share in (min(bls_shares), max(bls_shares), min(separate_shares), max(separate_shares))]
+ABSTRACT_FIGURES += ["1.2", signed(min(stage_changes)), signed(max(stage_changes))]
+# The years the abstract names, and any other number it states that no tie
+# checks in the abstract, each as often as the abstract states it.
+ABSTRACT_YEARS = ["2020–2025", "2025", "2025", "2035", "2022–2025"]
+# Each token minus any of ( ) , . ; : at its ends. Other punctuation stays,
+# so "2025's", "2025?" or a quoted "2025" fails the check.
+abstract_numbers = [token.strip("(),.;:") for token in re.findall(r"\S*\d\S*", ABSTRACT)]
+check(
+    "abstract states exactly the numbers the guard lists, each as a bare number",
+    bool(ABSTRACT) and sorted(abstract_numbers) == sorted(ABSTRACT_FIGURES + ABSTRACT_YEARS),
+)
+if ABSTRACT and sorted(abstract_numbers) != sorted(ABSTRACT_FIGURES + ABSTRACT_YEARS):
+    numbers_stated = Counter(abstract_numbers)
+    numbers_listed = Counter(ABSTRACT_FIGURES + ABSTRACT_YEARS)
+    failure_notes.append(
+        f"the abstract states {sorted((numbers_stated - numbers_listed).elements())} beyond the lists "
+        f"and lacks {sorted((numbers_listed - numbers_stated).elements())}"
+    )
+
 if failures:
     print("PAPER DRIFT CHECK FAILED:")
     for f in failures:
         print(f"  - {f}")
+    for note in failure_notes:
+        print(f"    {note}")
     sys.exit(1)
 print(
     f"paper drift check passed ({len(EXPECTED_TABLES)} tables, {len(listed)} frozen + {len(current_listed)} retrospective + {len(ROLLING_FILES)} rolling + {len(INKIND_FILES)} in-kind artifacts, prose pins OK)"
