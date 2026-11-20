@@ -82,9 +82,9 @@
   },
   "classification": "current_retrospective_research",
   "code_sha256": {
-    "scripts/replicate_ce_inkind.py": "53cfdad1c2875e07b89ef06fab49c73f63490e3bb438948aefe540d8373d91f1",
+    "scripts/replicate_ce_inkind.py": "a8b3e16d767f1d688d361979dda206b43be0bdda721925ae0738792bef93d8ed",
     "spm_calculator/ce_decomposition.py": "39be6fc2ceef0764cbf1133a1f4ea39c67a4de6a4e781357f717a7a82d0e00c0",
-    "spm_calculator/ce_inkind.py": "97d0b6b76982bab9d9c7e9d15d5c1723f667adbbfe54432533eaf1ebf198bdd8",
+    "spm_calculator/ce_inkind.py": "1240e2707e666a42b2b46932cd23b259f1be43c03588c4c57dbd16e87553a729",
     "spm_calculator/ce_inkind_stage.py": "68e881d04cfc8c35f5ca11fd7b6b60d88abfb0bc26921ad93f7ba8a390a8fd8c",
     "spm_calculator/ce_internet.py": "c0a1a928b708a418cacef585f07c53a5da84b551d6540733251d9c5ca0fc0f73",
     "spm_calculator/ce_threshold.py": "4efbe2b03f6b1f4eb2911ab0f79f5151bd655cc1e5addf42f5c4540ace1f852f",
@@ -245,68 +245,68 @@
       "bls_fcsuti_index": {
         "owner_with_mortgage": {
           "factors": {
-            "in_kind": 1.0018768445588673,
+            "in_kind": 1.0019732634961656,
             "out_of_pocket_total": 1.0270982882638715,
             "price": 1.0238691252688361,
             "real_out_of_pocket": 1.0031538825767283,
-            "total": 1.0290259920976215
+            "total": 1.0291250238230767
           },
           "identity_residual": 0.0,
           "log_points": {
-            "in_kind": 0.1875085486777552,
+            "in_kind": 0.19713191691124826,
             "price": 2.358871109460789,
             "real_out_of_pocket": 0.3148919521598472,
-            "total": 2.8612716102983873
+            "total": 2.8708949785318745
           },
           "percentage_points": {
-            "in_kind": 0.19277038337499386,
+            "in_kind": 0.20267355592052252,
             "price": 2.386912526883611,
             "real_out_of_pocket": 0.32291629950354567,
-            "total": 2.9025992097621467
+            "total": 2.912502382307669
           }
         },
         "owner_without_mortgage": {
           "factors": {
-            "in_kind": 0.9926954912629312,
+            "in_kind": 0.9927161930142,
             "out_of_pocket_total": 1.0379622228460559,
             "price": 1.0238691252688361,
             "real_out_of_pocket": 1.0137645498134533,
-            "total": 1.0303804187205294
+            "total": 1.0304019063562933
           },
           "identity_residual": 0.0,
           "log_points": {
-            "in_kind": -0.7331317289662166,
+            "in_kind": -0.7310463427026549,
             "price": 2.358871109460789,
             "real_out_of_pocket": 1.367067881152159,
-            "total": 2.9928072616467216
+            "total": 2.99489264791029
           },
           "percentage_points": {
-            "in_kind": -0.7581804125526349,
+            "in_kind": -0.7560316489762599,
             "price": 2.386912526883611,
             "real_out_of_pocket": 1.409309757721977,
-            "total": 3.0380418720529434
+            "total": 3.040190635629325
           }
         },
         "renter": {
           "factors": {
-            "in_kind": 1.0011250145146926,
+            "in_kind": 1.0010351481591235,
             "out_of_pocket_total": 1.0336558952632384,
             "price": 1.0238691252688361,
             "real_out_of_pocket": 1.009558614233858,
-            "total": 1.0348187731486072
+            "total": 1.0347258822603875
           },
-          "identity_residual": 0.0,
+          "identity_residual": 2.220446049250313e-16,
           "log_points": {
-            "in_kind": 0.11243821600911003,
+            "in_kind": 0.1034612762712417,
             "price": 2.358871109460789,
             "real_out_of_pocket": 0.9513219723974823,
-            "total": 3.4226312978673747
+            "total": 3.4136543581295227
           },
           "percentage_points": {
-            "in_kind": 0.11628778853687188,
+            "in_kind": 0.10699869971489291,
             "price": 2.386912526883611,
             "real_out_of_pocket": 0.9786769994402389,
-            "total": 3.481877314860715
+            "total": 3.472588226038753
           }
         }
       },
@@ -320,75 +320,75 @@
         "decomposition": {
           "owner_with_mortgage": {
             "factors": {
-              "in_kind": 1.002853151042308,
+              "in_kind": 1.0027789280637327,
               "out_of_pocket_total": 1.0261947958761266,
               "price": 1.0238691252688361,
               "real_out_of_pocket": 1.0022714530108328,
-              "total": 1.0291226846275918
+              "total": 1.0290465173932435
             },
             "identity_residual": 2.220446049250313e-16,
             "log_points": {
-              "in_kind": 0.28490885323414344,
+              "in_kind": 0.27750739816345515,
               "price": 2.358871109460789,
               "real_out_of_pocket": 0.2268877161319191,
-              "total": 2.870667678826862
+              "total": 2.863266223756179
             },
             "percentage_points": {
-              "in_kind": 0.2927888751465004,
+              "in_kind": 0.2851721517116617,
               "price": 2.386912526883611,
               "real_out_of_pocket": 0.23256706072906,
-              "total": 2.912268462759182
+              "total": 2.9046517393243487
             }
           },
           "owner_without_mortgage": {
             "factors": {
-              "in_kind": 0.9917418462405265,
+              "in_kind": 0.9916956453653878,
               "out_of_pocket_total": 1.038042601802699,
               "price": 1.0238691252688361,
               "real_out_of_pocket": 1.0138430549218302,
-              "total": 1.0294702863881284
+              "total": 1.0294223279114936
             },
-            "identity_residual": 0.0,
+            "identity_residual": -2.220446049250313e-16,
             "log_points": {
-              "in_kind": -0.8292441209065903,
+              "in_kind": -0.8339027880279508,
               "price": 2.358871109460789,
               "real_out_of_pocket": 1.3748115006012882,
-              "total": 2.904438489155498
+              "total": 2.89977982203411
             },
             "percentage_points": {
-              "in_kind": -0.8572315414570584,
+              "in_kind": -0.8620273891205158,
               "price": 2.386912526883611,
               "real_out_of_pocket": 1.4173476533862788,
-              "total": 2.947028638812843
+              "total": 2.9422327911493573
             }
           },
           "renter": {
             "factors": {
-              "in_kind": 0.9990200770045017,
+              "in_kind": 0.9990598310079909,
               "out_of_pocket_total": 1.0349003792097486,
               "price": 1.0238691252688361,
               "real_out_of_pocket": 1.0107740859340943,
-              "total": 1.0338862565301112
+              "total": 1.0339273979633972
             },
-            "identity_residual": 2.220446049250313e-16,
+            "identity_residual": 0.0,
             "log_points": {
-              "in_kind": -0.09804034339242879,
+              "in_kind": -0.09406112280820289,
               "price": 2.358871109460789,
               "real_out_of_pocket": 1.071645901894883,
-              "total": 3.3324766679632662
+              "total": 3.3364558885474764
             },
             "percentage_points": {
-              "in_kind": -0.10141226796375609,
+              "in_kind": -0.09729812463514698,
               "price": 2.386912526883611,
               "real_out_of_pocket": 1.1031253940912449,
-              "total": 3.3886256530111236
+              "total": 3.3927397963397166
             }
           }
         },
         "growth_percent_with": {
-          "owner_with_mortgage": 2.912268462759182,
-          "owner_without_mortgage": 2.947028638812843,
-          "renter": 3.3886256530111236
+          "owner_with_mortgage": 2.9046517393243487,
+          "owner_without_mortgage": 2.9422327911493573,
+          "renter": 3.3927397963397166
         },
         "growth_percent_without": {
           "owner_with_mortgage": 2.619479587612661,
@@ -402,9 +402,9 @@
         }
       },
       "growth_percent_with": {
-        "owner_with_mortgage": 2.9025992097621467,
-        "owner_without_mortgage": 3.0380418720529434,
-        "renter": 3.481877314860715
+        "owner_with_mortgage": 2.912502382307669,
+        "owner_without_mortgage": 3.040190635629325,
+        "renter": 3.472588226038753
       },
       "growth_percent_without": {
         "owner_with_mortgage": 2.7098288263871506,
@@ -418,92 +418,92 @@
       },
       "in_kind_percentage_points_by_implicate": {
         "owner_with_mortgage": [
-          0.301357063162393,
-          -0.014672865119502845,
-          0.19682472423279215,
-          0.21268270716641777,
-          0.26741416485764075
+          0.30735940760545866,
+          0.003923017772537873,
+          0.26117674991090073,
+          0.22733909022430068,
+          0.2132963718876815
         ],
         "owner_without_mortgage": [
-          -1.1705022005053918,
-          -0.40119541690186256,
-          -0.9299786068543778,
-          -0.4418252737758099,
-          -0.8448705963691567
+          -1.2660878178708146,
+          -0.4413431221574971,
+          -0.9479573056434365,
+          -0.46806507193253827,
+          -0.6529218793015144
         ],
         "renter": [
-          -0.07321629583279352,
-          0.3379929659347292,
-          0.08757377552489629,
-          0.05917815001598857,
-          0.17002533694979782
+          -0.05027994887936777,
+          0.3079501962977353,
+          0.0005654232603960625,
+          0.05114904071148224,
+          0.22577907732569555
         ]
       },
       "package_cpi": {
         "owner_with_mortgage": {
           "factors": {
-            "in_kind": 1.0018768445588673,
+            "in_kind": 1.0019732634961656,
             "out_of_pocket_total": 1.0270982882638715,
             "price": 1.0227700968786673,
             "real_out_of_pocket": 1.0042318321570147,
-            "total": 1.0290259920976215
+            "total": 1.0291250238230767
           },
           "identity_residual": 0.0,
           "log_points": {
-            "in_kind": 0.1875085486777552,
+            "in_kind": 0.19713191691124826,
             "price": 2.2514727479015564,
             "real_out_of_pocket": 0.4222903137190714,
-            "total": 2.8612716102983873
+            "total": 2.8708949785318745
           },
           "percentage_points": {
-            "in_kind": 0.19277038337499383,
+            "in_kind": 0.2026735559205225,
             "price": 2.2770096878667268,
             "real_out_of_pocket": 0.43281913852042103,
-            "total": 2.9025992097621467
+            "total": 2.912502382307669
           }
         },
         "owner_without_mortgage": {
           "factors": {
-            "in_kind": 0.9926954912629312,
+            "in_kind": 0.9927161930142,
             "out_of_pocket_total": 1.0379622228460559,
             "price": 1.0218261417892724,
             "real_out_of_pocket": 1.0157914153855256,
-            "total": 1.0303804187205294
+            "total": 1.0304019063562933
           },
           "identity_residual": 0.0,
           "log_points": {
-            "in_kind": -0.7331317289662166,
+            "in_kind": -0.7310463427026549,
             "price": 2.1591361644127622,
             "real_out_of_pocket": 1.5668028262001845,
-            "total": 2.9928072616467216
+            "total": 2.99489264791029
           },
           "percentage_points": {
-            "in_kind": -0.7581804125526349,
+            "in_kind": -0.7560316489762599,
             "price": 2.1826141789272446,
             "real_out_of_pocket": 1.6136081056783422,
-            "total": 3.0380418720529434
+            "total": 3.040190635629325
           }
         },
         "renter": {
           "factors": {
-            "in_kind": 1.0011250145146926,
+            "in_kind": 1.0010351481591235,
             "out_of_pocket_total": 1.0336558952632384,
             "price": 1.022729006287408,
             "real_out_of_pocket": 1.0106840511109547,
-            "total": 1.0348187731486072
+            "total": 1.0347258822603875
           },
-          "identity_residual": 0.0,
+          "identity_residual": 2.220446049250313e-16,
           "log_points": {
-            "in_kind": 0.11243821600911003,
+            "in_kind": 0.1034612762712417,
             "price": 2.247455088719866,
             "real_out_of_pocket": 1.062737993138407,
-            "total": 3.4226312978673747
+            "total": 3.4136543581295227
           },
           "percentage_points": {
-            "in_kind": 0.11628778853687188,
+            "in_kind": 0.10699869971489291,
             "price": 2.2729006287407927,
             "real_out_of_pocket": 1.0926888975830593,
-            "total": 3.481877314860715
+            "total": 3.472588226038753
           }
         }
       },
@@ -517,68 +517,68 @@
       "bls_fcsuti_index": {
         "owner_with_mortgage": {
           "factors": {
-            "in_kind": 0.9974065484910247,
+            "in_kind": 0.99721759908622,
             "out_of_pocket_total": 1.0411188688483761,
             "price": 1.031697658402204,
             "real_out_of_pocket": 1.0091317551895609,
-            "total": 1.038418777546939
+            "total": 1.038222058756339
           },
           "identity_residual": 2.220446049250313e-16,
           "log_points": {
-            "in_kind": -0.2596820330183501,
+            "in_kind": -0.27862789864415566,
             "price": 3.120565747172311,
             "real_out_of_pocket": 0.9090312816482143,
-            "total": 3.7699149958022
+            "total": 3.7509691301764034
           },
           "percentage_points": {
-            "in_kind": -0.2700091301437452,
+            "in_kind": -0.28968100920373363,
             "price": 3.1697658402203954,
             "real_out_of_pocket": 0.942121044617214,
-            "total": 3.84187775469389
+            "total": 3.8222058756339106
           }
         },
         "owner_without_mortgage": {
           "factors": {
-            "in_kind": 1.0133022488390269,
+            "in_kind": 1.0134090044908268,
             "out_of_pocket_total": 1.0250970009933071,
             "price": 1.031697658402204,
             "real_out_of_pocket": 0.9936021397788968,
-            "total": 1.0387330963846602
+            "total": 1.0388425312831595
           },
-          "identity_residual": -2.220446049250313e-16,
+          "identity_residual": 0.0,
           "log_points": {
-            "in_kind": 1.3214550791715804,
+            "in_kind": 1.3319899446314034,
             "price": 3.120565747172311,
             "real_out_of_pocket": -0.6418414243550042,
-            "total": 3.800179401988874
+            "total": 3.8107142674487093
           },
           "percentage_points": {
-            "in_kind": 1.363609539135314,
+            "in_kind": 1.3745530289852366,
             "price": 3.1697658402203954,
             "real_out_of_pocket": -0.6600657408896803,
-            "total": 3.873309638466016
+            "total": 3.884253128315951
           }
         },
         "renter": {
           "factors": {
-            "in_kind": 0.997571874323456,
+            "in_kind": 0.997680862750014,
             "out_of_pocket_total": 1.0470625062559324,
             "price": 1.031697658402204,
             "real_out_of_pocket": 1.014892781551452,
-            "total": 1.0445201068995458
+            "total": 1.0446342245946103
           },
-          "identity_residual": 0.0,
+          "identity_residual": -2.220446049250313e-16,
           "log_points": {
-            "in_kind": -0.24310783543114467,
+            "in_kind": -0.23218306137707667,
             "price": 3.120565747172311,
             "real_out_of_pocket": 1.4782972974636883,
-            "total": 4.355755209204848
+            "total": 4.366679983258895
           },
           "percentage_points": {
-            "in_kind": -0.25423993563865904,
+            "in_kind": -0.24282816613218353,
             "price": 3.1697658402203954,
             "real_out_of_pocket": 1.5364847853728474,
-            "total": 4.4520106899545775
+            "total": 4.4634224594610306
           }
         }
       },
@@ -592,75 +592,75 @@
         "decomposition": {
           "owner_with_mortgage": {
             "factors": {
-              "in_kind": 0.9946591046298584,
+              "in_kind": 0.9947687124350142,
               "out_of_pocket_total": 1.0397748675294345,
               "price": 1.031697658402204,
               "real_out_of_pocket": 1.0078290466799544,
-              "total": 1.034221538753457
+              "total": 1.0343355061945427
             },
-            "identity_residual": 0.0,
+            "identity_residual": -2.220446049250313e-16,
             "log_points": {
-              "in_kind": -0.5355208939417577,
+              "in_kind": -0.5245018658245776,
               "price": 3.120565747172311,
               "real_out_of_pocket": 0.7798558718391888,
-              "total": 3.364900725069749
+              "total": 3.375919753186897
             },
             "percentage_points": {
-              "in_kind": -0.5553328775977548,
+              "in_kind": -0.5439361334891498,
               "price": 3.1697658402203954,
               "real_out_of_pocket": 0.8077209127230537,
-              "total": 3.4221538753457015
+              "total": 3.433550619454273
             }
           },
           "owner_without_mortgage": {
             "factors": {
-              "in_kind": 1.0138924256196822,
+              "in_kind": 1.013736587020285,
               "out_of_pocket_total": 1.0212974872971068,
               "price": 1.031697658402204,
               "real_out_of_pocket": 0.9899193615296132,
-              "total": 1.0354857866749503
+              "total": 1.035326629104962
             },
             "identity_residual": 2.220446049250313e-16,
             "log_points": {
-              "in_kind": 1.3796810408678035,
+              "in_kind": 1.3643095307214663,
               "price": 3.120565747172311,
               "real_out_of_pocket": -1.013179217136789,
-              "total": 3.4870675709033403
+              "total": 3.471696060757007
             },
             "percentage_points": {
-              "in_kind": 1.418829937784336,
+              "in_kind": 1.4029141807855139,
               "price": 3.1697658402203954,
               "real_out_of_pocket": -1.0400171105097196,
-              "total": 3.548578667495028
+              "total": 3.5326629104962093
             }
           },
           "renter": {
             "factors": {
-              "in_kind": 0.99960353863846,
+              "in_kind": 0.9995041203563423,
               "out_of_pocket_total": 1.0417862350605478,
               "price": 1.031697658402204,
               "real_out_of_pocket": 1.0097786173848335,
-              "total": 1.041373207071362
+              "total": 1.0412696344735386
             },
-            "identity_residual": 0.0,
+            "identity_residual": 2.220446049250313e-16,
             "log_points": {
-              "in_kind": -0.03965399731239555,
+              "in_kind": -0.049600263262837736,
               "price": 3.120565747172311,
               "real_out_of_pocket": 0.9731116119288343,
-              "total": 4.05402336178874
+              "total": 4.04407709583832
             },
             "percentage_points": {
-              "in_kind": -0.04130279891857715,
+              "in_kind": -0.0516600587009337,
               "price": 3.1697658402203954,
               "real_out_of_pocket": 1.008857665834385,
-              "total": 4.137320707136194
+              "total": 4.12696344735386
             }
           }
         },
         "growth_percent_with": {
-          "owner_with_mortgage": 3.4221538753457015,
-          "owner_without_mortgage": 3.548578667495028,
-          "renter": 4.137320707136194
+          "owner_with_mortgage": 3.433550619454273,
+          "owner_without_mortgage": 3.5326629104962093,
+          "renter": 4.12696344735386
         },
         "growth_percent_without": {
           "owner_with_mortgage": 3.9774867529434488,
@@ -674,9 +674,9 @@
         }
       },
       "growth_percent_with": {
-        "owner_with_mortgage": 3.84187775469389,
-        "owner_without_mortgage": 3.873309638466016,
-        "renter": 4.4520106899545775
+        "owner_with_mortgage": 3.8222058756339106,
+        "owner_without_mortgage": 3.884253128315951,
+        "renter": 4.4634224594610306
       },
       "growth_percent_without": {
         "owner_with_mortgage": 4.111886884837612,
@@ -690,92 +690,92 @@
       },
       "in_kind_percentage_points_by_implicate": {
         "owner_with_mortgage": [
-          -0.3536354357853658,
-          -0.1732375745117494,
-          -0.24866478427825764,
-          -0.3216370617603199,
-          -0.25247659838753306
+          -0.35225787506638145,
+          -0.16654836850616694,
+          -0.3059955931040532,
+          -0.3440852879024686,
+          -0.27907201347521027
         ],
         "owner_without_mortgage": [
-          0.8147557283060612,
-          1.4713382896749805,
-          1.6029220692162,
-          1.2926431577590813,
-          1.637910914668747
+          0.9153764994941254,
+          1.4470961795062982,
+          1.6306209848089896,
+          1.2962453704501185,
+          1.5847548702093797
         ],
         "renter": [
-          -0.07703346232531684,
-          -0.3782156817537217,
-          -0.3592170705959957,
-          -0.24046958117431202,
-          -0.21570582158964735
+          -0.09460624290140332,
+          -0.4013682739647219,
+          -0.2883677118923891,
+          -0.23763960569812245,
+          -0.19160561227162323
         ]
       },
       "package_cpi": {
         "owner_with_mortgage": {
           "factors": {
-            "in_kind": 0.9974065484910247,
+            "in_kind": 0.99721759908622,
             "out_of_pocket_total": 1.0411188688483761,
             "price": 1.033377000778809,
             "real_out_of_pocket": 1.0074918137947064,
-            "total": 1.038418777546939
+            "total": 1.038222058756339
           },
           "identity_residual": 2.220446049250313e-16,
           "log_points": {
-            "in_kind": -0.2596820330183501,
+            "in_kind": -0.27862789864415566,
             "price": 3.283208074831443,
             "real_out_of_pocket": 0.746388953989077,
-            "total": 3.7699149958022
+            "total": 3.7509691301764034
           },
           "percentage_points": {
-            "in_kind": -0.2700091301437452,
+            "in_kind": -0.28968100920373363,
             "price": 3.3377000778809007,
             "real_out_of_pocket": 0.7741868069567034,
-            "total": 3.84187775469389
+            "total": 3.8222058756339106
           }
         },
         "owner_without_mortgage": {
           "factors": {
-            "in_kind": 1.0133022488390269,
+            "in_kind": 1.0134090044908268,
             "out_of_pocket_total": 1.0250970009933071,
             "price": 1.033372847682562,
             "real_out_of_pocket": 0.9919914223527216,
-            "total": 1.0387330963846602
+            "total": 1.0388425312831595
           },
-          "identity_residual": -2.220446049250313e-16,
+          "identity_residual": 0.0,
           "log_points": {
-            "in_kind": 1.3214550791715804,
+            "in_kind": 1.3319899446314034,
             "price": 3.282806178467449,
             "real_out_of_pocket": -0.8040818556501423,
-            "total": 3.800179401988874
+            "total": 3.8107142674487093
           },
           "percentage_points": {
-            "in_kind": 1.363609539135314,
+            "in_kind": 1.3745530289852366,
             "price": 3.33728476825621,
             "real_out_of_pocket": -0.8275846689254951,
-            "total": 3.873309638466016
+            "total": 3.884253128315951
           }
         },
         "renter": {
           "factors": {
-            "in_kind": 0.997571874323456,
+            "in_kind": 0.997680862750014,
             "out_of_pocket_total": 1.0470625062559324,
             "price": 1.0336149350471044,
             "real_out_of_pocket": 1.0130102330692572,
-            "total": 1.0445201068995458
+            "total": 1.0446342245946103
           },
-          "identity_residual": 0.0,
+          "identity_residual": -2.220446049250313e-16,
           "log_points": {
-            "in_kind": -0.24310783543114467,
+            "in_kind": -0.23218306137707667,
             "price": 3.3062303484283926,
             "real_out_of_pocket": 1.2926326962076047,
-            "total": 4.355755209204848
+            "total": 4.366679983258895
           },
           "percentage_points": {
-            "in_kind": -0.25423993563865904,
+            "in_kind": -0.2428281661321835,
             "price": 3.3614935047104444,
             "real_out_of_pocket": 1.3447571208827964,
-            "total": 4.4520106899545775
+            "total": 4.4634224594610306
           }
         }
       },
@@ -789,68 +789,68 @@
       "bls_fcsuti_index": {
         "owner_with_mortgage": {
           "factors": {
-            "in_kind": 1.0010293526483762,
+            "in_kind": 1.0009492562933864,
             "out_of_pocket_total": 1.0988300119122498,
             "price": 1.0720615477044777,
             "real_out_of_pocket": 1.024969148707077,
-            "total": 1.099961095495127
+            "total": 1.0998730832164192
           },
-          "identity_residual": 2.220446049250313e-16,
+          "identity_residual": -2.220446049250313e-16,
           "log_points": {
-            "in_kind": 0.10288232282144154,
+            "in_kind": 0.09488060345492744,
             "price": 6.958347490392587,
             "real_out_of_pocket": 2.466251331502885,
-            "total": 9.527481144716926
+            "total": 9.519479425350385
           },
           "percentage_points": {
-            "in_kind": 0.11310835828771532,
+            "in_kind": 0.10430713041695341,
             "price": 7.20615477044777,
             "real_out_of_pocket": 2.676846420777211,
-            "total": 9.99610954951271
+            "total": 9.987308321641919
           }
         },
         "owner_without_mortgage": {
           "factors": {
-            "in_kind": 1.0051484810291131,
+            "in_kind": 1.0048291440849657,
             "out_of_pocket_total": 1.0859394375240214,
             "price": 1.0720615477044777,
             "real_out_of_pocket": 1.0129450495162888,
-            "total": 1.0915303761168795
+            "total": 1.0911835955353717
           },
-          "identity_residual": -2.220446049250313e-16,
+          "identity_residual": 2.220446049250313e-16,
           "log_points": {
-            "in_kind": 0.5135272915743234,
+            "in_kind": 0.48175211727941974,
             "price": 6.958347490392587,
             "real_out_of_pocket": 1.2861978500339353,
-            "total": 8.758072632000836
+            "total": 8.726297457705957
           },
           "percentage_points": {
-            "in_kind": 0.5590938592858217,
+            "in_kind": 0.5244158011350116,
             "price": 7.20615477044777,
             "real_out_of_pocket": 1.3877889819543705,
-            "total": 9.153037611687953
+            "total": 9.11835955353717
           }
         },
         "renter": {
           "factors": {
-            "in_kind": 1.0023312199494387,
+            "in_kind": 1.0023937361410757,
             "out_of_pocket_total": 1.0978475845914428,
             "price": 1.0720615477044777,
             "real_out_of_pocket": 1.0240527579243737,
-            "total": 1.1004069087820858
+            "total": 1.1004755420320722
           },
           "identity_residual": 2.220446049250313e-16,
           "log_points": {
-            "in_kind": 0.23285068719145946,
+            "in_kind": 0.2390875718540993,
             "price": 6.958347490392587,
             "real_out_of_pocket": 2.376804670065492,
-            "total": 9.568002847649556
+            "total": 9.574239732312186
           },
           "percentage_points": {
-            "in_kind": 0.2559324190642712,
+            "in_kind": 0.26279574406292444,
             "price": 7.20615477044777,
             "real_out_of_pocket": 2.5786036886965173,
-            "total": 10.04069087820858
+            "total": 10.04755420320722
           }
         }
       },
@@ -864,75 +864,75 @@
         "decomposition": {
           "owner_with_mortgage": {
             "factors": {
-              "in_kind": 1.0020524453444495,
+              "in_kind": 1.001802183935226,
               "out_of_pocket_total": 1.0948289941110214,
               "price": 1.0720615477044777,
               "real_out_of_pocket": 1.0212370702552422,
-              "total": 1.0970760707829528
+              "total": 1.096802077336028
             },
-            "identity_residual": -2.220446049250313e-16,
+            "identity_residual": 2.220446049250313e-16,
             "log_points": {
-              "in_kind": 0.20503419560715788,
+              "in_kind": 0.18005619502090023,
               "price": 6.958347490392587,
               "real_out_of_pocket": 2.101470640714703,
-              "total": 9.264852326714436
+              "total": 9.2398743261282
             },
             "percentage_points": {
-              "in_kind": 0.2247076671931476,
+              "in_kind": 0.1973083225006546,
               "price": 7.20615477044777,
               "real_out_of_pocket": 2.2767446406543725,
-              "total": 9.707607078295277
+              "total": 9.680207733602808
             }
           },
           "owner_without_mortgage": {
             "factors": {
-              "in_kind": 0.9954336936559562,
+              "in_kind": 0.9956989574803554,
               "out_of_pocket_total": 1.092261364289027,
               "price": 1.0720615477044777,
               "real_out_of_pocket": 1.0188420306910566,
-              "total": 1.0872737642919201
+              "total": 1.087563501718655
             },
             "identity_residual": 0.0,
             "log_points": {
-              "in_kind": -0.4576763767533843,
+              "in_kind": -0.4310318610485048,
               "price": 6.958347490392587,
               "real_out_of_pocket": 1.866671836746247,
-              "total": 8.367342950385439
+              "total": 8.393987466090318
             },
             "percentage_points": {
-              "in_kind": -0.49875999971068746,
+              "in_kind": -0.4697862570372106,
               "price": 7.20615477044777,
               "real_out_of_pocket": 2.0199816584549417,
-              "total": 8.727376429192013
+              "total": 8.75635017186549
             }
           },
           "renter": {
             "factors": {
-              "in_kind": 1.003601292852634,
+              "in_kind": 1.003729638442177,
               "out_of_pocket_total": 1.0942462478752344,
               "price": 1.0720615477044777,
               "real_out_of_pocket": 1.0206934949007909,
-              "total": 1.098186949066729
+              "total": 1.0983273907465176
             },
-            "identity_residual": 2.220446049250313e-16,
+            "identity_residual": 0.0,
             "log_points": {
-              "in_kind": 0.3594823724360315,
+              "in_kind": 0.3722700585835267,
               "price": 6.958347490392587,
               "real_out_of_pocket": 2.048229323250985,
-              "total": 9.366059186079607
+              "total": 9.378846872227093
             },
             "percentage_points": {
-              "in_kind": 0.3940701191494772,
+              "in_kind": 0.40811428712834125,
               "price": 7.20615477044777,
               "real_out_of_pocket": 2.2184700170756573,
-              "total": 9.81869490667291
+              "total": 9.832739074651764
             }
           }
         },
         "growth_percent_with": {
-          "owner_with_mortgage": 9.707607078295277,
-          "owner_without_mortgage": 8.727376429192013,
-          "renter": 9.81869490667291
+          "owner_with_mortgage": 9.680207733602808,
+          "owner_without_mortgage": 8.75635017186549,
+          "renter": 9.832739074651764
         },
         "growth_percent_without": {
           "owner_with_mortgage": 9.482899411102142,
@@ -946,9 +946,9 @@
         }
       },
       "growth_percent_with": {
-        "owner_with_mortgage": 9.99610954951271,
-        "owner_without_mortgage": 9.153037611687953,
-        "renter": 10.04069087820858
+        "owner_with_mortgage": 9.987308321641919,
+        "owner_without_mortgage": 9.11835955353717,
+        "renter": 10.04755420320722
       },
       "growth_percent_without": {
         "owner_with_mortgage": 9.883001191224983,
@@ -962,92 +962,92 @@
       },
       "in_kind_percentage_points_by_implicate": {
         "owner_with_mortgage": [
-          0.28121131213601125,
-          0.07382052016792733,
-          0.21002004394467916,
-          -0.0950726455470208,
-          0.09509482709080974
+          0.24262552791588649,
+          0.0767720222510376,
+          0.18568457364992488,
+          -0.052588855013509975,
+          0.06864468101567178
         ],
         "owner_without_mortgage": [
-          1.2847376648473374,
-          -0.059061888427001705,
-          0.11855668575147986,
-          0.39890461986147907,
-          1.058738211849527
+          1.1679202039267116,
+          -0.10800390746045119,
+          0.13630950306349554,
+          0.3867147038759207,
+          1.044301923887786
         ],
         "renter": [
-          0.10864707391115414,
-          0.3302314976347033,
-          0.05211017395405005,
-          0.5564793761141716,
-          0.2311469566812783
+          0.1519698389956556,
+          0.3449497574794305,
+          0.06711190286301465,
+          0.5084841180853356,
+          0.24055797689259606
         ]
       },
       "package_cpi": {
         "owner_with_mortgage": {
           "factors": {
-            "in_kind": 1.0010293526483762,
+            "in_kind": 1.0009492562933864,
             "out_of_pocket_total": 1.0988300119122498,
             "price": 1.074265368946463,
             "real_out_of_pocket": 1.0228664570932575,
-            "total": 1.099961095495127
+            "total": 1.0998730832164192
           },
-          "identity_residual": 2.220446049250313e-16,
+          "identity_residual": -2.220446049250313e-16,
           "log_points": {
-            "in_kind": 0.10288232282144154,
+            "in_kind": 0.09488060345492744,
             "price": 7.163705024641379,
             "real_out_of_pocket": 2.260893797254084,
-            "total": 9.527481144716926
+            "total": 9.519479425350385
           },
           "percentage_points": {
-            "in_kind": 0.1131083582877153,
+            "in_kind": 0.1043071304169534,
             "price": 7.426536894646296,
             "real_out_of_pocket": 2.4564642965786754,
-            "total": 9.99610954951271
+            "total": 9.987308321641919
           }
         },
         "owner_without_mortgage": {
           "factors": {
-            "in_kind": 1.0051484810291131,
+            "in_kind": 1.0048291440849657,
             "out_of_pocket_total": 1.0859394375240214,
             "price": 1.074543445154548,
             "real_out_of_pocket": 1.0106054272825,
-            "total": 1.0915303761168795
+            "total": 1.0911835955353717
           },
-          "identity_residual": -2.220446049250313e-16,
+          "identity_residual": 2.220446049250313e-16,
           "log_points": {
-            "in_kind": 0.5135272915743234,
+            "in_kind": 0.48175211727941974,
             "price": 7.189586918629569,
             "real_out_of_pocket": 1.0549584217969645,
-            "total": 8.758072632000836
+            "total": 8.726297457705957
           },
           "percentage_points": {
-            "in_kind": 0.5590938592858218,
+            "in_kind": 0.5244158011350117,
             "price": 7.454344515454792,
             "real_out_of_pocket": 1.139599236947361,
-            "total": 9.153037611687953
+            "total": 9.11835955353717
           }
         },
         "renter": {
           "factors": {
-            "in_kind": 1.0023312199494387,
+            "in_kind": 1.0023937361410757,
             "out_of_pocket_total": 1.0978475845914428,
             "price": 1.074431674632229,
             "real_out_of_pocket": 1.0217937636352994,
-            "total": 1.1004069087820858
+            "total": 1.1004755420320722
           },
           "identity_residual": 2.220446049250313e-16,
           "log_points": {
-            "in_kind": 0.23285068719145946,
+            "in_kind": 0.2390875718540993,
             "price": 7.179184702113382,
             "real_out_of_pocket": 2.1559674583446893,
-            "total": 9.568002847649556
+            "total": 9.574239732312186
           },
           "percentage_points": {
-            "in_kind": 0.25593241906427117,
+            "in_kind": 0.2627957440629244,
             "price": 7.443167463222911,
             "real_out_of_pocket": 2.34159099592137,
-            "total": 10.04069087820858
+            "total": 10.04755420320722
           }
         }
       },
@@ -1061,68 +1061,68 @@
       "bls_fcsuti_index": {
         "owner_with_mortgage": {
           "factors": {
-            "in_kind": 1.0015032828597694,
+            "in_kind": 1.0014116998001523,
             "out_of_pocket_total": 1.0828415366465385,
             "price": 1.0617226295552544,
             "real_out_of_pocket": 1.0198911716708257,
-            "total": 1.0844693537684258
+            "total": 1.0843701838274191
           },
-          "identity_residual": 2.220446049250313e-16,
+          "identity_residual": 0.0,
           "log_points": {
-            "in_kind": 0.15021540612185832,
+            "in_kind": 0.1410704288788106,
             "price": 5.989271126371562,
             "real_out_of_pocket": 1.9695927163556017,
-            "total": 8.109079248849046
+            "total": 8.099934271605987
           },
           "percentage_points": {
-            "in_kind": 0.16278171218871182,
+            "in_kind": 0.15286471808805513,
             "price": 6.172262955525443,
             "real_out_of_pocket": 2.1118907091284003,
-            "total": 8.446935376842578
+            "total": 8.437018382741911
           }
         },
         "owner_without_mortgage": {
           "factors": {
-            "in_kind": 0.9998499245644884,
+            "in_kind": 1.000071816708011,
             "out_of_pocket_total": 1.089718783156935,
             "price": 1.0617226295552544,
             "real_out_of_pocket": 1.026368613442296,
-            "total": 1.0895552431359676
+            "total": 1.089797043172599
           },
           "identity_residual": 0.0,
           "log_points": {
-            "in_kind": -0.01500866979565955,
+            "in_kind": 0.007181412931461681,
             "price": 5.989271126371562,
             "real_out_of_pocket": 2.602695458662916,
-            "total": 8.576957915238827
+            "total": 8.599147997965936
           },
           "percentage_points": {
-            "in_kind": -0.016354002096744622,
+            "in_kind": 0.007826001566400754,
             "price": 6.172262955525443,
             "real_out_of_pocket": 2.7996153601680556,
-            "total": 8.955524313596763
+            "total": 8.979704317259895
           }
         },
         "renter": {
           "factors": {
-            "in_kind": 0.996043995477334,
+            "in_kind": 0.9960893813852937,
             "out_of_pocket_total": 1.0875356947658255,
             "price": 1.0617226295552544,
             "real_out_of_pocket": 1.0243124376291988,
-            "total": 1.083233398638771
+            "total": 1.0832827574337167
           },
-          "identity_residual": -2.220446049250313e-16,
+          "identity_residual": 0.0,
           "log_points": {
-            "in_kind": -0.39638502071022014,
+            "in_kind": -0.39182850772824396,
             "price": 5.989271126371562,
             "real_out_of_pocket": 2.4021594951503893,
-            "total": 7.995045600811715
+            "total": 7.999602113793712
           },
           "percentage_points": {
-            "in_kind": -0.4302296127054293,
+            "in_kind": -0.42529373321088054,
             "price": 6.172262955525443,
             "real_out_of_pocket": 2.5813065210571033,
-            "total": 8.323339863877099
+            "total": 8.328275743371671
           }
         }
       },
@@ -1136,75 +1136,75 @@
         "decomposition": {
           "owner_with_mortgage": {
             "factors": {
-              "in_kind": 1.0029907814298622,
+              "in_kind": 1.003012410899906,
               "out_of_pocket_total": 1.0850845305904837,
               "price": 1.0617226295552544,
               "real_out_of_pocket": 1.0220037704621736,
-              "total": 1.0883297812544046
+              "total": 1.0883532510577538
             },
-            "identity_residual": 2.220446049250313e-16,
+            "identity_residual": 0.0,
             "log_points": {
-              "in_kind": 0.29863179404146445,
+              "in_kind": 0.30078826818140947,
               "price": 5.989271126371562,
               "real_out_of_pocket": 2.176518107233309,
-              "total": 8.464421027646356
+              "total": 8.466577501786295
             },
             "percentage_points": {
-              "in_kind": 0.324525066392076,
+              "in_kind": 0.3268720467270042,
               "price": 6.172262955525443,
               "real_out_of_pocket": 2.3361901035229202,
-              "total": 8.83297812544046
+              "total": 8.835325105775382
             }
           },
           "owner_without_mortgage": {
             "factors": {
-              "in_kind": 1.0056218138808797,
+              "in_kind": 1.0056766437081293,
               "out_of_pocket_total": 1.084446060471871,
               "price": 1.0617226295552544,
               "real_out_of_pocket": 1.0214024174337655,
-              "total": 1.0905426143876973
+              "total": 1.0906020743778542
             },
-            "identity_residual": 2.220446049250313e-16,
+            "identity_residual": -2.220446049250313e-16,
             "log_points": {
-              "in_kind": 0.5606070462044357,
+              "in_kind": 0.5660592283066275,
               "price": 5.989271126371562,
               "real_out_of_pocket": 2.117660201318121,
-              "total": 8.667538373894129
+              "total": 8.672990555996295
             },
             "percentage_points": {
-              "in_kind": 0.6096553915826047,
+              "in_kind": 0.6156013905983209,
               "price": 6.172262955525443,
               "real_out_of_pocket": 2.27234309166167,
-              "total": 9.054261438769728
+              "total": 9.060207437785417
             }
           },
           "renter": {
             "factors": {
-              "in_kind": 0.994486524689087,
+              "in_kind": 0.99445917938361,
               "out_of_pocket_total": 1.0926046303453152,
               "price": 1.0617226295552544,
               "real_out_of_pocket": 1.029086693577396,
-              "total": 1.086580581691317
+              "total": 1.0865507040839346
             },
-            "identity_residual": -2.220446049250313e-16,
+            "identity_residual": 0.0,
             "log_points": {
-              "in_kind": -0.5528730614915488,
+              "in_kind": -0.5556227901968451,
               "price": 5.989271126371562,
               "real_out_of_pocket": 2.867170362122283,
-              "total": 8.30356842700229
+              "total": 8.300818698297002
             },
             "percentage_points": {
-              "in_kind": -0.6024048653998068,
+              "in_kind": -0.6053926261380553,
               "price": 6.172262955525443,
               "real_out_of_pocket": 3.088200079006071,
-              "total": 8.6580581691317
+              "total": 8.655070408393462
             }
           }
         },
         "growth_percent_with": {
-          "owner_with_mortgage": 8.83297812544046,
-          "owner_without_mortgage": 9.054261438769728,
-          "renter": 8.6580581691317
+          "owner_with_mortgage": 8.835325105775382,
+          "owner_without_mortgage": 9.060207437785417,
+          "renter": 8.655070408393462
         },
         "growth_percent_without": {
           "owner_with_mortgage": 8.508453059048371,
@@ -1218,9 +1218,9 @@
         }
       },
       "growth_percent_with": {
-        "owner_with_mortgage": 8.446935376842578,
-        "owner_without_mortgage": 8.955524313596763,
-        "renter": 8.323339863877099
+        "owner_with_mortgage": 8.437018382741911,
+        "owner_without_mortgage": 8.979704317259895,
+        "renter": 8.328275743371671
       },
       "growth_percent_without": {
         "owner_with_mortgage": 8.284153664653848,
@@ -1234,92 +1234,92 @@
       },
       "in_kind_percentage_points_by_implicate": {
         "owner_with_mortgage": [
-          -0.1595955668143617,
-          0.25428348254385935,
-          0.12372790627129662,
-          0.5092509168702851,
-          0.08829716327549354
+          -0.14131138169785473,
+          0.21769950177616018,
+          0.11743467297613037,
+          0.47764098347223033,
+          0.09455940744774023
         ],
         "owner_without_mortgage": [
-          0.33632828456670394,
-          0.3697983502466575,
-          0.0422684441841148,
-          -0.5772391247536504,
-          -0.2504932379346901
+          0.36246534114168655,
+          0.4406923881522418,
+          0.04933448241790659,
+          -0.572835895392983,
+          -0.23771052458467315
         ],
         "renter": [
-          0.04256085562803574,
-          -0.5648529204683964,
-          -0.3094097297684348,
-          -1.0655903124571935,
-          -0.24935889072962075
+          0.007658232520650695,
+          -0.5607998350655371,
+          -0.3033818260799715,
+          -1.0254543584132996,
+          -0.24060407322675634
         ]
       },
       "package_cpi": {
         "owner_with_mortgage": {
           "factors": {
-            "in_kind": 1.0015032828597694,
+            "in_kind": 1.0014116998001523,
             "out_of_pocket_total": 1.0828415366465385,
             "price": 1.0586772919938918,
             "real_out_of_pocket": 1.0228249390398618,
-            "total": 1.0844693537684258
+            "total": 1.0843701838274191
           },
-          "identity_residual": 2.220446049250313e-16,
+          "identity_residual": 0.0,
           "log_points": {
-            "in_kind": 0.15021540612185832,
+            "in_kind": 0.1410704288788106,
             "price": 5.7020291184573875,
             "real_out_of_pocket": 2.256834724269774,
-            "total": 8.109079248849046
+            "total": 8.099934271605987
           },
           "percentage_points": {
-            "in_kind": 0.16278171218871182,
+            "in_kind": 0.15286471808805513,
             "price": 5.867729199389182,
             "real_out_of_pocket": 2.416424465264658,
-            "total": 8.446935376842578
+            "total": 8.437018382741911
           }
         },
         "owner_without_mortgage": {
           "factors": {
-            "in_kind": 0.9998499245644884,
+            "in_kind": 1.000071816708011,
             "out_of_pocket_total": 1.089718783156935,
             "price": 1.0604748552934549,
             "real_out_of_pocket": 1.0275762576712748,
-            "total": 1.0895552431359676
+            "total": 1.089797043172599
           },
           "identity_residual": 0.0,
           "log_points": {
-            "in_kind": -0.01500866979565955,
+            "in_kind": 0.007181412931461681,
             "price": 5.871678450431312,
             "real_out_of_pocket": 2.7202881346031704,
-            "total": 8.576957915238827
+            "total": 8.599147997965936
           },
           "percentage_points": {
-            "in_kind": -0.016354002096744622,
+            "in_kind": 0.007826001566400754,
             "price": 6.0474855293454866,
             "real_out_of_pocket": 2.924392786348018,
-            "total": 8.955524313596763
+            "total": 8.979704317259895
           }
         },
         "renter": {
           "factors": {
-            "in_kind": 0.996043995477334,
+            "in_kind": 0.9960893813852937,
             "out_of_pocket_total": 1.0875356947658255,
             "price": 1.0579586932087393,
             "real_out_of_pocket": 1.0279566695249513,
-            "total": 1.083233398638771
+            "total": 1.0832827574337167
           },
-          "identity_residual": -2.220446049250313e-16,
+          "identity_residual": 0.0,
           "log_points": {
-            "in_kind": -0.39638502071022014,
+            "in_kind": -0.39182850772824396,
             "price": 5.634129033815061,
             "real_out_of_pocket": 2.7573015877068823,
-            "total": 7.995045600811715
+            "total": 7.999602113793712
           },
           "percentage_points": {
-            "in_kind": -0.43022961270542925,
+            "in_kind": -0.4252937332108805,
             "price": 5.795869320873925,
             "real_out_of_pocket": 2.9577001557086113,
-            "total": 8.323339863877099
+            "total": 8.328275743371671
           }
         }
       },
@@ -1333,68 +1333,68 @@
       "bls_fcsuti_index": {
         "owner_with_mortgage": {
           "factors": {
-            "in_kind": 0.9985647926262279,
+            "in_kind": 0.9984056830604384,
             "out_of_pocket_total": 1.2115401444089868,
             "price": 1.1419231308083873,
             "real_out_of_pocket": 1.0609647109532816,
-            "total": 1.20980133306011
+            "total": 1.2096085654337967
           },
           "identity_residual": -2.220446049250313e-16,
           "log_points": {
-            "in_kind": -0.14362382703599666,
+            "in_kind": -0.15955892152670878,
             "price": 13.271379794239909,
             "real_out_of_pocket": 5.917859890273075,
-            "total": 19.045615857476974
+            "total": 19.029680762986263
           },
           "percentage_points": {
-            "in_kind": -0.1738811348876715,
+            "in_kind": -0.19315789751901305,
             "price": 14.192313080838726,
             "real_out_of_pocket": 6.96170136005997,
-            "total": 20.980133306011005
+            "total": 20.96085654337967
           }
         },
         "owner_without_mortgage": {
           "factors": {
-            "in_kind": 0.9867650591753403,
+            "in_kind": 0.9868575433452342,
             "out_of_pocket_total": 1.2311843605728257,
             "price": 1.1419231308083873,
             "real_out_of_pocket": 1.0781674592240276,
-            "total": 1.2148897084163977
+            "total": 1.2150035734799718
           },
-          "identity_residual": -4.440892098500626e-16,
+          "identity_residual": -2.220446049250313e-16,
           "log_points": {
-            "in_kind": -1.332330316689325,
+            "in_kind": -1.3229582949214838,
             "price": 13.271379794239909,
             "real_out_of_pocket": 7.526280293078172,
-            "total": 19.465329770628735
+            "total": 19.47470179239659
           },
           "percentage_points": {
-            "in_kind": -1.6294652156427842,
+            "in_kind": -1.618078709285387,
             "price": 14.192313080838726,
             "real_out_of_pocket": 8.926122976443851,
-            "total": 21.488970841639766
+            "total": 21.50035734799718
           }
         },
         "renter": {
           "factors": {
-            "in_kind": 0.9977210028463814,
+            "in_kind": 0.9978182521930268,
             "out_of_pocket_total": 1.1982430313960903,
             "price": 1.1419231308083873,
             "real_out_of_pocket": 1.0493202204843974,
-            "total": 1.1955122389381951
+            "total": 1.1956287672901207
           },
           "identity_residual": -2.220446049250313e-16,
           "log_points": {
-            "in_kind": -0.2281598019961045,
+            "in_kind": -0.2184131286117805,
             "price": 13.271379794239909,
             "real_out_of_pocket": 4.8142545447210985,
-            "total": 17.857474536964887
+            "total": 17.867221210349204
           },
           "percentage_points": {
-            "in_kind": -0.2730792457894973,
+            "in_kind": -0.2614264105969366,
             "price": 14.192313080838726,
             "real_out_of_pocket": 5.631990058770308,
-            "total": 19.551223893819515
+            "total": 19.562876729012068
           }
         }
       },
@@ -1408,75 +1408,75 @@
         "decomposition": {
           "owner_with_mortgage": {
             "factors": {
-              "in_kind": 1.0008135129341547,
+              "in_kind": 1.0007614165860432,
               "out_of_pocket_total": 1.2212641846287786,
               "price": 1.1419231308083873,
               "real_out_of_pocket": 1.0694802055233126,
-              "total": 1.2222576988389942
+              "total": 1.2221940754348954
             },
-            "identity_residual": 2.220446049250313e-16,
+            "identity_residual": 0.0,
             "log_points": {
-              "in_kind": 0.0813182211860062,
+              "in_kind": 0.07611268554955794,
               "price": 13.271379794239909,
               "real_out_of_pocket": 6.717274120944963,
-              "total": 20.0699721363709
+              "total": 20.06476660073443
             },
             "percentage_points": {
-              "in_kind": 0.09935142102153546,
+              "in_kind": 0.0929890806116912,
               "price": 14.192313080838726,
               "real_out_of_pocket": 7.93410538203913,
-              "total": 22.225769883899417
+              "total": 22.219407543489545
             }
           },
           "owner_without_mortgage": {
             "factors": {
-              "in_kind": 0.9906513125601327,
+              "in_kind": 0.9905780860708108,
               "out_of_pocket_total": 1.2299478516355231,
               "price": 1.1419231308083873,
               "real_out_of_pocket": 1.07708462894943,
-              "total": 1.2184494536032462
+              "total": 1.218359388840022
             },
-            "identity_residual": -4.440892098500626e-16,
+            "identity_residual": -2.220446049250313e-16,
             "log_points": {
-              "in_kind": -0.9392660694346614,
+              "in_kind": -0.9466580947504475,
               "price": 13.271379794239909,
               "real_out_of_pocket": 7.425797349885688,
-              "total": 19.757911074690917
+              "total": 19.750519049375136
             },
             "percentage_points": {
-              "in_kind": -1.1498398032276755,
+              "in_kind": -1.1588462795501104,
               "price": 14.192313080838726,
               "real_out_of_pocket": 8.802472082713598,
-              "total": 21.84494536032462
+              "total": 21.835938884002193
             }
           },
           "renter": {
             "factors": {
-              "in_kind": 0.9965013673903154,
+              "in_kind": 0.996489595221417,
               "out_of_pocket_total": 1.2111272320185236,
               "price": 1.1419231308083873,
               "real_out_of_pocket": 1.0606031170952335,
-              "total": 1.2068899427901068
+              "total": 1.2068756851957738
             },
-            "identity_residual": 2.220446049250313e-16,
+            "identity_residual": 0.0,
             "log_points": {
-              "in_kind": -0.3504767137238268,
+              "in_kind": -0.35165807070128857,
               "price": 13.271379794239909,
               "real_out_of_pocket": 5.883772470887382,
-              "total": 18.80467555140349
+              "total": 18.803494194426012
             },
             "percentage_points": {
-              "in_kind": -0.4237289228417099,
+              "in_kind": -0.4251546822749825,
               "price": 14.192313080838726,
               "real_out_of_pocket": 6.920410121013631,
-              "total": 20.688994279010675
+              "total": 20.687568519577383
             }
           }
         },
         "growth_percent_with": {
-          "owner_with_mortgage": 22.225769883899417,
-          "owner_without_mortgage": 21.84494536032462,
-          "renter": 20.688994279010675
+          "owner_with_mortgage": 22.219407543489545,
+          "owner_without_mortgage": 21.835938884002193,
+          "renter": 20.687568519577383
         },
         "growth_percent_without": {
           "owner_with_mortgage": 22.12641846287786,
@@ -1490,9 +1490,9 @@
         }
       },
       "growth_percent_with": {
-        "owner_with_mortgage": 20.980133306011005,
-        "owner_without_mortgage": 21.488970841639766,
-        "renter": 19.551223893819515
+        "owner_with_mortgage": 20.96085654337967,
+        "owner_without_mortgage": 21.50035734799718,
+        "renter": 19.562876729012068
       },
       "growth_percent_without": {
         "owner_with_mortgage": 21.154014440898685,
@@ -1506,92 +1506,92 @@
       },
       "in_kind_percentage_points_by_implicate": {
         "owner_with_mortgage": [
-          -0.30556568211848756,
-          0.08876774494370224,
-          -0.251674895560672,
-          0.18304928442867083,
-          -0.5817223926009729
+          -0.3075529963188298,
+          0.026512004819516943,
+          -0.24483611247593665,
+          0.13924440514183148,
+          -0.5774105940799475
         ],
         "owner_without_mortgage": [
-          -3.139374003055111,
-          -1.9696779158894415,
-          -0.02238901615631026,
-          -1.7285559144361493,
-          -1.2830562712171913
+          -3.140558260668618,
+          -1.9063135440943415,
+          -0.038592936078750154,
+          -1.7289699075357248,
+          -1.2718403778318172
         ],
         "renter": [
-          0.17502351484656295,
-          -0.40751099305890537,
-          -0.05479959614413862,
-          -0.9078701460652069,
-          -0.16543097556897218
+          0.15695999991785942,
+          -0.3762141428774865,
+          -0.06810797911110522,
+          -0.8573131503353347,
+          -0.15836396492966948
         ]
       },
       "package_cpi": {
         "owner_with_mortgage": {
           "factors": {
-            "in_kind": 0.9985647926262279,
+            "in_kind": 0.9984056830604384,
             "out_of_pocket_total": 1.2115401444089868,
             "price": 1.1308796807594212,
             "real_out_of_pocket": 1.071325415976525,
-            "total": 1.20980133306011
+            "total": 1.2096085654337967
           },
           "identity_residual": 0.0,
           "log_points": {
-            "in_kind": -0.14362382703599666,
+            "in_kind": -0.15955892152670878,
             "price": 12.299580841515303,
             "real_out_of_pocket": 6.889658842997676,
-            "total": 19.045615857476974
+            "total": 19.029680762986263
           },
           "percentage_points": {
-            "in_kind": -0.1738811348876715,
+            "in_kind": -0.19315789751901302,
             "price": 13.087968075942126,
             "real_out_of_pocket": 8.066046364956561,
-            "total": 20.980133306011005
+            "total": 20.96085654337967
           }
         },
         "owner_without_mortgage": {
           "factors": {
-            "in_kind": 0.9867650591753403,
+            "in_kind": 0.9868575433452342,
             "out_of_pocket_total": 1.2311843605728257,
             "price": 1.1326853391953076,
             "real_out_of_pocket": 1.0869606217800034,
-            "total": 1.2148897084163977
+            "total": 1.2150035734799718
           },
-          "identity_residual": -2.220446049250313e-16,
+          "identity_residual": 0.0,
           "log_points": {
-            "in_kind": -1.332330316689325,
+            "in_kind": -1.3229582949214838,
             "price": 12.459121990364059,
             "real_out_of_pocket": 8.338538096954009,
-            "total": 19.465329770628735
+            "total": 19.47470179239659
           },
           "percentage_points": {
-            "in_kind": -1.629465215642784,
+            "in_kind": -1.6180787092853866,
             "price": 13.268533919530757,
             "real_out_of_pocket": 9.849902137751801,
-            "total": 21.488970841639766
+            "total": 21.50035734799718
           }
         },
         "renter": {
           "factors": {
-            "in_kind": 0.9977210028463814,
+            "in_kind": 0.9978182521930268,
             "out_of_pocket_total": 1.1982430313960903,
             "price": 1.129878339539373,
             "real_out_of_pocket": 1.0605062416583613,
-            "total": 1.1955122389381951
+            "total": 1.1956287672901207
           },
           "identity_residual": -2.220446049250313e-16,
           "log_points": {
-            "in_kind": -0.2281598019961045,
+            "in_kind": -0.2184131286117805,
             "price": 12.210996280360265,
             "real_out_of_pocket": 5.874638058600739,
-            "total": 17.857474536964887
+            "total": 17.867221210349204
           },
           "percentage_points": {
-            "in_kind": -0.2730792457894973,
+            "in_kind": -0.26142641059693655,
             "price": 12.987833953937301,
             "real_out_of_pocket": 6.836469185671727,
-            "total": 19.551223893819515
+            "total": 19.562876729012068
           }
         }
       },
@@ -1605,68 +1605,68 @@
       "bls_fcsuti_index": {
         "owner_with_mortgage": {
           "factors": {
-            "in_kind": 1.0022791555974058,
+            "in_kind": 1.0022321294232739,
             "out_of_pocket_total": 1.0587773809883272,
             "price": 1.0397557328015952,
             "real_out_of_pocket": 1.0182943431679656,
-            "total": 1.0611904993826133
+            "total": 1.0611407091331282
           },
           "identity_residual": 0.0,
           "log_points": {
-            "in_kind": 0.22765622619496972,
+            "in_kind": 0.22296419233196024,
             "price": 3.898581326030303,
             "real_out_of_pocket": 1.8129015007672846,
-            "total": 5.939139052992562
+            "total": 5.934447019129562
           },
           "percentage_points": {
-            "in_kind": 0.24131183942861661,
+            "in_kind": 0.2363328144800912,
             "price": 3.9755732801595167,
             "real_out_of_pocket": 1.9021648186731963,
-            "total": 6.119049938261334
+            "total": 6.114070913312819
           }
         },
         "owner_without_mortgage": {
           "factors": {
-            "in_kind": 0.9710359523447841,
+            "in_kind": 0.9708105476395471,
             "out_of_pocket_total": 1.0861554906263051,
             "price": 1.0397557328015952,
             "real_out_of_pocket": 1.044625633079884,
-            "total": 1.0546960312348301
+            "total": 1.054451206676624
           },
           "identity_residual": -2.220446049250313e-16,
           "log_points": {
-            "in_kind": -2.93917852745269,
+            "in_kind": -2.9623940294247775,
             "price": 3.898581326030303,
             "real_out_of_pocket": 4.3658575374827215,
-            "total": 5.325260336060312
+            "total": 5.302044834088236
           },
           "percentage_points": {
-            "in_kind": -3.145945939147468,
+            "in_kind": -3.1704283949680874,
             "price": 3.9755732801595167,
             "real_out_of_pocket": 4.639975782470988,
-            "total": 5.469603123483013
+            "total": 5.445120667662406
           }
         },
         "renter": {
           "factors": {
-            "in_kind": 0.9993223550876396,
+            "in_kind": 0.9994332431051164,
             "out_of_pocket_total": 1.0535112132229147,
             "price": 1.0397557328015952,
             "real_out_of_pocket": 1.0132295307324306,
-            "total": 1.0527973067091596
+            "total": 1.0529141284789834
           },
           "identity_residual": 0.0,
           "log_points": {
-            "in_kind": -0.06778746174522529,
+            "in_kind": -0.05669175622816674,
             "price": 3.898581326030303,
             "real_out_of_pocket": 1.314278472580901,
-            "total": 5.145072336865981
+            "total": 5.156168042383024
           },
           "percentage_points": {
-            "in_kind": -0.07139065137551853,
+            "in_kind": -0.05970847439312874,
             "price": 3.9755732801595167,
             "real_out_of_pocket": 1.3755480421319608,
-            "total": 5.279730670915961
+            "total": 5.291412847898336
           }
         }
       },
@@ -1680,75 +1680,75 @@
         "decomposition": {
           "owner_with_mortgage": {
             "factors": {
-              "in_kind": 1.0021708982321278,
+              "in_kind": 1.002094591313199,
               "out_of_pocket_total": 1.062339916170655,
               "price": 1.0397557328015952,
               "real_out_of_pocket": 1.0217206625138842,
-              "total": 1.0646461480165887
+              "total": 1.0645650841307308
             },
-            "identity_residual": 2.220446049250313e-16,
+            "identity_residual": 4.440892098500626e-16,
             "log_points": {
-              "in_kind": 0.21685452373534425,
+              "in_kind": 0.2092400715219219,
               "price": 3.898581326030303,
               "real_out_of_pocket": 2.1488130071197804,
-              "total": 6.264248856885442
+              "total": 6.256634404672042
             },
             "percentage_points": {
-              "in_kind": 0.23062318459336634,
+              "in_kind": 0.22251679600754912,
               "price": 3.9755732801595167,
               "real_out_of_pocket": 2.2584183369059763,
-              "total": 6.4646148016588745
+              "total": 6.456508413073081
             }
           },
           "owner_without_mortgage": {
             "factors": {
-              "in_kind": 0.9707479372641246,
+              "in_kind": 0.9704635564153015,
               "out_of_pocket_total": 1.0923613530052751,
               "price": 1.0397557328015952,
               "real_out_of_pocket": 1.050594210297774,
-              "total": 1.060407530176919
+              "total": 1.06009688352813
             },
-            "identity_residual": -2.220446049250313e-16,
+            "identity_residual": 0.0,
             "log_points": {
-              "in_kind": -2.968843526149297,
+              "in_kind": -2.9981428427650734,
               "price": 3.898581326030303,
               "real_out_of_pocket": 4.93559186694781,
-              "total": 5.865329666828808
+              "total": 5.836030350213051
             },
             "percentage_points": {
-              "in_kind": -3.195382282835608,
+              "in_kind": -3.226446947714527,
               "price": 3.9755732801595167,
               "real_out_of_pocket": 5.260562020367991,
-              "total": 6.040753017691891
+              "total": 6.009688352812992
             }
           },
           "renter": {
             "factors": {
-              "in_kind": 0.9991968026309653,
+              "in_kind": 0.9993015223932051,
               "out_of_pocket_total": 1.056351796490892,
               "price": 1.0397557328015952,
               "real_out_of_pocket": 1.0159615024622939,
-              "total": 1.0555033375071754
+              "total": 1.0556139584161455
             },
             "identity_residual": 0.0,
             "log_points": {
-              "in_kind": -0.08035201048667676,
+              "in_kind": -0.06987216559269839,
               "price": 3.898581326030303,
               "real_out_of_pocket": 1.583545716112777,
-              "total": 5.4017750316563955
+              "total": 5.41225487655037
             },
             "percentage_points": {
-              "in_kind": -0.08484589837165311,
+              "in_kind": -0.0737838074746417,
               "price": 3.9755732801595167,
               "real_out_of_pocket": 1.6596063689296847,
-              "total": 5.55033375071754
+              "total": 5.561395841614547
             }
           }
         },
         "growth_percent_with": {
-          "owner_with_mortgage": 6.4646148016588745,
-          "owner_without_mortgage": 6.040753017691891,
-          "renter": 5.55033375071754
+          "owner_with_mortgage": 6.456508413073081,
+          "owner_without_mortgage": 6.009688352812992,
+          "renter": 5.561395841614547
         },
         "growth_percent_without": {
           "owner_with_mortgage": 6.233991617065504,
@@ -1762,9 +1762,9 @@
         }
       },
       "growth_percent_with": {
-        "owner_with_mortgage": 6.119049938261334,
-        "owner_without_mortgage": 5.469603123483013,
-        "renter": 5.279730670915961
+        "owner_with_mortgage": 6.114070913312819,
+        "owner_without_mortgage": 5.445120667662406,
+        "renter": 5.291412847898336
       },
       "growth_percent_without": {
         "owner_with_mortgage": 5.877738098832719,
@@ -1778,92 +1778,92 @@
       },
       "in_kind_percentage_points_by_implicate": {
         "owner_with_mortgage": [
-          0.18870818400788333,
-          0.3937150047302233,
-          0.13185231927190266,
-          0.3469792406534823,
-          0.1455853005441101
+          0.18002597103408247,
+          0.3751686641391285,
+          0.1449542598841,
+          0.34019776474780883,
+          0.1415238145861173
         ],
         "owner_without_mortgage": [
-          -3.302613305882938,
-          -3.671150055643501,
-          -2.568169119041093,
-          -3.260041689512358,
-          -2.9266593954784708
+          -3.391396117579213,
+          -3.6840540410074185,
+          -2.5878946773681144,
+          -3.2638575278039585,
+          -2.923467263112471
         ],
         "renter": [
-          -0.11436508769016153,
-          -0.062455851143615744,
-          0.2596170876447072,
-          -0.1657356939535277,
-          -0.2728370328142189
+          -0.07187712813059893,
+          -0.03860214633748586,
+          0.24295150640664961,
+          -0.15952540706222954,
+          -0.2704759968766334
         ]
       },
       "package_cpi": {
         "owner_with_mortgage": {
           "factors": {
-            "in_kind": 1.0022791555974058,
+            "in_kind": 1.0022321294232739,
             "out_of_pocket_total": 1.0587773809883272,
             "price": 1.0356375347623288,
             "real_out_of_pocket": 1.022343576250651,
-            "total": 1.0611904993826133
+            "total": 1.0611407091331282
           },
           "identity_residual": 2.220446049250313e-16,
           "log_points": {
-            "in_kind": 0.22765622619496972,
+            "in_kind": 0.22296419233196024,
             "price": 3.501721269799912,
             "real_out_of_pocket": 2.209761556997671,
-            "total": 5.939139052992562
+            "total": 5.934447019129562
           },
           "percentage_points": {
-            "in_kind": 0.2413118394286166,
+            "in_kind": 0.23633281448009116,
             "price": 3.563753476232878,
             "real_out_of_pocket": 2.3139846225998295,
-            "total": 6.119049938261334
+            "total": 6.114070913312819
           }
         },
         "owner_without_mortgage": {
           "factors": {
-            "in_kind": 0.9710359523447841,
+            "in_kind": 0.9708105476395471,
             "out_of_pocket_total": 1.0861554906263051,
             "price": 1.0345715966025375,
             "real_out_of_pocket": 1.0498601490637918,
-            "total": 1.0546960312348301
+            "total": 1.054451206676624
           },
           "identity_residual": -2.220446049250313e-16,
           "log_points": {
-            "in_kind": -2.93917852745269,
+            "in_kind": -2.9623940294247775,
             "price": 3.398742470427354,
             "real_out_of_pocket": 4.865696393085673,
-            "total": 5.325260336060312
+            "total": 5.302044834088236
           },
           "percentage_points": {
-            "in_kind": -3.145945939147468,
+            "in_kind": -3.1704283949680874,
             "price": 3.45715966025375,
             "real_out_of_pocket": 5.1583894023767565,
-            "total": 5.469603123483013
+            "total": 5.445120667662406
           }
         },
         "renter": {
           "factors": {
-            "in_kind": 0.9993223550876396,
+            "in_kind": 0.9994332431051164,
             "out_of_pocket_total": 1.0535112132229147,
             "price": 1.0362059134550228,
             "real_out_of_pocket": 1.0167006379168315,
-            "total": 1.0527973067091596
+            "total": 1.0529141284789834
           },
           "identity_residual": 0.0,
           "log_points": {
-            "in_kind": -0.06778746174522529,
+            "in_kind": -0.05669175622816674,
             "price": 3.55658822487238,
             "real_out_of_pocket": 1.6562715737388236,
-            "total": 5.145072336865981
+            "total": 5.156168042383024
           },
           "percentage_points": {
-            "in_kind": -0.07139065137551852,
+            "in_kind": -0.059708474393128735,
             "price": 3.6205913455022776,
             "real_out_of_pocket": 1.730529976789199,
-            "total": 5.279730670915961
+            "total": 5.291412847898336
           }
         }
       },
@@ -1877,68 +1877,68 @@
       "bls_fcsuti_index": {
         "owner_with_mortgage": {
           "factors": {
-            "in_kind": 0.9947986196755283,
+            "in_kind": 0.9947777481899294,
             "out_of_pocket_total": 1.056740245909767,
             "price": 1.034414197178332,
             "real_out_of_pocket": 1.0215832775616729,
-            "total": 1.0512437379866144
+            "total": 1.05122168224779
           },
           "identity_residual": -2.220446049250313e-16,
           "log_points": {
-            "in_kind": -0.5214954593528116,
+            "in_kind": -0.5235935427374756,
             "price": 3.3835273418380494,
             "real_out_of_pocket": 2.1353656731501487,
-            "total": 4.997397555635372
+            "total": 4.995299472250698
           },
           "percentage_points": {
-            "in_kind": -0.5496507923152453,
+            "in_kind": -0.5518563661976766,
             "price": 3.441419717833205,
             "real_out_of_pocket": 2.2326048731434964,
-            "total": 5.124373798661441
+            "total": 5.122168224779
           }
         },
         "owner_without_mortgage": {
           "factors": {
-            "in_kind": 1.0163508037123723,
+            "in_kind": 1.0164564836815826,
             "out_of_pocket_total": 1.0401995257010197,
             "price": 1.034414197178332,
             "real_out_of_pocket": 1.005592854910991,
-            "total": 1.05720762396746
+            "total": 1.0573175522213083
           },
-          "identity_residual": 0.0,
+          "identity_residual": -2.220446049250313e-16,
           "log_points": {
-            "in_kind": 1.621856880559033,
+            "in_kind": 1.6322543215718484,
             "price": 3.3835273418380494,
             "real_out_of_pocket": 0.5577272969325049,
-            "total": 5.5631115193296035
+            "total": 5.573508960342393
           },
           "percentage_points": {
-            "in_kind": 1.7008098266440133,
+            "in_kind": 1.7118026520288778,
             "price": 3.441419717833205,
             "real_out_of_pocket": 0.5785328522687574,
-            "total": 5.720762396745993
+            "total": 5.73175522213083
           }
         },
         "renter": {
           "factors": {
-            "in_kind": 1.0023629140962163,
+            "in_kind": 1.00230372084997,
             "out_of_pocket_total": 1.0458327303044237,
             "price": 1.034414197178332,
             "real_out_of_pocket": 1.0110386469532602,
-            "total": 1.0483039432051444
+            "total": 1.0482420369708072
           },
           "identity_residual": 0.0,
           "log_points": {
-            "in_kind": 0.23601268045934862,
+            "in_kind": 0.23010713534461785,
             "price": 3.3835273418380494,
             "real_out_of_pocket": 1.0978165769898016,
-            "total": 4.717356599287204
+            "total": 4.71145105417247
           },
           "percentage_points": {
-            "in_kind": 0.24712129007206515,
+            "in_kind": 0.24093066663834609,
             "price": 3.441419717833205,
             "real_out_of_pocket": 1.1418533126091668,
-            "total": 4.830394320514442
+            "total": 4.82420369708072
           }
         }
       },
@@ -1952,75 +1952,75 @@
         "decomposition": {
           "owner_with_mortgage": {
             "factors": {
-              "in_kind": 0.995667730505435,
+              "in_kind": 0.9956702439964908,
               "out_of_pocket_total": 1.0594550831933245,
               "price": 1.034414197178332,
               "real_out_of_pocket": 1.0242077942117371,
-              "total": 1.0548652382555441
+              "total": 1.0548679011864197
             },
-            "identity_residual": 0.0,
+            "identity_residual": -2.220446049250313e-16,
             "log_points": {
-              "in_kind": -0.4341680965907958,
+              "in_kind": -0.43391565415379824,
               "price": 3.3835273418380494,
               "real_out_of_pocket": 2.391943006591854,
-              "total": 5.341302251839107
+              "total": 5.3415546942760965
             },
             "percentage_points": {
-              "in_kind": -0.4589844937780263,
+              "in_kind": -0.45871820069045877,
               "price": 3.441419717833205,
               "real_out_of_pocket": 2.504088601499234,
-              "total": 5.486523825554412
+              "total": 5.486790118641971
             }
           },
           "owner_without_mortgage": {
             "factors": {
-              "in_kind": 1.014798128063198,
+              "in_kind": 1.0149651279429377,
               "out_of_pocket_total": 1.0382750457014347,
               "price": 1.034414197178332,
               "real_out_of_pocket": 1.0037324009411648,
-              "total": 1.0536395727925472
+              "total": 1.053812964600316
             },
             "identity_residual": 0.0,
             "log_points": {
-              "in_kind": 1.4689704105101886,
+              "in_kind": 1.4854255197080173,
               "price": 3.3835273418380494,
               "real_out_of_pocket": 0.37254528161973766,
-              "total": 5.225043033967975
+              "total": 5.241498143165796
             },
             "percentage_points": {
-              "in_kind": 1.5364527091112494,
+              "in_kind": 1.553791889888145,
               "price": 3.441419717833205,
               "real_out_of_pocket": 0.38608485231026185,
-              "total": 5.363957279254716
+              "total": 5.381296460031604
             }
           },
           "renter": {
             "factors": {
-              "in_kind": 1.0028314846843767,
+              "in_kind": 1.0027421216075598,
               "out_of_pocket_total": 1.0493446614282569,
               "price": 1.034414197178332,
               "real_out_of_pocket": 1.0144337387196076,
-              "total": 1.0523158647657236
+              "total": 1.0522220920981369
             },
-            "identity_residual": 2.220446049250313e-16,
+            "identity_residual": 0.0,
             "log_points": {
-              "in_kind": 0.28274835825440103,
+              "in_kind": 0.27383688508825776,
               "price": 3.3835273418380494,
               "real_out_of_pocket": 1.4330563926523252,
-              "total": 5.0993320927448025
+              "total": 5.090420619578645
             },
             "percentage_points": {
-              "in_kind": 0.29712033374665225,
+              "in_kind": 0.28774306698799684,
               "price": 3.441419717833205,
               "real_out_of_pocket": 1.4930464249924726,
-              "total": 5.2315864765723585
+              "total": 5.2222092098136885
             }
           }
         },
         "growth_percent_with": {
-          "owner_with_mortgage": 5.486523825554412,
-          "owner_without_mortgage": 5.363957279254716,
-          "renter": 5.2315864765723585
+          "owner_with_mortgage": 5.486790118641971,
+          "owner_without_mortgage": 5.381296460031604,
+          "renter": 5.2222092098136885
         },
         "growth_percent_without": {
           "owner_with_mortgage": 5.945508319332449,
@@ -2034,9 +2034,9 @@
         }
       },
       "growth_percent_with": {
-        "owner_with_mortgage": 5.124373798661441,
-        "owner_without_mortgage": 5.720762396745993,
-        "renter": 4.830394320514442
+        "owner_with_mortgage": 5.122168224779,
+        "owner_without_mortgage": 5.73175522213083,
+        "renter": 4.82420369708072
       },
       "growth_percent_without": {
         "owner_with_mortgage": 5.674024590976701,
@@ -2050,92 +2050,92 @@
       },
       "in_kind_percentage_points_by_implicate": {
         "owner_with_mortgage": [
-          -0.2987507316809839,
-          -0.5611989681372741,
-          -0.47088748641302197,
-          -0.679819660628947,
-          -0.737371521174437
+          -0.3096748197341976,
+          -0.5614051049100484,
+          -0.4718309807194715,
+          -0.6805176720074476,
+          -0.7356625214682997
         ],
         "owner_without_mortgage": [
-          0.2048242818075236,
-          1.558179186349367,
-          2.4583952301348737,
-          2.276173135551761,
-          2.0101324173579185
+          0.266797889034472,
+          1.5579362532748136,
+          2.4572840009322463,
+          2.2753427020080994,
+          2.0042250807096846
         ],
         "renter": [
-          0.2255652842714873,
-          0.25064344636873864,
-          -0.007278816745105983,
-          0.3997907710033717,
-          0.36742717672830066
+          0.20111227165016624,
+          0.25043948550665274,
+          -0.00820871989122188,
+          0.3990958654250237,
+          0.36279954839516815
         ]
       },
       "package_cpi": {
         "owner_with_mortgage": {
           "factors": {
-            "in_kind": 0.9947986196755283,
+            "in_kind": 0.9947777481899294,
             "out_of_pocket_total": 1.056740245909767,
             "price": 1.0308307133412289,
             "real_out_of_pocket": 1.0251346144747255,
-            "total": 1.0512437379866144
+            "total": 1.05122168224779
           },
           "identity_residual": -2.220446049250313e-16,
           "log_points": {
-            "in_kind": -0.5214954593528116,
+            "in_kind": -0.5235935427374756,
             "price": 3.0364994987842655,
             "real_out_of_pocket": 2.48239351620393,
-            "total": 4.997397555635372
+            "total": 4.995299472250698
           },
           "percentage_points": {
-            "in_kind": -0.5496507923152453,
+            "in_kind": -0.5518563661976766,
             "price": 3.083071334122889,
             "real_out_of_pocket": 2.59095325685381,
-            "total": 5.124373798661441
+            "total": 5.122168224779
           }
         },
         "owner_without_mortgage": {
           "factors": {
-            "in_kind": 1.0163508037123723,
+            "in_kind": 1.0164564836815826,
             "out_of_pocket_total": 1.0401995257010197,
             "price": 1.0320522777151546,
             "real_out_of_pocket": 1.0078942202461896,
-            "total": 1.05720762396746
+            "total": 1.0573175522213083
           },
-          "identity_residual": 0.0,
+          "identity_residual": -2.220446049250313e-16,
           "log_points": {
-            "in_kind": 1.621856880559033,
+            "in_kind": 1.6322543215718484,
             "price": 3.1549322477094877,
             "real_out_of_pocket": 0.78632239106107,
-            "total": 5.5631115193296035
+            "total": 5.573508960342393
           },
           "percentage_points": {
-            "in_kind": 1.7008098266440137,
+            "in_kind": 1.7118026520288783,
             "price": 3.205227771515462,
             "real_out_of_pocket": 0.8147247985865042,
-            "total": 5.720762396745993
+            "total": 5.73175522213083
           }
         },
         "renter": {
           "factors": {
-            "in_kind": 1.0023629140962163,
+            "in_kind": 1.00230372084997,
             "out_of_pocket_total": 1.0458327303044237,
             "price": 1.0307056974719184,
             "real_out_of_pocket": 1.014676384218704,
-            "total": 1.0483039432051444
+            "total": 1.0482420369708072
           },
           "identity_residual": 0.0,
           "log_points": {
-            "in_kind": 0.23601268045934862,
+            "in_kind": 0.23010713534461785,
             "price": 3.0243710814729843,
             "real_out_of_pocket": 1.4569728373548636,
-            "total": 4.717356599287204
+            "total": 4.71145105417247
           },
           "percentage_points": {
-            "in_kind": 0.24712129007206515,
+            "in_kind": 0.24093066663834609,
             "price": 3.0705697471918425,
             "real_out_of_pocket": 1.5127032832505263,
-            "total": 4.830394320514442
+            "total": 4.82420369708072
           }
         }
       },
@@ -2147,8 +2147,8 @@
     }
   },
   "generated_by": "scripts/replicate_ce_inkind.py",
-  "generated_on": "2026-11-16",
-  "git_head": "d97169d79f4bb7afabb06dc0bdaeba07332628db",
+  "generated_on": "2026-11-17",
+  "git_head": "46ec2692e2ec3d3c5fec125d29c17101ec9706d2",
   "home_internet": {
     "annualization": "three-month cost times four, with FMLI spending",
     "cpi_input": {
@@ -3362,8 +3362,8 @@
     },
     "wic": {
       "2014": {
-        "ce_mean_amount_per_participant": 665.9530345556736,
-        "ce_mean_amount_per_unit": 21.517959075146642,
+        "ce_mean_amount_per_participant": 680.8442869270818,
+        "ce_mean_amount_per_unit": 21.99846998760706,
         "ce_participation_rate_by_implicate": [
           0.07920010692229719,
           0.0723101494070167,
@@ -3380,11 +3380,21 @@
           "region": 44,
           "state": 91
         },
-        "monthly_food_cost": 43.64
+        "monthly_food_cost_mean_without_ebt": 44.60516073023812,
+        "monthly_food_cost_national": 43.64,
+        "units_state_withheld": 1318,
+        "units_state_withheld_without_ebt": 888,
+        "units_with_wic_on_cell_mean_by_implicate": [
+          103,
+          77,
+          94,
+          80,
+          92
+        ]
       },
       "2015": {
-        "ce_mean_amount_per_participant": 616.9091236882886,
-        "ce_mean_amount_per_unit": 19.473622780621838,
+        "ce_mean_amount_per_participant": 646.2227594736287,
+        "ce_mean_amount_per_unit": 20.399262649308625,
         "ce_participation_rate_by_implicate": [
           0.07393487769300709,
           0.06811566816997872,
@@ -3401,11 +3411,21 @@
           "region": 44,
           "state": 91
         },
-        "monthly_food_cost": 43.37
+        "monthly_food_cost_mean_without_ebt": 45.468028018901904,
+        "monthly_food_cost_national": 43.37,
+        "units_state_withheld": 1021,
+        "units_state_withheld_without_ebt": 449,
+        "units_with_wic_on_cell_mean_by_implicate": [
+          46,
+          49,
+          34,
+          39,
+          38
+        ]
       },
       "2016": {
-        "ce_mean_amount_per_participant": 505.27289447125315,
-        "ce_mean_amount_per_unit": 15.085848942434136,
+        "ce_mean_amount_per_participant": 531.6101579435964,
+        "ce_mean_amount_per_unit": 15.872640698960506,
         "ce_participation_rate_by_implicate": [
           0.06864861801778353,
           0.07269301076912149,
@@ -3422,11 +3442,21 @@
           "region": 44,
           "state": 91
         },
-        "monthly_food_cost": 42.77
+        "monthly_food_cost_mean_without_ebt": 45.55372618346101,
+        "monthly_food_cost_national": 42.77,
+        "units_state_withheld": 874,
+        "units_state_withheld_without_ebt": 290,
+        "units_with_wic_on_cell_mean_by_implicate": [
+          22,
+          30,
+          22,
+          26,
+          27
+        ]
       },
       "2017": {
-        "ce_mean_amount_per_participant": 483.5635251298019,
-        "ce_mean_amount_per_unit": 14.057932022273368,
+        "ce_mean_amount_per_participant": 521.1513439039561,
+        "ce_mean_amount_per_unit": 15.151779136178272,
         "ce_participation_rate_by_implicate": [
           0.06859556323255743,
           0.06577112432361892,
@@ -3443,11 +3473,21 @@
           "region": 44,
           "state": 91
         },
-        "monthly_food_cost": 41.24
+        "monthly_food_cost_mean_without_ebt": 44.663502986729085,
+        "monthly_food_cost_national": 41.24,
+        "units_state_withheld": 928,
+        "units_state_withheld_without_ebt": 297,
+        "units_with_wic_on_cell_mean_by_implicate": [
+          30,
+          23,
+          24,
+          25,
+          19
+        ]
       },
       "2018": {
-        "ce_mean_amount_per_participant": 388.6871839641325,
-        "ce_mean_amount_per_unit": 10.24533310920491,
+        "ce_mean_amount_per_participant": 429.29761015326704,
+        "ce_mean_amount_per_unit": 11.316464171396984,
         "ce_participation_rate_by_implicate": [
           0.059131634970089476,
           0.06265758636814514,
@@ -3464,11 +3504,21 @@
           "region": 44,
           "state": 91
         },
-        "monthly_food_cost": 40.94
+        "monthly_food_cost_mean_without_ebt": 44.89698420703957,
+        "monthly_food_cost_national": 40.94,
+        "units_state_withheld": 889,
+        "units_state_withheld_without_ebt": 241,
+        "units_with_wic_on_cell_mean_by_implicate": [
+          15,
+          17,
+          11,
+          14,
+          14
+        ]
       },
       "2019": {
-        "ce_mean_amount_per_participant": 314.01746879303425,
-        "ce_mean_amount_per_unit": 7.429805838884657,
+        "ce_mean_amount_per_participant": 340.8560879046141,
+        "ce_mean_amount_per_unit": 8.06436849268175,
         "ce_participation_rate_by_implicate": [
           0.05940688420579936,
           0.0556531753962177,
@@ -3485,7 +3535,17 @@
           "region": 44,
           "state": 91
         },
-        "monthly_food_cost": 40.9
+        "monthly_food_cost_mean_without_ebt": 44.51712301441573,
+        "monthly_food_cost_national": 40.9,
+        "units_state_withheld": 844,
+        "units_state_withheld_without_ebt": 181,
+        "units_with_wic_on_cell_mean_by_implicate": [
+          12,
+          8,
+          10,
+          12,
+          15
+        ]
       },
       "2020": {
         "ce_mean_amount_per_participant": 0.0,
@@ -3506,7 +3566,17 @@
           "region": 44,
           "state": 91
         },
-        "monthly_food_cost": 38.48
+        "monthly_food_cost_mean_without_ebt": null,
+        "monthly_food_cost_national": 38.48,
+        "units_state_withheld": 575,
+        "units_state_withheld_without_ebt": 0,
+        "units_with_wic_on_cell_mean_by_implicate": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
       },
       "2021": {
         "ce_mean_amount_per_participant": 0.0,
@@ -3527,7 +3597,17 @@
           "region": 44,
           "state": 91
         },
-        "monthly_food_cost": 35.57
+        "monthly_food_cost_mean_without_ebt": null,
+        "monthly_food_cost_national": 35.57,
+        "units_state_withheld": 626,
+        "units_state_withheld_without_ebt": 0,
+        "units_with_wic_on_cell_mean_by_implicate": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
       },
       "2022": {
         "ce_mean_amount_per_participant": 0.0,
@@ -3548,7 +3628,17 @@
           "region": 44,
           "state": 91
         },
-        "monthly_food_cost": 47.75
+        "monthly_food_cost_mean_without_ebt": null,
+        "monthly_food_cost_national": 47.75,
+        "units_state_withheld": 515,
+        "units_state_withheld_without_ebt": 0,
+        "units_with_wic_on_cell_mean_by_implicate": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
       },
       "2023": {
         "ce_mean_amount_per_participant": 0.0,
@@ -3569,7 +3659,17 @@
           "region": 44,
           "state": 91
         },
-        "monthly_food_cost": 56.01
+        "monthly_food_cost_mean_without_ebt": null,
+        "monthly_food_cost_national": 56.01,
+        "units_state_withheld": 548,
+        "units_state_withheld_without_ebt": 0,
+        "units_with_wic_on_cell_mean_by_implicate": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
       },
       "2024": {
         "ce_mean_amount_per_participant": 0.0,
@@ -3590,7 +3690,17 @@
           "region": 44,
           "state": 91
         },
-        "monthly_food_cost": 61.07
+        "monthly_food_cost_mean_without_ebt": null,
+        "monthly_food_cost_national": 61.07,
+        "units_state_withheld": 476,
+        "units_state_withheld_without_ebt": 0,
+        "units_with_wic_on_cell_mean_by_implicate": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
       }
     }
   },
@@ -3609,6 +3719,7 @@
     "parameter_draws": true,
     "parameter_files_sha256": {
       "census_school_lunch_observed.json": "db930b5a23cb33525f74a2983d40db5d2943ace15b619da2dad212651f449e67",
+      "census_wic_state_monthly_cost.csv": "1fc672d44ffbd6b7b58c26d1d1a44c884a07c85ef1786962b0b23b7812a3c704",
       "opm_thresholds.json": "b402b39a283d64aec46f7ec496d4bcc089be29e032141775613579bb92aa280b",
       "usda_nslp_rates.csv": "54083fb3741e00587bdbb56985bb8dfdc2ee097fb2bc314e8bff665584bd95e4",
       "usda_wic_ebt_statewide.csv": "6a61a4e0f1307f0a15e1c0a7c72a65e8be231a0fd1a6cdfb6c468c617a5d40f3",
@@ -3624,9 +3735,9 @@
     "Rental assistance uses a log-normal Tobit on CE unit characteristics and takes reported rents as exact",
     "School lunch donor values for reference years 2014-2017 come from the USDA formula; later years use Census SPM_SCHLUNCH values",
     "BLS says it assigns school lunch by the traditional method before and after the COVID-19 period; the stage uses Census SPM_SCHLUNCH values for every reference year from 2018, and from reference year 2023 Census estimates those values with its fall 2022 method",
-    "The imputation assigns school lunch only to households it imputes as receiving free, reduced-price or universal-free lunch; Census also values paid lunches and, in some years, P-EBT or Summer EBT for other households",
-    "Census accounts for P-EBT in its school lunch values for reference years 2020 and 2021, and for 2022 it counts summer P-EBT, which its technical documentation calls summer EBT, but not school-year P-EBT; states paid both on EBT cards (Census SPM technical documentation; Shrider 2023). BLS says it follows Census's COVID-era methods, so the stage does too, but by BLS's reasoning for leaving out SNAP, reported food spending may already include those benefits",
-    "WIC uses USDA's national fiscal-year average food cost; Census has used state averages since its revised 2019 estimates",
+    "The imputation assigns school lunch only to households it imputes as receiving free, reduced-price or universal-free lunch; Census also values paid lunches and, in some years, P-EBT or summer EBT for other households",
+    "Census accounts for P-EBT in its school lunch values for reference years 2020 and 2021. For 2022, it counts summer P-EBT (summer EBT in its technical documentation) and excludes school-year P-EBT. States paid both forms on EBT cards (Census SPM technical documentation; Shrider 2023). BLS says it follows Census's COVID-era methods, so the stage does too, but by BLS's reasoning for leaving out SNAP, reported food spending may already include those benefits",
+    "WIC applies the Census SPM team's state averages of the monthly food cost per person to every reference year we assign WIC; Census has used state averages since its revised 2019 estimates. Where the CE withholds the state, the unit takes the weighted mean value of known-state units in its region and collection quarter whose state had not finished WIC EBT; where it also withholds the region, the unit counts as having finished WIC EBT and gets no WIC",
     "Participation models share one covariate set across programs and years; CE and CPS income concepts differ",
     "We take home internet from CE UCC 690114 alone and price it with CPI-U CUUR0000SEEE03; BLS has not published the UCCs or the price series behind its home internet term",
     "We count home internet as out-of-pocket spending in its own component, and no in-kind total, share or contribution includes it",
@@ -3638,8 +3749,8 @@
   "results": {
     "2019": {
       "band": {
-        "with_mean_fcsuti": 30048.866251875275,
-        "with_mean_su": 16261.157726509375,
+        "with_mean_fcsuti": 30051.732640589362,
+        "with_mean_su": 16259.824571542893,
         "without": {
           "band_rows": 2217,
           "fcsuti_mean": 29171.859966821394,
@@ -3673,9 +3784,9 @@
           "renter": 2.379616890378955
         },
         "wic": {
-          "owner_with_mortgage": 0.12464967057697063,
-          "owner_without_mortgage": -0.0031632173461693114,
-          "renter": 0.12334602582355636
+          "owner_with_mortgage": 0.15440552323242596,
+          "owner_without_mortgage": 0.018680162893347507,
+          "renter": 0.1039277526368787
         }
       },
       "cpi_component_weights": {
@@ -3688,9 +3799,9 @@
       },
       "fcsuti_deflated": {
         "gap_percent_with": {
-          "owner_with_mortgage": 2.944723450547393,
-          "owner_without_mortgage": 5.666156144678269,
-          "renter": 4.092740408404483
+          "owner_with_mortgage": 2.972075340856839,
+          "owner_without_mortgage": 5.666977899705095,
+          "renter": 4.086870488865957
         },
         "gap_percent_without": {
           "owner_with_mortgage": 0.39132104958625735,
@@ -3703,9 +3814,9 @@
           "renter": 1.5732887051521205
         },
         "in_kind_lift_percent": {
-          "owner_with_mortgage": 2.5434493482757725,
-          "owner_without_mortgage": 2.749352237915037,
-          "renter": 3.262713968423414
+          "owner_with_mortgage": 2.570694622093739,
+          "owner_without_mortgage": 2.75015130925238,
+          "renter": 3.2568908551116937
         },
         "inflation_factors": {
           "2014": 1.107226857951496,
@@ -3717,40 +3828,40 @@
         },
         "methodology_id_without": "ce-fmli-internet-research-v1:0fce7347e807b3c60c3dc68d56098918d298e9dd4e09429c1afd18f9b2985536",
         "with_in_kind": {
-          "owner_with_mortgage": 29932.387779035642,
-          "owner_without_mortgage": 25904.007761318135,
-          "renter": 30096.38611708465
+          "owner_with_mortgage": 29940.340662484057,
+          "owner_without_mortgage": 25904.209214170867,
+          "renter": 30094.688944311463
         },
         "with_in_kind_between_implicate_sd": {
-          "owner_with_mortgage": 33.96179613539589,
-          "owner_without_mortgage": 88.83853595659357,
-          "renter": 37.787914610278186
+          "owner_with_mortgage": 32.37330474982246,
+          "owner_without_mortgage": 96.36481524278227,
+          "renter": 36.455501218358044
         },
         "with_in_kind_by_implicate": [
           {
-            "owner_with_mortgage": 29954.540428200067,
-            "owner_without_mortgage": 26016.840338140883,
-            "renter": 30069.997979352567
+            "owner_with_mortgage": 29961.3556411184,
+            "owner_without_mortgage": 26025.326277542725,
+            "renter": 30068.798052893188
           },
           {
-            "owner_with_mortgage": 29887.791492166823,
-            "owner_without_mortgage": 25830.97632354782,
-            "renter": 30094.69206701273
+            "owner_with_mortgage": 29901.062956669237,
+            "owner_without_mortgage": 25806.943760085378,
+            "renter": 30099.7464616865
           },
           {
-            "owner_with_mortgage": 29955.0256938151,
-            "owner_without_mortgage": 25941.075591602097,
-            "renter": 30072.698390597317
+            "owner_with_mortgage": 29961.125700910805,
+            "owner_without_mortgage": 25945.027570038586,
+            "renter": 30070.934801991767
           },
           {
-            "owner_with_mortgage": 29903.816514856328,
-            "owner_without_mortgage": 25933.307748387015,
-            "renter": 30161.71300588152
+            "owner_with_mortgage": 29909.309076135043,
+            "owner_without_mortgage": 25939.909364049654,
+            "renter": 30156.109515235876
           },
           {
-            "owner_with_mortgage": 29960.764766139888,
-            "owner_without_mortgage": 25797.838804912855,
-            "renter": 30082.82914257911
+            "owner_with_mortgage": 29968.84993758681,
+            "owner_without_mortgage": 25803.839099137997,
+            "renter": 30077.85588974998
           }
         ],
         "without_home_internet": {
@@ -3765,9 +3876,9 @@
         }
       },
       "gap_percent_with": {
-        "owner_with_mortgage": 2.507702983888205,
-        "owner_without_mortgage": 4.944219146362339,
-        "renter": 3.639154803493061
+        "owner_with_mortgage": 2.541802010114691,
+        "owner_without_mortgage": 4.954486237422051,
+        "renter": 3.6205725260837207
       },
       "gap_percent_without": {
         "owner_with_mortgage": -0.03184175178088111,
@@ -3790,18 +3901,18 @@
         "weighted_share_reporting": 0.7319474687190354
       },
       "in_kind_lift_percent": {
-        "owner_with_mortgage": 2.5403536287659234,
-        "owner_without_mortgage": 2.406420395839093,
-        "renter": 3.239112793823762
+        "owner_with_mortgage": 2.5744635161780716,
+        "owner_without_mortgage": 2.416439204420051,
+        "renter": 3.2206022430858017
       },
       "methodology_id_without": "ce-fmli-internet-research-v1:0fce7347e807b3c60c3dc68d56098918d298e9dd4e09429c1afd18f9b2985536",
       "methodology_id_without_home_internet": "ce-fmli-research-v1:9b0ac2584036d8cf22989b08b14bde56b986c438c987abac56f633432fd3ce28",
       "methodology_ids_with": [
-        "ce-fmli-inkind-research-v1:d46dc5262508527df10e9a52b32db80a87d030c5c5c43c50ab6da438ee3432b5",
-        "ce-fmli-inkind-research-v1:cddf6bbd1dd8c7542549af7f3605e4306611960ce4d74803c9110cedf29b6290",
-        "ce-fmli-inkind-research-v1:9e71d25422256af415adbf43b833596696b87c262e7eac49df2cf6bd707e5c06",
-        "ce-fmli-inkind-research-v1:66044ff0cfcfbd05745c64a98a11677a2c219506e6a08ba5799bf3017bd57097",
-        "ce-fmli-inkind-research-v1:7024e907bdd43e553ca792d75e497c5d4ecfdc2fd3c488d526d631e6701346b5"
+        "ce-fmli-inkind-research-v1:6cec42ffd9e3ee524dc7929d3773fa25adfac573ab04099e686ad49fd4bd6d95",
+        "ce-fmli-inkind-research-v1:780e466b0b5850b5f6066ddb6e16a996349a53754885f1b5623893feb96d9d08",
+        "ce-fmli-inkind-research-v1:5f31a552cfb49279062a1d4ca28b96f9a084abf7f903191b48f566a3a194f190",
+        "ce-fmli-inkind-research-v1:b91f4b289e1d77971c10969cc9df0da5b65ed3d9dbe60fd65845918b6d9b8f39",
+        "ce-fmli-inkind-research-v1:c76ac5540efa945e58455bd010fd3752eb98c61bf67139d59ebf5f7c29f7cc65"
       ],
       "published": {
         "owner_with_mortgage": 29076.17484,
@@ -3813,13 +3924,13 @@
         "liheap": 17.76335995675116,
         "nslp": 320.6368662573768,
         "rental_assistance": 446.4433449557613,
-        "wic": 52.339389223916406
+        "wic": 55.115334019536974
       },
       "sample_share_with_any_in_kind": 0.34029444861119906,
       "share_of_gap_closed": {
-        "owner_with_mortgage": 79.75518285377653,
-        "owner_without_mortgage": -0.9951140110189879,
-        "renter": -8.391591486668903
+        "owner_with_mortgage": 80.82607325142567,
+        "owner_without_mortgage": -0.9992570347441271,
+        "renter": -8.343636077310396
       },
       "stage_effects": {
         "home_internet_dollars": {
@@ -3833,51 +3944,51 @@
           "renter": 1.525802579396518
         },
         "in_kind_dollars": {
-          "owner_with_mortgage": 738.4024674831599,
-          "owner_without_mortgage": 604.5523127174711,
-          "renter": 940.1552555375965
+          "owner_with_mortgage": 748.3171599675079,
+          "owner_without_mortgage": 607.069285191923,
+          "renter": 934.7825523725915
         },
         "in_kind_percent": {
-          "owner_with_mortgage": 2.5403536287659234,
-          "owner_without_mortgage": 2.406420395839093,
-          "renter": 3.239112793823762
+          "owner_with_mortgage": 2.5744635161780716,
+          "owner_without_mortgage": 2.416439204420051,
+          "renter": 3.2206022430858017
         }
       },
       "with_in_kind": {
-        "owner_with_mortgage": 29805.31894406323,
-        "owner_without_mortgage": 25727.025250646002,
-        "renter": 29965.240684185053
+        "owner_with_mortgage": 29815.23363654758,
+        "owner_without_mortgage": 25729.542223120454,
+        "renter": 29959.86798102005
       },
       "with_in_kind_between_implicate_sd": {
-        "owner_with_mortgage": 20.38602166297624,
-        "owner_without_mortgage": 75.13329319202519,
-        "renter": 38.21158277622074
+        "owner_with_mortgage": 22.873764018467746,
+        "owner_without_mortgage": 91.78868228744639,
+        "renter": 43.31759849778428
       },
       "with_in_kind_by_implicate": [
         {
-          "owner_with_mortgage": 29828.614797543476,
-          "owner_without_mortgage": 25838.90424286593,
-          "renter": 29938.962644721458
+          "owner_with_mortgage": 29837.42208437036,
+          "owner_without_mortgage": 25865.58532452217,
+          "renter": 29930.05212389797
         },
         {
-          "owner_with_mortgage": 29780.11999435552,
-          "owner_without_mortgage": 25662.24457836219,
-          "renter": 29945.09891968788
+          "owner_with_mortgage": 29787.30837001437,
+          "owner_without_mortgage": 25676.354457046888,
+          "renter": 29948.57233308753
         },
         {
-          "owner_with_mortgage": 29823.073217255576,
-          "owner_without_mortgage": 25748.533902312665,
-          "renter": 29953.12131357581
+          "owner_with_mortgage": 29825.801975151262,
+          "owner_without_mortgage": 25745.370587046367,
+          "renter": 29957.231083433133
         },
         {
-          "owner_with_mortgage": 29792.71192743042,
-          "owner_without_mortgage": 25731.776356181974,
-          "renter": 30032.483798922174
+          "owner_with_mortgage": 29794.145343019864,
+          "owner_without_mortgage": 25740.384306281023,
+          "renter": 30034.302460900733
         },
         {
-          "owner_with_mortgage": 29802.074783731176,
-          "owner_without_mortgage": 25653.667173507256,
-          "renter": 29956.536744017965
+          "owner_with_mortgage": 29831.490410182036,
+          "owner_without_mortgage": 25620.016440705822,
+          "renter": 29929.18190378086
         }
       ],
       "without_home_internet": {
@@ -3893,8 +4004,8 @@
     },
     "2020": {
       "band": {
-        "with_mean_fcsuti": 30986.4832527052,
-        "with_mean_su": 16688.826065447636,
+        "with_mean_fcsuti": 30989.727128547023,
+        "with_mean_su": 16686.434403546755,
         "without": {
           "band_rows": 2072,
           "fcsuti_mean": 30110.310879697274,
@@ -3928,9 +4039,9 @@
           "renter": 2.358133359703829
         },
         "wic": {
-          "owner_with_mortgage": 0.16143680055511478,
-          "owner_without_mortgage": 0.18135694970111693,
-          "renter": 0.0895846659501709
+          "owner_with_mortgage": 0.18515453448975094,
+          "owner_without_mortgage": 0.18531069330516292,
+          "renter": 0.08489803979851995
         }
       },
       "cpi_component_weights": {
@@ -3943,9 +4054,9 @@
       },
       "fcsuti_deflated": {
         "gap_percent_with": {
-          "owner_with_mortgage": 3.319012804988164,
-          "owner_without_mortgage": 5.617107999823379,
-          "renter": 3.793801320208079
+          "owner_with_mortgage": 3.3388152830349016,
+          "owner_without_mortgage": 5.613009100268185,
+          "renter": 3.7920782917898466
         },
         "gap_percent_without": {
           "owner_with_mortgage": 0.4696715229038917,
@@ -3958,9 +4069,9 @@
           "renter": 1.792609789842614
         },
         "in_kind_lift_percent": {
-          "owner_with_mortgage": 2.8360212976656696,
-          "owner_without_mortgage": 1.90083228844804,
-          "renter": 3.161524460428189
+          "owner_with_mortgage": 2.8557312038956395,
+          "owner_without_mortgage": 1.896877614020287,
+          "renter": 3.15981192811845
         },
         "inflation_factors": {
           "2015": 1.114041565565988,
@@ -3972,40 +4083,40 @@
         },
         "methodology_id_without": "ce-fmli-internet-research-v1:0fce7347e807b3c60c3dc68d56098918d298e9dd4e09429c1afd18f9b2985536",
         "with_in_kind": {
-          "owner_with_mortgage": 30804.09926847528,
-          "owner_without_mortgage": 26667.40628864448,
-          "renter": 31116.23997767746
+          "owner_with_mortgage": 30810.003288296535,
+          "owner_without_mortgage": 26666.371351958136,
+          "renter": 31115.723432709765
         },
         "with_in_kind_between_implicate_sd": {
-          "owner_with_mortgage": 26.95106403349512,
-          "owner_without_mortgage": 92.46274791215843,
-          "renter": 45.874401236355396
+          "owner_with_mortgage": 32.057292967458295,
+          "owner_without_mortgage": 100.39560767825225,
+          "renter": 48.06916035143981
         },
         "with_in_kind_by_implicate": [
           {
-            "owner_with_mortgage": 30838.406870923332,
-            "owner_without_mortgage": 26621.30300130681,
-            "renter": 31045.26264503338
+            "owner_with_mortgage": 30845.324341504907,
+            "owner_without_mortgage": 26602.723225961752,
+            "renter": 31046.42746844349
           },
           {
-            "owner_with_mortgage": 30763.291990796864,
-            "owner_without_mortgage": 26670.920842680003,
-            "renter": 31108.99017328918
+            "owner_with_mortgage": 30757.48923609421,
+            "owner_without_mortgage": 26661.545613538947,
+            "renter": 31125.829468058928
           },
           {
-            "owner_with_mortgage": 30801.068304982895,
-            "owner_without_mortgage": 26661.049329192516,
-            "renter": 31114.38042192177
+            "owner_with_mortgage": 30816.685365222675,
+            "owner_without_mortgage": 26699.19804932635,
+            "renter": 31089.709220264354
           },
           {
-            "owner_with_mortgage": 30806.792072942942,
-            "owner_without_mortgage": 26816.018819368237,
-            "renter": 31163.935258917307
+            "owner_with_mortgage": 30813.602283552907,
+            "owner_without_mortgage": 26815.590879389616,
+            "renter": 31162.31937317364
           },
           {
-            "owner_with_mortgage": 30810.937102730368,
-            "owner_without_mortgage": 26567.739450674835,
-            "renter": 31148.631389225637
+            "owner_with_mortgage": 30816.915215107954,
+            "owner_without_mortgage": 26552.79899157401,
+            "renter": 31154.331633608414
           }
         ],
         "without_home_internet": {
@@ -4020,9 +4131,9 @@
         }
       },
       "gap_percent_with": {
-        "owner_with_mortgage": 2.8707371478072785,
-        "owner_without_mortgage": 4.988241950293104,
-        "renter": 3.434727519930525
+        "owner_with_mortgage": 2.9148603362267878,
+        "owner_without_mortgage": 5.000702995676276,
+        "renter": 3.4068987042446874
       },
       "gap_percent_without": {
         "owner_with_mortgage": 0.13426209185614102,
@@ -4045,18 +4156,18 @@
         "weighted_share_reporting": 0.7553272142393301
       },
       "in_kind_lift_percent": {
-        "owner_with_mortgage": 2.732805933538396,
-        "owner_without_mortgage": 1.6583918033257428,
-        "renter": 3.3552582942008025
+        "owner_with_mortgage": 2.7768699606733227,
+        "owner_without_mortgage": 1.6704576290821338,
+        "renter": 3.3274508594813623
       },
       "methodology_id_without": "ce-fmli-internet-research-v1:0fce7347e807b3c60c3dc68d56098918d298e9dd4e09429c1afd18f9b2985536",
       "methodology_id_without_home_internet": "ce-fmli-research-v1:9b0ac2584036d8cf22989b08b14bde56b986c438c987abac56f633432fd3ce28",
       "methodology_ids_with": [
-        "ce-fmli-inkind-research-v1:88b62ce3c5ff734b20ba29d8838a52b24a874611e2dfb3200ae792db3452aec2",
-        "ce-fmli-inkind-research-v1:0ef6958d4b029a3462c2d492ffe1394cfc74119e03ed556e81479ab4b1ddc41c",
-        "ce-fmli-inkind-research-v1:12b7f16b09ec447330a5609e66a484971407cd90420a2dce830bdbcca01521df",
-        "ce-fmli-inkind-research-v1:07882a318d34fba96479f20de881a25ef16b05f98a3d0dcf4a769b3b5e6b003b",
-        "ce-fmli-inkind-research-v1:36157799d57f83e8b87270cdd7fcc655a029a25ba1a07e331bd270fc51291f93"
+        "ce-fmli-inkind-research-v1:50edb43397dab0e01d855f4ab195ec907b2f850647883b41270fa1fab9de74ef",
+        "ce-fmli-inkind-research-v1:93a9d9272ea92e108df46f81519d8cb64a334501567801dc36469e4d095b265e",
+        "ce-fmli-inkind-research-v1:f24cc8c2cb62268aaef7ea66815365e7b0bc37559fea56edbf229ee51bc81250",
+        "ce-fmli-inkind-research-v1:587b1d9523fd4b4f85181214b5b7b42eb19a5b14d4b0aed7f86f2052aa9e1791",
+        "ce-fmli-inkind-research-v1:974e3d594c0dee90d501a3e7114ae2f825ca639cf5947ccb23da8668ffa7d43f"
       ],
       "published": {
         "owner_with_mortgage": 29814.550519,
@@ -4068,13 +4179,13 @@
         "liheap": 18.340150361279022,
         "nslp": 343.660893015101,
         "rental_assistance": 443.25501981326033,
-        "wic": 43.65586900923354
+        "wic": 46.582760071079356
       },
       "sample_share_with_any_in_kind": 0.34653773613193983,
       "share_of_gap_closed": {
-        "owner_with_mortgage": -20.38159109633954,
-        "owner_without_mortgage": -0.5228813076003361,
-        "renter": -43.67102161029906
+        "owner_with_mortgage": -20.71022584207842,
+        "owner_without_mortgage": -0.5266855924117558,
+        "renter": -43.309088496339456
       },
       "stage_effects": {
         "home_internet_dollars": {
@@ -4088,51 +4199,51 @@
           "renter": 1.5532648261789017
         },
         "in_kind_dollars": {
-          "owner_with_mortgage": 815.867737996381,
-          "owner_without_mortgage": 432.445196152079,
-          "renter": 1006.6429380705413
+          "owner_with_mortgage": 829.0228682983106,
+          "owner_without_mortgage": 435.59150233587206,
+          "renter": 998.3001652251405
         },
         "in_kind_percent": {
-          "owner_with_mortgage": 2.732805933538396,
-          "owner_without_mortgage": 1.6583918033257428,
-          "renter": 3.3552582942008025
+          "owner_with_mortgage": 2.7768699606733227,
+          "owner_without_mortgage": 1.6704576290821338,
+          "renter": 3.3274508594813623
         }
       },
       "with_in_kind": {
-        "owner_with_mortgage": 30670.447896200698,
-        "owner_without_mortgage": 26508.623050194263,
-        "renter": 31008.593601911107
+        "owner_with_mortgage": 30683.603026502627,
+        "owner_without_mortgage": 26511.769356378056,
+        "renter": 31000.250829065706
       },
       "with_in_kind_between_implicate_sd": {
-        "owner_with_mortgage": 53.980767036213685,
-        "owner_without_mortgage": 67.4521516625916,
-        "renter": 55.599009509502146
+        "owner_with_mortgage": 54.912512164136736,
+        "owner_without_mortgage": 64.3944688756027,
+        "renter": 57.588920486119626
       },
       "with_in_kind_by_implicate": [
         {
-          "owner_with_mortgage": 30726.809837375196,
-          "owner_without_mortgage": 26517.361541082282,
-          "renter": 30924.665036322986
+          "owner_with_mortgage": 30737.673272826694,
+          "owner_without_mortgage": 26520.019413840593,
+          "renter": 30922.32600849569
         },
         {
-          "owner_with_mortgage": 30582.74067365605,
-          "owner_without_mortgage": 26533.484676653436,
-          "renter": 31054.140360566955
+          "owner_with_mortgage": 30595.66200023117,
+          "owner_without_mortgage": 26537.765122402667,
+          "renter": 31048.745034101557
         },
         {
-          "owner_with_mortgage": 30689.926633828924,
-          "owner_without_mortgage": 26486.54962740133,
-          "renter": 30987.451506534446
+          "owner_with_mortgage": 30711.928215008626,
+          "owner_without_mortgage": 26478.666961181236,
+          "renter": 30965.6379003065
         },
         {
-          "owner_with_mortgage": 30663.40736966797,
-          "owner_without_mortgage": 26594.92229310715,
-          "renter": 31061.026596469655
+          "owner_with_mortgage": 30669.24942106363,
+          "owner_without_mortgage": 26597.06476314028,
+          "renter": 31060.496056422373
         },
         {
-          "owner_with_mortgage": 30689.354966475355,
-          "owner_without_mortgage": 26410.797112727123,
-          "renter": 31015.6845096615
+          "owner_with_mortgage": 30703.502223383013,
+          "owner_without_mortgage": 26425.3305213255,
+          "renter": 31004.04914600241
         }
       ],
       "without_home_internet": {
@@ -4148,8 +4259,8 @@
     },
     "2021": {
       "band": {
-        "with_mean_fcsuti": 32251.78743421156,
-        "with_mean_su": 17445.734919877585,
+        "with_mean_fcsuti": 32254.089622679625,
+        "with_mean_su": 17447.959172455747,
         "without": {
           "band_rows": 1925,
           "fcsuti_mean": 31375.29919382978,
@@ -4183,9 +4294,9 @@
           "renter": 2.025718416219302
         },
         "wic": {
-          "owner_with_mortgage": 0.12438586863867673,
-          "owner_without_mortgage": 0.16536026890112687,
-          "renter": 0.010971359191058738
+          "owner_with_mortgage": 0.14313921290372011,
+          "owner_without_mortgage": 0.15181872505227734,
+          "renter": 0.011935579180732958
         }
       },
       "cpi_component_weights": {
@@ -4198,9 +4309,9 @@
       },
       "fcsuti_deflated": {
         "gap_percent_with": {
-          "owner_with_mortgage": 2.8241756949717534,
-          "owner_without_mortgage": 5.980790530754376,
-          "renter": 3.8022127451509125
+          "owner_with_mortgage": 2.8552163516365914,
+          "owner_without_mortgage": 5.96038855325054,
+          "renter": 3.7901658177704967
         },
         "gap_percent_without": {
           "owner_with_mortgage": 0.5253765948689981,
@@ -4213,9 +4324,9 @@
           "renter": 2.0306317820656616
         },
         "in_kind_lift_percent": {
-          "owner_with_mortgage": 2.286784867633185,
-          "owner_without_mortgage": 3.316482021599021,
-          "renter": 3.120624901982061
+          "owner_with_mortgage": 2.3176632962611743,
+          "owner_without_mortgage": 3.2965929404606076,
+          "renter": 3.108657077339738
         },
         "inflation_factors": {
           "2016": 1.1286682991147108,
@@ -4227,40 +4338,40 @@
         },
         "methodology_id_without": "ce-fmli-internet-research-v1:0fce7347e807b3c60c3dc68d56098918d298e9dd4e09429c1afd18f9b2985536",
         "with_in_kind": {
-          "owner_with_mortgage": 31858.262945356742,
-          "owner_without_mortgage": 27613.72017937755,
-          "renter": 32403.618617556098
+          "owner_with_mortgage": 31867.880347055725,
+          "owner_without_mortgage": 27608.40436228395,
+          "renter": 32399.857965157415
         },
         "with_in_kind_between_implicate_sd": {
-          "owner_with_mortgage": 41.970389633827786,
-          "owner_without_mortgage": 83.99682523542744,
-          "renter": 42.22220611538297
+          "owner_with_mortgage": 47.924404707296,
+          "owner_without_mortgage": 73.86048795797635,
+          "renter": 47.08046958954823
         },
         "with_in_kind_by_implicate": [
           {
-            "owner_with_mortgage": 31909.690940529905,
-            "owner_without_mortgage": 27491.31675384859,
-            "renter": 32357.474374702168
+            "owner_with_mortgage": 31922.48174917098,
+            "owner_without_mortgage": 27503.18239455005,
+            "renter": 32351.838046173612
           },
           {
-            "owner_with_mortgage": 31799.29266770797,
-            "owner_without_mortgage": 27686.85271263085,
-            "renter": 32417.36793433788
+            "owner_with_mortgage": 31801.764742120347,
+            "owner_without_mortgage": 27669.44456603298,
+            "renter": 32416.710063364928
           },
           {
-            "owner_with_mortgage": 31870.97582599898,
-            "owner_without_mortgage": 27622.473821103256,
-            "renter": 32362.923284854412
+            "owner_with_mortgage": 31893.940677010723,
+            "owner_without_mortgage": 27606.27078120251,
+            "renter": 32352.4006537738
           },
           {
-            "owner_with_mortgage": 31836.329038912267,
-            "owner_without_mortgage": 27693.111919561725,
-            "renter": 32455.741308192413
+            "owner_with_mortgage": 31837.70016415176,
+            "owner_without_mortgage": 27686.09097206839,
+            "renter": 32460.771741001405
           },
           {
-            "owner_with_mortgage": 31875.026253634598,
-            "owner_without_mortgage": 27574.845689743324,
-            "renter": 32424.586185693614
+            "owner_with_mortgage": 31883.514402824843,
+            "owner_without_mortgage": 27577.033097565836,
+            "renter": 32417.569321473336
           }
         ],
         "without_home_internet": {
@@ -4275,9 +4386,9 @@
         }
       },
       "gap_percent_with": {
-        "owner_with_mortgage": 2.793533536091597,
-        "owner_without_mortgage": 5.680138558746295,
-        "renter": 3.755702009877293
+        "owner_with_mortgage": 2.8181419779923944,
+        "owner_without_mortgage": 5.703816893626112,
+        "renter": 3.7391194822937956
       },
       "gap_percent_without": {
         "owner_with_mortgage": 0.31928538341066126,
@@ -4300,18 +4411,18 @@
         "weighted_share_reporting": 0.7738605012685484
       },
       "in_kind_lift_percent": {
-        "owner_with_mortgage": 2.4663733829688006,
-        "owner_without_mortgage": 3.010677027668862,
-        "renter": 3.104298737730815
+        "owner_with_mortgage": 2.490903503779296,
+        "owner_without_mortgage": 3.0337572520149125,
+        "renter": 3.0878203192470366
       },
       "methodology_id_without": "ce-fmli-internet-research-v1:0fce7347e807b3c60c3dc68d56098918d298e9dd4e09429c1afd18f9b2985536",
       "methodology_id_without_home_internet": "ce-fmli-research-v1:9b0ac2584036d8cf22989b08b14bde56b986c438c987abac56f633432fd3ce28",
       "methodology_ids_with": [
-        "ce-fmli-inkind-research-v1:2bc0b9f9277aa7dd6ce8d8ab85aa4103314adc54dd444449a1a6c2449aebe75c",
-        "ce-fmli-inkind-research-v1:ca9958eecfdfefb94d2c3179bbab9828ff424231863a8070c929cf8db9575429",
-        "ce-fmli-inkind-research-v1:1d357bbab835c57de9de2fc6e33c22a5805e824bf2601673d04e37c221225d86",
-        "ce-fmli-inkind-research-v1:d64c9664fd1dae4eda11319757acdb57efa3f7e847637ef851721eed1c6828a6",
-        "ce-fmli-inkind-research-v1:37bac54dbdb3f0f1a297760c3b1f56f204f8e6fcd8b1f9484ea5242289cb87e4"
+        "ce-fmli-inkind-research-v1:aaab46f716daf9a8880602427db0a71a979f7f108f144a19c36de5d962a9293e",
+        "ce-fmli-inkind-research-v1:c8d740d618652a90b98452ebb544f634241c95acefe3dce74b2317db003843f5",
+        "ce-fmli-inkind-research-v1:5dfd189f510e4fa73b0de15cd09c0d8d3c971d85ad35f19aec6137b4b45481d8",
+        "ce-fmli-inkind-research-v1:f567a4d98d3d7858048f7d996438ab2a46c2e133309d48734b0c9587b5586e4c",
+        "ce-fmli-inkind-research-v1:e9206d911a9920f8a5c00d544d290737dd3d77b01d9edb738abbf5c2b68f247d"
       ],
       "published": {
         "owner_with_mortgage": 30983.241762,
@@ -4323,13 +4434,13 @@
         "liheap": 18.364550236194056,
         "nslp": 334.53754578262203,
         "rental_assistance": 453.5190081108152,
-        "wic": 31.50769936984718
+        "wic": 33.87934694942914
       },
       "sample_share_with_any_in_kind": 0.3312518321765342,
       "share_of_gap_closed": {
-        "owner_with_mortgage": -7.749331103887912,
-        "owner_without_mortgage": -1.191883687910875,
-        "renter": -4.944536027894031
+        "owner_with_mortgage": -7.826404603582484,
+        "owner_without_mortgage": -1.2010208164233538,
+        "renter": -4.918289155167056
       },
       "stage_effects": {
         "home_internet_dollars": {
@@ -4343,51 +4454,51 @@
           "renter": 2.0235549177155754
         },
         "in_kind_dollars": {
-          "owner_with_mortgage": 766.602286936959,
-          "owner_without_mortgage": 804.7723862753264,
-          "renter": 975.181849225024
+          "owner_with_mortgage": 774.2267799849396,
+          "owner_without_mortgage": 810.9418714283456,
+          "renter": 970.0053324117434
         },
         "in_kind_percent": {
-          "owner_with_mortgage": 2.4663733829688006,
-          "owner_without_mortgage": 3.010677027668862,
-          "renter": 3.104298737730815
+          "owner_with_mortgage": 2.490903503779296,
+          "owner_without_mortgage": 3.0337572520149125,
+          "renter": 3.0878203192470366
         }
       },
       "with_in_kind": {
-        "owner_with_mortgage": 31848.769011189812,
-        "owner_without_mortgage": 27535.384101822063,
-        "renter": 32389.09950387276
+        "owner_with_mortgage": 31856.393504237793,
+        "owner_without_mortgage": 27541.553586975082,
+        "renter": 32383.92298705948
       },
       "with_in_kind_between_implicate_sd": {
-        "owner_with_mortgage": 41.0371015349847,
-        "owner_without_mortgage": 85.26244633183748,
-        "renter": 44.73818117218284
+        "owner_with_mortgage": 40.009022692733396,
+        "owner_without_mortgage": 73.88934579455986,
+        "renter": 45.69842682298904
       },
       "with_in_kind_by_implicate": [
         {
-          "owner_with_mortgage": 31881.600613335875,
-          "owner_without_mortgage": 27398.919512170305,
-          "renter": 32356.234937867564
+          "owner_with_mortgage": 31893.295754120587,
+          "owner_without_mortgage": 27428.350392787856,
+          "renter": 32348.353718864135
         },
         {
-          "owner_with_mortgage": 31787.287578277756,
-          "owner_without_mortgage": 27589.792887571955,
-          "renter": 32398.174406881262
+          "owner_with_mortgage": 31802.764437452875,
+          "owner_without_mortgage": 27587.810425252406,
+          "renter": 32385.35697947673
         },
         {
-          "owner_with_mortgage": 31875.546662192453,
-          "owner_without_mortgage": 27575.841339061022,
-          "renter": 32334.48642136199
+          "owner_with_mortgage": 31880.7908164671,
+          "owner_without_mortgage": 27574.968792174157,
+          "renter": 32333.663526222615
         },
         {
-          "owner_with_mortgage": 31825.627113246283,
-          "owner_without_mortgage": 27606.152527647377,
-          "renter": 32448.144034416713
+          "owner_with_mortgage": 31824.805890518488,
+          "owner_without_mortgage": 27609.334544587688,
+          "renter": 32448.46880603375
         },
         {
-          "owner_with_mortgage": 31873.783088896686,
-          "owner_without_mortgage": 27506.214242659647,
-          "renter": 32408.457718836253
+          "owner_with_mortgage": 31880.31062262992,
+          "owner_without_mortgage": 27507.30378007331,
+          "renter": 32403.77190470019
         }
       ],
       "without_home_internet": {
@@ -4403,8 +4514,8 @@
     },
     "2022": {
       "band": {
-        "with_mean_fcsuti": 35447.34674286021,
-        "with_mean_su": 19053.71702465161,
+        "with_mean_fcsuti": 35448.902960315594,
+        "with_mean_su": 19050.475002388634,
         "without": {
           "band_rows": 1815,
           "fcsuti_mean": 34438.99725319434,
@@ -4438,9 +4549,9 @@
           "renter": 2.248702623873333
         },
         "wic": {
-          "owner_with_mortgage": 0.04238190572083411,
-          "owner_without_mortgage": 0.16629075181107122,
-          "renter": 0.017587216441827813
+          "owner_with_mortgage": 0.04357047893599475,
+          "owner_without_mortgage": 0.2758820561832964,
+          "renter": 0.019058182223519182
         }
       },
       "cpi_component_weights": {
@@ -4453,9 +4564,9 @@
       },
       "fcsuti_deflated": {
         "gap_percent_with": {
-          "owner_with_mortgage": 2.861942006491902,
-          "owner_without_mortgage": 5.513135265908842,
-          "renter": 4.23305626175845
+          "owner_with_mortgage": 2.8672966609074146,
+          "owner_without_mortgage": 5.520935111858916,
+          "renter": 4.234287633514855
         },
         "gap_percent_without": {
           "owner_with_mortgage": 0.35632271268219995,
@@ -4468,9 +4579,9 @@
           "renter": 2.3820341853055815
         },
         "in_kind_lift_percent": {
-          "owner_with_mortgage": 2.496722903033466,
-          "owner_without_mortgage": 2.8447073142995105,
-          "renter": 3.491992471400729
+          "owner_with_mortgage": 2.502058545343555,
+          "owner_without_mortgage": 2.8523099020892673,
+          "renter": 3.493215088496626
         },
         "inflation_factors": {
           "2017": 1.1854619941316507,
@@ -4482,40 +4593,40 @@
         },
         "methodology_id_without": "ce-fmli-internet-research-v1:0fce7347e807b3c60c3dc68d56098918d298e9dd4e09429c1afd18f9b2985536",
         "with_in_kind": {
-          "owner_with_mortgage": 34950.937934062116,
-          "owner_without_mortgage": 30023.673485535586,
-          "renter": 35585.231068335794
+          "owner_with_mortgage": 34952.7573649467,
+          "owner_without_mortgage": 30025.89292511012,
+          "renter": 35585.65145942912
         },
         "with_in_kind_between_implicate_sd": {
-          "owner_with_mortgage": 66.61207332106585,
-          "owner_without_mortgage": 50.26728837891423,
-          "renter": 99.40262897092104
+          "owner_with_mortgage": 65.87693953826576,
+          "owner_without_mortgage": 52.517639421586715,
+          "renter": 97.34265104133588
         },
         "with_in_kind_by_implicate": [
           {
-            "owner_with_mortgage": 35021.41176730523,
-            "owner_without_mortgage": 30025.34412737696,
-            "renter": 35529.70159425015
+            "owner_with_mortgage": 35023.04816566045,
+            "owner_without_mortgage": 30033.745944665134,
+            "renter": 35531.536077977005
           },
           {
-            "owner_with_mortgage": 34909.38286554442,
-            "owner_without_mortgage": 29936.871276977516,
-            "renter": 35581.34572358644
+            "owner_with_mortgage": 34906.15809690748,
+            "owner_without_mortgage": 29933.85266713498,
+            "renter": 35588.66243653447
           },
           {
-            "owner_with_mortgage": 34985.074401025486,
-            "owner_without_mortgage": 30057.28561125924,
-            "renter": 35477.40112822298
+            "owner_with_mortgage": 34988.26003746944,
+            "owner_without_mortgage": 30059.49683595198,
+            "renter": 35475.12051810238
           },
           {
-            "owner_with_mortgage": 34856.55330246518,
-            "owner_without_mortgage": 30041.92037456273,
-            "renter": 35742.37967274606
+            "owner_with_mortgage": 34863.01718508969,
+            "owner_without_mortgage": 30044.447695732208,
+            "renter": 35736.05628940752
           },
           {
-            "owner_with_mortgage": 34982.267333970274,
-            "owner_without_mortgage": 30056.94603750148,
-            "renter": 35595.32722287333
+            "owner_with_mortgage": 34983.30333960648,
+            "owner_without_mortgage": 30057.9214820663,
+            "renter": 35596.881975124255
           }
         ],
         "without_home_internet": {
@@ -4530,9 +4641,9 @@
         }
       },
       "gap_percent_with": {
-        "owner_with_mortgage": 3.101708135207115,
-        "owner_without_mortgage": 5.62571574306574,
-        "renter": 4.396962798679738
+        "owner_with_mortgage": 3.1181387989061227,
+        "owner_without_mortgage": 5.615816941859997,
+        "renter": 4.386788063549774
       },
       "gap_percent_without": {
         "owner_with_mortgage": 0.5165751936583751,
@@ -4555,18 +4666,18 @@
         "weighted_share_reporting": 0.794079860807959
       },
       "in_kind_lift_percent": {
-        "owner_with_mortgage": 2.571847415780071,
-        "owner_without_mortgage": 3.541025544141907,
-        "renter": 3.344657535821116
+        "owner_with_mortgage": 2.5881936389451132,
+        "owner_without_mortgage": 3.5313221114002813,
+        "renter": 3.3345853604499487
       },
       "methodology_id_without": "ce-fmli-internet-research-v1:0fce7347e807b3c60c3dc68d56098918d298e9dd4e09429c1afd18f9b2985536",
       "methodology_id_without_home_internet": "ce-fmli-research-v1:9b0ac2584036d8cf22989b08b14bde56b986c438c987abac56f633432fd3ce28",
       "methodology_ids_with": [
-        "ce-fmli-inkind-research-v1:88024f7093c02f08b7f06cd49110dac322dbeb37c00122297a3cf4e31b632ebe",
-        "ce-fmli-inkind-research-v1:02b8fd4b88be3d6f9467bb5d315c6caef742942db11575defcbf71613e418b8d",
-        "ce-fmli-inkind-research-v1:0a8f59484fc30aac068fa92f305eebcdb3dc8cabe51df8c9c281960fdf1136b7",
-        "ce-fmli-inkind-research-v1:125c7ea7720fb927466cc8c9c5ac89f140b66bef348feae3fcaf9086159ce5f2",
-        "ce-fmli-inkind-research-v1:359cf52b983e912140d575c642af0a8e38aac54ceba91cafaf59b99fee795e53"
+        "ce-fmli-inkind-research-v1:36290347cbe17bb5ca6a09a85aef65978353d2db60bd5e4ebfe84802c49faccc",
+        "ce-fmli-inkind-research-v1:5aa51f211ac1bf128c5da9b9648b27180cfa85786315cf26e6edf4463f0dd11e",
+        "ce-fmli-inkind-research-v1:10c507b7188e6413082bbf1eb3dfaefb6f0795f3d8c69b2cbad3c2027f245a83",
+        "ce-fmli-inkind-research-v1:d7f25c3185e5e258715c02918436d84fff6e45d11f438b4fed8c6038d856dac7",
+        "ce-fmli-inkind-research-v1:90aea61b7c8a5ce0fbc3ff948efea4a3a8db7b22ab24d0b444012be1f48f7479"
       ],
       "published": {
         "owner_with_mortgage": 33978.493165,
@@ -4578,13 +4689,13 @@
         "liheap": 21.955910496570542,
         "nslp": 424.03507869940825,
         "rental_assistance": 484.9920644052506,
-        "wic": 22.84798039737606
+        "wic": 24.861818270810833
       },
       "sample_share_with_any_in_kind": 0.362636117165746,
       "share_of_gap_closed": {
-        "owner_with_mortgage": -5.004369108862668,
-        "owner_without_mortgage": -1.7941435986869863,
-        "renter": -3.3181634708630146
+        "owner_with_mortgage": -5.03617602468191,
+        "owner_without_mortgage": -1.7892271270259734,
+        "renter": -3.3081710803026105
       },
       "stage_effects": {
         "home_internet_dollars": {
@@ -4598,51 +4709,51 @@
           "renter": 2.3797959983665296
         },
         "in_kind_dollars": {
-          "owner_with_mortgage": 878.3892198503017,
-          "owner_without_mortgage": 1027.8827141307447,
-          "renter": 1153.4952435825107
+          "owner_with_mortgage": 883.9721117922309,
+          "owner_without_mortgage": 1025.066018611742,
+          "renter": 1150.0215825996638
         },
         "in_kind_percent": {
-          "owner_with_mortgage": 2.571847415780071,
-          "owner_without_mortgage": 3.541025544141907,
-          "renter": 3.344657535821116
+          "owner_with_mortgage": 2.5881936389451132,
+          "owner_without_mortgage": 3.5313221114002813,
+          "renter": 3.3345853604499487
         }
       },
       "with_in_kind": {
-        "owner_with_mortgage": 35032.4068517196,
-        "owner_without_mortgage": 30055.708165184584,
-        "renter": 35641.18886329201
+        "owner_with_mortgage": 35037.98974366153,
+        "owner_without_mortgage": 30052.89146966558,
+        "renter": 35637.71520230916
       },
       "with_in_kind_between_implicate_sd": {
-        "owner_with_mortgage": 82.14671009134678,
-        "owner_without_mortgage": 90.91459334177219,
-        "renter": 112.51980791416702
+        "owner_with_mortgage": 74.0637273900259,
+        "owner_without_mortgage": 94.3536622835312,
+        "renter": 104.1880584027842
       },
       "with_in_kind_by_implicate": [
         {
-          "owner_with_mortgage": 35122.11424914818,
-          "owner_without_mortgage": 30105.571482546213,
-          "renter": 35557.36847549897
+          "owner_with_mortgage": 35122.69183061444,
+          "owner_without_mortgage": 30105.868643596998,
+          "renter": 35562.72173682891
         },
         {
-          "owner_with_mortgage": 34952.29112933461,
-          "owner_without_mortgage": 29944.549117041635,
-          "renter": 35675.246494317034
+          "owner_with_mortgage": 34970.247651039186,
+          "owner_without_mortgage": 29928.895422475875,
+          "renter": 35665.899146409705
         },
         {
-          "owner_with_mortgage": 35092.752355633944,
-          "owner_without_mortgage": 29978.38663655126,
-          "renter": 35515.18737381839
+          "owner_with_mortgage": 35090.76746313427,
+          "owner_without_mortgage": 29982.33340284657,
+          "renter": 35519.1341401137
         },
         {
-          "owner_with_mortgage": 34940.69675430474,
-          "owner_without_mortgage": 30088.731965874525,
-          "renter": 35803.68378214297
+          "owner_with_mortgage": 34953.31553475538,
+          "owner_without_mortgage": 30088.834582088308,
+          "renter": 35788.468412835486
         },
         {
-          "owner_with_mortgage": 35054.179770176495,
-          "owner_without_mortgage": 30161.301623909276,
-          "renter": 35654.45819068271
+          "owner_with_mortgage": 35052.926238764376,
+          "owner_without_mortgage": 30158.525297320164,
+          "renter": 35652.352575357996
         }
       ],
       "without_home_internet": {
@@ -4658,8 +4769,8 @@
     },
     "2023": {
       "band": {
-        "with_mean_fcsuti": 38431.90134923317,
-        "with_mean_su": 20356.82224189481,
+        "with_mean_fcsuti": 38432.6566745418,
+        "with_mean_su": 20352.609309231986,
         "without": {
           "band_rows": 1700,
           "fcsuti_mean": 37354.563833439395,
@@ -4693,9 +4804,9 @@
           "renter": 1.6370609813843862
         },
         "wic": {
-          "owner_with_mortgage": 0.03152834788144876,
-          "owner_without_mortgage": -0.06434138266675493,
-          "renter": 0.048753944347401657
+          "owner_with_mortgage": 0.03892562342246997,
+          "owner_without_mortgage": -0.06107881297628959,
+          "renter": 0.0392728230478534
         }
       },
       "cpi_component_weights": {
@@ -4708,9 +4819,9 @@
       },
       "fcsuti_deflated": {
         "gap_percent_with": {
-          "owner_with_mortgage": 2.8996973044782326,
-          "owner_without_mortgage": 7.043250590475858,
-          "renter": 3.855598151460571
+          "owner_with_mortgage": 2.907273069114513,
+          "owner_without_mortgage": 7.057000330612273,
+          "renter": 3.8539693223944793
         },
         "gap_percent_without": {
           "owner_with_mortgage": 0.09379965020024361,
@@ -4723,9 +4834,9 @@
           "renter": 2.0266705388627404
         },
         "in_kind_lift_percent": {
-          "owner_with_mortgage": 2.8032681985135977,
-          "owner_without_mortgage": 3.4228811174540574,
-          "renter": 2.9213919260324683
+          "owner_with_mortgage": 2.810836863768351,
+          "owner_without_mortgage": 3.436165819961512,
+          "renter": 2.9197777486777987
         },
         "inflation_factors": {
           "2018": 1.2301421253877785,
@@ -4737,40 +4848,40 @@
         },
         "methodology_id_without": "ce-fmli-internet-research-v1:0fce7347e807b3c60c3dc68d56098918d298e9dd4e09429c1afd18f9b2985536",
         "with_in_kind": {
-          "owner_with_mortgage": 38038.146636414094,
-          "owner_without_mortgage": 32742.095376438567,
-          "renter": 38666.22107385223
+          "owner_with_mortgage": 38040.94711157259,
+          "owner_without_mortgage": 32746.301109172433,
+          "renter": 38665.61464852821
         },
         "with_in_kind_between_implicate_sd": {
-          "owner_with_mortgage": 45.446533081102736,
-          "owner_without_mortgage": 152.2130914972558,
-          "renter": 72.09357948085002
+          "owner_with_mortgage": 41.80465060325323,
+          "owner_without_mortgage": 154.3437875939638,
+          "renter": 73.62434768369666
         },
         "with_in_kind_by_implicate": [
           {
-            "owner_with_mortgage": 38031.605668659344,
-            "owner_without_mortgage": 32972.066366728715,
-            "renter": 38726.41473802809
+            "owner_with_mortgage": 38035.27263215349,
+            "owner_without_mortgage": 32976.896918548846,
+            "renter": 38724.54917131765
           },
           {
-            "owner_with_mortgage": 37967.91210464769,
-            "owner_without_mortgage": 32758.87549753101,
-            "renter": 38663.0115080862
+            "owner_with_mortgage": 37978.337380013676,
+            "owner_without_mortgage": 32769.18964049411,
+            "renter": 38658.01707309861
           },
           {
-            "owner_with_mortgage": 38085.127843794726,
-            "owner_without_mortgage": 32706.054100353926,
-            "renter": 38572.34785410381
+            "owner_with_mortgage": 38087.40332001524,
+            "owner_without_mortgage": 32714.49537366921,
+            "renter": 38568.48031617038
           },
           {
-            "owner_with_mortgage": 38070.85939355629,
-            "owner_without_mortgage": 32547.273199062234,
-            "renter": 38622.76340003995
+            "owner_with_mortgage": 38069.77656560422,
+            "owner_without_mortgage": 32545.998405969207,
+            "renter": 38626.596467722586
           },
           {
-            "owner_with_mortgage": 38035.22817141247,
-            "owner_without_mortgage": 32726.20771851694,
-            "renter": 38746.56786900309
+            "owner_with_mortgage": 38033.94566007633,
+            "owner_without_mortgage": 32724.925207180804,
+            "renter": 38750.43021433184
           }
         ],
         "without_home_internet": {
@@ -4785,9 +4896,9 @@
         }
       },
       "gap_percent_with": {
-        "owner_with_mortgage": 2.773703911721448,
-        "owner_without_mortgage": 7.060443896162649,
-        "renter": 3.6984836011050293
+        "owner_with_mortgage": 2.780682603644813,
+        "owner_without_mortgage": 7.074167848678048,
+        "renter": 3.6931016231392277
       },
       "gap_percent_without": {
         "owner_with_mortgage": 0.04639718900623091,
@@ -4810,18 +4921,18 @@
         "weighted_share_reporting": 0.818883633502583
       },
       "in_kind_lift_percent": {
-        "owner_with_mortgage": 2.7260419158950944,
-        "owner_without_mortgage": 3.525486579640047,
-        "renter": 2.9358256032160357
+        "owner_with_mortgage": 2.7330173714031902,
+        "owner_without_mortgage": 3.5387573901303426,
+        "renter": 2.930483207396417
       },
       "methodology_id_without": "ce-fmli-internet-research-v1:0fce7347e807b3c60c3dc68d56098918d298e9dd4e09429c1afd18f9b2985536",
       "methodology_id_without_home_internet": "ce-fmli-research-v1:9b0ac2584036d8cf22989b08b14bde56b986c438c987abac56f633432fd3ce28",
       "methodology_ids_with": [
-        "ce-fmli-inkind-research-v1:d9925a7d8d3e711784250399ed05d073b1e03abc491b99dff6ad6dbc9707f35f",
-        "ce-fmli-inkind-research-v1:fcbe5455940222b796ca78b071ddff96103ad301661386e668251f23511d533d",
-        "ce-fmli-inkind-research-v1:2fc6753f6dc2ea678bdc901e2e383b8bfa56d9188142d3f2145ecbae36bead82",
-        "ce-fmli-inkind-research-v1:f4c2a234d94290c08c45488125a56f1b88e02e9110638b8ad9fa6d6a2395d8cf",
-        "ce-fmli-inkind-research-v1:8a7290f68274714eb0c41afeccb3964bf8a88c913bd4ffdd5797da847db42a96"
+        "ce-fmli-inkind-research-v1:e025685d774b5a92e109850cbf5f49ba658ce0335ba798d13cf5c305f60d18a2",
+        "ce-fmli-inkind-research-v1:9f8cf9ed34afef080d2f457ca5c8b4053c7c966814884b518cb737d68a95d1c8",
+        "ce-fmli-inkind-research-v1:7c8e2f82362beb784fcc3ef41ac3e4048dca1357ce0fa942d5733873025de138",
+        "ce-fmli-inkind-research-v1:7b6be3bd202a4e951c06a09002665fe0bd795d48105b70280d32bcfe14adb4f0",
+        "ce-fmli-inkind-research-v1:78f6cd1a4dfb8795535916dc02d25ea03f97e63dc6743a59cfe55ecc9ab78d99"
       ],
       "published": {
         "owner_with_mortgage": 36966.23764,
@@ -4833,13 +4944,13 @@
         "liheap": 25.58826521763558,
         "nslp": 507.19517373950185,
         "rental_assistance": 479.1238969805021,
-        "wic": 13.30151216835939
+        "wic": 14.593913089129321
       },
       "sample_share_with_any_in_kind": 0.38548712690194425,
       "share_of_gap_closed": {
-        "owner_with_mortgage": -58.78172322786672,
-        "owner_without_mortgage": -1.0677361121223483,
-        "renter": -3.9918372850409405
+        "owner_with_mortgage": -58.93213518326405,
+        "owner_without_mortgage": -1.0717553370654906,
+        "renter": -3.984573238157229
       },
       "stage_effects": {
         "home_internet_dollars": {
@@ -4853,51 +4964,51 @@
           "renter": 1.8269091074269106
         },
         "in_kind_dollars": {
-          "owner_with_mortgage": 1008.1826842906012,
-          "owner_without_mortgage": 1115.1877893270757,
-          "renter": 1101.1283023284268
+          "owner_with_mortgage": 1010.7624441311564,
+          "owner_without_mortgage": 1119.3856342142753,
+          "renter": 1099.1245514132606
         },
         "in_kind_percent": {
-          "owner_with_mortgage": 2.7260419158950944,
-          "owner_without_mortgage": 3.525486579640047,
-          "renter": 2.9358256032160357
+          "owner_with_mortgage": 2.7330173714031902,
+          "owner_without_mortgage": 3.5387573901303426,
+          "renter": 2.930483207396417
         }
       },
       "with_in_kind": {
-        "owner_with_mortgage": 37991.57161943692,
-        "owner_without_mortgage": 32747.354417541374,
-        "renter": 38607.72614391012
+        "owner_with_mortgage": 37994.15137927748,
+        "owner_without_mortgage": 32751.552262428573,
+        "renter": 38605.722392994954
       },
       "with_in_kind_between_implicate_sd": {
-        "owner_with_mortgage": 40.05596445769499,
-        "owner_without_mortgage": 111.6271251360864,
-        "renter": 77.01682197932956
+        "owner_with_mortgage": 36.07819538098199,
+        "owner_without_mortgage": 113.25228657839119,
+        "renter": 74.47033586219692
       },
       "with_in_kind_by_implicate": [
         {
-          "owner_with_mortgage": 37975.63082650978,
-          "owner_without_mortgage": 32907.86027433063,
-          "renter": 38685.04094930822
+          "owner_with_mortgage": 37982.67723191005,
+          "owner_without_mortgage": 32916.05388366573,
+          "renter": 38678.45276774723
         },
         {
-          "owner_with_mortgage": 37936.67053891842,
-          "owner_without_mortgage": 32741.872074629304,
-          "renter": 38596.59131043171
+          "owner_with_mortgage": 37943.366758267475,
+          "owner_without_mortgage": 32745.973864996467,
+          "renter": 38587.924104050835
         },
         {
-          "owner_with_mortgage": 38043.30941367369,
-          "owner_without_mortgage": 32680.68240421353,
-          "renter": 38514.14653004397
+          "owner_with_mortgage": 38038.949289901815,
+          "owner_without_mortgage": 32687.103500956597,
+          "renter": 38520.56762678704
         },
         {
-          "owner_with_mortgage": 38013.17358351423,
-          "owner_without_mortgage": 32614.57245153868,
-          "renter": 38556.263531303455
+          "owner_with_mortgage": 38015.853264622194,
+          "owner_without_mortgage": 32616.008562411957,
+          "renter": 38554.24245080905
         },
         {
-          "owner_with_mortgage": 37989.073734568476,
-          "owner_without_mortgage": 32791.784882994725,
-          "renter": 38686.58839846325
+          "owner_with_mortgage": 37989.91035168586,
+          "owner_without_mortgage": 32792.62150011211,
+          "renter": 38687.425015580644
         }
       ],
       "without_home_internet": {
@@ -4913,8 +5024,8 @@
     },
     "2024": {
       "band": {
-        "with_mean_fcsuti": 40628.25094699932,
-        "with_mean_su": 21575.796942982473,
+        "with_mean_fcsuti": 40628.61249036407,
+        "with_mean_su": 21573.26965000845,
         "without": {
           "band_rows": 1593,
           "fcsuti_mean": 39503.13645735829,
@@ -4948,9 +5059,9 @@
           "renter": 1.348778666451489
         },
         "wic": {
-          "owner_with_mortgage": -0.009174743503337357,
-          "owner_without_mortgage": -0.010727838377277976,
-          "renter": 0.040560374757458995
+          "owner_with_mortgage": -0.008763031693781453,
+          "owner_without_mortgage": -0.011953685227927835,
+          "renter": 0.043335052263193674
         }
       },
       "cpi_component_weights": {
@@ -4963,9 +5074,9 @@
       },
       "fcsuti_deflated": {
         "gap_percent_with": {
-          "owner_with_mortgage": 3.227478310640941,
-          "owner_without_mortgage": 5.600511978869882,
-          "renter": 4.060264656045143
+          "owner_with_mortgage": 3.227217721007958,
+          "owner_without_mortgage": 5.583136728907689,
+          "renter": 4.069538371812786
         },
         "gap_percent_without": {
           "owner_with_mortgage": 0.19512920358280006,
@@ -4978,9 +5089,9 @@
           "renter": 2.1644507133468993
         },
         "in_kind_lift_percent": {
-          "owner_with_mortgage": 3.026443631702702,
-          "owner_without_mortgage": 0.39754851068130037,
-          "renter": 2.838725734820091
+          "owner_with_mortgage": 3.0261835495659195,
+          "owner_without_mortgage": 0.38102934360269014,
+          "renter": 2.847890588624047
         },
         "inflation_factors": {
           "2019": 1.2501410288051331,
@@ -4992,40 +5103,40 @@
         },
         "methodology_id_without": "ce-fmli-internet-research-v1:0fce7347e807b3c60c3dc68d56098918d298e9dd4e09429c1afd18f9b2985536",
         "with_in_kind": {
-          "owner_with_mortgage": 40497.166294148425,
-          "owner_without_mortgage": 34719.96449094634,
-          "renter": 40812.32539224131
+          "owner_with_mortgage": 40497.06406224395,
+          "owner_without_mortgage": 34714.25175290744,
+          "renter": 40815.96253372616
         },
         "with_in_kind_between_implicate_sd": {
-          "owner_with_mortgage": 50.1528424963451,
-          "owner_without_mortgage": 144.95346592677214,
-          "renter": 78.35191369509423
+          "owner_with_mortgage": 49.245139101751214,
+          "owner_without_mortgage": 139.02594401311495,
+          "renter": 81.3010099792038
         },
         "with_in_kind_by_implicate": [
           {
-            "owner_with_mortgage": 40452.860533103194,
-            "owner_without_mortgage": 34843.46849643906,
-            "renter": 40894.88814880117
+            "owner_with_mortgage": 40458.1340491709,
+            "owner_without_mortgage": 34818.388083901635,
+            "renter": 40904.703092109994
           },
           {
-            "owner_with_mortgage": 40481.65683073616,
-            "owner_without_mortgage": 34530.544348045754,
-            "renter": 40821.10109575585
+            "owner_with_mortgage": 40481.73622504268,
+            "owner_without_mortgage": 34530.62374235227,
+            "renter": 40821.18049006237
           },
           {
-            "owner_with_mortgage": 40512.26531698731,
-            "owner_without_mortgage": 34835.020560263525,
-            "renter": 40826.62866137407
+            "owner_with_mortgage": 40508.1402109443,
+            "owner_without_mortgage": 34830.65484709855,
+            "renter": 40833.490792626835
           },
           {
-            "owner_with_mortgage": 40577.10015674354,
-            "owner_without_mortgage": 34599.30203390428,
-            "renter": 40682.44027914022
+            "owner_with_mortgage": 40577.36962858003,
+            "owner_without_mortgage": 34599.57150574077,
+            "renter": 40682.70975097671
           },
           {
-            "owner_with_mortgage": 40461.94863317192,
-            "owner_without_mortgage": 34791.487016079074,
-            "renter": 40836.568776135246
+            "owner_with_mortgage": 40459.94019748184,
+            "owner_without_mortgage": 34792.02058544398,
+            "renter": 40837.7285428549
           }
         ],
         "without_home_internet": {
@@ -5040,9 +5151,9 @@
         }
       },
       "gap_percent_with": {
-        "owner_with_mortgage": 2.766436123229443,
-        "owner_without_mortgage": 5.048603498096993,
-        "renter": 3.6364611389237966
+        "owner_with_mortgage": 2.768592271369563,
+        "owner_without_mortgage": 5.037681699317154,
+        "renter": 3.642581617613705
       },
       "gap_percent_without": {
         "owner_with_mortgage": -0.18816443782481151,
@@ -5065,18 +5176,18 @@
         "weighted_share_reporting": 0.8308585041085953
       },
       "in_kind_lift_percent": {
-        "owner_with_mortgage": 2.960170549327046,
-        "owner_without_mortgage": 0.526969452817938,
-        "renter": 2.86607166469639
+        "owner_with_mortgage": 2.9623307622196116,
+        "owner_without_mortgage": 0.5165177638306373,
+        "renter": 2.8721466463449197
       },
       "methodology_id_without": "ce-fmli-internet-research-v1:0fce7347e807b3c60c3dc68d56098918d298e9dd4e09429c1afd18f9b2985536",
       "methodology_id_without_home_internet": "ce-fmli-research-v1:9b0ac2584036d8cf22989b08b14bde56b986c438c987abac56f633432fd3ce28",
       "methodology_ids_with": [
-        "ce-fmli-inkind-research-v1:fe55c12f7fe393c57f076e370c68c53ef9c6012a1c2da36f5a74b4e9a9129d32",
-        "ce-fmli-inkind-research-v1:b7f80e888c3af3827ec2d2f317af0f98d42b2e812024ef64bc1cae1654bd16e0",
-        "ce-fmli-inkind-research-v1:417640ffed2823800d61bbdd2fcf068ba16575568da3197d7f5bb13065cafa68",
-        "ce-fmli-inkind-research-v1:1e6ba6a59d0bb9b50f6b2b45b72802d7266e59d5b971529a7033eaa54a13531a",
-        "ce-fmli-inkind-research-v1:a16ab444bac6b32c2cfeaaeddde61e212c1f93b053e03fbf189b9f5421298685"
+        "ce-fmli-inkind-research-v1:1387a51821598e9f7527518ec19d9aaa5012e277d24ca2d4773bb499ec5d0b1a",
+        "ce-fmli-inkind-research-v1:8ad7d405ebfdc9c4fe1c04481c5c9dbbf0e59b67a765bb4a6fade9366530c7dd",
+        "ce-fmli-inkind-research-v1:9c2c676b5b01f5875aec2016c77cf90714f4797932a2c130d16f0ea012f3173e",
+        "ce-fmli-inkind-research-v1:189ac07fedbbde7e2d46ed2d7c96694d514f21adac281846ea90c1c5e63d9ba5",
+        "ce-fmli-inkind-research-v1:805c1ef3fa4a9fa0f4bbccb4f4985accdffa6d32e02fa42ec8b12c57c18eb000"
       ],
       "published": {
         "owner_with_mortgage": 39230.994457,
@@ -5088,13 +5199,13 @@
         "liheap": 26.35859399426685,
         "nslp": 550.411544439984,
         "rental_assistance": 503.7229909025597,
-        "wic": 5.671114732046298
+        "wic": 6.166625440148065
       },
       "sample_share_with_any_in_kind": 0.39782797595870784,
       "share_of_gap_closed": {
-        "owner_with_mortgage": 15.70222617626145,
-        "owner_without_mortgage": -0.12242787574212677,
-        "renter": -3.855576103211357
+        "owner_with_mortgage": 15.713685026642795,
+        "owner_without_mortgage": -0.1199996930955063,
+        "renter": -3.86374845785274
       },
       "stage_effects": {
         "home_internet_dollars": {
@@ -5108,51 +5219,51 @@
           "renter": 2.17721792441683
         },
         "in_kind_dollars": {
-          "owner_with_mortgage": 1159.1191823336849,
-          "owner_without_mortgage": 181.0532739801347,
-          "renter": 1132.4887065246949
+          "owner_with_mortgage": 1159.9650606910218,
+          "owner_without_mortgage": 177.46234000919503,
+          "renter": 1134.8891517731681
         },
         "in_kind_percent": {
-          "owner_with_mortgage": 2.960170549327046,
-          "owner_without_mortgage": 0.526969452817938,
-          "renter": 2.86607166469639
+          "owner_with_mortgage": 2.9623307622196116,
+          "owner_without_mortgage": 0.5165177638306373,
+          "renter": 2.8721466463449197
         }
       },
       "with_in_kind": {
-        "owner_with_mortgage": 40316.29485916059,
-        "owner_without_mortgage": 34538.50473762127,
-        "renter": 40646.11010247338
+        "owner_with_mortgage": 40317.140737517926,
+        "owner_without_mortgage": 34534.91380365033,
+        "renter": 40648.51054772185
       },
       "with_in_kind_between_implicate_sd": {
-        "owner_with_mortgage": 41.95216894423591,
-        "owner_without_mortgage": 162.03527718481206,
-        "renter": 57.72584611628604
+        "owner_with_mortgage": 41.3548155329603,
+        "owner_without_mortgage": 158.8688464300392,
+        "renter": 60.44415588284487
       },
       "with_in_kind_by_implicate": [
         {
-          "owner_with_mortgage": 40279.40207116987,
-          "owner_without_mortgage": 34656.23374962607,
-          "renter": 40710.88224307919
+          "owner_with_mortgage": 40283.578206038175,
+          "owner_without_mortgage": 34635.63888202392,
+          "renter": 40720.38273987978
         },
         {
-          "owner_with_mortgage": 40315.85104081986,
-          "owner_without_mortgage": 34360.76087235623,
-          "renter": 40637.835908106565
+          "owner_with_mortgage": 40315.9301043944,
+          "owner_without_mortgage": 34360.839935930766,
+          "renter": 40637.9149716811
         },
         {
-          "owner_with_mortgage": 40329.55649092773,
-          "owner_without_mortgage": 34657.00743735409,
-          "renter": 40675.074542664246
+          "owner_with_mortgage": 40329.9181821209,
+          "owner_without_mortgage": 34657.36912854726,
+          "renter": 40675.43623385741
         },
         {
-          "owner_with_mortgage": 40379.386190856225,
-          "owner_without_mortgage": 34361.24828389179,
-          "renter": 40555.55447927977
+          "owner_with_mortgage": 40379.65463860929,
+          "owner_without_mortgage": 34361.51673164486,
+          "renter": 40555.82292703283
         },
         {
-          "owner_with_mortgage": 40277.278502029265,
-          "owner_without_mortgage": 34657.27334487813,
-          "renter": 40651.20333923714
+          "owner_with_mortgage": 40276.62255642685,
+          "owner_without_mortgage": 34659.20434010483,
+          "renter": 40652.99586615812
         }
       ],
       "without_home_internet": {
@@ -5327,11 +5438,11 @@
       "methodology_id_without": "ce-fmli-internet-research-v1:0fce7347e807b3c60c3dc68d56098918d298e9dd4e09429c1afd18f9b2985536",
       "methodology_id_without_home_internet": "ce-fmli-research-v1:9b0ac2584036d8cf22989b08b14bde56b986c438c987abac56f633432fd3ce28",
       "methodology_ids_with": [
-        "ce-fmli-inkind-research-v1:459357483c8b32f1d8911bbc5b3d8fd3a01c5fe5bde4242b847f5c24e0619ae0",
-        "ce-fmli-inkind-research-v1:99ecec1204e4263a95b11ac10a985760362ac643871f289cf9c067cb64fa7d2c",
-        "ce-fmli-inkind-research-v1:3886117f067be154a544804fada47c8d09155ca6675b69f68647595415c5420f",
-        "ce-fmli-inkind-research-v1:1307ed0e8c2d749c2e2bf916d613e751a3eb3cffa4ab76a209ee413af7016138",
-        "ce-fmli-inkind-research-v1:65f47b74016a4f9c1dfce92c15472bd6483b0c4682cc099508f59b9c51143a41"
+        "ce-fmli-inkind-research-v1:601dc4054ec0ad4e3b7748f82e1a63cf0e11b665976bc38455e2276c467d6d25",
+        "ce-fmli-inkind-research-v1:f4b8eb827b7a651983f859083b08be7656c8561b74e607477599f11af945da91",
+        "ce-fmli-inkind-research-v1:019b5eed3712fd83c6d4dd6beeaf103e3580de2b0d85d04501f98d233b496df4",
+        "ce-fmli-inkind-research-v1:2691cdad0e3ecfdeda989091a21dde3345e147e4ee353d583b958e481398a619",
+        "ce-fmli-inkind-research-v1:916d808a670a3ae7ca8f94d33725560f4220e0edadeb6291cbdc2731bcf03ddd"
       ],
       "published": {
         "owner_with_mortgage": 41322.707394,
@@ -5428,7 +5539,7 @@
     "python": "3.14.7",
     "scipy": "1.18.1"
   },
-  "runtime_seconds": 45,
+  "runtime_seconds": 75,
   "schema_version": 2,
   "threshold_series": {
     "path": "spm_calculator/data/bls/threshold_series.json",
@@ -5447,37 +5558,37 @@
           "owner_without_mortgage": 0.0,
           "renter": 0.0
         },
-        "sample_mean_wic_threshold_year_dollars": 52.339389223916406,
+        "sample_mean_wic_threshold_year_dollars": 55.115334019536974,
         "with_in_kind": {
-          "owner_with_mortgage": 29805.31894406323,
-          "owner_without_mortgage": 25727.025250646002,
-          "renter": 29965.240684185053
+          "owner_with_mortgage": 29815.23363654758,
+          "owner_without_mortgage": 25729.542223120454,
+          "renter": 29959.86798102005
         },
         "with_in_kind_by_implicate": [
           {
-            "owner_with_mortgage": 29828.614797543476,
-            "owner_without_mortgage": 25838.90424286593,
-            "renter": 29938.962644721458
+            "owner_with_mortgage": 29837.42208437036,
+            "owner_without_mortgage": 25865.58532452217,
+            "renter": 29930.05212389797
           },
           {
-            "owner_with_mortgage": 29780.11999435552,
-            "owner_without_mortgage": 25662.24457836219,
-            "renter": 29945.09891968788
+            "owner_with_mortgage": 29787.30837001437,
+            "owner_without_mortgage": 25676.354457046888,
+            "renter": 29948.57233308753
           },
           {
-            "owner_with_mortgage": 29823.073217255576,
-            "owner_without_mortgage": 25748.533902312665,
-            "renter": 29953.12131357581
+            "owner_with_mortgage": 29825.801975151262,
+            "owner_without_mortgage": 25745.370587046367,
+            "renter": 29957.231083433133
           },
           {
-            "owner_with_mortgage": 29792.71192743042,
-            "owner_without_mortgage": 25731.776356181974,
-            "renter": 30032.483798922174
+            "owner_with_mortgage": 29794.145343019864,
+            "owner_without_mortgage": 25740.384306281023,
+            "renter": 30034.302460900733
           },
           {
-            "owner_with_mortgage": 29802.074783731176,
-            "owner_without_mortgage": 25653.667173507256,
-            "renter": 29956.536744017965
+            "owner_with_mortgage": 29831.490410182036,
+            "owner_without_mortgage": 25620.016440705822,
+            "renter": 29929.18190378086
           }
         ]
       },
@@ -5492,275 +5603,275 @@
           "owner_without_mortgage": 0.0,
           "renter": 0.0
         },
-        "sample_mean_wic_threshold_year_dollars": 43.65586900923354,
+        "sample_mean_wic_threshold_year_dollars": 46.582760071079356,
         "with_in_kind": {
-          "owner_with_mortgage": 30670.447896200698,
-          "owner_without_mortgage": 26508.623050194263,
-          "renter": 31008.593601911107
+          "owner_with_mortgage": 30683.603026502627,
+          "owner_without_mortgage": 26511.769356378056,
+          "renter": 31000.250829065706
         },
         "with_in_kind_by_implicate": [
           {
-            "owner_with_mortgage": 30726.809837375196,
-            "owner_without_mortgage": 26517.361541082282,
-            "renter": 30924.665036322986
+            "owner_with_mortgage": 30737.673272826694,
+            "owner_without_mortgage": 26520.019413840593,
+            "renter": 30922.32600849569
           },
           {
-            "owner_with_mortgage": 30582.74067365605,
-            "owner_without_mortgage": 26533.484676653436,
-            "renter": 31054.140360566955
+            "owner_with_mortgage": 30595.66200023117,
+            "owner_without_mortgage": 26537.765122402667,
+            "renter": 31048.745034101557
           },
           {
-            "owner_with_mortgage": 30689.926633828924,
-            "owner_without_mortgage": 26486.54962740133,
-            "renter": 30987.451506534446
+            "owner_with_mortgage": 30711.928215008626,
+            "owner_without_mortgage": 26478.666961181236,
+            "renter": 30965.6379003065
           },
           {
-            "owner_with_mortgage": 30663.40736966797,
-            "owner_without_mortgage": 26594.92229310715,
-            "renter": 31061.026596469655
+            "owner_with_mortgage": 30669.24942106363,
+            "owner_without_mortgage": 26597.06476314028,
+            "renter": 31060.496056422373
           },
           {
-            "owner_with_mortgage": 30689.354966475355,
-            "owner_without_mortgage": 26410.797112727123,
-            "renter": 31015.6845096615
+            "owner_with_mortgage": 30703.502223383013,
+            "owner_without_mortgage": 26425.3305213255,
+            "renter": 31004.04914600241
           }
         ]
       },
       "2021": {
         "change_dollars": {
-          "owner_with_mortgage": 7.323543234298995,
-          "owner_without_mortgage": 2.771286795137712,
-          "renter": -4.330719498302642
+          "owner_with_mortgage": 9.346033780675498,
+          "owner_without_mortgage": -9.474688877991866,
+          "renter": -7.05999015560883
         },
         "change_percent": {
-          "owner_with_mortgage": 0.0229947450456347,
-          "owner_without_mortgage": 0.01006445664564204,
-          "renter": -0.013370916649857456
+          "owner_with_mortgage": 0.029338015866220424,
+          "owner_without_mortgage": -0.034401432177999514,
+          "renter": -0.021800910774238957
         },
-        "sample_mean_wic_threshold_year_dollars": 33.44343029453283,
+        "sample_mean_wic_threshold_year_dollars": 35.94833219511567,
         "with_in_kind": {
-          "owner_with_mortgage": 31856.09255442411,
-          "owner_without_mortgage": 27538.1553886172,
-          "renter": 32384.768784374457
+          "owner_with_mortgage": 31865.739538018468,
+          "owner_without_mortgage": 27532.07889809709,
+          "renter": 32376.86299690387
         },
         "with_in_kind_by_implicate": [
           {
-            "owner_with_mortgage": 31896.28845011758,
-            "owner_without_mortgage": 27410.441418185637,
-            "renter": 32347.438800834945
+            "owner_with_mortgage": 31913.90760436155,
+            "owner_without_mortgage": 27426.553939759815,
+            "renter": 32331.78951120069
           },
           {
-            "owner_with_mortgage": 31791.042316006613,
-            "owner_without_mortgage": 27588.094060418327,
-            "renter": 32399.22424685546
+            "owner_with_mortgage": 31802.307100492973,
+            "owner_without_mortgage": 27558.438014824318,
+            "renter": 32388.969009249937
           },
           {
-            "owner_with_mortgage": 31887.78350196243,
-            "owner_without_mortgage": 27568.83036782291,
-            "renter": 32325.591327552476
+            "owner_with_mortgage": 31885.364753578408,
+            "owner_without_mortgage": 27573.791306446197,
+            "renter": 32333.06157939449
           },
           {
-            "owner_with_mortgage": 31830.31654857986,
-            "owner_without_mortgage": 27612.33665785262,
-            "renter": 32438.90038352609
+            "owner_with_mortgage": 31845.31256861564,
+            "owner_without_mortgage": 27619.802046177934,
+            "renter": 32426.401548019203
           },
           {
-            "owner_with_mortgage": 31875.031955454047,
-            "owner_without_mortgage": 27511.07443880651,
-            "renter": 32412.689163103318
+            "owner_with_mortgage": 31881.80566304378,
+            "owner_without_mortgage": 27481.80918327718,
+            "renter": 32404.09333665504
           }
         ]
       },
       "2022": {
         "change_dollars": {
-          "owner_with_mortgage": 2.7985952136514243,
-          "owner_without_mortgage": 2.458498572545068,
-          "renter": 2.7091423838573974
+          "owner_with_mortgage": 3.786716246177093,
+          "owner_without_mortgage": 1.8670133271334635,
+          "renter": 3.796390585877816
         },
         "change_percent": {
-          "owner_with_mortgage": 0.007988589609331243,
-          "owner_without_mortgage": 0.008179805842645216,
-          "renter": 0.00760115605078493
+          "owner_with_mortgage": 0.01080745862955812,
+          "owner_without_mortgage": 0.006212424947582562,
+          "renter": 0.010652732826232914
         },
-        "sample_mean_wic_threshold_year_dollars": 25.415503963973443,
+        "sample_mean_wic_threshold_year_dollars": 27.689488538939504,
         "with_in_kind": {
-          "owner_with_mortgage": 35035.20544693325,
-          "owner_without_mortgage": 30058.16666375713,
-          "renter": 35643.89800567587
+          "owner_with_mortgage": 35041.776459907705,
+          "owner_without_mortgage": 30054.758482992715,
+          "renter": 35641.51159289504
         },
         "with_in_kind_by_implicate": [
           {
-            "owner_with_mortgage": 35119.96548980281,
-            "owner_without_mortgage": 30108.353146940437,
-            "renter": 35570.153638019176
+            "owner_with_mortgage": 35127.23234570484,
+            "owner_without_mortgage": 30104.793950253297,
+            "renter": 35571.254607424984
           },
           {
-            "owner_with_mortgage": 34958.858252323305,
-            "owner_without_mortgage": 29947.10266398653,
-            "renter": 35673.289844244806
+            "owner_with_mortgage": 34976.36931107009,
+            "owner_without_mortgage": 29925.41641225517,
+            "renter": 35667.04761372284
           },
           {
-            "owner_with_mortgage": 35095.80362191082,
-            "owner_without_mortgage": 29982.362678305228,
-            "renter": 35519.94568846403
+            "owner_with_mortgage": 35093.87088189767,
+            "owner_without_mortgage": 29989.177004946163,
+            "renter": 35526.130747075294
           },
           {
-            "owner_with_mortgage": 34942.22971323587,
-            "owner_without_mortgage": 30090.264924805666,
-            "renter": 35805.21674107411
+            "owner_with_mortgage": 34954.96021583069,
+            "owner_without_mortgage": 30090.479263163626,
+            "renter": 35790.113093910804
           },
           {
-            "owner_with_mortgage": 35059.17015739344,
-            "owner_without_mortgage": 30162.749904747765,
-            "renter": 35650.88411657722
+            "owner_with_mortgage": 35056.44954503525,
+            "owner_without_mortgage": 30163.92578434531,
+            "renter": 35653.011902341255
           }
         ]
       },
       "2023": {
         "change_dollars": {
-          "owner_with_mortgage": 9.978446809211164,
-          "owner_without_mortgage": 17.52329630138047,
-          "renter": -4.658422042091843
+          "owner_with_mortgage": 6.180079944431782,
+          "owner_without_mortgage": 18.93003943740041,
+          "renter": 1.5459376121143578
         },
         "change_percent": {
-          "owner_with_mortgage": 0.026264896091077183,
-          "owner_without_mortgage": 0.05351057089360012,
-          "renter": -0.012066035758562244
+          "owner_with_mortgage": 0.01626587177256944,
+          "owner_without_mortgage": 0.05779890762342976,
+          "renter": 0.004004426070247646
         },
-        "sample_mean_wic_threshold_year_dollars": 16.29450820189627,
+        "sample_mean_wic_threshold_year_dollars": 17.817230843475016,
         "with_in_kind": {
-          "owner_with_mortgage": 38001.550066246135,
-          "owner_without_mortgage": 32764.877713842754,
-          "renter": 38603.06772186803
+          "owner_with_mortgage": 38000.33145922191,
+          "owner_without_mortgage": 32770.48230186597,
+          "renter": 38607.26833060707
         },
         "with_in_kind_by_implicate": [
           {
-            "owner_with_mortgage": 38004.75215475647,
-            "owner_without_mortgage": 32920.133516817084,
-            "renter": 38658.6067100015
+            "owner_with_mortgage": 38005.06729326743,
+            "owner_without_mortgage": 32924.4992322212,
+            "renter": 38664.56536798889
           },
           {
-            "owner_with_mortgage": 37944.35480715133,
-            "owner_without_mortgage": 32777.82251247716,
-            "renter": 38592.99612629084
+            "owner_with_mortgage": 37942.9915135597,
+            "owner_without_mortgage": 32792.46987210096,
+            "renter": 38594.83747444626
           },
           {
-            "owner_with_mortgage": 38049.747900057424,
-            "owner_without_mortgage": 32681.312860385013,
-            "renter": 38514.776986215446
+            "owner_with_mortgage": 38043.49598629356,
+            "owner_without_mortgage": 32691.650197348346,
+            "renter": 38525.11432317878
           },
           {
-            "owner_with_mortgage": 38012.80126771718,
-            "owner_without_mortgage": 32616.927142505858,
-            "renter": 38558.19901976872
+            "owner_with_mortgage": 38012.8655091224,
+            "owner_without_mortgage": 32614.456878312485,
+            "renter": 38559.92192803958
           },
           {
-            "owner_with_mortgage": 37996.09420154828,
-            "owner_without_mortgage": 32828.19253702866,
-            "renter": 38690.75976706362
+            "owner_with_mortgage": 37997.23699386646,
+            "owner_without_mortgage": 32829.33532934685,
+            "renter": 38691.902559381815
           }
         ]
       },
       "2024": {
         "change_dollars": {
-          "owner_with_mortgage": 0.332821845113358,
-          "owner_without_mortgage": 6.325581231074466,
-          "renter": 4.205798049821169
+          "owner_with_mortgage": 3.3991171611996833,
+          "owner_without_mortgage": 18.197967319465533,
+          "renter": 2.4489468779138406
         },
         "change_percent": {
-          "owner_with_mortgage": 0.0008255268652002101,
-          "owner_without_mortgage": 0.018314577539269017,
-          "renter": 0.010347356830009424
+          "owner_with_mortgage": 0.008430947976512115,
+          "owner_without_mortgage": 0.05269440492288169,
+          "renter": 0.006024690314387904
         },
-        "sample_mean_wic_threshold_year_dollars": 8.771825057459683,
+        "sample_mean_wic_threshold_year_dollars": 9.505954267285741,
         "with_in_kind": {
-          "owner_with_mortgage": 40316.6276810057,
-          "owner_without_mortgage": 34544.83031885234,
-          "renter": 40650.3159005232
+          "owner_with_mortgage": 40320.539854679126,
+          "owner_without_mortgage": 34553.111770969794,
+          "renter": 40650.95949459977
         },
         "with_in_kind_by_implicate": [
           {
-            "owner_with_mortgage": 40277.62832094929,
-            "owner_without_mortgage": 34670.65806844066,
-            "renter": 40719.79532141347
+            "owner_with_mortgage": 40286.11362828994,
+            "owner_without_mortgage": 34649.04801137856,
+            "renter": 40725.19548815352
           },
           {
-            "owner_with_mortgage": 40321.63615109547,
-            "owner_without_mortgage": 34355.91935108699,
-            "renter": 40637.24667935006
+            "owner_with_mortgage": 40331.458983565455,
+            "owner_without_mortgage": 34383.19124674985,
+            "renter": 40631.36730710194
           },
           {
-            "owner_with_mortgage": 40328.939885150125,
-            "owner_without_mortgage": 34661.59520635354,
-            "renter": 40681.22551219585
+            "owner_with_mortgage": 40329.931805107735,
+            "owner_without_mortgage": 34662.58712631115,
+            "renter": 40682.21743215346
           },
           {
-            "owner_with_mortgage": 40373.57419094132,
-            "owner_without_mortgage": 34377.51734979774,
-            "renter": 40560.920376714865
+            "owner_with_mortgage": 40373.71518454128,
+            "owner_without_mortgage": 34377.6583433977,
+            "renter": 40561.06137031483
           },
           {
-            "owner_with_mortgage": 40281.35985689229,
-            "owner_without_mortgage": 34658.46161858276,
-            "renter": 40652.39161294177
+            "owner_with_mortgage": 40281.47967189122,
+            "owner_without_mortgage": 34693.074127011685,
+            "renter": 40654.95587527509
           }
         ]
       },
       "2025": {
         "change_dollars": {
-          "owner_with_mortgage": 7.5143861356627895,
-          "owner_without_mortgage": 2.9839993782225065,
-          "renter": -5.17487819580856
+          "owner_with_mortgage": 7.328369173104875,
+          "owner_without_mortgage": 1.7184381365441368,
+          "renter": -5.891000308380171
         },
         "change_percent": {
-          "owner_with_mortgage": 0.017730030120444162,
-          "owner_without_mortgage": 0.008172123290051125,
-          "renter": -0.012144899444610502
+          "owner_with_mortgage": 0.017291127156249253,
+          "owner_without_mortgage": 0.004706196797710227,
+          "renter": -0.013825563359426418
         },
-        "sample_mean_wic_threshold_year_dollars": 3.201685639673573,
+        "sample_mean_wic_threshold_year_dollars": 3.4481025243472123,
         "with_in_kind": {
-          "owner_with_mortgage": 42389.766895650166,
-          "owner_without_mortgage": 36517.35452842766,
-          "renter": 42604.30261817749
+          "owner_with_mortgage": 42389.58087868761,
+          "owner_without_mortgage": 36516.088967185984,
+          "renter": 42603.58649606492
         },
         "with_in_kind_by_implicate": [
           {
-            "owner_with_mortgage": 42459.77934969935,
-            "owner_without_mortgage": 36124.81246606252,
-            "renter": 42656.370218545235
+            "owner_with_mortgage": 42455.317438586935,
+            "owner_without_mortgage": 36108.36912337721,
+            "renter": 42657.30984251964
           },
           {
-            "owner_with_mortgage": 42386.756208708335,
-            "owner_without_mortgage": 36285.07273760488,
-            "renter": 42595.21012680748
+            "owner_with_mortgage": 42386.72962426158,
+            "owner_without_mortgage": 36285.04615315813,
+            "renter": 42595.183542360726
           },
           {
-            "owner_with_mortgage": 42429.67134354302,
-            "owner_without_mortgage": 36905.57933029922,
-            "renter": 42535.4359617501
+            "owner_with_mortgage": 42434.29797207725,
+            "owner_without_mortgage": 36915.52779395437,
+            "renter": 42530.74865439099
           },
           {
-            "owner_with_mortgage": 42398.713444461864,
-            "owner_without_mortgage": 36528.84904438489,
-            "renter": 42580.63700851985
+            "owner_with_mortgage": 42398.411514470485,
+            "owner_without_mortgage": 36527.071697503765,
+            "renter": 42578.859661638715
           },
           {
-            "owner_with_mortgage": 42273.91413183825,
-            "owner_without_mortgage": 36742.45906378678,
-            "renter": 42653.85977526481
+            "owner_with_mortgage": 42273.14784404178,
+            "owner_without_mortgage": 36744.43006793645,
+            "renter": 42655.83077941449
           }
         ]
       }
     },
     "growth_2022_2025_change_points": {
-      "owner_with_mortgage": 0.011784266319605052,
-      "owner_without_mortgage": -9.332690687813283e-06,
-      "renter": -0.0236048567735061
+      "owner_with_mortgage": 0.007841853480236693,
+      "owner_without_mortgage": -0.0018299588997479077,
+      "renter": -0.029263837695367556
     },
     "growth_2022_2025_percent_with": {
-      "owner_with_mortgage": 20.99191757233061,
-      "owner_without_mortgage": 21.488961508949078,
-      "renter": 19.52761903704601
+      "owner_with_mortgage": 20.968698396859907,
+      "owner_without_mortgage": 21.498527389097433,
+      "renter": 19.5336128913167
     },
     "wic_ebt_all_states_from_reference_year": null
   }
