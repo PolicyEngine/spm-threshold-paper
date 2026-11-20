@@ -1377,23 +1377,29 @@ INKIND_METHOD_CONSTANTS = (
     # state and reference year
     "Where the CE reports the unit's state, we value each participant's WIC at twelve times the average monthly "
     "WIC food cost per person in that state, for the fiscal year that matches the unit's reference year",
+    # _wic_known_state_complete: a known state counts as finished when its
+    # FNS statewide date is on or before the midpoint of the unit's reference
+    # period, 1.5 months before the interview month (ordinal <= midpoint);
+    # the FNS table itself is pinned below
+    "For earlier reference years, we take each state's statewide date from FNS and add no WIC when the unit's state "
+    "had fully implemented WIC EBT by the midpoint of its three-month reference period",
     # _wic_cells: (region, CE year, collection quarter); _wic_ebt_complete
-    # draws a suppressed-state unit's status from its cell's share of
+    # draws a withheld-state unit's status from its cell's share of
     # known-state survey weight (FINLWT21) whose state had finished WIC EBT
-    "When the CE suppresses a unit's state, we draw that status with probability equal to the weighted share of "
+    "When the CE withholds a unit's state, we draw that status with probability equal to the weighted share of "
     "known-state units in the same region, collection year, and collection quarter whose states had done so",
     # _wic_ebt_complete: prob = 1.0 where the cell has no known-state weight
     "Where that cell has no known-state unit, as when the CE also withholds the region, we count the state as "
     "having done so and add no WIC",
-    # _wic_monthly_cost: a suppressed-state unit takes the survey-weighted
+    # _wic_monthly_cost: a withheld-state unit takes the survey-weighted
     # mean of the state values of its cell's known-state units whose state had
     # not finished WIC EBT by the midpoint of their own reference periods,
     # each looked up at the unit's reference year, which its cell (CE year
     # and collection quarter) fixes; per_unit then multiplies by 12.0
-    "If a unit with a suppressed state takes WIC, we value each participant's WIC at twelve times a weighted mean "
+    "If a unit with a withheld state takes WIC, we value each participant's WIC at twelve times a weighted mean "
     "monthly food cost per person",
-    "We average over the cell's known-state units whose states had not done so, weighting each unit by its survey "
-    "weight and taking its state's cost for the fiscal year that matches the cell's reference year",
+    "We average over the cell's known-state units whose states had not fully implemented WIC EBT, weighting each "
+    "unit by its survey weight and taking its state's cost for the fiscal year that matches the cell's reference year",
     # _wic_participants: n_lt5 children, plus a mother when n_infants > 0
     # and n_women_15_plus >= 1; otherwise one participant. Census's rule
     # has no woman test. Every narrow-universe unit has a woman aged 15 or
