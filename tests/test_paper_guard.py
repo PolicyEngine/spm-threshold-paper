@@ -4631,8 +4631,9 @@ class PaperGuardTests(unittest.TestCase):
 
     def test_phrase_miss_report_names_the_missing_phrase(self):
         """When a pin's figure still occurs in its section but a phrase
-        doesn't, the report names the phrase after the failures; a changed
-        figure adds no such note."""
+        doesn't, the report names the phrase after the failures and after
+        any note that #13's abstract number check prints. A changed figure
+        adds no phrase line."""
         result = self.run_section_mutation("evaluation", r"renter(\s+)difference", r"renter\1gap")
         self.assertNotEqual(result.returncode, 0)
         self.assertEqual(failure_lines(result.stdout), ["owner misses within one SE; renter about 2.4 SE"])
@@ -4645,6 +4646,27 @@ class PaperGuardTests(unittest.TestCase):
         result = self.run_section_mutation("evaluation", r"about(\s+)2\.4(\s+)standard", r"about\g<1>2.5\2standard")
         self.assertEqual(failure_lines(result.stdout), ["owner misses within one SE; renter about 2.4 SE"])
         self.assertNotIn("Phrases missing", result.stdout)
+        # This paper also fails #13's abstract number check, so the guard
+        # prints that check's note, then the phrase §6.2 misses.
+        self.install_article()
+        self.mutate_article("abstract", r"renters\.", "renters in 2024.", once=True)
+        self.mutate_article("evaluation", r"giving(\s+)a(\s+)mean(\s+)absolute(\s+)error", r"giving\1an\2error", once=True)
+        result = self.run_guard()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(
+            sorted(failure_lines(result.stdout)),
+            ["abstract states exactly the numbers the guard lists, each as a bare number", "evaluation amended MAE 1.17"],
+        )
+        lines = result.stdout.splitlines()
+        last = max(index for index, line in enumerate(lines) if line.startswith("  - "))
+        self.assertEqual(
+            lines[last + 1 :],
+            [
+                "    the abstract states ['2024'] beyond the lists and lacks []",
+                "Phrases missing from sections that hold the pin's figure:",
+                "    '1.17' occurs in the section; 'giving a mean absolute error of 1.17 percent' doesn't",
+            ],
+        )
         self.install_article()
 
     def test_section_slices_fail_closed_without_unique_markers(self):
@@ -4713,9 +4735,9 @@ class PaperGuardTests(unittest.TestCase):
         how or where the guard runs. The test always runs the guard with -B
         in a checkout named paper. The test's papers respace most sets of a
         tie's spaces only beside another tie's respaced literal in the same
-        section. A mapping of such a set that fires when no other spacer
-        sits in the section therefore gets past. A mapping of a run the
-        test doesn't try gets past too."""
+        section. A mapping of such a set that fires only when no other copy
+        of its spacer sits in the section therefore gets past. A mapping of
+        a run the test doesn't try gets past too."""
         for name, rows in whitespace_papers():
             hosts = list(dict.fromkeys(where for where, _, _, _ in rows))
             labels = {label for _, _, label, _ in rows}
@@ -5352,10 +5374,12 @@ WHITESPACE = tuple(character for character in map(chr, range(sys.maxunicode + 1)
 # Each whitespace character other than a space, and runs of whitespace, that
 # a helper could map back to one space. The whitespace test writes each one
 # into the paper. The guard cuts its section slices from text it reads with
-# universal newlines, so there a carriage return, alone or with the line feed
-# after it, reaches the ties as one line break. The abstract's parser reads
-# the stored bytes and fails closed on a lone carriage return, U+0085, U+2028
-# or U+2029 anywhere in the paper. The helper test runs the helpers on
+# universal newlines, so in those slices a carriage return, alone or with the
+# line feed after it, reaches the ties as one line break. The abstract's
+# parser reads the stored bytes and fails closed on a lone carriage return,
+# U+0085, U+2028 or U+2029 anywhere in the paper, so with those spacers the
+# abstract's ties fail too; the whitespace test asserts only that the listed
+# ties are among the failures. The helper test runs the helpers on
 # strings and sees each spacer as written.
 SPACERS = tuple(character for character in WHITESPACE if character != " ") + (
     "  ",
