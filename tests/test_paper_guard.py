@@ -200,7 +200,7 @@ ROLLING_PROSE_MUTATIONS = (
 )
 
 
-INKIND_HEADING = "# Imputing in-kind benefits {#sec-inkind}\n"
+INKIND_HEADING = "# Home internet and in-kind benefits {#sec-inkind}\n"
 PROJECTION_HEADING = "# Projecting thresholds {#sec-projection}\n"
 INKIND_NAMES = (
     "ce_inkind_bls_components_2019_2025.json",
@@ -228,21 +228,33 @@ REPLICATION_HEADING = "# Replication from public consumption data {#sec-replicat
 # range also appears in the abstract and the discussion, so the first case
 # fails only because the pin reads the in-kind section itself.
 INKIND_PROSE_MUTATIONS = (
-    ("lift range", "section", r"0\.9(\s+)to(\s+)3\.8", r"1.0\1to\g<2>3.8", "in-kind lift range"),
-    ("abstract lift range", "abstract", r"0\.9(\s+)to(\s+)3\.8", r"0.9\1to\g<2>3.9", "abstract in-kind lift range"),
     (
-        "swapped stage changes",
-        "section",
-        r"\+0\.06(.*?)\+1\.04",
-        r"+1.04\1+0.06",
-        "stage changes in tenure order",
+        'lift range',
+        'section',
+        r"0\.5(\s+)to(\s+)3\.5",
+        r"0.6\1to\g<2>3.5",
+        'in-kind lift range',
     ),
     (
-        "rental assistance share of the difference",
-        "section",
-        r"\\\$162",
-        r"\\$126",
-        "difference in rises by benefit",
+        'abstract lift range',
+        'abstract',
+        r"0\.5(\s+)to(\s+)3\.5",
+        r"0.5\1to\g<2>3.6",
+        'abstract in-kind lift range',
+    ),
+    (
+        'swapped stage changes',
+        'section',
+        r"by(\s+)−0\.17,(\s+)−1\.63,",
+        r"by\1−1.63,\2−0.17,",
+        'stage changes in tenure order',
+    ),
+    (
+        'rental assistance share of the difference',
+        'section',
+        r"\\\$175",
+        r"\\$157",
+        'difference in rises by benefit',
     ),
     (
         "BLS imputed renter points",
@@ -252,11 +264,11 @@ INKIND_PROSE_MUTATIONS = (
         "BLS 2024-2025 renter growth without its imputed terms",
     ),
     (
-        "Garner–Munoz lower bound",
-        "section",
-        r"1\.73(\s+)percent(\s+)below",
-        r"1.74\1percent\2below",
-        "Garner–Munoz range with benefits",
+        'Garner–Munoz lower bound with home internet',
+        'section',
+        r"by(\s+)−2\.13(\s+)to(\s+)\+0\.90",
+        r"by\1−2.14\2to\g<3>+0.90",
+        'Garner–Munoz range with home internet',
     ),
     (
         "vacation-home utilities",
@@ -274,11 +286,11 @@ INKIND_PROSE_MUTATIONS = (
     ),
     ("implicate count", "section", r"We draw five implicates", "We draw four implicates", "implicate, matching-neighbor"),
     (
-        "abstract stage changes",
-        "abstract",
-        r"−0\.63(\s+)to(\s+)\+1\.04(\s+)points",
-        r"−0.63\1to\g<2>+1.40\3points",
-        "abstract stage-change range",
+        'abstract stage changes',
+        'abstract',
+        r"−1\.63(\s+)to(\s+)−0\.17(\s+)points",
+        r"−1.63\1to\g<2>−0.71\3points",
+        'abstract stage-change range',
     ),
     (
         "abstract accounting share",
@@ -317,17 +329,17 @@ INKIND_PROSE_MUTATIONS = (
         "appendix names the recorded calculator commits",
     ),
     (
-        "replication standard-error ratios",
-        "replication",
-        r"0\.66(\s+)to(\s+)1\.02",
-        r"0.67\1to\g<2>1.02",
+        'replication standard-error ratios',
+        'replication',
+        r"0\.62(\s+)to(\s+)1\.04",
+        r"0.63\1to\g<2>1.04",
         "replication standard errors relative to BLS's",
     ),
     (
-        "swapped replication standard-error ratios",
-        "replication",
-        r"0\.85(\s+)to(\s+)1\.35(.*?)1\.01(\s+)to(\s+)1\.95",
-        r"1.01\1to\g<2>1.95\g<3>0.85\g<4>to\g<5>1.35",
+        'swapped replication standard-error ratios',
+        'replication',
+        r"0\.88(\s+)to(\s+)1\.27(.*?)0\.91(\s+)to(\s+)1\.46",
+        r"0.91\1to\g<2>1.46\g<3>0.88\g<4>to\g<5>1.27",
         "replication standard errors relative to BLS's",
     ),
     (
@@ -338,11 +350,11 @@ INKIND_PROSE_MUTATIONS = (
         "stage changes in tenure order, each within one standard error",
     ),
     (
-        "stage-change standard error",
-        "section",
-        r"2\.57(\s+)for",
-        r"2.75\1for",
-        "standard errors of the stage change",
+        'stage-change standard error',
+        'section',
+        r"3\.19(\s+)for",
+        r"3.91\1for",
+        'standard errors of the stage change',
     ),
     ("replicate count", "section", r"CE's(\s+)44(\s+)replicate", r"CE's\g<1>40\2replicate", "standard errors of the stage change"),
     (
@@ -353,10 +365,10 @@ INKIND_PROSE_MUTATIONS = (
         "every stage change within three-quarters of a standard error",
     ),
     (
-        "implicate variance share",
-        "section",
-        r"17(\s+)to(\s+)44(\s+)percent",
-        r"17\1to\g<2>45\3percent",
+        'implicate variance share',
+        'section',
+        r"for(\s+)8(\s+)to(\s+)30(\s+)percent",
+        r"for\g<1>8\2to\g<3>31\4percent",
         "implicate share of the stage change's variance",
     ),
     (
@@ -383,8 +395,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "stage changes moved out of the growth section",
         "section",
-        r"(We estimate that the imputed benefits\s+change the replication's growth by .*?"
-        r"each within one standard error of zero) \(@sec-inkind-uncertainty\)\."
+        r"(With\s+home\s+internet\s+added,\s+we\s+estimate\s+that\s+the\s+imputed\s+benefits\s+change\s+growth\s+by\s.*?"
+        r"each\s+within\s+one\s+standard\s+error\s+of\s+zero)\s+\(@sec-inkind-uncertainty\)\."
         r"(.*?## Uncertainty and limitations \{#sec-inkind-uncertainty\}\n\n)",
         r"\2\1. ",
         "stage changes in tenure order, each within one standard error",
@@ -413,25 +425,25 @@ INKIND_PROSE_MUTATIONS = (
     # Labels, directions and the displayed formula: each figure stays put
     # while the words that give it meaning change.
     (
-        "swapped stage-change tenure labels",
-        "section",
-        r"\+0\.06(\s+)points(\s+)for(\s+)owners(\s+)with(\s+)mortgages,(\s+)\+1\.04(\s+)for(\s+)owners(\s+)without",
-        r"+0.06\1points\2for\3owners\4without\5mortgages,\6+1.04\7for\8owners\9with",
-        "stage changes in tenure order",
+        'swapped home internet tenure labels',
+        'section',
+        r"\+0\.01(\s+)points(\s+)for(\s+)owners(\s+)with(\s+)mortgages,(\s+)\+4\.33(\s+)for(\s+)owners(\s+)without",
+        r"+0.01\1points\2for\3owners\4without\5mortgages,\6+4.33\7for\8owners\9with",
+        "home internet's change to growth",
     ),
     (
-        "level comparison direction",
-        "section",
-        r"thresholds(\s+)that(\s+)exceed",
-        r"thresholds\1that\2fall below",
-        "replication with benefits exceeds BLS in every cell",
+        'level comparison direction',
+        'section',
+        r"both,(\s+)we(\s+)estimate(\s+)thresholds(\s+)that(\s+)exceed",
+        r"both,\1we\2estimate\3thresholds\4that\5fall below",
+        'replication with home internet and benefits exceeds BLS in every cell',
     ),
     (
-        "rental assistance level gap direction",
-        "section",
-        r"70(\s+)to(\s+)81(\s+)percent(\s+)above",
-        r"70\1to\g<2>81\3percent\4below",
-        "rental assistance per renter: level gap before 2024",
+        'rental assistance level gap direction',
+        'section',
+        r"60(\s+)to(\s+)89(\s+)percent(\s+)above",
+        r"60\1to\g<2>89\3percent\4below",
+        'rental assistance per renter: level gap before 2024',
     ),
     (
         "mean absolute deviation direction",
@@ -441,17 +453,17 @@ INKIND_PROSE_MUTATIONS = (
         "Garner–Munoz mean absolute deviation",
     ),
     (
-        "deflator direction",
-        "section",
-        r"growth(\s+)rises(\s+)by(\s+)0\.9",
-        r"growth\1falls\2by\g<3>0.9",
-        "deflator effect exceeds the stage in every tenure",
+        'deflator direction',
+        'section',
+        r"changes(\s+)by(\s+)\+0\.97,",
+        r"changes\1by\2−0.97,",
+        "BLS's index in place of the composite CPI: growth with home internet",
     ),
     (
         "renter shortfall direction",
         "section",
-        r"shortfall(\s+)narrows",
-        r"shortfall\1widens",
+        r"benefits(\s+)trails(\s+)BLS's(\s+)by(\s+)2\.59",
+        r"benefits\1exceeds\2BLS's\3by\g<4>2.59",
         "renter shortfall with imputed terms removed",
     ),
     (
@@ -483,6 +495,20 @@ INKIND_PROSE_MUTATIONS = (
         "displayed share formula reproduces BLS's shares",
     ),
     (
+        "summer Pandemic EBT year",
+        "section",
+        r"summer(\s+)Pandemic(\s+)EBT(\s+)in(\s+)its(\s+)2022",
+        r"summer\1Pandemic\2EBT\3in\4its\g<5>2023",
+        "school lunch EBT caveat reaches 2022's summer Pandemic EBT",
+    ),
+    (
+        "EBT-card caveat confined to 2020 and 2021",
+        "section",
+        r"2021(\s+)values(\s+)and(\s+)for(\s+)summer(\s+)Pandemic(\s+)EBT(\s+)in(\s+)its(\s+)2022(\s+)values(\s+)",
+        r"2021\1values\2",
+        "school lunch EBT caveat reaches 2022's summer Pandemic EBT",
+    ),
+    (
         "school days",
         "section",
         r"179(\s+)school",
@@ -506,32 +532,32 @@ INKIND_PROSE_MUTATIONS = (
     # Round 2: the verb or label beside each figure, and the method facts
     # the section quotes, each changed while every figure stays put.
     (
-        "lift direction",
-        "section",
-        r"imputed(\s+)benefits(\s+)raise(\s+)the(\s+)replicated",
-        r"imputed\1benefits\2lower\3the\4replicated",
-        "in-kind lift range",
+        'lift direction',
+        'section',
+        r"they(\s+)raise(\s+)the(\s+)thresholds(\s+)by(\s+)a(\s+)further",
+        r"they\1lower\2the\3thresholds\4by\5a\6further",
+        'in-kind lift range',
     ),
     (
-        "abstract lift direction",
-        "abstract",
-        r"they(\s+)raise(\s+)replicated",
-        r"they\1lower\2replicated",
-        "abstract in-kind lift range",
+        'abstract lift direction',
+        'abstract',
+        r"they(\s+)raise(\s+)thresholds(\s+)by(\s+)a(\s+)further",
+        r"they\1lower\2thresholds\3by\4a\5further",
+        'abstract in-kind lift range',
     ),
     (
-        "discussion lift direction",
-        "discussion",
-        r"benefits(\s+)raises(\s+)our(\s+)levels",
-        r"benefits\1lowers\2our\3levels",
-        "discussion in-kind lift range",
+        'discussion lift direction',
+        'discussion',
+        r"benefits(\s+)raises(\s+)them",
+        r"benefits\1lowers\2them",
+        'discussion home internet and in-kind lift ranges',
     ),
     (
-        "swapped stages in the 2024-2025 renter growth",
-        "section",
-        r"With(\s+)our(\s+)imputed(\s+)benefits,(\s+)we(\s+)estimate(\s+)the(\s+)retrospective(.*?)without(\s+)them",
-        r"Without\1our\2imputed\3benefits,\4we\5estimate\6the\7retrospective\8with\9them",
-        "replication 2024-2025 renter growth with and without benefits",
+        'swapped stages in the 2024-2025 renter growth',
+        'section',
+        r"at(\s+)4\.85(\s+)percent(.*?)internet,(\s+)and(\s+)4\.83",
+        r"at\g<1>4.83\2percent\3internet,\4and\g<5>4.85",
+        'replication 2024-2025 renter growth in three stages',
     ),
     (
         "swapped benefits in the difference",
@@ -548,11 +574,11 @@ INKIND_PROSE_MUTATIONS = (
         "BLS and replication imputed totals",
     ),
     (
-        "standard error of our rise",
-        "section",
-        r"standard(\s+)error(\s+)of(\s+)\\\$196",
-        r"standard\1error\2of\3\\$169",
-        "BLS and replication imputed totals",
+        'standard error of our rise',
+        'section',
+        r"standard(\s+)error(\s+)of(\s+)\\\$190",
+        r"standard\1error\2of\3\\$109",
+        'BLS and replication imputed totals',
     ),
     (
         "swapped price series",
@@ -569,18 +595,18 @@ INKIND_PROSE_MUTATIONS = (
         "growth table caption names the growth window",
     ),
     (
-        "Garner–Munoz stage without benefits",
-        "section",
-        r"the(\s+)out-of-pocket(\s+)replication(\s+)trails",
-        r"the\1replication\2with benefits\3trails",
-        "Garner–Munoz out-of-pocket range",
+        'Garner–Munoz stage without home internet or benefits',
+        'section',
+        r"replication(\s+)without(\s+)home(\s+)internet(\s+)or(\s+)benefits(\s+)trails",
+        r"replication\1with\2home\3internet\4and\5benefits\6trails",
+        'Garner–Munoz range without home internet or benefits',
     ),
     (
-        "Garner–Munoz stage with benefits",
-        "section",
+        'Garner–Munoz stage with benefits',
+        'section',
         r"When(\s+)we(\s+)also(\s+)add(\s+)the(\s+)imputed(\s+)benefits",
         r"When\1we\2also\3remove\4the\5imputed\6benefits",
-        "Garner–Munoz range with benefits",
+        'Garner–Munoz range with benefits and home internet',
     ),
     (
         "share formula deflator",
@@ -681,11 +707,11 @@ INKIND_PROSE_MUTATIONS = (
         "programs the participation models cover",
     ),
     (
-        "benefit count",
-        "section",
-        r"with(\s+)the(\s+)five(\s+)benefits",
-        r"with\1the\2four\3benefits",
-        "programs the participation models cover",
+        'benefit count',
+        'section',
+        r"internet(\s+)and(\s+)the(\s+)five(\s+)benefits",
+        r"internet\1and\2the\3four\4benefits",
+        'programs the participation models cover',
     ),
     (
         "amounts caption implicate count",
@@ -760,11 +786,11 @@ INKIND_PROSE_MUTATIONS = (
     # Round 3 (the r4 review): the accounting, the level gap, the new
     # standard errors and the method facts read from code.
     (
-        "Garner–Munoz stage change",
-        "section",
-        r"by(\s+)\+0\.08,(\s+)−1\.51,",
-        r"by\1+0.08,\2−1.15,",
-        "Garner–Munoz restrictions with the composite CPI",
+        'Garner–Munoz stage change',
+        'section',
+        r"by(\s+)\+0\.42,(\s+)−4\.45,",
+        r"by\1+0.42,\2−4.54,",
+        'Garner–Munoz restrictions with the composite CPI',
     ),
     (
         "abstract names the CE summaries",
@@ -776,25 +802,9 @@ INKIND_PROSE_MUTATIONS = (
     (
         'internet share of thresholds',
         'section',
-        '1\\.85(\\s+)to(\\s+)2\\.55',
-        '1.85\\1to\\g<2>2.65',
-        "home internet's share of BLS's thresholds",
-    ),
-    (
-        'common-component gap',
-        'section',
-        '0\\.81(\\s+)to(\\s+)3\\.80',
-        '0.81\\1to\\g<2>3.90',
-        'thresholds on the components both series hold',
-    ),
-    (
-        'common-component definitions swapped',
-        'section',
-        'Under(\\s+)the(\\s+)Garner–Munoz(\\s+)restrictions(\\s+)they(\\s+)do(\\s+)so(\\s+)by(.*?)and(\\s+)with'
-        '(\\s+)the(\\s+)CE(\\s+)summaries',
-        'With\\1the\\2CE\\3summaries\\4they\\5do\\6so\\7by\\8and\\9under\\g<10>the\\g<11>Garner–Munoz'
-        '\\g<12>restrictions',
-        'thresholds on the components both series hold',
+        r"1\.85(\s+)to(\s+)2\.55",
+        r"1.85\1to\g<2>2.65",
+        "home internet's share of our thresholds and BLS's",
     ),
     (
         'BLS 2025 rental assistance per renter',
@@ -806,8 +816,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         'standard error of our rental rise',
         'section',
-        'with(\\s+)a(\\s+)standard(\\s+)error(\\s+)of(\\s+)\\\\\\$438',
-        'with\\1a\\2standard\\3error\\4of\\5\\\\$483',
+        r"with(\s+)a(\s+)standard(\s+)error(\s+)of(\s+)\\\$453",
+        r"with\1a\2standard\3error\4of\5\\$435",
         "rental assistance per renter: BLS's 2024 and 2025 rise",
     ),
     (
@@ -834,8 +844,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         're-ranking sign',
         'section',
-        '−0\\.01,(\\s+)\\+0\\.94,',
-        '−0.01,\\1−0.94,',
+        r"−0\.27,(\s+)−1\.72,",
+        r"−0.27,\1+1.72,",
         're-ranking left out of the accounting',
     ),
     (
@@ -862,22 +872,22 @@ INKIND_PROSE_MUTATIONS = (
     (
         'school lunch rise standard error',
         'section',
-        '\\\\\\$50(\\s+)for(\\s+)school(\\s+)lunch',
-        '\\\\$55\\1for\\2school\\3lunch',
+        r"\\\$47(\s+)for(\s+)school(\s+)lunch",
+        r"\\$74\1for\2school\3lunch",
         'standard errors of the rises in band amounts',
     ),
     (
         'lift standard errors',
         'section',
-        '0\\.31(\\s+)to(\\s+)0\\.60',
-        '0.31\\1to\\g<2>0.70',
+        r"0\.26(\s+)to(\s+)0\.57",
+        r"0.26\1to\g<2>0.75",
         "standard errors of the benefits' lifts",
     ),
     (
         'lift years within 1.5 standard errors',
         'section',
-        'the(\\s+)2021–2025(\\s+)lifts',
-        'the\\g<1>2020–2025\\2lifts',
+        r"the(\s+)2024–2025(\s+)lifts",
+        r"the\g<1>2023–2025\2lifts",
         "standard errors of the benefits' lifts",
     ),
     (
@@ -890,8 +900,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "owners' rented-dwelling spending",
         'section',
-        '\\\\\\$64(\\s+)to(\\s+)\\\\\\$684',
-        '\\\\$64\\1to\\2\\\\$648',
+        r"\\\$52(\s+)to(\s+)\\\$655",
+        r"\\$52\1to\2\\$565",
         "Garner–Munoz restrictions keep owners' rented-dwelling spending",
     ),
     (
@@ -904,8 +914,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         'discussion uncertainty',
         'discussion',
-        'points,(\\s+)each(\\s+)within(\\s+)one',
-        'points,\\1each\\2within\\3half a',
+        'points,(\\s+)each(\\s+)change(\\s+)within(\\s+)one',
+        'points,\\1each\\2change\\3within\\4half a',
         'abstract and discussion: each change within one standard error',
     ),
     (
@@ -913,7 +923,7 @@ INKIND_PROSE_MUTATIONS = (
         'discussion',
         "With(\\s+)the(\\s+)CE's(\\s+)spending(\\s+)summaries,(\\s+)we(\\s+)estimate",
         'We\\6estimate',
-        'abstract and discussion: each change within one standard error',
+        'discussion growth changes from home internet and the benefits',
     ),
     (
         'reference-year rule',
@@ -967,8 +977,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         'our 2024-2025 rental assistance per renter',
         'section',
-        'ours(\\s+)rose(\\s+)from(\\s+)\\\\\\$1,285',
-        'ours\\1rose\\2from\\3\\\\$1,258',
+        r"ours(\s+)rose(\s+)from(\s+)\\\$1,277",
+        r"ours\1rose\2from\3\\$1,272",
         'BLS 2024-2025 renter growth without its imputed terms',
     ),
     (
@@ -1040,17 +1050,17 @@ INKIND_PROSE_MUTATIONS = (
     # tenure's own broadband row: 2.13 where BLS's shares give 2.12.
     (
         "internet's share row",
-        "section",
+        'section',
         r"1\.54(\s+)to(\s+)2\.12",
         r"1.54\1to\g<2>2.13",
-        "home internet's share of BLS's thresholds",
+        "home internet's share of our thresholds and BLS's",
     ),
     (
         "internet's two readings swapped",
-        "section",
-        r"supplies(\s+)1\.54(\s+)to(\s+)2\.12(.*?)and(\s+)1\.85(\s+)to(\s+)2\.55",
-        r"supplies\g<1>1.85\2to\g<3>2.55\4and\g<5>1.54\6to\g<7>2.12",
-        "home internet's share of BLS's thresholds",
+        'section',
+        r"supplies(\s+)1\.54(\s+)to(\s+)2\.12(.*?)supplies(\s+)1\.85(\s+)to(\s+)2\.55",
+        r"supplies\g<1>1.85\2to\g<3>2.55\4supplies\g<5>1.54\6to\g<7>2.12",
+        "home internet's share of our thresholds and BLS's",
     ),
     (
         "shared component's term coefficient",
@@ -1241,13 +1251,6 @@ INKIND_PROSE_MUTATIONS = (
         "WIC by-state sensitivity from the imputation receipt",
     ),
     (
-        "common-component gaps' accounting",
-        "section",
-        r"band(\s+)to(\s+)our(\s+)thresholds",
-        r"band\1from\2our\3thresholds",
-        "thresholds on the components both series hold",
-    ),
-    (
         "separate-Other terms match each component row and Other",
         "section",
         r"for(\s+)Other(\s+)and(\s+)for(\s+)each(\s+)component",
@@ -1297,11 +1300,11 @@ INKIND_PROSE_MUTATIONS = (
         "BLS's 2025 WIC band mean against our none",
     ),
     (
-        "by-state WIC rise",
-        "section",
-        r"\\\$1\.94(\s+)to(\s+)\\\$3\.21",
-        r"\\$1.94\1to\2\\$3.12",
-        "WIC by-state sensitivity from the imputation receipt",
+        'by-state WIC rise',
+        'section',
+        r"\\\$1\.94(\s+)to(\s+)\\\$3\.20",
+        r"\\$1.94\1to\2\\$3.02",
+        'WIC by-state sensitivity from the imputation receipt',
     ),
     (
         "by-state WIC thresholds",
@@ -1311,24 +1314,24 @@ INKIND_PROSE_MUTATIONS = (
         "WIC by-state sensitivity from the imputation receipt",
     ),
     (
-        "by-state WIC threshold moves in dollars",
-        "section",
-        r"move(\s+)by(\s+)−\\\$20(\s+)to",
-        r"move\1by\2+\\$20\3to",
-        "WIC by-state sensitivity from the imputation receipt",
+        'by-state WIC threshold moves in dollars',
+        'section',
+        r"move(\s+)by(\s+)−\\\$5(\s+)to",
+        r"move\1by\2+\\$5\3to",
+        'WIC by-state sensitivity from the imputation receipt',
     ),
     (
-        "by-state WIC threshold moves in percent",
-        "section",
-        r"\(−0\.06(\s+)to(\s+)\+0\.12(\s+)percent\)",
-        r"(−0.06\1to\g<2>+0.21\3percent)",
-        "WIC by-state sensitivity from the imputation receipt",
+        'by-state WIC threshold moves in percent',
+        'section',
+        r"\(−0\.01(\s+)to(\s+)\+0\.05(\s+)percent\)",
+        r"(−0.01\1to\g<2>+0.50\3percent)",
+        'WIC by-state sensitivity from the imputation receipt',
     ),
     (
         "by-state WIC growth bound",
         "section",
-        r"growth(\s+)changes(\s+)by(\s+)0\.03(\s+)points(\s+)or(\s+)less",
-        r"growth\1changes\2by\g<3>0.02\4points\5or\6less",
+        r"change(\s+)of(\s+)0\.03(\s+)points(\s+)or(\s+)less",
+        r"change\1of\g<2>0.02\3points\4or\5less",
         "WIC by-state sensitivity from the imputation receipt",
     ),
     (
@@ -1366,13 +1369,6 @@ INKIND_PROSE_MUTATIONS = (
         r"of(\s+)one(\s+)of(\s+)the(\s+)five(\s+)recipients",
         r"of\1twenty-one\2of\3the\4five\5recipients",
         "implicate, matching-neighbor and cell-donor counts",
-    ),
-    (
-        "common-component gaps' reach",
-        "section",
-        r"for(\s+)every(\s+)tenure(\s+)in(\s+)every(\s+)year\.(\s+)Under",
-        r"for\1most\2tenures\3in\4every\5year.\6Under",
-        "thresholds on the components both series hold",
     ),
     (
         "interview that supplies the replacement rent",
@@ -1452,6 +1448,328 @@ INKIND_PROSE_MUTATIONS = (
         r"replication,(\s+)we(\s+)estimate(\s+)that(\s+)this(\s+)re-ranking",
         r"replication,\1that\2re-ranking",
         "re-ranking left out of the accounting",
+    ),
+    (
+        "home internet's lift for owners without mortgages",
+        'section',
+        r"0\.34(\s+)to(\s+)4\.00",
+        r"0.34\1to\g<2>4.10",
+        "home internet's lift by tenure",
+    ),
+    (
+        "home internet's lift direction",
+        'section',
+        r"home(\s+)internet(\s+)raises(\s+)the(\s+)replicated",
+        r"home\1internet\2lowers\3the\4replicated",
+        "home internet's lift by tenure",
+    ),
+    (
+        'home internet item code',
+        'section',
+        r"\(UCC\)(\s+)690114",
+        r"(UCC)\g<1>690116",
+        'home internet rules read from fingerprinted calculator code',
+    ),
+    (
+        'home internet annualization',
+        'section',
+        r"three-month(\s+)total(\s+)by(\s+)four",
+        r"three-month\1total\2by\3three",
+        'home internet rules read from fingerprinted calculator code',
+    ),
+    (
+        "home internet's spending summaries",
+        'section',
+        r"FCSUti(\s+)but(\s+)not(\s+)to(\s+)shelter",
+        r"FCSUti\1and\2to\4shelter",
+        'home internet rules read from fingerprinted calculator code',
+    ),
+    (
+        "home internet's CPI weight",
+        'section',
+        r"FCSUti(\s+)spending(\s+)among(\s+)units(\s+)with(\s+)children",
+        r"FCSUti\1spending\2among\3all\4units",
+        'home internet rules read from fingerprinted calculator code',
+    ),
+    (
+        'home internet added after the band',
+        'section',
+        r"internet(\s+)before(\s+)we(\s+)estimate",
+        r"internet\1after\2we\3estimate",
+        'home internet rules read from fingerprinted calculator code',
+    ),
+    (
+        "home internet moved into the benefits' terms",
+        'section',
+        r"count(\s+)home(\s+)internet(\s+)with(\s+)out-of-pocket(\s+)spending",
+        r"count\1home\2internet\3with\4the\5benefits",
+        'home internet counts with out-of-pocket spending in the accounting',
+    ),
+    (
+        "a standard error for home internet's change",
+        'section',
+        r"report(\s+)no(\s+)standard(\s+)error",
+        r"report\1a\2standard\3error",
+        "no standard error for home internet's own change",
+    ),
+    (
+        'Garner–Munoz deviation with home internet',
+        'section',
+        r"from(\s+)3\.14(\s+)to(\s+)1\.11",
+        r"from\g<1>3.14\2to\g<3>1.12",
+        'Garner–Munoz mean absolute deviation in three stages',
+    ),
+    (
+        'Garner–Munoz deviation with benefits',
+        'section',
+        r"rises(\s+)to(\s+)1\.76",
+        r"rises\1to\g<2>1.67",
+        'Garner–Munoz mean absolute deviation in three stages',
+    ),
+    (
+        'Garner–Munoz lower bound with benefits',
+        'section',
+        r"by(\s+)0\.76(\s+)to(\s+)3\.63",
+        r"by\g<1>0.67\2to\g<3>3.63",
+        'Garner–Munoz range with benefits and home internet',
+    ),
+    (
+        'Garner–Munoz direction with benefits',
+        'section',
+        r"benefits,(\s+)we(\s+)estimate(\s+)thresholds(\s+)that(\s+)exceed",
+        r"benefits,\1we\2estimate\3thresholds\4that\5fall below",
+        'Garner–Munoz range with benefits and home internet',
+    ),
+    (
+        "Garner–Munoz growth against BLS's",
+        'section',
+        r"BLS's(\s+)by(\s+)\+0\.56,",
+        r"BLS's\1by\2+0.65,",
+        "Garner–Munoz restrictions with BLS's index",
+    ),
+    (
+        "our band's home internet",
+        'section',
+        r"spending(\s+)of(\s+)\\\$543(\s+)to(\s+)\\\$869",
+        r"spending\1of\2\\$543\3to\4\\$896",
+        "home internet in our band and BLS's",
+    ),
+    (
+        "our band's home internet against BLS's",
+        'section',
+        r"by(\s+)−1\.1(\s+)to(\s+)\+3\.1",
+        r"by\1−1.1\2to\g<3>+3.2",
+        "home internet in our band and BLS's",
+    ),
+    (
+        "home internet's share of ours, Other separate",
+        'section',
+        r"supplies(\s+)1\.49(\s+)to(\s+)2\.04",
+        r"supplies\g<1>1.49\2to\g<3>2.40",
+        "home internet's share of our thresholds and BLS's",
+    ),
+    (
+        "home internet's share of ours, Other spread",
+        'section',
+        r"1\.78(\s+)to(\s+)2\.44(\s+)percent(\s+)of(\s+)ours",
+        r"1.78\1to\g<2>2.45\3percent\4of\5ours",
+        "home internet's share of our thresholds and BLS's",
+    ),
+    (
+        "evaluation's home internet change",
+        'evaluation',
+        r"by(\s+)−0\.27(\s+)points(\s+)and",
+        r"by\1−0.72\2points\3and",
+        "evaluation section cites BLS's imputed renter points and our changes",
+    ),
+    (
+        "evaluation's benefits change",
+        'evaluation',
+        r"by(\s+)\+0\.25(\s+)points",
+        r"by\1+0.52\2points",
+        "evaluation section cites BLS's imputed renter points and our changes",
+    ),
+    (
+        "discussion's home internet growth change",
+        'discussion',
+        r"by(\s+)−0\.54(\s+)to(\s+)\+4\.33",
+        r"by\1−0.54\2to\g<3>+4.34",
+        'discussion growth changes from home internet and the benefits',
+    ),
+    (
+        "discussion's benefits growth change",
+        'discussion',
+        r"by(\s+)−1\.63(\s+)to(\s+)−0\.17",
+        r"by\1−1.63\2to\g<3>−0.71",
+        'discussion growth changes from home internet and the benefits',
+    ),
+    (
+        "discussion's home internet lift",
+        'discussion',
+        r"by(\s+)0\.3(\s+)to(\s+)4\.0(\s+)percent",
+        r"by\g<1>0.3\2to\g<3>4.1\4percent",
+        'discussion home internet and in-kind lift ranges',
+    ),
+    (
+        "discussion's home internet lift direction",
+        'discussion',
+        r"internet(\s+)raises(\s+)our(\s+)levels",
+        r"internet\1lowers\2our\3levels",
+        'discussion home internet and in-kind lift ranges',
+    ),
+    (
+        'replication standard errors without home internet',
+        'replication',
+        r"for(\s+)the(\s+)replication(\s+)with(\s+)home(\s+)internet(\s+)added",
+        r"for\1the\2replication\3without\4home\5internet",
+        "replication standard errors relative to BLS's",
+    ),
+    (
+        "abstract home internet lift",
+        'abstract',
+        r"by(\s+)0\.3(\s+)to(\s+)4\.0(\s+)percent",
+        r"by\g<1>0.3\2to\g<3>4.1\4percent",
+        'abstract home internet lift range',
+    ),
+    (
+        "abstract standard-error clause moves to home internet",
+        'abstract',
+        r"4\.0(\s+)percent\.([\s\S]*?)summaries,(\s+)each(\s+)change(\s+)within(\s+)one(\s+)standard(\s+)error(\s+)of(\s+)zero\.",
+        r"4.0\1percent, each change within one standard error of zero.\2summaries.",
+        'abstract and discussion: each change within one standard error',
+    ),
+    (
+        "abstract benefits' growth change given to home internet",
+        'abstract',
+        r"percent(\s+)and(\s+)change(\s+)2022–2025",
+        r"percent\1and\2home internet costs change\g<3>2022–2025",
+        'abstract stage-change range',
+    ),
+    (
+        "discussion levels claim given to BLS",
+        'discussion',
+        r"We(\s+)estimate(\s+)that(\s+)adding(\s+)home(\s+)internet(\s+)raises",
+        r"BLS\1estimates\2that\3adding\4home\5internet\6raises",
+        'discussion home internet and in-kind lift ranges',
+    ),
+    (
+        "discussion credits home internet with the shelter definitions' move",
+        'discussion',
+        r"shelter(\s+)definitions(\s+)also(\s+)move(\s+)them",
+        r"shelter\1definitions\2and\3home internet\3also move\4them",
+        'discussion home internet and in-kind lift ranges',
+    ),
+    (
+        "WIC threshold moves without our estimate",
+        'section',
+        r"it,(\s+)we(\s+)estimate(\s+)that(\s+)those(\s+)thresholds(\s+)move",
+        r"it,\1those\5thresholds\6move",
+        'WIC by-state sensitivity from the imputation receipt',
+    ),
+    (
+        "abstract home internet lift direction",
+        'abstract',
+        r"it(\s+)raises(\s+)replicated",
+        r"it\1lowers\2replicated",
+        'abstract home internet lift range',
+    ),
+    (
+        "run count",
+        'section',
+        r"replication(\s+)three(\s+)ways",
+        r"replication\1four\2ways",
+        "three runs, the first reproducing the retrospective replication",
+    ),
+    (
+        "the second run claims the exact reproduction",
+        'section',
+        r"The(\s+)first(\s+)run(\s+)reproduces",
+        r"The\1second\2run\3reproduces",
+        "three runs, the first reproducing the retrospective replication",
+    ),
+    (
+        "appendix names the run with home internet as the reproduction",
+        'appendix',
+        r"run(\s+)without(\s+)home(\s+)internet(\s+)or(\s+)benefits(\s+)reproduces",
+        r"run\1with\2home\3internet\6reproduces",
+        "three runs, the first reproducing the retrospective replication",
+    ),
+    (
+        "section 3 includes home internet",
+        'replication',
+        r"We(\s+)omit(\s+)home-internet(\s+)spending",
+        r"We\1include\2home-internet\3spending",
+        "section 3 replication omits home internet",
+    ),
+    (
+        "growth caption swaps the second and third rows",
+        'section',
+        r"benefits,(\s+)with(\s+)home(\s+)internet,(\s+)and(\s+)with(\s+)both\.",
+        r"benefits,\1with\2both,\4and\5with\6home internet.",
+        "growth table caption names the stages in row order",
+    ),
+    (
+        "growth caption puts the standard deviation in the second row",
+        'section',
+        r"In(\s+)the(\s+)third(\s+)row,",
+        r"In\1the\2second\3row,",
+        "growth table caption names the stages in row order",
+    ),
+    (
+        "growth caption's Garner–Munoz row count",
+        'section',
+        r"In(\s+)the(\s+)final(\s+)three(\s+)rows",
+        r"In\1the\2final\3two\4rows",
+        "growth table caption names the stages in row order",
+    ),
+    (
+        "levels caption drops home internet",
+        'section',
+        r"replication(\s+)with(\s+)home(\s+)internet(\s+)and(\s+)imputed(\s+)in-kind(\s+)benefits(\s+)from",
+        r"replication\1with\5imputed\6in-kind\7benefits\8from",
+        "levels table caption names the stage with both",
+    ),
+    (
+        "discussion's standard-error clause moves to home internet",
+        'discussion',
+        r"\+4\.33(\s+)points\.(\s+)We(\s+)estimate",
+        r"+4.33\1points, each change within one standard error of zero.\2We\3estimate",
+        'discussion growth changes from home internet and the benefits',
+    ),
+    (
+        "discussion drops the benefits' standard-error clause",
+        'discussion',
+        r"points,(\s+)each(\s+)change(\s+)within(\s+)one(\s+)standard(\s+)error(\s+)of(\s+)zero\.",
+        r"points.",
+        'abstract and discussion: each change within one standard error',
+    ),
+    (
+        "implicate share without the benefits' scope",
+        'section',
+        r"For(\s+)each(\s+)of(\s+)the(\s+)benefits'(\s+)changes(\s+)to(\s+)2022–2025(\s+)growth,",
+        r"For\1each\2change,",
+        "implicate share of the stage change's variance",
+    ),
+    (
+        "band scope drops home internet",
+        'section',
+        r"In(\s+)our(\s+)band(\s+)with(\s+)home(\s+)internet(\s+)and(\s+)the(\s+)benefits,",
+        r"In\1our\2band\3with\7the\8benefits,",
+        "home internet in our band and BLS's",
+    ),
+    (
+        "evaluation's home internet change without its period",
+        'evaluation',
+        r"replication's(\s+)2024–2025(\s+)renter",
+        r"replication's\1renter",
+        "evaluation section cites BLS's imputed renter points and our changes",
+    ),
+    (
+        "our home internet share stage drops home internet",
+        'section',
+        r"of(\s+)ours(\s+)with(\s+)home(\s+)internet(\s+)and(\s+)the(\s+)benefits",
+        r"of\1ours\2with\6the\7benefits",
+        "home internet's share of our thresholds and BLS's",
     ),
 )
 
@@ -2453,12 +2771,12 @@ SECTION_MARKER_CASES = (
         (
             (
                 DISCUSSION_HEADING,
-                "# Imputing in-kind benefits {#sec-inkind}\n\n" + DISCUSSION_HEADING,
+                "# Home internet and in-kind benefits {#sec-inkind}\n\n" + DISCUSSION_HEADING,
             ),
         ),
         (
             "paper section heading not unique: "
-            "'# Imputing in-kind benefits {#sec-inkind}' occurs 2 times",
+            "'# Home internet and in-kind benefits {#sec-inkind}' occurs 2 times",
             "current tenure-sensitivity prose",
         ),
     ),
@@ -2657,7 +2975,8 @@ SECTION_MARKER_CASES = (
             "no text to slice for paper section '## Projecting expenditure records and rolling windows'",
             "no text to slice for paper section '## Projecting local relative housing costs'",
             "rolling real-growth sensitivities in stated order with their block counts",
-            "in-kind prose: discussion stage-change range",
+            "in-kind prose: discussion home internet and in-kind lift ranges",
+            "in-kind prose: discussion growth changes from home internet and the benefits",
         ),
     ),
 )
@@ -2665,6 +2984,7 @@ SECTION_MARKER_CASES = (
 # The in-kind ties that read the abstract, labeled as the guard reports them.
 INKIND_ABSTRACT_TIE_LABELS = (
     "in-kind prose: abstract in-kind lift range",
+    "in-kind prose: abstract home internet lift range",
     "in-kind prose: abstract and discussion: each change within one standard error",
     "in-kind prose: abstract and discussion: the accounting's shares",
     "in-kind prose: abstract stage-change range",
@@ -3239,6 +3559,34 @@ class PaperGuardTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("current projection prose replication_ratio", result.stdout)
 
+    def test_projection_and_backtest_figures_quoted_elsewhere_still_pin(self):
+        """The in-kind section also quotes 0.90 and 0.76, so a drifted
+        abstract blend or benchmark blend must still fail its own pin."""
+        path = self.repo / "paper/index.qmd"
+        text = path.read_text()
+        for number, old, new, label in (
+            (
+                "0.90",
+                "0.90 percent with an equal blend",
+                "0.91 percent with an equal blend",
+                "abstract current projection blend 0.90",
+            ),
+            (
+                "0.76",
+                "The equal blend scores 0.76 percent",
+                "The equal blend scores 0.77 percent",
+                "backtest prose literal 0.76",
+            ),
+        ):
+            with self.subTest(label=label):
+                self.assertEqual(text.count(old), 1)
+                self.assertGreater(len(re.findall(rf"(?<![\d.]){re.escape(number)}(?!\d)", text)), 1)
+                path.write_text(text.replace(old, new))
+                result = self.run_guard()
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(label, result.stdout)
+        path.write_text(text)
+
     def test_signed_cpi_u_bias_pins_its_sign(self):
         path = self.repo / "paper/index.qmd"
         text = path.read_text()
@@ -3735,7 +4083,7 @@ class PaperGuardTests(unittest.TestCase):
             targets[year]["sample_mean_wic_threshold_year_dollars"] += 1
 
         def push_growth_past_the_stated_bound(receipts):
-            # 0.031 still rounds to the 0.03 the prose states, and the 2025
+            # 0.031 still rounds to the 0.03 the prose states, and the 2022
             # thresholds are restated to give it.
             growth = sensitivity(receipts)["growth_2022_2025_change_points"]
             tenure = max(growth, key=lambda tenure: abs(growth[tenure]))
@@ -3758,24 +4106,46 @@ class PaperGuardTests(unittest.TestCase):
             self.assertTrue(unmoved, "every threshold moves")
             targets[unmoved[0]]["sample_mean_wic_threshold_year_dollars"] -= 1
 
+        def quoted_extremes(receipts):
+            """The rounded extremes the prose quotes, over the years whose
+            mean WIC rises."""
+            targets = sensitivity(receipts)["by_target"]
+            results = receipts[INKIND_NAMES[1]]["results"]
+            risen = [
+                year
+                for year in targets
+                if targets[year]["sample_mean_wic_threshold_year_dollars"]
+                - results[year]["sample_mean_in_kind_threshold_year_dollars"]["wic"]
+                > 1e-9
+            ]
+            moves = [move for year in risen for move in targets[year]["change_dollars"].values()]
+            percents = [move for year in risen for move in targets[year]["change_percent"].values()]
+            return tuple(f"{value:+.0f}" for value in (min(moves), max(moves))) + tuple(
+                f"{value:+.2f}" for value in (min(percents), max(percents))
+            )
+
         def set_growth_changes(receipts, changes):
-            """Give the rerun's 2025 thresholds the 2022–2025 growth changes
+            """Give the rerun's 2022 thresholds the 2022–2025 growth changes
             asked for, and restate every figure that follows from them, so
-            the block stays consistent and its quoted extremes stay put."""
+            the block stays consistent. 2025 holds the lowest move the prose
+            quotes, so the fixture restates 2022 and checks that the quoted
+            extremes stay put."""
             block = sensitivity(receipts)
             targets = block["by_target"]
             results = receipts[INKIND_NAMES[1]]["results"]
+            quoted = quoted_extremes(receipts)
             for tenure, change in changes.items():
                 base_growth = 100 * (
                     results["2025"]["with_in_kind"][tenure] / results["2022"]["with_in_kind"][tenure] - 1
                 )
-                level = targets["2022"]["with_in_kind"][tenure] * (1 + (base_growth + change) / 100)
-                moved = level - results["2025"]["with_in_kind"][tenure]
-                set_threshold(targets, "2025", tenure, level)
-                targets["2025"]["change_dollars"][tenure] = moved
-                targets["2025"]["change_percent"][tenure] = 100 * moved / results["2025"]["with_in_kind"][tenure]
+                level = targets["2025"]["with_in_kind"][tenure] / (1 + (base_growth + change) / 100)
+                moved = level - results["2022"]["with_in_kind"][tenure]
+                set_threshold(targets, "2022", tenure, level)
+                targets["2022"]["change_dollars"][tenure] = moved
+                targets["2022"]["change_percent"][tenure] = 100 * moved / results["2022"]["with_in_kind"][tenure]
                 block["growth_2022_2025_percent_with"][tenure] = base_growth + change
                 block["growth_2022_2025_change_points"][tenure] = change
+            self.assertEqual(quoted_extremes(receipts), quoted, "a restated threshold moved a quoted extreme")
 
         def shrink_growth_well_below_the_stated_bound(receipts):
             # The prose's "0.03 points or less" must be the bound, not a loose one.
@@ -3783,21 +4153,21 @@ class PaperGuardTests(unittest.TestCase):
             set_growth_changes(receipts, {tenure: math.copysign(0.004, growth[tenure]) for tenure in growth})
 
         def break_the_run_of_moved_years(receipts):
-            # 2022 stops moving while 2021 and 2023–2025 still do, so the
-            # prose's "2021–2025" would cover a year with no change. 2022's
-            # moves are no extreme the prose quotes, and the 2025 thresholds
-            # are restated so that 2022–2025 growth changes as before.
+            # 2024 stops moving while 2021–2023 and 2025 still do, so the
+            # prose's "2021–2025" would cover a year with no change. 2024
+            # lies outside the 2022–2025 growth window, and its moves are no
+            # extreme the prose quotes.
             targets = sensitivity(receipts)["by_target"]
             results = receipts[INKIND_NAMES[1]]["results"]
-            growth = dict(sensitivity(receipts)["growth_2022_2025_change_points"])
-            targets["2022"]["sample_mean_wic_threshold_year_dollars"] = results["2022"][
+            quoted = quoted_extremes(receipts)
+            targets["2024"]["sample_mean_wic_threshold_year_dollars"] = results["2024"][
                 "sample_mean_in_kind_threshold_year_dollars"
             ]["wic"]
-            for tenure in targets["2022"]["change_dollars"]:
-                targets["2022"]["change_dollars"][tenure] = 0.0
-                targets["2022"]["change_percent"][tenure] = 0.0
-                set_threshold(targets, "2022", tenure, results["2022"]["with_in_kind"][tenure])
-            set_growth_changes(receipts, growth)
+            for tenure in targets["2024"]["change_dollars"]:
+                targets["2024"]["change_dollars"][tenure] = 0.0
+                targets["2024"]["change_percent"][tenure] = 0.0
+                set_threshold(targets, "2024", tenure, results["2024"]["with_in_kind"][tenure])
+            self.assertEqual(quoted_extremes(receipts), quoted, "2024 held a quoted extreme")
 
         def misstate_a_percent(receipts):
             # Dollars unchanged, so only the percent's tie to them can fail.
@@ -3937,7 +4307,7 @@ class PaperGuardTests(unittest.TestCase):
 
     def test_resealed_inkind_receipts_must_agree_with_their_sources(self):
         replication = self.inkind_replication()
-        replication["results"]["2025"]["without_in_kind"]["renter"] += 1
+        replication["results"]["2025"]["without_home_internet"]["renter"] += 1
         with self.subTest(stage="component receipt still names the old replication"):
             self.reseal_inkind(INKIND_NAMES[1], replication)
             result = self.run_guard()
@@ -3952,8 +4322,9 @@ class PaperGuardTests(unittest.TestCase):
             self.assertIn("generators were not run", result.stdout)
 
     def test_internally_consistent_inkind_edit_fails_the_cross_receipt_check(self):
-        """Shift one threshold with its implicates and lift, so the replication
-        receipt agrees with itself; the component receipt still disagrees."""
+        """Shift one threshold with its implicates, lift and stage effect, so
+        the replication receipt agrees with itself; the component receipt
+        still disagrees."""
         replication = self.inkind_replication()
         record = replication["results"]["2025"]
         for draw in record["with_in_kind_by_implicate"]:
@@ -3962,12 +4333,15 @@ class PaperGuardTests(unittest.TestCase):
         record["in_kind_lift_percent"]["renter"] = 100 * (
             record["with_in_kind"]["renter"] / record["without_in_kind"]["renter"] - 1
         )
+        record["stage_effects"]["in_kind_dollars"]["renter"] += 5
+        record["stage_effects"]["in_kind_percent"]["renter"] = record["in_kind_lift_percent"]["renter"]
         self.reseal_inkind_replication(replication)
         result = self.run_guard()
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("package run with 2025 renter", result.stdout)
         self.assertNotIn("implicate mean", result.stdout)
         self.assertNotIn("in-kind lift 2025", result.stdout)
+        self.assertNotIn("in-kind stage 2025", result.stdout)
         self.assertIn("generators were not run", result.stdout)
 
     def test_inkind_table_drift_is_detected_without_repair(self):
@@ -4050,10 +4424,10 @@ class PaperGuardTests(unittest.TestCase):
 
     def test_inkind_pins_reject_a_figure_borrowed_from_another_section(self):
         cases = (
-            ("rental assistance share", (("supplies \\$162 and school", "supplies \\$126 and school"),),
+            ("rental assistance share", (("supplies \\$175 and school", "supplies \\$157 and school"),),
              "difference in rises by benefit",
-             "Of the \\$251 difference between the two rises, rental assistance supplies \\$162 and school "
-             "lunch \\$97, and the other three benefits narrow it by \\$8."),
+             "Of the \\$259 difference between the two rises, rental assistance supplies \\$175 and school "
+             "lunch \\$92, and the other three benefits narrow it by \\$9."),
             ("renter split", (("5.71 percent, 0.62", "5.71 percent, 0.66"),),
              "BLS 2024-2025 renter growth without its imputed terms",
              "With its imputed benefits' terms removed from both years, it grows 5.71 percent, 0.62 points less."),
@@ -4193,13 +4567,15 @@ class PaperGuardTests(unittest.TestCase):
         decimal written without its leading zero, with a decimal comma or
         split by a space, a tied figure restated in other wording, a whole
         number at a range's first end or in a contrast, the abstract's first
-        lift range reversed or rounded beside a correct copy, or extended, a
-        new year, a thousands separator, and a year with an apostrophe, a
-        question mark, or straight or curly quotes, double or single, or
-        followed by any other mark the abstract's prose allows. A range whose
-        first end carries the rule's unit fails that rule's tie too. A year in
-        parentheses before a semicolon or a colon passes, since the check
-        strips ( ) , . ; : from each number's ends."""
+        lift range reversed or rounded beside a correct copy, a new year, a
+        thousands separator, and a year with an apostrophe, a question mark,
+        or straight or curly quotes, double or single, or followed by any
+        other mark the abstract's prose allows. A range whose first end
+        carries the rule's unit fails that rule's tie too, and so does the
+        first lift range extended by a whole number, since the home internet
+        tie reads "percent" after it. A year in parentheses before a semicolon
+        or a colon passes, since the check strips ( ) , . ; : from each
+        number's ends."""
         self.install_article()
         block = PAPER_TEXT.block_words((self.repo / "paper/index.qmd").read_text(), "abstract")
         # Copy the abstract's lift sentence from the first word after the
@@ -4259,7 +4635,7 @@ class PaperGuardTests(unittest.TestCase):
             (
                 "lift range extended by a whole number",
                 ((rf"to(\s+){re.escape(high)}(\s+)percent", f"to\\g<1>{high}\u20134\\g<2>percent"),),
-                [ABSTRACT_INVENTORY],
+                [ABSTRACT_INVENTORY, "in-kind prose: abstract home internet lift range"],
             ),
             ("year added", ((renters, "renters in 2024."),), [ABSTRACT_INVENTORY]),
             ("thousands separator", ((renters, "renters, across 10,000 records."),), [ABSTRACT_INVENTORY]),
@@ -4400,8 +4776,13 @@ class PaperGuardTests(unittest.TestCase):
                 "stage-change range reworded",
                 r"points(\s+)per(\s+)tenure",
                 r"points\1per\2household",
-                "change 2022–2025 growth by −0.63 to +1.04 points per tenure with the CE's spending summaries",
-                ["in-kind prose: abstract stage-change range"],
+                "We estimate that they raise thresholds by a further 0.5 to 3.5 percent and change 2022–2025 "
+                "growth by −1.63 to −0.17 points per tenure with the CE's spending summaries, each change within "
+                "one standard error of zero.",
+                [
+                    "in-kind prose: abstract stage-change range",
+                    "in-kind prose: abstract and discussion: each change within one standard error",
+                ],
             ),
         )
         places = {

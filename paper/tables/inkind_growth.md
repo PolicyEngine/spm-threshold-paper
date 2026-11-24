@@ -4,8 +4,11 @@
 | BLS FCSUti price index | 14.19% | 14.19% | 14.19% |
 | BLS thresholds | 21.61% | 20.63% | 22.15% |
 | Replication | 21.15% | 18.79% | 20.37% |
-| With imputed benefits | 21.21% (0.38) | 19.82% (1.08) | 19.74% (0.60) |
+| With home internet | 21.15% | 23.12% | 19.82% |
+| With home internet and benefits | 20.98% (0.31) | 21.49% (1.13) | 19.55% (0.41) |
 | Replication, FCSUti index | 22.08% | 20.81% | 21.48% |
-| With imputed benefits | 22.10% (0.46) | 21.76% (1.00) | 20.88% (0.50) |
+| With home internet | 22.13% | 22.99% | 21.11% |
+| With home internet and benefits | 22.23% (0.35) | 21.84% (0.79) | 20.69% (0.39) |
 | Garner–Munoz restrictions, FCSUti index | 21.44% | 20.94% | 21.46% |
-| With imputed benefits | 21.55% (0.26) | 21.16% (1.46) | 21.43% (0.37) |
+| With home internet | 21.67% | 23.47% | 21.07% |
+| With home internet and benefits | 22.17% (0.08) | 20.12% (0.82) | 21.01% (0.43) |
