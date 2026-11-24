@@ -245,15 +245,15 @@ INKIND_PROSE_MUTATIONS = (
     (
         'swapped stage changes',
         'section',
-        r"by(\s+)−0\.17,(\s+)−1\.63,",
-        r"by\1−1.63,\2−0.17,",
+        r"by(\s+)−0\.19,(\s+)−1\.62,",
+        r"by\1−1.62,\2−0.19,",
         'stage changes in tenure order',
     ),
     (
         'rental assistance share of the difference',
         'section',
-        r"\\\$175",
-        r"\\$157",
+        r"\\\$174",
+        r"\\$147",
         'difference in rises by benefit',
     ),
     (
@@ -288,8 +288,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         'abstract stage changes',
         'abstract',
-        r"−1\.63(\s+)to(\s+)−0\.17(\s+)points",
-        r"−1.63\1to\g<2>−0.71\3points",
+        r"−1\.62(\s+)to(\s+)−0\.19(\s+)points",
+        r"−1.62\1to\g<2>−0.91\3points",
         'abstract stage-change range',
     ),
     (
@@ -352,8 +352,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         'stage-change standard error',
         'section',
-        r"3\.19(\s+)for",
-        r"3.91\1for",
+        r"3\.18(\s+)for",
+        r"3.81\1for",
         'standard errors of the stage change',
     ),
     ("replicate count", "section", r"CE's(\s+)44(\s+)replicate", r"CE's\g<1>40\2replicate", "standard errors of the stage change"),
@@ -441,8 +441,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         'rental assistance level gap direction',
         'section',
-        r"60(\s+)to(\s+)89(\s+)percent(\s+)above",
-        r"60\1to\g<2>89\3percent\4below",
+        r"58(\s+)to(\s+)87(\s+)percent(\s+)above",
+        r"58\1to\g<2>87\3percent\4below",
         'rental assistance per renter: level gap before 2024',
     ),
     (
@@ -462,8 +462,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "renter shortfall direction",
         "section",
-        r"benefits(\s+)trails(\s+)BLS's(\s+)by(\s+)2\.59",
-        r"benefits\1exceeds\2BLS's\3by\g<4>2.59",
+        r"benefits(\s+)trails(\s+)BLS's(\s+)by(\s+)2\.58",
+        r"benefits\1exceeds\2BLS's\3by\g<4>2.58",
         "renter shortfall with imputed terms removed",
     ),
     (
@@ -555,8 +555,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         'swapped stages in the 2024-2025 renter growth',
         'section',
-        r"at(\s+)4\.85(\s+)percent(.*?)internet,(\s+)and(\s+)4\.83",
-        r"at\g<1>4.83\2percent\3internet,\4and\g<5>4.85",
+        r"at(\s+)4\.85(\s+)percent(.*?)internet,(\s+)and(\s+)4\.82",
+        r"at\g<1>4.82\2percent\3internet,\4and\g<5>4.85",
         'replication 2024-2025 renter growth in three stages',
     ),
     (
@@ -576,8 +576,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         'standard error of our rise',
         'section',
-        r"standard(\s+)error(\s+)of(\s+)\\\$190",
-        r"standard\1error\2of\3\\$109",
+        r"standard(\s+)error(\s+)of(\s+)\\\$189",
+        r"standard\1error\2of\3\\$198",
         'BLS and replication imputed totals',
     ),
     (
@@ -670,6 +670,97 @@ INKIND_PROSE_MUTATIONS = (
         r"we(\s+)count(\s+)one(\s+)pregnant(\s+)woman",
         r"we\1count\2two\3pregnant\4women",
         "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "WIC state food cost",
+        "section",
+        r"per(\s+)person(\s+)in(\s+)that(\s+)state,",
+        r"per\1person\2in\3the\4nation,",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "WIC withheld-state food cost donors",
+        "section",
+        r"had(\s+)not(\s+)fully(\s+)implemented(\s+)WIC(\s+)EBT,(\s+)weighting",
+        r"had\1fully\3implemented\4WIC\5EBT,\6weighting",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "WIC withheld-state cell",
+        "section",
+        r"same(\s+)region,(\s+)collection(\s+)year,(\s+)and(\s+)collection(\s+)quarter(\s+)whose",
+        r"same\1region\2and\3collection\4year\7whose",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "WIC withheld-state draw weights",
+        "section",
+        r"the(\s+)weighted(\s+)share(\s+)of(\s+)known-state(\s+)units",
+        r"the\1unweighted\2share\3of\4known-state\5units",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "WIC withheld-state annual value",
+        "section",
+        r"at(\s+)twelve(\s+)times(\s+)a(\s+)weighted(\s+)mean(\s+)monthly",
+        r"at\1a\4weighted\5mean\6monthly",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "WIC donor survey weights",
+        "section",
+        r"weighting(\s+)each(\s+)unit(\s+)by(\s+)its(\s+)survey(\s+)weight",
+        r"weighting\1each\2state\3by\4its\5WIC\6caseload",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "WIC EBT midpoint timing",
+        "section",
+        r"implemented(\s+)WIC(\s+)EBT(\s+)by(\s+)the(\s+)midpoint(\s+)of(\s+)its",
+        r"implemented\1WIC\2EBT\3after\4the\5midpoint\6of\7its",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "WIC cell without known-state units",
+        "section",
+        r"as(\s+)having(\s+)done(\s+)so(\s+)and(\s+)add(\s+)no(\s+)WIC\.",
+        r"as\1having\2done\3so\4and\5add\6their\7WIC.",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "WIC donor cost year",
+        "section",
+        r"matches(\s+)the(\s+)cell's(\s+)reference(\s+)year",
+        r"matches\1the\2donor's\3interview\4year",
+        "method constants read from fingerprinted calculator code",
+    ),
+    (
+        "WIC years valued with state averages",
+        "section",
+        r"add(\s+)WIC,(\s+)2014(\s+)to(\s+)2019\.",
+        r"add\1WIC,\g<2>2015\3to\g<4>2019.",
+        "WIC years valued with state averages",
+    ),
+    (
+        "Census national average until its 2021 report",
+        "section",
+        r"September(\s+)2021(\s+)report,",
+        r"September\g<1>2020\2report,",
+        "WIC years valued with state averages",
+    ),
+    (
+        "WIC state averages source",
+        "section",
+        r"The(\s+)Census(\s+)Bureau's(\s+)SPM(\s+)team(\s+)compiled",
+        r"The\1Food\2and\3Nutrition\4Service\5compiled",
+        "WIC food cost from the Census SPM team's state averages",
+    ),
+    (
+        "WIC state averages provided as received",
+        "section",
+        r"We(\s+)publish(\s+)their(\s+)table(\s+)as(\s+)received",
+        r"We\1publish\2their\3table\4as\5revised",
+        "WIC food cost from the Census SPM team's state averages",
     ),
     (
         "income imputations",
@@ -788,8 +879,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         'Garner–Munoz stage change',
         'section',
-        r"by(\s+)\+0\.42,(\s+)−4\.45,",
-        r"by\1+0.42,\2−4.54,",
+        r"by(\s+)\+0\.41,(\s+)−4\.49,",
+        r"by\1+0.41,\2−4.94,",
         'Garner–Munoz restrictions with the composite CPI',
     ),
     (
@@ -816,8 +907,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         'standard error of our rental rise',
         'section',
-        r"with(\s+)a(\s+)standard(\s+)error(\s+)of(\s+)\\\$453",
-        r"with\1a\2standard\3error\4of\5\\$435",
+        r"with(\s+)a(\s+)standard(\s+)error(\s+)of(\s+)\\\$452",
+        r"with\1a\2standard\3error\4of\5\\$425",
         "rental assistance per renter: BLS's 2024 and 2025 rise",
     ),
     (
@@ -844,8 +935,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         're-ranking sign',
         'section',
-        r"−0\.27,(\s+)−1\.72,",
-        r"−0.27,\1+1.72,",
+        r"−0\.28,(\s+)−1\.70,",
+        r"−0.28,\1+1.70,",
         're-ranking left out of the accounting',
     ),
     (
@@ -872,15 +963,15 @@ INKIND_PROSE_MUTATIONS = (
     (
         'school lunch rise standard error',
         'section',
-        r"\\\$47(\s+)for(\s+)school(\s+)lunch",
-        r"\\$74\1for\2school\3lunch",
+        r"\\\$46(\s+)for(\s+)school(\s+)lunch",
+        r"\\$64\1for\2school\3lunch",
         'standard errors of the rises in band amounts',
     ),
     (
         'lift standard errors',
         'section',
-        r"0\.26(\s+)to(\s+)0\.57",
-        r"0.26\1to\g<2>0.75",
+        r"0\.27(\s+)to(\s+)0\.57",
+        r"0.27\1to\g<2>0.75",
         "standard errors of the benefits' lifts",
     ),
     (
@@ -1302,8 +1393,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         'by-state WIC rise',
         'section',
-        r"\\\$1\.94(\s+)to(\s+)\\\$3\.20",
-        r"\\$1.94\1to\2\\$3.02",
+        r"\\\$2\.07(\s+)to(\s+)\\\$3\.45",
+        r"\\$2.07\1to\2\\$3.54",
         'WIC by-state sensitivity from the imputation receipt',
     ),
     (
@@ -1316,15 +1407,15 @@ INKIND_PROSE_MUTATIONS = (
     (
         'by-state WIC threshold moves in dollars',
         'section',
-        r"move(\s+)by(\s+)−\\\$5(\s+)to",
-        r"move\1by\2+\\$5\3to",
+        r"move(\s+)by(\s+)−\\\$9(\s+)to",
+        r"move\1by\2+\\$9\3to",
         'WIC by-state sensitivity from the imputation receipt',
     ),
     (
         'by-state WIC threshold moves in percent',
         'section',
-        r"\(−0\.01(\s+)to(\s+)\+0\.05(\s+)percent\)",
-        r"(−0.01\1to\g<2>+0.50\3percent)",
+        r"\(−0\.03(\s+)to(\s+)\+0\.06(\s+)percent\)",
+        r"(−0.03\1to\g<2>+0.60\3percent)",
         'WIC by-state sensitivity from the imputation receipt',
     ),
     (
@@ -1529,8 +1620,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         'Garner–Munoz lower bound with benefits',
         'section',
-        r"by(\s+)0\.76(\s+)to(\s+)3\.63",
-        r"by\g<1>0.67\2to\g<3>3.63",
+        r"by(\s+)0\.75(\s+)to(\s+)3\.63",
+        r"by\g<1>0.57\2to\g<3>3.63",
         'Garner–Munoz range with benefits and home internet',
     ),
     (
@@ -1543,8 +1634,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "Garner–Munoz growth against BLS's",
         'section',
-        r"BLS's(\s+)by(\s+)\+0\.56,",
-        r"BLS's\1by\2+0.65,",
+        r"BLS's(\s+)by(\s+)\+0\.54,",
+        r"BLS's\1by\2+0.45,",
         "Garner–Munoz restrictions with BLS's index",
     ),
     (
@@ -1557,8 +1648,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "our band's home internet against BLS's",
         'section',
-        r"by(\s+)−1\.1(\s+)to(\s+)\+3\.1",
-        r"by\1−1.1\2to\g<3>+3.2",
+        r"by(\s+)−1\.1(\s+)to(\s+)\+3\.2",
+        r"by\1−1.1\2to\g<3>+2.3",
         "home internet in our band and BLS's",
     ),
     (
@@ -1585,8 +1676,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "evaluation's benefits change",
         'evaluation',
-        r"by(\s+)\+0\.25(\s+)points",
-        r"by\1+0.52\2points",
+        r"by(\s+)\+0\.24(\s+)points",
+        r"by\1+0.42\2points",
         "evaluation section cites BLS's imputed renter points and our changes",
     ),
     (
@@ -1599,8 +1690,8 @@ INKIND_PROSE_MUTATIONS = (
     (
         "discussion's benefits growth change",
         'discussion',
-        r"by(\s+)−1\.63(\s+)to(\s+)−0\.17",
-        r"by\1−1.63\2to\g<3>−0.71",
+        r"by(\s+)−1\.62(\s+)to(\s+)−0\.19",
+        r"by\1−1.62\2to\g<3>−0.91",
         'discussion growth changes from home internet and the benefits',
     ),
     (
@@ -3560,32 +3651,29 @@ class PaperGuardTests(unittest.TestCase):
         self.assertIn("current projection prose replication_ratio", result.stdout)
 
     def test_projection_and_backtest_figures_quoted_elsewhere_still_pin(self):
-        """The in-kind section also quotes 0.90 and 0.76, so a drifted
-        abstract blend or benchmark blend must still fail its own pin."""
-        path = self.repo / "paper/index.qmd"
-        text = path.read_text()
-        for number, old, new, label in (
+        """A drifted abstract blend or benchmark blend must fail its own pin
+        even where another section quotes the same number. Each case restates
+        the number under the discussion heading, so the case holds whether or
+        not the in-kind figures happen to share it."""
+        for quoted, old, new, label in (
             (
-                "0.90",
+                "0.90 percent with an equal blend",
                 "0.90 percent with an equal blend",
                 "0.91 percent with an equal blend",
                 "abstract current projection blend 0.90",
             ),
             (
-                "0.76",
+                "0.76 percent",
                 "The equal blend scores 0.76 percent",
                 "The equal blend scores 0.77 percent",
                 "backtest prose literal 0.76",
             ),
         ):
             with self.subTest(label=label):
-                self.assertEqual(text.count(old), 1)
-                self.assertGreater(len(re.findall(rf"(?<![\d.]){re.escape(number)}(?!\d)", text)), 1)
-                path.write_text(text.replace(old, new))
-                result = self.run_guard()
-                self.assertNotEqual(result.returncode, 0)
-                self.assertIn(label, result.stdout)
-        path.write_text(text)
+                self.assert_article_mutation_fails(
+                    label, ((old, new),), label, DISCUSSION_HEADING, f"Another estimate reaches {quoted}."
+                )
+        self.install_article()
 
     def test_signed_cpi_u_bias_pins_its_sign(self):
         path = self.repo / "paper/index.qmd"
@@ -4006,6 +4094,37 @@ class PaperGuardTests(unittest.TestCase):
             )
         )
 
+    def test_paper_states_the_wic_and_summer_ebt_rules_the_receipt_states(self):
+        def limitations(receipts):
+            return receipts[INKIND_NAMES[1]]["limitations"]
+
+        def reword(receipts, old, new):
+            texts = limitations(receipts)
+            matches = [i for i, text in enumerate(texts) if old in text]
+            self.assertEqual(len(matches), 1, texts)
+            texts[matches[0]] = texts[matches[0]].replace(old, new)
+
+        def value_wic_at_a_national_average(receipts):
+            reword(receipts, "WIC applies the Census SPM team's state averages", "WIC applies USDA's national average")
+
+        def count_school_year_pebt(receipts):
+            reword(receipts, "and excludes school-year P-EBT", "and counts school-year P-EBT")
+
+        self.assert_resealed_receipts_fail(
+            (
+                (
+                    "WIC food cost",
+                    value_wic_at_a_national_average,
+                    ("WIC food cost from the Census SPM team's state averages",),
+                ),
+                (
+                    "summer P-EBT",
+                    count_school_year_pebt,
+                    ("school lunch EBT caveat reaches 2022's summer Pandemic EBT",),
+                ),
+            )
+        )
+
     def test_wic_ebt_dates_follow_the_fns_table_the_receipt_hashes(self):
         def change_the_fns_table(receipts):
             receipts[INKIND_NAMES[1]]["in_kind_methodology"]["parameter_files_sha256"][
@@ -4014,6 +4133,32 @@ class PaperGuardTests(unittest.TestCase):
 
         self.assert_resealed_receipts_fail(
             (("FNS table", change_the_fns_table, ("WIC EBT dates from the calculator's FNS table",)),)
+        )
+
+    def test_wic_citation_follows_the_census_table_the_receipt_hashes(self):
+        def change_the_census_table(receipts):
+            receipts[INKIND_NAMES[1]]["in_kind_methodology"]["parameter_files_sha256"][
+                "census_wic_state_monthly_cost.csv"
+            ] = "0" * 64
+
+        def drop_the_census_table(receipts):
+            del receipts[INKIND_NAMES[1]]["in_kind_methodology"]["parameter_files_sha256"][
+                "census_wic_state_monthly_cost.csv"
+            ]
+
+        self.assert_resealed_receipts_fail(
+            (
+                ("changed Census table", change_the_census_table, ("WIC food cost from the Census SPM team's state averages",)),
+                ("missing Census table", drop_the_census_table, ("WIC food cost from the Census SPM team's state averages",)),
+            )
+        )
+
+    def test_unset_wic_cutoff_fails_by_name(self):
+        def unset_the_cutoff(receipts):
+            receipts[INKIND_NAMES[1]]["in_kind_methodology"]["wic_ebt_all_states_from_reference_year"] = None
+
+        self.assert_resealed_receipts_fail(
+            (("unset WIC cutoff", unset_the_cutoff, ("WIC years valued with state averages",)),)
         )
 
     def test_paper_adds_no_2025_wic_only_while_the_receipt_adds_none(self):
@@ -4264,6 +4409,8 @@ class PaperGuardTests(unittest.TestCase):
         inkind = (inkind, original.index("\n}\n", inkind) + 3)
         se = original.index("@misc{spmcalculator2026se")
         se = (se, original.index("\n}\n", se) + 3)
+        wic = original.index("@misc{spmcalculator2026wictable")
+        wic = (wic, original.index("\n}\n", wic) + 3)
 
         def in_entry(entry, old, new):
             start, end = entry
@@ -4274,6 +4421,9 @@ class PaperGuardTests(unittest.TestCase):
             ("stale standard-error commit", in_entry(se, uncertainty, stale_uncertainty)),
             ("stale components link", in_entry(inkind, f"blob/{components}/", f"blob/{stale_components}/")),
             ("stale standard-error link", in_entry(se, f"blob/{uncertainty}/", f"blob/{stale_uncertainty}/")),
+            ("stale WIC table commit", in_entry(wic, f"commit {replication},", f"commit {stale_replication},")),
+            ("stale WIC table link", in_entry(wic, f"blob/{replication}/", f"blob/{stale_replication}/")),
+            ("WIC table link to the main branch", in_entry(wic, f"blob/{replication}/", "blob/main/")),
             (
                 "note names the imputation's old commit",
                 original.replace(
@@ -4293,6 +4443,7 @@ class PaperGuardTests(unittest.TestCase):
         self.assertEqual(original.count(note), 1)
         self.assertEqual(original[inkind[0] : inkind[1]].count(components), 2)
         self.assertEqual(original[se[0] : se[1]].count(uncertainty), 2)
+        self.assertEqual(original[wic[0] : wic[1]].count(replication), 2)
         for name, edited in cases:
             with self.subTest(name=name):
                 self.assertNotEqual(edited, original)
@@ -4424,10 +4575,10 @@ class PaperGuardTests(unittest.TestCase):
 
     def test_inkind_pins_reject_a_figure_borrowed_from_another_section(self):
         cases = (
-            ("rental assistance share", (("supplies \\$175 and school", "supplies \\$157 and school"),),
+            ("rental assistance share", (("supplies \\$174 and school", "supplies \\$147 and school"),),
              "difference in rises by benefit",
-             "Of the \\$259 difference between the two rises, rental assistance supplies \\$175 and school "
-             "lunch \\$92, and the other three benefits narrow it by \\$9."),
+             "Of the \\$260 difference between the two rises, rental assistance supplies \\$174 and school "
+             "lunch \\$92, and the other three benefits narrow it by \\$6."),
             ("renter split", (("5.71 percent, 0.62", "5.71 percent, 0.66"),),
              "BLS 2024-2025 renter growth without its imputed terms",
              "With its imputed benefits' terms removed from both years, it grows 5.71 percent, 0.62 points less."),
@@ -4777,7 +4928,7 @@ class PaperGuardTests(unittest.TestCase):
                 r"points(\s+)per(\s+)tenure",
                 r"points\1per\2household",
                 "We estimate that they raise thresholds by a further 0.5 to 3.5 percent and change 2022–2025 "
-                "growth by −1.63 to −0.17 points per tenure with the CE's spending summaries, each change within "
+                "growth by −1.62 to −0.19 points per tenure with the CE's spending summaries, each change within "
                 "one standard error of zero.",
                 [
                     "in-kind prose: abstract stage-change range",
