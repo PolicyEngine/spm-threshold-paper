@@ -1528,6 +1528,10 @@ BIB_TEXT = (REPO / "bibliography" / "references.bib").read_text()
 
 # The page the bibliography links for each calculator commit.
 CALCULATOR_DOC = "https://github.com/PolicyEngine/spm-calculator/blob/{}/docs/ce-inkind-imputation.md"
+# The Census SPM team's state WIC table, as the imputation receipt's commit holds it.
+CALCULATOR_WIC_TABLE = (
+    "https://github.com/PolicyEngine/spm-calculator/blob/{}/spm_calculator/data/inkind/census_wic_state_monthly_cost.csv"
+)
 
 
 def inkind_bib_note(commits):
@@ -1702,22 +1706,49 @@ def displayed_shares() -> list[float] | None:
 
 # Method constants the section quotes from the calculator's code rather
 # than from a receipt. We read each from spm_calculator/ce_inkind.py at
-# this fingerprint (calculator commit 2321f2f). Since 4778dfa, the file has
-# changed two rules: the 2020 WIC cutoff, quoted below, and the broadband
+# this fingerprint (calculator commit 83afa0c). Since 4778dfa, the file has
+# changed three rules: the 2020 WIC cutoff, quoted below, the broadband
 # start (reference year 2022), which the receipt records and a pin below
-# reads. Since e602bc7 it has changed only a docstring and the diagnostics
-# entry it gives a program before its first reference year, which now has
-# a new status and names that year. A receipt rebuilt from changed code
-# fails the pin until someone rereads them.
+# reads, and, since 948c6e1, the WIC food cost, which now comes from the
+# Census SPM team's state table, with a cell mean where the CE withholds
+# the state, both quoted below. A receipt rebuilt from changed code fails
+# the pin until someone rereads them.
 INKIND_METHOD_SOURCE = (
     "spm_calculator/ce_inkind.py",
-    "97d0b6b76982bab9d9c7e9d15d5c1723f667adbbfe54432533eaf1ebf198bdd8",
+    "1240e2707e666a42b2b46932cd23b259f1be43c03588c4c57dbd16e87553a729",
 )
 INKIND_METHOD_CONSTANTS = (
     "over 179 school days",  # NSLP_SCHOOL_DAYS
     "free rate below 150 percent of the poverty line",  # FREE_LUNCH_POVERTY_RATIO
     "split the income groups at 150 percent of the official poverty line",  # the same ratio, for cells
-    "twelve months of USDA's national average monthly food cost",  # 12.0 * cost in the WIC stage
+    # per_unit = participants * 12.0 * monthly in the WIC stage;
+    # _wic_monthly_cost looks up wic_state_monthly_food_cost() by the unit's
+    # state and reference year
+    "Where the CE reports the unit's state, we value each participant's WIC at twelve times the average monthly "
+    "WIC food cost per person in that state, for the fiscal year that matches the unit's reference year",
+    # _wic_known_state_complete: a known state counts as finished when its
+    # FNS statewide date is on or before the midpoint of the unit's reference
+    # period, 1.5 months before the interview month (ordinal <= midpoint);
+    # the FNS table itself is pinned below
+    "For earlier reference years, we take each state's statewide date from FNS and add no WIC when the unit's state "
+    "had fully implemented WIC EBT by the midpoint of its three-month reference period",
+    # _wic_cells: (region, CE year, collection quarter); _wic_ebt_complete
+    # draws a withheld-state unit's status from its cell's share of
+    # known-state survey weight (FINLWT21) whose state had finished WIC EBT
+    "When the CE withholds a unit's state, we draw that status with probability equal to the weighted share of "
+    "known-state units in the same region, collection year, and collection quarter whose states had done so",
+    # _wic_ebt_complete: prob = 1.0 where the cell has no known-state weight
+    "Where that cell has no known-state unit, as when the CE also withholds the region, we count the state as "
+    "having done so and add no WIC",
+    # _wic_monthly_cost: a withheld-state unit takes the survey-weighted
+    # mean of the state values of its cell's known-state units whose state had
+    # not finished WIC EBT by the midpoint of their own reference periods,
+    # each looked up at the unit's reference year, which its cell (CE year
+    # and collection quarter) fixes; per_unit then multiplies by 12.0
+    "If a unit with a withheld state takes WIC, we value each participant's WIC at twelve times a weighted mean "
+    "monthly food cost per person",
+    "We average over the cell's known-state units whose states had not fully implemented WIC EBT, weighting each "
+    "unit by its survey weight and taking its state's cost for the fiscal year that matches the cell's reference year",
     # _wic_participants: n_lt5 children, plus a mother when n_infants > 0
     # and n_women_15_plus >= 1; otherwise one participant. Census's rule
     # has no woman test. Every narrow-universe unit has a woman aged 15 or
@@ -1876,6 +1907,13 @@ INKIND_WIC_DATES_SOURCE = (
     "usda_wic_ebt_statewide.csv",
     "6a61a4e0f1307f0a15e1c0a7c72a65e8be231a0fd1a6cdfb6c468c617a5d40f3",
 )
+# The Census SPM team's table of state average monthly WIC food costs per
+# person, which the paper cites at the replication commit
+# (spm_calculator/data/inkind/census_wic_state_monthly_cost.csv).
+INKIND_WIC_COST_SOURCE = (
+    "census_wic_state_monthly_cost.csv",
+    "1fc672d44ffbd6b7b58c26d1d1a44c884a07c85ef1786962b0b23b7812a3c704",
+)
 INKIND_WIC_DATES_CONSTANTS = (
     "including in six states whose WIC agencies implemented EBT statewide between June and September 2020, "
     "from Hawaii to Illinois [@fnswicebt2022]",
@@ -1885,6 +1923,12 @@ INKIND_WIC_DATES_CONSTANTS = (
     "its date",
 )
 replication_receipt = json.loads((DATA / "inkind" / "ce_inkind_replication_2019_2025.json").read_text())
+# Reference years in which the imputation adds WIC to any CE unit.
+wic_amount_years = sorted(
+    int(year)
+    for year, row in replication_receipt["imputation_diagnostics"]["wic"].items()
+    if row["ce_mean_amount_per_unit"] > 0
+)
 
 
 def wic_by_state_pin() -> bool:
@@ -1983,7 +2027,7 @@ def wic_by_state_pin() -> bool:
 # The rental-assistance sensitivities: scripts/rent_sensitivity.py writes this
 # receipt, so replacing it takes an edit here.
 RENT_SENSITIVITY = DATA / "rent_sensitivity" / "rent_model_sensitivity_2022.json"
-RENT_SENSITIVITY_SHA256 = "f503130b124943991969c7a8b97460f884bad38dde0eae58e3c6d48f04ea052b"
+RENT_SENSITIVITY_SHA256 = "f36ab621dc597643084cab0957b8791f69744358b31a2ebe8566b25c7b9e609a"
 rent_sensitivity = json.loads(RENT_SENSITIVITY.read_text())
 rent_variants = {
     name: row["percent_vs_base"] for name, row in rent_sensitivity["variants"].items()
@@ -2816,11 +2860,51 @@ inkind_pins = (
         # respondents who report EBT and not SNAP. The receipt's limitation
         # must say the same, so a rewording there sends someone back here.
         "school lunch EBT caveat reaches 2022's summer Pandemic EBT",
-        any("for 2022 it counts summer P-EBT" in limitation for limitation in replication_receipt["limitations"])
+        any(
+            "For 2022, it counts summer P-EBT (summer EBT in its technical documentation) and excludes "
+            "school-year P-EBT" in limitation
+            for limitation in replication_receipt["limitations"]
+        )
         and has_number(
             "Census accounts for Pandemic EBT in its 2020 and 2021 values and for summer Pandemic EBT in its 2022 "
             "values [@spmtechnical; @shrider2023]. States paid those benefits on EBT cards, so under BLS's "
             "reasoning for SNAP, reported food spending may already include them",
+            text=INKIND_TEXT,
+        ),
+    ),
+    (
+        # The receipt's WIC limitation names the Census SPM team's state
+        # averages; the paper's method sentence must name the same source.
+        "WIC food cost from the Census SPM team's state averages",
+        inkind_method["parameter_files_sha256"].get(INKIND_WIC_COST_SOURCE[0]) == INKIND_WIC_COST_SOURCE[1]
+        and any(
+            limitation.startswith("WIC applies the Census SPM team's state averages of the monthly food cost per person")
+            for limitation in replication_receipt["limitations"]
+        )
+        and has_number(
+            "The Census Bureau's SPM team compiled these state averages from the WIC program data of USDA's Food "
+            "and Nutrition Service (FNS) and provided them to us. We publish their table as received in the "
+            "calculator's repository [@spmcalculator2026wictable]",
+            text=INKIND_TEXT,
+        ),
+    ),
+    (
+        # The reference years with WIC, from the imputation's diagnostics, all
+        # before the cutoff; Census used USDA's national average until its
+        # September 2021 report (Burns and Fox 2021, p. 1).
+        "WIC years valued with state averages",
+        bool(wic_amount_years)
+        and wic_amount_years == list(range(wic_amount_years[0], wic_amount_years[-1] + 1))
+        and isinstance(replication_receipt["in_kind_methodology"]["wic_ebt_all_states_from_reference_year"], int)
+        and wic_amount_years[-1] < replication_receipt["in_kind_methodology"]["wic_ebt_all_states_from_reference_year"]
+        and has_number(
+            "Census valued WIC at USDA's national average until its September 2021 report, when it adopted state "
+            "averages and recomputed its 2019 estimates with them [@burnsfox2021]",
+            text=INKIND_TEXT,
+        )
+        and has_number(
+            "We apply the state averages in every reference year in which we add WIC, "
+            f"{wic_amount_years[0] if wic_amount_years else ''} to {wic_amount_years[-1] if wic_amount_years else ''}",
             text=INKIND_TEXT,
         ),
     ),
@@ -2876,7 +2960,9 @@ inkind_pins = (
         bib_field("spmcalculator2026inkind", "note") == inkind_bib_note(receipt_commits)
         and bib_field("spmcalculator2026inkind", "url") == CALCULATOR_DOC.format(receipt_commits[COMPONENTS])
         and bib_field("spmcalculator2026se", "note") == f"Commit {receipt_commits[UNCERTAINTY]}"
-        and bib_field("spmcalculator2026se", "url") == CALCULATOR_DOC.format(receipt_commits[UNCERTAINTY]),
+        and bib_field("spmcalculator2026se", "url") == CALCULATOR_DOC.format(receipt_commits[UNCERTAINTY])
+        and bib_field("spmcalculator2026wictable", "note") == f"Data file at commit {receipt_commits[REPLICATION]}, as received"
+        and bib_field("spmcalculator2026wictable", "url") == CALCULATOR_WIC_TABLE.format(receipt_commits[REPLICATION]),
     ),
     (
         "appendix names the recorded calculator commits",
